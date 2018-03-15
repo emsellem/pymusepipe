@@ -70,13 +70,13 @@ class check_plot(object):
         self.get_set_spectra()
         self.get_set_images()
 
-    def open_cube(self, cube_folder"./", cube_name=None) :
+    def open_cube(self, cube_folder="./", cube_name=None) :
         """Open the cube
         """
         self.cube_folder = cube_folder
         self._isCube = True
         self.cube_name = cube_name
-        if cubein is None | not os.isfile(cube_folder + cubein):
+        if (cubein is None) | (not os.isfile(cube_folder + cubein)):
             self._isCube = False
         else :
             self._isCube = True
@@ -86,19 +86,19 @@ class check_plot(object):
         else :
             print("WARNING: No Cube is defined, yet")
 
-    def open_image(self, image_folder"./", image_name=None) :
+    def open_image(self, image_folder="./", image_name=None) :
         """Open the image
         """
         self.image_folder = image_folder
         self._isImage = True
         self.image_name = image_name
-        if imagein is None | not os.isfile(image_folder + imagein):
+        if (imagein is None) | (not os.isfile(image_folder + imagein)):
             self._isImage = False
         else :
             self._isImage = True
         self.image_galaxy = Image(image_folder + image_name)
 
-    def get_spectrum(self, nx=None, ny=None, width=0) :
+    def get_spectrum_from_cube(self, nx=None, ny=None, width=0) :
         if not self._isCube : 
             print("WARNING: No Cube is defined, yet")
             return
@@ -107,31 +107,30 @@ class check_plot(object):
         if ny == None : ny = self.spaxel_centralcoord[1] // 2
         width2 = width // 2
         return (self.cube_galaxy[:, ny - width2: ny + width2 + 1, 
-                    nx - width2: nx + width2 + 1]).sum(axis=1,2)
+                    nx - width2: nx + width2 + 1]).sum(axis=(1,2))
 
-    def get_image(self, nlambda=None, width=0) :
+    def get_image_from_cube(self, nlambda=None, width=0) :
         if not self._isCube : 
             print("WARNING: No Cube is defined, yet")
             return
 
         if nlambda == None : nlambda = 1472
         width2 = width // 2
-        return (self.cube_galaxy[nlambda - width2: nlambda + width2 + 1, 
-            :, :).sum(axis=0)
+        return (self.cube_galaxy[nlambda - width2: nlambda + width2 + 1, :, :].sum(axis=0))
 
     def get_set_images(self) :
         """Get a set of standard images from the Cube
         """
-        self.
+        pass
 
     def get_set_spectra(self) :
         """Get a set of standard spectra from the Cube
         """
         if self._isCube :
             self.spec_fullgalaxy = self.cube_galaxy.sum(axis=(1,2))
-            self.spec_4quad = get_quadrant_spectrum()
-            self.spec_central_aper = [get_spectrum(width=0), 
-                   get_spectrum(width=20), get_spectrum(width=40))
+            self.spec_4quad = get_quadrant_spectrum_from_cube()
+            self.spec_central_aper = [get_spectrum_from_cube(width=0), 
+                   get_spectrum_from_cube(width=20), get_spectrum_from_cube(width=40)]
 
     def get_quadrant_spectra(self, width=0) :
         """Get quadrant spectra from the Cube
@@ -148,13 +147,16 @@ class check_plot(object):
         nx4 = self.cube_galaxy.shape[2] // 4
         nx34, ny34 = 3 * nx4, 3 * ny4
 
-        spec1 = self.get_spectrum( nx4,  ny4, width) 
-        spec2 = self.get_spectrum( nx4, ny34, width) 
-        spec3 = self.get_spectrum(nx34,  ny4, width) 
-        spec4 = self.get_spectrum(nx34, ny34, width) 
+        spec1 = self.get_spectrum_from_cube( nx4,  ny4, width) 
+        spec2 = self.get_spectrum_from_cube( nx4, ny34, width) 
+        spec3 = self.get_spectrum_from_cube(nx34,  ny4, width) 
+        spec4 = self.get_spectrum_from_cube(nx34, ny34, width) 
         return spec1, spec2, spec3, spec4
 
     def check_bias(self) :
+        pass
+        # bias = RawFile(self. ..)
+
         pass
     def check_flat(self) :
         pass

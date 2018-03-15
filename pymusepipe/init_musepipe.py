@@ -165,6 +165,7 @@ class init_muse_parameters(object) :
                    "init_musepipe.py").format(param=key))
             setattr(self, key, dic_param[key])
 
+
 ####################################################
 # Defining classes to get samples and objects
 ####################################################
@@ -188,6 +189,3 @@ class musepipe_target(object) :
 
         self.pointing = pointing
         self.run = self.info_pointings[pointing]
-
-    def init_folders(self) :
-        self.ra

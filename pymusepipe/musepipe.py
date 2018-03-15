@@ -136,7 +136,7 @@ def feed_sof(sof_filename, folderin="", list_files=[], type_files="BIAS", verbos
     """Feeding an sof file with some filename (which can be a list)
     and a type (e.g., BIAS=default)
     """
-    sof_file = open(sof_filename, "w+")
+    sof_file = open(sof_filename, "a")
     print("Writing in file {0}".format(folderin + sof_filename))
 
     for filename in list_files :
@@ -144,6 +144,18 @@ def feed_sof(sof_filename, folderin="", list_files=[], type_files="BIAS", verbos
         sof_file.write(text_to_write)
         if verbose :
             print(text_to_write)
+
+def changeto_dir(self, path) :
+    """Changing directory and keeping memory of the old working one
+    """
+    prev_folder = os.getcwd()
+    try: 
+        os.chdir(path)
+    except OSError:
+        if not os.path.isdir(path):
+            raise
+
+    return prev_folder
 
 #########################################################################
 # Main class
@@ -191,8 +203,6 @@ class muse_pipe(object):
         # Set up the default parameters
         self.galaxyname = galaxyname
         self.pointing = pointing
-        self.my_params.data_folder = "{0}/P{1:02d}".format(self.galaxyname, self.pointing)
-        self.my_params.fulldata_folder = self.my_params.root_folder + self.my_params.data_folder
 
         if outlog is None : 
             outlog = "log_{timestamp}".format(timestamp=create_time_name())
@@ -203,8 +213,6 @@ class muse_pipe(object):
         self.redo = redo
         self.align_file = align_file
 
-        # Recording the folder where we start
-        self.orig_wd = os.getcwd()
         # Mode of the observations
         self.mode = mode
         # Checking if mode is correct
@@ -222,15 +230,20 @@ class muse_pipe(object):
         if self.verbose:
             print("Creating directory structure")
             print("Going to the data folder {0}".format(self.my_params.fulldata_folder))
+
+        # Create full path folder 
+        self.create_fullpaths()
+
         # Go to the data directory
-        os.chdir(self.my_params.fulldata_folder)
+        # and Recording the folder where we start
+        self.orig_wd = changeto_dir(self.my_params.fulldata_folder)
 
         # Init the Master folder
         safely_create_folder(self.my_params.mastercalib_folder)
         # Init the Master exposure flag dictionary
         self.Master = {}
         for mastertype in listMaster_dic.keys() :
-            [masterfolder,mastername] = listMaster_dic[mastertype]
+            [masterfolder, mastername] = listMaster_dic[mastertype]
             safely_create_folder(self.my_params.mastercalib_folder + masterfolder)
             self.Master[mastertype] = False
         self.check_for_calibrations(verbose=False)
@@ -251,7 +264,24 @@ class muse_pipe(object):
         # Selecting the ones which 
         self.select_run_tables()
         # Going back to initial working directory
-        os.chdir(self.orig_wd)
+        old_folder = changeto_dir(self.orig_wd)
+
+    def create_fullpath_names() :
+        """Create full path names to be used
+        """
+        # initialisation of the full paths 
+        self.my_params.data_folder = "{0}/P{1:02d}".format(self.galaxyname, self.pointing)
+        self.paths.root = self.my_params.root_folder
+        self.paths.fulldata = self.paths.root + self.my_params.data_folder
+        self.path.master = self.paths.root + self.my_params.mastercalib_folder
+        self.path.sky = self.paths.root + self.my_params.sky_folder
+        self.path.reduced = self.paths.root + self.my_params.reducedfiles_folder
+        self.path.raw = self.paths.root + self.my_params.rawdata_folder
+        self.path.cubes = self.paths.root + self.my_params.cubes_folder
+
+        for mastertype in listMaster_dic.keys() :
+            name_attr = mastertype.lower()
+            setattr(self.paths, name_attr, self.paths.master + getattr(self.my_params, expotype))
 
     def probe_files(self, rawfolder=None, verbose=None) :
         """Determine which files are in the raw folder
@@ -265,14 +295,10 @@ class muse_pipe(object):
             self.my_params.rawdata_folder = rawfolder
 
         # Check the raw folder
-        if os.path.isdir(rawfolder) : 
-            os.chdir(rawfolder)
-        else : 
-            print("ERROR: rawfolder {rawfolder} is not an existing folder".format(rawfolder=rawfolder))
-            return
+        prev_folder = changeto_dir(self.my_params.fulldata_folder + rawfolder)
 
         if verbose : print(("Probing the files in the (rawdata) "
-                         "{rawfolder} folder").format(rawfolder=rawfolder))
+                         "{rawfolder} folder").format(rawdata=rawdata, rawfolder=rawfolder))
 
         # Extracting the fits Headers and processing them
         command = ("fitsheader -e 0 -k '{0}' -t ascii.tab "
@@ -374,7 +400,11 @@ class muse_pipe(object):
             except AttributeError:
                 pass
 
-    def create_calibrations(self):
+   def set_full_path_folders(self) :
+      root_folder = self.my_params.fulldata_folder
+      self.my_params.bias_folder = root_folder + 
+
+   def create_calibrations(self):
         self.check_for_calibrations()
         # MdB: this creates the standard calibrations, if needed
         if not ((self.redo==0) and (self.Master['BIAS']==1)):
@@ -498,6 +528,8 @@ class muse_pipe(object):
                 return
         else : expoBIAS = self.BIAS
 
+        # Go to the data folder
+        prev_folder = changeto_dir(self.my_params.fulldata_folder)
         # Feeding the sof input file
         feed_sof(sof_filename, self.my_params.rawdata_folder, expoBIAS, "BIAS")
 
@@ -506,6 +538,8 @@ class muse_pipe(object):
                    "--merge {sof}".format(CPU0=self.cpu0, CPU1=self.cpu1, 
                        outlog=self.outlog, sof=sof_filename))
         run_oscommand(command)
+        # Go back to original folder
+        os.chdir(prev_folder)
 
     def run_bias(self, expoBIAS=None):
        
