@@ -29,7 +29,7 @@ name_final_datacube = "DATACUBE_FINAL.fits"
 class check_pipe(muse_pipe) :
     """Checking the outcome of the data reduction
     """
-    def __init__(self, pdf_name="check_pipe.pdf", pipe=None, **kwargs) :
+    def __init__(self, pdf_name="check_pipe.pdf", pipe=None, standard_set=True, **kwargs) :
         if pipe is not None:
             self.__dict__.update(pipe.__dict__)
         else :
@@ -38,17 +38,21 @@ class check_pipe(muse_pipe) :
         self.cube = muse_cube(filename=joinpath(self.paths.reduced, name_final_datacube))
         self.pdf = graph_muse(pdf_name=pdf_name)
 
-        # getting standard spectra
-        self.cube.get_set_spectra()
+        if standard_set :
+            # getting standard spectra
+            self.cube.get_set_spectra()
 
-        # plotting all standard data
-        self.check_quadrants()
-        # plotting the white image and Ha image
-        self.check_white_Ha_image()
-        # closing the pdf
-        self.pdf.close()
+            # plotting all standard data
+            self.check_quadrants()
+            # plotting the white image and Ha image
+            self.check_white_Ha_image()
+
+            # closing the pdf
+            self.pdf.close()
 
     def check_quadrants(self) :
+        """Checking spectra from the 4 quadrants
+        """
         self.pdf.plot_page(self.cube.spec_4quad)
 
     def check_master_bias_flat(self) :
