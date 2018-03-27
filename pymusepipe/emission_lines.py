@@ -54,3 +54,9 @@ list_emission_lines = {
         "Pa" :         [18751.01,  18756.13],
         "Brg" :	       [21655.29,  21661.20],
             }
+
+            
+def print_emission_lines() :
+    """Printing the names of the various emission lines
+    """
+    print(list_emission_lines.keys())

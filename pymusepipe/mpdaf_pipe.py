@@ -49,7 +49,7 @@ __version__ = '0.0.1 (15 March 2018)'
 def doppler_shift(wavelength, velocity=0.):
     """Return the redshifted wavelength
     """
-    doppler_factor = np.sqrt((1. + velocity / const.c) / (1. - velocity / const.c))
+    doppler_factor = np.sqrt((1. + velocity / const.c.value) / (1. - velocity / const.c.value))
     return wavelength * doppler_factor
 
 #########################################################################
@@ -68,10 +68,7 @@ class muse_cube(Cube):
         if source is not None:
             self.__dict__.update(source.__dict__)
         else :
-#            filename = joinpath(cube_folder, cube_name)
-#            if os.path.isfile(filename) :
-#                Cube.__init__(self, filename=filename, **kwargs)
-                Cube.__init__(self, **kwargs)
+            Cube.__init__(self, **kwargs)
  
         self.verbose = verbose
 
@@ -87,7 +84,7 @@ class muse_cube(Cube):
         return muse_spectrum(source=subcube.sum(axis=(1,2)), title=title)
 
     def get_whiteimage_from_cube(self) :
-        return muse_image(source=self.sum(axis=0))
+        return muse_image(source=self.sum(axis=0), title="White Image")
 
     def get_image_from_cube(self, nlambda=None, width=0) :
         """Get image from integrated cube, with spectral pixel
@@ -140,7 +137,7 @@ class muse_cube(Cube):
         # Get the velocity
         if redshift is not None : velocity = redshift * const.c
 
-        if line not in emission_lines :
+        if line not in list_emission_lines :
             print("ERROR: could not guess the emission line you wish to use")
             print("ERROR: please review the 'emission_line' dictionary")
             return
@@ -149,19 +146,16 @@ class muse_cube(Cube):
             print("ERROR: please choose between one of these media: {0}".format(index_line.key()))
             return
 
-        wavel = emission_lines[line][index_line[medium]]
-        red_wavel = doppler_shift[wavel, velocity]
+        wavel = list_emission_lines[line][index_line[medium]]
+        red_wavel = doppler_shift(wavel, velocity)
         
-        try :
-            self.images[line] = self.select_lambda(red_wavel - width/2., red_wavel + width/2.)
-        except AttributeError :
-            self.images = {}
-            self.images[line] = self.select_lambda(red_wavel - width/2., red_wavel + width/2.)
+        return muse_image(self.select_lambda(red_wavel - width/2., red_wavel + width/2.).sum(axis=0), 
+                      title="{0} map".format(line))
 
 class muse_image(Image): 
     """Wrapper around the mpdaf Image functionalities
     """
-    def __init__(self, source=None, title="Frame", scale='log', vmin=0, colorbar='v', verbose=False, **kwargs) :
+    def __init__(self, source=None, **kwargs) :
         """Initialisation of the opening of an Image
         """
         if source is not None:
@@ -169,28 +163,24 @@ class muse_image(Image):
         else :
             Image.__init__(self, **kwargs)
  
-        self.verbose = verbose
+        self.verbose = kwargs.get('verbose', False)
         # Arguments for the plots
-        self.title = title
-        self.scale = scale
-        self.vmin = vmin
-        self.colorbar = colorbar
+        self.title = kwargs.get('title', "Frame")
+        self.scale = kwargs.get('scale', "log")
+        self.vmin = np.int(kwargs.get('vmin', 0))
+        self.colorbar = kwargs.get('colorbar', "v")
         self.get_fwhm_startend()
 
     def get_fwhm_startend(self) :
         """Get range of FWHM
         """
-        if self._isImage :
-            self.fwhm_startobs = self.image.primary_header['HIERARCH ESO TEL AMBI FWHM START']
-            self.fwhm_endobs = self.image.primary_header['HIERARCH ESO TEL AMBI FWHM END']
-        else :
-            if self.verbose :
-                print("WARNING: image not yet opened, hence no header to be read")
+        self.fwhm_startobs = self.primary_header['HIERARCH ESO TEL AMBI FWHM START']
+        self.fwhm_endobs = self.primary_header['HIERARCH ESO TEL AMBI FWHM END']
 
 class museset_images(list) :
     """Set of images
     """
-    def __new__(self, add_number=True, *args, **kwargs):
+    def __new__(self, *args, **kwargs):
         return super(museset_images, self).__new__(self, args, kwargs)
 
     def __init__(self, *args, **kwargs):
@@ -199,10 +189,10 @@ class museset_images(list) :
         else:
             list.__init__(self, args)
         self.__dict__.update(kwargs)
+
+        # required attributes
         self.nimages = len(self)
-        if add_number :
-            for i in range(len(self)) :
-                self[0].title += " {0:2d}".format(i+1)
+        self.subtitle = kwargs.get('subtitle', "")
 
     def __call__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -220,7 +210,7 @@ class museset_images(list) :
 class muse_spectrum(Spectrum): 
     """Wrapper around the mpdaf Spectrum functionalities
     """
-    def __init__(self, source=None, title="Spectrum", verbose=False, **kwargs) :
+    def __init__(self, source=None, **kwargs) :
         """Initialisation of the opening of spectra
         """
         if source is not None:
@@ -228,9 +218,9 @@ class muse_spectrum(Spectrum):
         else :
             Spectrum.__init__(self, **kwargs)
 
-        self.verbose = verbose
+        self.verbose = kwargs.get('verbose', False)
         # Arguments for the plots
-        self.title = title
+        self.title = kwargs.get('title', "Spectrum")
 
 class museset_spectra(list) :
     """Set of spectra
@@ -244,28 +234,11 @@ class museset_spectra(list) :
         else:
             list.__init__(self, args)
         self.__dict__.update(kwargs)
+
+        ## 2 required attributes
         self.nspectra = len(self)
+        self.subtitle = kwargs.get('subtitle', "")
 
     def __call__(self, **kwargs):
         self.__dict__.update(kwargs)
         return self
-
-#    def __init__(self, spectra_list=None, subtitle="", add_number=True) :
-#        """Initialise the list
-#        """
-#        self.nspectra = 0
-#        self.spectra = []
-#        self.subtitle = subtitle
-#
-#        for spectrum in spectra_list :
-#            self.add_spectrum(spectrum, add_number=add_number)
-#
-#    def add_spectrum(self, spectrum, add_number=True) :
-#        """Add a spectrum to the set
-#        """
-#        spectrum.id = self.nspectra
-#        if isinstance(spectrum, Spectrum) :
-#            spectrum = muse_spectrum(source=spectrum)
-#        if add_number :
-#            spectrum.title += " {0:2d}".format(spectrum.id)
-#        self.spectra.append(spectrum)

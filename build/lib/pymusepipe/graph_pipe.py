@@ -46,27 +46,30 @@ class graph_muse(object):
     """Graphic output to check MUSE data reduction products
     """
     
-    def __init__(self, folder_fig='./', name_of_figure='drs_check.pdf', 
+    def __init__(self, pdf_name='drs_check.pdf', 
             figsize=(10,14), rect_layout=[0, 0.03, 1, 0.95], verbose=True) :
         """Initialise the class for plotting the outcome results
         """
         self.verbose = verbose
-        self.figure_name = name_of_figure
-        self.pp = PdfPages(name_of_figure)
+        self.pdf_name = pdf_name
+        self.pp = PdfPages(pdf_name)
         self.figsize = figsize
         self.rect_layout = rect_layout
-        self.npage = 0
+        self.npages = 0
 
-    def savepage_and_close(self) :
-        self.pp.savefig()
+    def close(self) :
         self.pp.close()
-        self.npage += 1
+
+    def savepage(self) :
+        self.pp.savefig()
+        plt.close()
+        self.npages += 1
 
     def start_page(self) :
         """Start the page
         """
         if self.verbose :
-            print("Starting page {0}".format(self.npage))
+            print("Starting page {0}".format(self.npages+1))
         plt.figure(figsize=self.figsize)
 
     def plot_page(self, list_data) :
@@ -101,7 +104,7 @@ class graph_muse(object):
             elif isinstance(data, museset_images) :
                 self.plot_set_images(data)
 
-        self.savepage_and_close()
+        self.savepage()
 
     def plot_set_spectra(self, set_of_spectra=None, add_sky_lines=False,
             color='red', ls='--', alpha=0.3) :
@@ -115,9 +118,7 @@ class graph_muse(object):
             print("ERROR: list of spectra is empty")
             return
 
-        nspec = len(set_of_spectra)
-
-        for i in range(nspec) :
+        for i in range(set_of_spectra.nspectra) :
             self.list_ax.append(plt.subplot(self.gs[self.count_lines,:]))
             self.count_lines += 1
             set_of_spectra[i].plot(title=set_of_spectra[i].title, ax=self.list_ax[-1])
@@ -127,36 +128,18 @@ class graph_muse(object):
 
         plt.tight_layout(rect=self.rect_layout)
 
-    def plot_set_images(self, list_of_images=None, scales=None, titles=None) :
+    def plot_set_images(self, set_of_images=None) :
         """Plotting a set of images
         """
-        if self.verbose :
-            print("Starting Page {0}".format(self.npage + 1))
-
-        if list_of_images is None :
+        if set_of_images is None :
             print("ERROR: list of images is empty")
             return
 
-        nima = len(list_of_images)
-        if scales is None : myscales = ['log'] * nima
-        else : myscales = scales
-
-        if len(scales) != nima :
-            print("ERROR: scales should have the same number of items than images")
-            return
-
-        if titles is None : mytitles = ['Frame {0}'.format(i+1) for i in range(nima)]
-        else :
-            if len(titles) != nima :
-                print("ERROR: titles should have the same number of items than images")
-                return
-            mytitles = ['Frame {0} - {1}'.format(i+1, titles[i]) for i in range(nima)]
-
-        for i in range(nima) :
-            self.count_cols = i%2
-            self.list_ax.append(plt.subplot(self.gs[self.count_lines:self.count_lines+2,self.counts_cols:1-self.count_cols]))
-            self.count_lines += 2
-            image = list_of_images[i]
+        for i in range(set_of_images.nimages) :
+            count_cols = i%2
+            self.list_ax.append(plt.subplot(self.gs[self.count_lines: self.count_lines + 2, count_cols]))
+            self.count_lines += count_cols * 2
+            image = set_of_images[i]
             image.plot(scale=image.scale, vmin=image.vmin, colorbar=image.colorbar, title=image.title, ax=self.list_ax[-1])
 
         plt.tight_layout(rect=self.rect_layout)
