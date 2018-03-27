@@ -16,7 +16,7 @@ import numpy as np
 import os
 from os.path import join as joinpath
 
-from graph_musepipe import graph_musepipe
+from graph_pipe import graph_muse
 
 __version__ = '0.0.1 (15 March 2018)'
 
