@@ -24,13 +24,13 @@ try :
 except ImportError :
     raise Exception("mpdaf is required for this - MUSE related - module")
 
-from mpdaf.obj import Cube
-from mpdaf.obj import Image
-from mpdaf.obj import Spectrum
+from mpdaf.obj import Cube, Image
+from mpdaf.obj import Spectrum, WaveCoord
 
 # Astropy
-from astropy.io import fits
+from astropy.io import fits as pyfits
 from astropy import constants as const
+from astropy import units as units
 
 from emission_lines import list_emission_lines
 
@@ -152,23 +152,34 @@ class muse_cube(Cube):
         return muse_image(self.select_lambda(red_wavel - width/2., red_wavel + width/2.).sum(axis=0), 
                       title="{0} map".format(line))
 
+def get_sky_spectrum(filename) :
+    """Read sky spectrum from MUSE data reduction
+    """
+    sky = pyfits.getdata(filename)
+    crval = sky['lambda'][0]
+    cdelt = sky['lambda'][1] - crval
+    wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit= units.angstrom)
+    spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
+    return spec
+
 class muse_image(Image): 
     """Wrapper around the mpdaf Image functionalities
     """
     def __init__(self, source=None, **kwargs) :
         """Initialisation of the opening of an Image
         """
+        self.verbose = kwargs.pop('verbose', False)
+        # Arguments for the plots
+        self.title = kwargs.pop('title', "Frame")
+        self.scale = kwargs.pop('scale', "log")
+        self.vmin = np.int(kwargs.pop('vmin', 0))
+        self.colorbar = kwargs.pop('colorbar', "v")
+
         if source is not None:
             self.__dict__.update(source.__dict__)
         else :
             Image.__init__(self, **kwargs)
  
-        self.verbose = kwargs.get('verbose', False)
-        # Arguments for the plots
-        self.title = kwargs.get('title', "Frame")
-        self.scale = kwargs.get('scale', "log")
-        self.vmin = np.int(kwargs.get('vmin', 0))
-        self.colorbar = kwargs.get('colorbar', "v")
         self.get_fwhm_startend()
 
     def get_fwhm_startend(self) :
@@ -189,23 +200,19 @@ class museset_images(list) :
         else:
             list.__init__(self, args)
         self.__dict__.update(kwargs)
-
-        # required attributes
-        self.nimages = len(self)
-        self.subtitle = kwargs.get('subtitle', "")
+        self.update(**kwargs)
 
     def __call__(self, **kwargs):
         self.__dict__.update(kwargs)
+        self.update(**kwargs)
         return self
 
-#    def add_image(self, image, add_number=True) :
-#        """Add an image to the set
-#        """
-#        self.nimages += 1
-#        image.id = self.nimages
-#        if add_number :
-#            image.title += " {0:2d}".format(image.id)
-#        self.images.append(image)
+    def update(self, **kwargs) :
+        # 1 required attribute
+        if not hasattr(self, 'subtitle') :
+            if 'subtitle' in kwargs :
+                print("WARNING: overiding subtitle")
+            self.subtitle = kwargs.get('subtitle', "")
 
 class muse_spectrum(Spectrum): 
     """Wrapper around the mpdaf Spectrum functionalities
@@ -213,14 +220,19 @@ class muse_spectrum(Spectrum):
     def __init__(self, source=None, **kwargs) :
         """Initialisation of the opening of spectra
         """
+        self.verbose = kwargs.pop('verbose', False)
+        # Arguments for the plots
+        self.title = kwargs.pop('title', "Spectrum")
+        self.add_sky_lines = kwargs.pop("add_sky_lines", False)
+        if self.add_sky_lines :
+            self.color_sky = kwargs.pop("color_sky", "red")
+            self.linestyle_sky = kwargs.pop("linestyle_sky", "--")
+            self.alpha_sky = kwargs.pop("alpha_sky", 0.3)
+
         if source is not None:
             self.__dict__.update(source.__dict__)
         else :
             Spectrum.__init__(self, **kwargs)
-
-        self.verbose = kwargs.get('verbose', False)
-        # Arguments for the plots
-        self.title = kwargs.get('title', "Spectrum")
 
 class museset_spectra(list) :
     """Set of spectra
@@ -234,11 +246,17 @@ class museset_spectra(list) :
         else:
             list.__init__(self, args)
         self.__dict__.update(kwargs)
-
-        ## 2 required attributes
-        self.nspectra = len(self)
-        self.subtitle = kwargs.get('subtitle', "")
+        self.update(**kwargs)
 
     def __call__(self, **kwargs):
         self.__dict__.update(kwargs)
+        self.update(**kwargs)
         return self
+
+    def update(self, **kwargs) :
+        ## 1 required attribute
+        if not hasattr(self, 'subtitle') :
+            if 'subtitle' in kwargs :
+                print("WARNING: overiding subtitle")
+            self.subtitle = kwargs.get('subtitle', "")
+

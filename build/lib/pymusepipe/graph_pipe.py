@@ -90,12 +90,13 @@ class graph_muse(object):
         for data in list_data :
             if isinstance(data, museset_spectra) :
                 nspectra_blocks += 1
-                nlines += data.nspectra
+                nlines += data.__len__()
             elif isinstance(data, museset_images) :
                 nimages_blocks += 1
-                nlines += 2 * data.nimages
+                nlines += 2 * data.__len__()
 
         self.gs = gridspec.GridSpec(nlines, 2)
+        print("NLINES is {0}".format(nlines))
         self.list_ax = []
         self.count_lines = 0
         for data in list_data :
@@ -106,9 +107,9 @@ class graph_muse(object):
 
         self.savepage()
 
-    def plot_set_spectra(self, set_of_spectra=None, add_sky_lines=False,
-            color='red', ls='--', alpha=0.3) :
+    def plot_set_spectra(self, set_of_spectra=None, ) :
         """Plotting a set of spectra
+        Skipping the ones that are 'None'
         """
 
         # Set of sky lines to plot when relevant - add_sky_lines to True
@@ -118,28 +119,32 @@ class graph_muse(object):
             print("ERROR: list of spectra is empty")
             return
 
-        for i in range(set_of_spectra.nspectra) :
+        for spec in set_of_spectra :
+            print("COUNT LINE is {0}".format(self.count_lines))
             self.list_ax.append(plt.subplot(self.gs[self.count_lines,:]))
             self.count_lines += 1
-            set_of_spectra[i].plot(title=set_of_spectra[i].title, ax=self.list_ax[-1])
-            if add_sky_lines :
-                for line in sky_lines :
-                    plt.axvline(x=line, color=color, linestyle=ls, alpha=alpha)
+            if spec is not None :
+                spec.plot(title=spec.title, ax=self.list_ax[-1])
+                if spec.add_sky_lines :
+                    for line in sky_lines :
+                        plt.axvline(x=line, color=spec.color_sky, linestyle=spec.linestyle_sky, alpha=spec.alpha_sky)
 
         plt.tight_layout(rect=self.rect_layout)
 
     def plot_set_images(self, set_of_images=None) :
         """Plotting a set of images
+        Skipping the ones that are 'None'
         """
         if set_of_images is None :
             print("ERROR: list of images is empty")
             return
 
-        for i in range(set_of_images.nimages) :
-            count_cols = i%2
-            self.list_ax.append(plt.subplot(self.gs[self.count_lines: self.count_lines + 2, count_cols]))
-            self.count_lines += count_cols * 2
+        for i in range(set_of_images.__len__()) :
             image = set_of_images[i]
-            image.plot(scale=image.scale, vmin=image.vmin, colorbar=image.colorbar, title=image.title, ax=self.list_ax[-1])
+            count_cols = i%2
+            if image is not None :
+                self.list_ax.append(plt.subplot(self.gs[self.count_lines: self.count_lines + 2, count_cols]))
+                image.plot(scale=image.scale, vmin=image.vmin, colorbar=image.colorbar, title=image.title, ax=self.list_ax[-1])
+            self.count_lines += count_cols * 2
 
         plt.tight_layout(rect=self.rect_layout)

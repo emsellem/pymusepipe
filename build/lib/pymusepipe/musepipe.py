@@ -278,11 +278,29 @@ class muse_pipe(object):
         self.paths.reduced = joinpath(self.paths.fulldata, self.my_params.reducedfiles_folder)
         self.paths.raw = joinpath(self.paths.fulldata, self.my_params.rawdata_folder)
         self.paths.cubes = joinpath(self.paths.fulldata, self.my_params.cubes_folder)
+        self.paths.maps = joinpath(self.paths.fulldata, self.my_params.maps_folder)
 
+        self.filenames = lambda:None
         for mastertype in listMaster_dic.keys() :
             name_attr = "master{0}".format(mastertype.lower())
             [masterfolder, mastername] = listMaster_dic[mastertype]
             setattr(self.paths, name_attr, joinpath(self.paths.master, masterfolder))
+            setattr(self.filenames, name_attr, joinpath(self.paths.master, masterfolder, mastername))
+
+    def get_master(self, mastertype, **kwargs) :
+        """Getting the master type
+        Return None if not found or mastertype does not match
+        """
+        if mastertype.upper() not in listMaster_dic.keys() :
+            print("ERROR: mastertype not in the list of predefined types")
+            return None
+
+        attribute_master = "master{0}".format(mastertype.lower())
+        if os.path.isfile(getattr(self.filenames, attribute_master)) :
+            return muse_image(filename=self.filenames.attribute_master, title=mastertype, **kwargs)
+        else :
+            print("ERROR: file {0} not found".format(self.filenames.attribute_master))
+            return None
 
     def probe_files(self, rawfolder=None, verbose=None) :
         """Determine which files are in the raw folder

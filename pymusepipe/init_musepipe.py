@@ -43,6 +43,8 @@ dic_folders = {
             "sky_folder" : "Sky/",
             # Cubes
             "cubes_folder" : "Cubes/",
+            # Reconstructed Maps
+            "maps_folder" : "Maps/",
             # Flag 
             "init_rcfile" : "Hardcoded Default - see init_musepipe.py module"
             }
