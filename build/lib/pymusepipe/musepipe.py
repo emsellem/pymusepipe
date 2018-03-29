@@ -23,7 +23,6 @@ import numpy as np
 import os
 from os.path import join as joinpath
 import time
-import glob
 import subprocess
 from subprocess import call
 import copy
@@ -49,7 +48,7 @@ except ImportError :
 
 
 # Importing pymusepipe modules
-from init_musepipe import init_muse_parameters
+from init_musepipe import InitMuseParameters
 
 __version__ = '0.0.2 (08 March    2018)'
 __version__ = '0.0.1 (21 November 2017)'
@@ -161,14 +160,14 @@ def changeto_dir(path) :
 
 #########################################################################
 # Main class
-#                           muse_pipe
+#                           MusePipe
 #########################################################################
 
     
-class muse_pipe(object):
+class MusePipe(object):
     """Main Class to define and run the MUSE pipeline, given a certain galaxy name
     
-    musep = muse_pipe(galaxyname='NGC1087', rc_filename="", cal_filename="", 
+    musep = MusePipe(galaxyname='NGC1087', rc_filename="", cal_filename="", 
                       outlog"NGC1087_log1.log", objects=[''])
     musep.run()
     """
@@ -197,7 +196,7 @@ class muse_pipe(object):
 
         # Setting up the folders and names for the calibration files
         # Can be initialised by either an rc_file, a default rc_file or harcoded defaults.
-        self.my_params = init_muse_parameters(rc_filename=rc_filename, 
+        self.my_params = InitMuseParameters(rc_filename=rc_filename, 
                             cal_filename=cal_filename)
 
         # Set up the default parameters
@@ -297,7 +296,7 @@ class muse_pipe(object):
 
         attribute_master = "master{0}".format(mastertype.lower())
         if os.path.isfile(getattr(self.filenames, attribute_master)) :
-            return muse_image(filename=self.filenames.attribute_master, title=mastertype, **kwargs)
+            return MuseImage(filename=self.filenames.attribute_master, title=mastertype, **kwargs)
         else :
             print("ERROR: file {0} not found".format(self.filenames.attribute_master))
             return None

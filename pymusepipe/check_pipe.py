@@ -7,36 +7,32 @@ __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
 __license__   = "3-clause BSD License"
 __contact__   = " <eric.emsellem@eso.org>"
-# This module will take a muse_pipe object and do the plot check ups
-
-# Importing modules
-import numpy as np
+# This module will take a MusePipe object and do the plot check ups
 
 # Standard modules
 import os
 from os.path import join as joinpath
-
-from graph_pipe import graph_muse
+import glob
 
 __version__ = '0.0.1 (15 March 2018)'
 
-from graph_pipe import graph_muse
+from graph_pipe import GraphMuse
 from mpdaf_pipe import *
 from musepipe import *
 
 name_final_datacube = "DATACUBE_FINAL.fits"
 
-class check_pipe(muse_pipe) :
+class CheckPipe(MusePipe) :
     """Checking the outcome of the data reduction
     """
     def __init__(self, pdf_name="check_pipe.pdf", pipe=None, standard_set=True, **kwargs) :
         if pipe is not None:
             self.__dict__.update(pipe.__dict__)
         else :
-            muse_pipe.__init__(self, **kwargs)
+            MusePipe.__init__(self, **kwargs)
 
-        self.cube = muse_cube(filename=joinpath(self.paths.reduced, name_final_datacube))
-        self.pdf = graph_muse(pdf_name=pdf_name)
+        self.cube = MuseCube(filename=joinpath(self.paths.reduced, name_final_datacube))
+        self.pdf = GraphMuse(pdf_name=pdf_name)
 
         if standard_set :
             # getting standard spectra
@@ -67,7 +63,7 @@ class check_pipe(muse_pipe) :
         """
         bias = self.get_master(mastertype="Bias", scale='arcsinh', title="Master Bias")
         flat = self.get_master(mastertype="Flat", scale='arcsing', title="Master Flat")
-        tocheck = museset_images(bias, flat, subtitle="Master Bias - Master Flat")
+        tocheck = MuseSetImages(bias, flat, subtitle="Master Bias - Master Flat")
         self.pdf.plot_page(tocheck)
 
     def check_white_Ha_image(self, velocity=0.) :
@@ -76,17 +72,17 @@ class check_pipe(muse_pipe) :
         """
         white = self.cube.get_whiteimage_from_cube()
         Ha = self.cube.get_emissionline_image(line="Ha", velocity=velocity)
-        tocheck = museset_images(white, Ha, subtitle="White and Halpha images")
+        tocheck = MuseSetImages(white, Ha, subtitle="White and Halpha images")
         self.pdf.plot_page(tocheck)
 
     def check_sky_spectra(self) :
         """Check all sky spectra from the exposures
         """
         sky_spectra_names = glob.glob(self.paths.sky + "./SKY_SPECTRUM_????.fits")
-        tocheck = museset_spectra(subtitle="Sky Spectra")
+        tocheck = MuseSetSpectra(subtitle="Sky Spectra")
         counter = 1
         for specname in sky_spectra_names :
-            tocheck.append(muse_spectrum(source=get_sky_spectrum(filename=specname), title="Sky {0:2d}".format(counter),
+            tocheck.append(MuseSpectrum(source=get_sky_spectrum(filename=specname), title="Sky {0:2d}".format(counter),
                 add_sky_lines=True))
             counter += 1
 
@@ -96,10 +92,10 @@ class check_pipe(muse_pipe) :
         """Check all Ha images
         """
         Ha_image_names = glob.glob(self.paths.maps + "./img_ha?.fits")
-        tocheck = museset_images(subtitle="Ha Images")
+        tocheck = MuseSetImages(subtitle="Ha Images")
         counter = 1
         for imaname in Ha_image_names :
-            tocheck.append(muse_image(filename=imaname, title="Ha {0:2d}".format(counter)))
+            tocheck.append(MuseImage(filename=imaname, title="Ha {0:2d}".format(counter)))
             counter += 1
 
         self.pdf.plot_page(tocheck)

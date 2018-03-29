@@ -57,7 +57,7 @@ def doppler_shift(wavelength, velocity=0.):
 #                           check_musepipe
 #########################################################################
 
-class muse_cube(Cube): 
+class MuseCube(Cube): 
     """Wrapper around the mpdaf Cube functionalities
     """
     
@@ -81,10 +81,10 @@ class muse_cube(Cube):
         width2 = width // 2
         subcube = self[:, ny - width2: ny + width2 + 1, 
                     nx - width2: nx + width2 + 1]
-        return muse_spectrum(source=subcube.sum(axis=(1,2)), title=title)
+        return MuseSpectrum(source=subcube.sum(axis=(1,2)), title=title)
 
     def get_whiteimage_from_cube(self) :
-        return muse_image(source=self.sum(axis=0), title="White Image")
+        return MuseImage(source=self.sum(axis=0), title="White Image")
 
     def get_image_from_cube(self, nlambda=None, width=0) :
         """Get image from integrated cube, with spectral pixel
@@ -92,14 +92,14 @@ class muse_cube(Cube):
         """
         if nlambda == None : nlambda = self.shape[0] // 2
         width2 = width // 2
-        return muse_image(source=self[nlambda - width2: nlambda + width2 + 1, :, :].sum(axis=0))
+        return MuseImage(source=self[nlambda - width2: nlambda + width2 + 1, :, :].sum(axis=0))
 
     def get_set_spectra(self) :
         """Get a set of standard spectra from the Cube
         """
-        self.spec_fullgalaxy = muse_spectrum(source=self.sum(axis=(1,2)), title="Full galaxy Spectrum")
+        self.spec_fullgalaxy = MuseSpectrum(source=self.sum(axis=(1,2)), title="Full galaxy Spectrum")
         self.spec_4quad = self.get_quadrant_spectra_from_cube()
-        self.spec_central_aper = museset_spectra(
+        self.spec_central_aper = MuseSetSpectra(
                self.get_spectrum_from_cube(width=0, title="Central aperture"), 
                self.get_spectrum_from_cube(width=20, title="Central Aperture, w=20"), 
                self.get_spectrum_from_cube(width=40, title="Central Aperture, w=40"),
@@ -120,7 +120,7 @@ class muse_cube(Cube):
         spec2 = self.get_spectrum_from_cube( nx4, ny34, width, title="Quadrant 2") 
         spec3 = self.get_spectrum_from_cube(nx34,  ny4, width, title="Quadrant 3") 
         spec4 = self.get_spectrum_from_cube(nx34, ny34, width, title="Quadrant 4") 
-        return museset_spectra(spec1, spec2, spec3, spec4, subtitle="4 Quadrants")
+        return MuseSetSpectra(spec1, spec2, spec3, spec4, subtitle="4 Quadrants")
 
     def get_emissionline_image(self, line=None, velocity=0., redshift=None, width=10, medium='vacuum') :
         """Get a narrow band image around Ha
@@ -149,7 +149,7 @@ class muse_cube(Cube):
         wavel = list_emission_lines[line][index_line[medium]]
         red_wavel = doppler_shift(wavel, velocity)
         
-        return muse_image(self.select_lambda(red_wavel - width/2., red_wavel + width/2.).sum(axis=0), 
+        return MuseImage(self.select_lambda(red_wavel - width/2., red_wavel + width/2.).sum(axis=0), 
                       title="{0} map".format(line))
 
 def get_sky_spectrum(filename) :
@@ -162,7 +162,7 @@ def get_sky_spectrum(filename) :
     spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
     return spec
 
-class muse_image(Image): 
+class MuseImage(Image): 
     """Wrapper around the mpdaf Image functionalities
     """
     def __init__(self, source=None, **kwargs) :
@@ -188,11 +188,11 @@ class muse_image(Image):
         self.fwhm_startobs = self.primary_header['HIERARCH ESO TEL AMBI FWHM START']
         self.fwhm_endobs = self.primary_header['HIERARCH ESO TEL AMBI FWHM END']
 
-class museset_images(list) :
+class MuseSetImages(list) :
     """Set of images
     """
     def __new__(self, *args, **kwargs):
-        return super(museset_images, self).__new__(self, args, kwargs)
+        return super(MuseSetImages, self).__new__(self, args, kwargs)
 
     def __init__(self, *args, **kwargs):
         if len(args) == 1 and hasattr(args[0], '__iter__'):
@@ -214,7 +214,7 @@ class museset_images(list) :
                 print("WARNING: overiding subtitle")
             self.subtitle = kwargs.get('subtitle', "")
 
-class muse_spectrum(Spectrum): 
+class MuseSpectrum(Spectrum): 
     """Wrapper around the mpdaf Spectrum functionalities
     """
     def __init__(self, source=None, **kwargs) :
@@ -234,11 +234,11 @@ class muse_spectrum(Spectrum):
         else :
             Spectrum.__init__(self, **kwargs)
 
-class museset_spectra(list) :
+class MuseSetSpectra(list) :
     """Set of spectra
     """
     def __new__(self, *args, **kwargs):
-        return super(museset_spectra, self).__new__(self, args, kwargs)
+        return super(MuseSetSpectra, self).__new__(self, args, kwargs)
 
     def __init__(self, *args, **kwargs):
         if len(args) == 1 and hasattr(args[0], '__iter__'):

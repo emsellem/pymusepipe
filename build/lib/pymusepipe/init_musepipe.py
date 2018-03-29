@@ -92,7 +92,7 @@ MUSEPIPE_runs = {
 ############################################################
 #                      END
 ############################################################
-class init_muse_parameters(object) :
+class InitMuseParameters(object) :
     def __init__(self, dirname="", rc_filename=None, cal_filename=None, **kwargs) :
         """Define the default parameters (folders/calibration files) 
         and name suffixes for the MUSE data reduction
@@ -172,12 +172,12 @@ class init_muse_parameters(object) :
 ####################################################
 # Defining classes to get samples and objects
 ####################################################
-class musepipe_sample(object) :
+class MusepipeSample(object) :
     def __init__(self) :
         self.sample = MUSEPIPE_sample
         self.targets = MUSEPIPE_sample.keys()
 
-class musepipe_target(object) :
+class MusepipeTarget(object) :
     def __init__(self, galaxyname=None, pointing=1) :
         if galaxyname not in MUSEPIPE_sample.keys() :
             print("ERROR: no Galaxy named {gal} in the defined sample".format(gal=galaxyname))

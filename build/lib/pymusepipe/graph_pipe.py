@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.gridspec as gridspec
 
-from mpdaf_pipe import muse_image, muse_spectrum, museset_images, museset_spectra
+from mpdaf_pipe import MuseImage, MuseSpectrum, MuseSetImages, MuseSetSpectra
 
 __version__ = '0.0.1 (23 March 2018)'
 
@@ -40,9 +40,9 @@ __version__ = '0.0.1 (23 March 2018)'
 
 #########################################################################
 # Main class
-#                           muse_data()
+#                           GraphMuse
 #########################################################################
-class graph_muse(object): 
+class GraphMuse(object): 
     """Graphic output to check MUSE data reduction products
     """
     
@@ -83,26 +83,25 @@ class graph_muse(object):
         nblocks = len(list_data)
         nspectra_blocks, nimages_blocks = 0, 0
         nlines = 0
-        if isinstance(list_data, museset_spectra) | isinstance(list_data, museset_images) :
+        if isinstance(list_data, MuseSetSpectra) | isinstance(list_data, MuseSetImages) :
             plt.suptitle(list_data.subtitle)
             list_data = [list_data]
 
         for data in list_data :
-            if isinstance(data, museset_spectra) :
+            if isinstance(data, MuseSetSpectra) :
                 nspectra_blocks += 1
                 nlines += data.__len__()
-            elif isinstance(data, museset_images) :
+            elif isinstance(data, MuseSetImages) :
                 nimages_blocks += 1
                 nlines += 2 * data.__len__()
 
         self.gs = gridspec.GridSpec(nlines, 2)
-        print("NLINES is {0}".format(nlines))
         self.list_ax = []
         self.count_lines = 0
         for data in list_data :
-            if isinstance(data, museset_spectra) :
+            if isinstance(data, MuseSetSpectra) :
                 self.plot_set_spectra(data) 
-            elif isinstance(data, museset_images) :
+            elif isinstance(data, MuseSetImages) :
                 self.plot_set_images(data)
 
         self.savepage()
@@ -120,7 +119,6 @@ class graph_muse(object):
             return
 
         for spec in set_of_spectra :
-            print("COUNT LINE is {0}".format(self.count_lines))
             self.list_ax.append(plt.subplot(self.gs[self.count_lines,:]))
             self.count_lines += 1
             if spec is not None :
