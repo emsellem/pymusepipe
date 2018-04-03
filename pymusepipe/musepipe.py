@@ -23,8 +23,6 @@ import numpy as np
 import os
 from os.path import join as joinpath
 import time
-import subprocess
-from subprocess import call
 import copy
 
 # cpl module to link with esorex
@@ -46,12 +44,20 @@ try :
 except ImportError :
     raise Exception("astropy.io.ascii is required for this module")
 
+try :
+    from astropy.table import Table
+except ImportError :
+    raise Exception("astropy.table.Table is required for this module")
 
 # Importing pymusepipe modules
 from init_musepipe import InitMuseParameters
+from recipes_pipe import PipeRecipes
 
 # Likwid command
 likwid = "likwid-pin -c N:"
+
+# Included an astropy table
+__version__ = '0.1.0 (03 April    2018)'
 
 __version__ = '0.0.2 (08 March    2018)'
 __version__ = '0.0.1 (21 November 2017)'
@@ -80,14 +86,28 @@ listMaster_dic = {'DARK': ['Dark', 'MASTER_DARK'],
         'STD': ['Std', 'PIXTABLE_STD'], 
         }
 
-listexpo_files = {"TYPE" : ['ESO DPR TYPE', "raw_hdr_dprtype.txt"],
-        "DATE": ['MJD-OBS', "raw_hdr_mjd.txt"],
-        "MODE": ['HIERARCH ESO INS MODE', "raw_hdr_mode.txt"]
+# listexpo_files = {"TYPE" : ['Type', 'ESO DPR TYPE', "raw_hdr_dprtype.txt"],
+#         "DATE": ['MJD-OBS', "raw_hdr_mjd.txt"],
+#         "MODE": ['HIERARCH ESO INS MODE', "raw_hdr_mode.txt"]
+#         "TPLS": ['HIERARCH ESO TPL START', "raw_hdr_tpls.txt"]
+#          }
+listexpo_files = {
+        "OBJECT" : ['object', 'OBJECT', str, '20A'],
+        "TYPE" : ['type', 'ESO DPR TYPE', str, '20A'],
+        "DATE":  ['mjd', 'MJD-OBS', np.float, 'E'],
+        "MODE":  ['mode', 'ESO INS MODE', str, '10A'],
+        "EXPTIME":  ['exptime', 'EXPTIME', float, 'E'],
+        "TPLS":  ['tpls', 'ESO TPL START', str, '30A'],
+        "TPLN":  ['tplnexp', 'ESO TPL NEXP', np.int, 'J'],
+        "TPLNO":  ['tplno', 'ESO TPL EXPNO', np.int, 'J']
          }
 
 exclude_list_checkmode = ['BIAS', 'DARK']
 
 esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
+# Fits Raw table (default)
+default_raw_table = "rawfiles_table.fits"
+
 ############################################################
 #                      END
 ############################################################
@@ -163,7 +183,7 @@ class MusePipe(PipeRecipes):
 
     def __init__(self, galaxyname=None, pointing=0, objectlist=[], rc_filename=None, cal_filename=None, 
             outlog=None, verbose=True, redo=False, align_file=None, mode="WFM-NOAO-N", 
-            checkmode=True, strong_checkmode=False):
+            checkmode=True, strong_checkmode=False, create_raw_table=True):
         """Initialise the file parameters to be used during the run
 
         Input
@@ -243,7 +263,8 @@ class MusePipe(PipeRecipes):
         safely_create_folder(outlog)
 
         # First, list all the files and find out which types they are
-        self.probe_files()
+        if create_raw_table :
+            self.create_raw_table()
 
         # Selecting the ones which 
         self.select_run_tables()
@@ -278,6 +299,7 @@ class MusePipe(PipeRecipes):
         # Creating the filenames for Master files
         self.filenames = lambda:None
         self.paths.dic_master_folder_names = {}
+        self.dic_attr_master = {}
         for mastertype in listMaster_dic.keys() :
             name_attr = "master{0}".format(mastertype.lower())
             self.dic_attr_master[mastertype] = name_attr
@@ -302,81 +324,70 @@ class MusePipe(PipeRecipes):
             print("ERROR: file {0} not found".format(self.filenames.attr_master))
             return None
 
-    def probe_files(self, rawfolder=None, verbose=None) :
-        """Determine which files are in the raw folder
+    def create_raw_table(self, name_table=None, rawfolder=None, verbose=None) :
+        """ Create a fits table with all the information from
+        the Raw files
+        Also create an astropy table with the same info
         """
         if verbose is None: verbose = self.verbose
-
         if rawfolder is None :
             rawfolder = self.my_params.rawdata_folder
         else :
             # Changing the raw folder default
             self.my_params.rawdata_folder = rawfolder
 
+        if name_table is None : name_table = default_raw_table
+        self.name_table = name_table
+
         # Check the raw folder
         prev_folder = changeto_dir(joinpath(self.paths.fulldata, rawfolder))
+        # Get the list of files from the Raw data folder
+        files = os.listdir(".")
 
-        if verbose : print(("Probing the files in the {rawfolder} folder").format(rawfolder=rawfolder))
+        smalldic = {"FILENAME" : ['filename', '', str, '100A']}
+        fulldic = listexpo_files.copy()
+        fulldic.update(smalldic)
 
-        # Extracting the fits Headers and processing them
-        command = ("fitsheader -e 0 -k '{0}' -t ascii.tab "
-                "*fits.fz > {filename}".format(listexpo_files['TYPE'][0], 
-                filename=listexpo_files['TYPE'][1]))
-        run_oscommand(command)
-        command = ("fitsheader -e 0 -k '{0}' -t ascii.tab "
-                "*fits.fz > {filename}".format(listexpo_files['DATE'][0], 
-                filename=listexpo_files['DATE'][1]))
-        run_oscommand(command)
-        command = ("fitsheader -e 0 -k '{0}' -t ascii.tab "
-                "*fits.fz > {filename}".format(listexpo_files['MODE'][0], 
-                filename=listexpo_files['MODE'][1]))
-        run_oscommand(command)
+        # Init the lists
+        MUSE_infodic = {}
+        for key in fulldic.keys() :
+            MUSE_infodic[key] = []
 
-        info_types = ascii.read(listexpo_files['TYPE'][1])
-        info_dates = ascii.read(listexpo_files['DATE'][1])
-        info_modes = ascii.read(listexpo_files['MODE'][1])
-        # We need to copy the first one as we will scan and remove lines
-        copy_info_types = copy.copy(info_types)
+        # Looping over the files
+        for f in files:
+            # Excluding the files without MUSE and fits.fz
+            if ('MUSE' in f) and ('.fits.fz')  in f:
+                MUSE_infodic['FILENAME'].append(f)
+                header = pyfits.getheader(f, 0)
+                for k in listexpo_files.keys() :
+                    [namecol, keyword, func, form] = listexpo_files[k]
+                    MUSE_infodic[k].append(func(header[keyword]))
 
-        # Reset the dictionary of exposures
-        self.info_expo = {}
-        info_dates.add_index('filename')
-        nfiles_found = 0
-        # Loop over the file names and process the types
-        for i in range(info_types['filename'].size) :
-            filename = info_types['filename'][i]
-            if filename in info_dates['filename'] :
-                index_date = info_dates.loc[filename].index
-                index_mode = info_dates.loc[filename].index
-                expotype = info_types['value'][i] 
-                expodate = info_dates['value'][index_date]
-                expomode = info_modes['value'][index_mode]
-                # Values of this dictionary are the TYPE and DATE
-                self.info_expo[filename] = [expotype, expodate, expomode]
-                # removing line from the TYPE and DATE files
-                copy_info_types.remove_row(i - nfiles_found)
-                nfiles_found += 1
-                info_dates.remove_row(index_date)
-                info_modes.remove_row(index_mode)
+        # Transforming into numpy arrays
+        for k in fulldic.keys() :
+            MUSE_infodic[k] = np.array(MUSE_infodic[k])
 
-        # Check that all types are within the default list
-        for val in self.info_expo.values() :
-            # Only checking expotype, not expodate
-            if val[0] not in listexpo_types.keys() :
-                print("WARNING: {0} not in default TYPE list".format(val[0]))
+        # Getting a sorted array with indices
+        idxsort = np.argsort(MUSE_infodic['FILENAME'])
 
-        # Printing out the ones which were not found in both files
-        if verbose:
-            for missedname in copy_info_types['filename'] :
-                print("WARNING: file {filename} was missing a DATE keyword")
-            for missedname in info_dates['filename'] :
-                print("WARNING: file {filename} was missing a TYPE keyword")
-            for missedname in info_dates['filename'] :
-                print("WARNING: file {filename} was missing a MODE keyword")
+        # Creating the astropy table
+        self.rawfiles = Table([MUSE_infodic['FILENAME'][idxsort]], names=['filename'], meta={'name': 'raw file table'})
 
-        # Create the parameters to have the list of exposures for each type
+        # Creating the columns
+        columns=[]
+        for k in fulldic.keys() :
+            [namecol, keyword, func, form] = fulldic[k]
+            self.rawfiles[namecol] = MUSE_infodic[k][idxsort]
+            columns.append(pyfits.Column(name=namecol, format=form, array=MUSE_infodic[k][idxsort]))
+
+        # Writing up the table
+        table = pyfits.BinTableHDU.from_columns(columns)
+        table.writeto(self.name_table, clobber=True)
+
+        # Sorting the type
         self.sort_types()
-        os.chdir(self.orig_wd)
+        # Going back to the original folder
+        os.chdir(prev_folder)
 
     def reset_expotypes(self) :
         """Reseting all lists of expotypes
@@ -397,24 +408,12 @@ class MusePipe(PipeRecipes):
         if strong_checkmode is not None : self.strong_checkmode = strong_checkmode
         else : strong_checkmode = self.strong_checkmode
 
-        for expo in self.info_expo.keys() :
-            # first get the current list - and append the current exponame
-            var = listexpo_types[self.info_expo[expo][0]]
-            if checkmode & (self.info_expo[expo][2] != self.mode) :
-                if (var not in exclude_list_checkmode) | self.strong_checkmode :
-                    if self.verbose : 
-                        print(("WARNING: excluding file {0},{1} "
-                           "because of wrong mode").format(expo, var))
-                    continue
-            currentlist = getattr(self, var)
-            currentlist.append(expo)
-            # Then reset the attribute with the updated list
-            setattr(self, var, currentlist)
-
         # Sorting alphabetically (thus by date)
         for expotype in listexpo_types.values() :
+            expotype = expotype.upper()
             try :
-                setattr(self, expotype, sorted(getattr(self, expotype)))
+                mask = self.rawfiles['type'] == expotype
+                setattr(self, expotype, self.rawfiles[mask])
             except AttributeError:
                 pass
 

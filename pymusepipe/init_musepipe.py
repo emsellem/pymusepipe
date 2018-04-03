@@ -21,18 +21,12 @@ import copy
 # The following parameters can be adjusted for the need of
 # the specific pipeline to be used
 ############################################################
-# FOLDER structure, defined here
-dic_namefolders = {
-        "ReducedFiles": "ReducedFiles/", 
-        "RawData": "RawData/",
-        "SetOfFiles": "SOF/"}
-
 # Default hard-coded folders
 dic_folders = {
             # Muse calibration files (common to all)
-            "musecalib_folder": "/soft/ESO/MUSE/muse-kit-2.2-5/muse-calib-2.2/cal/",
+            "musecalib_folder": "/home/mcelroy/reflex/install/calib/muse-2.2/cal/'",
             # Calibration files (specific to OBs)
-            "root_folder" : "/science/PHANGS/",
+            "root_folder" : "/mnt/fhgfs/PHANGS/MUSE/LP_131117/",
             # Raw Data files
             "rawdata_folder" : "Raw/",
             # Master Calibration files
@@ -95,10 +89,11 @@ MUSEPIPE_runs = {
 #                      END
 ############################################################
 class InitMuseParameters(object) :
-    def __init__(self, dirname="", rc_filename=None, cal_filename=None, **kwargs) :
+    def __init__(self, dirname="", rc_filename=None, cal_filename=None, verbose=True, **kwargs) :
         """Define the default parameters (folders/calibration files) 
         and name suffixes for the MUSE data reduction
         """
+        self.verbose = verbose
         # Will first test if there is an rc_file provided
         # If not, it will look for a default rc_filename, the name of which is provided
         # above. If not, the hardcoded default will be used.
@@ -126,6 +121,8 @@ class InitMuseParameters(object) :
         Hardcoded in init_musepipe.py
         """
         for key in dic_param.keys() :
+            if self.verbose :
+                print("Default initialisation of attribute {0}".format(key))
             setattr(self, key, input_suffix + dic_param[key])
 
     def read_param_file(self, filename, dic_param) :
@@ -155,6 +152,8 @@ class InitMuseParameters(object) :
                 if sline[1][:] != "/" :
                     sline[1] += "/"
 
+                if self.verbose :
+                    print("Initialisation of attribute {0}".format(sline[0]))
                 setattr(self, sline[0], sline[1]) 
                 # Here we drop the item which was initialised
                 val = dummy_dic_param.pop(sline[0])
