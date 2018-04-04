@@ -25,14 +25,18 @@ name_final_datacube = "DATACUBE_FINAL.fits"
 class CheckPipe(MusePipe) :
     """Checking the outcome of the data reduction
     """
-    def __init__(self, pdf_name="check_pipe.pdf", pipe=None, standard_set=True, **kwargs) :
+    def __init__(self, mycube=name_final_datacube, pdf_name="check_pipe.pdf", 
+            pipe=None, standard_set=True, **kwargs) :
+        """Init of the CheckPipe class. Using a default datacube to run some checks
+        and create some plots
+        """
         if pipe is not None:
             self.__dict__.update(pipe.__dict__)
         else :
             MusePipe.__init__(self, **kwargs)
 
-        self.cube = MuseCube(filename=joinpath(self.paths.reduced, name_final_datacube))
-        self.pdf = GraphMuse(pdf_name=pdf_name)
+        self.cube = MuseCube(filename=joinpath(self.paths.cubes, mycube))
+        self.pdf = GraphMuse(pdf_name=joinpath(self.paths.figures, pdf_name))
 
         if standard_set :
             # getting standard spectra

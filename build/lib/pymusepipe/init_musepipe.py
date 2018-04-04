@@ -41,8 +41,10 @@ dic_folders = {
             "maps_folder" : "Maps/",
             # SOF folder 
             "sof_folder" : "SOF/", 
-            # Flag 
-            "init_rcfile" : "Hardcoded Default - see init_musepipe.py module"
+            # Config files
+            "config_folder" : "Config/",
+            # Figure
+            "fig_folder" : "Figures/",
             }
 
 # Default initialisation file
@@ -63,8 +65,6 @@ dic_calib_tables = {
             "std_flux_Table" : "std_flux_table.fits",
             # Sky Flat files
             "extinct_table" : "extinct_table.fits",
-            # Flag 
-            "init_calfile" : "Hardcoded Default - see init_musepipe.py module"
             }
 
 # ----------------- Galaxies and Pointings ----------------#
@@ -89,7 +89,7 @@ MUSEPIPE_runs = {
 #                      END
 ############################################################
 class InitMuseParameters(object) :
-    def __init__(self, dirname="", rc_filename=None, cal_filename=None, verbose=True, **kwargs) :
+    def __init__(self, dirname="Config/", rc_filename=None, cal_filename=None, verbose=True, **kwargs) :
         """Define the default parameters (folders/calibration files) 
         and name suffixes for the MUSE data reduction
         """
@@ -102,30 +102,32 @@ class InitMuseParameters(object) :
                 warnings.warn(("WARNING: No filename or {default_rc} file "
                      "to initialise from. We will use the default hardcoded " 
                      "in the init_musepipe.py module").format(default_rc=default_rc_filename), RuntimeWarning)
-                self.init_default_param(dic_folders)
+                self.init_default_param("rcfile", dic_folders)
 
             else :
-                self.read_param_file(default_rc_filename, dic_folders) 
+                self.read_param_file("rc_file", default_rc_filename, dic_folders) 
         else :
-            self.read_param_file(joinpath(dirname, rc_filename), dic_folders)
+            self.read_param_file("rc_file", joinpath(dirname, rc_filename), dic_folders)
 
         # Same happens with the calibration files.
         # If filename is provided, will use that, otherwise use the hard coded values.
         if cal_filename is None :
-            self.init_default_param(dic_calib_tables, self.musecalib_folder)
+            self.init_default_param("cal_file", dic_calib_tables, self.musecalib_folder)
         else :
-            self.read_param_file(joinpath(dirname, cal_filename), dic_calib_tables)
+            self.read_param_file("cal_file", joinpath(dirname, cal_filename), dic_calib_tables)
 
-    def init_default_param(self, dic_param, input_suffix="") :
+    def init_default_param(self, name_initfile, dic_param) :
         """Initialise the parameters as defined in the input dictionary
         Hardcoded in init_musepipe.py
         """
         for key in dic_param.keys() :
             if self.verbose :
                 print("Default initialisation of attribute {0}".format(key))
-            setattr(self, key, input_suffix + dic_param[key])
+            setattr(self, key, dic_param[key])
 
-    def read_param_file(self, filename, dic_param) :
+        setattr(self, name_initfile, "Hard coded value, see init_musepipe.py")
+
+    def read_param_file(self, name_initfile, filename, dic_param) :
         """Reading an input parameter initialisation file 
         """
 
@@ -138,7 +140,7 @@ class InitMuseParameters(object) :
             return
 
         # If it exists, open and read it
-        self.init_rcfile = filename
+        setattr(self, name_initfile, filename)
         f_param = open(filename)
         lines = f_param.readlines()
 

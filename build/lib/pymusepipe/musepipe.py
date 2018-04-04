@@ -51,7 +51,8 @@ except ImportError :
 
 # Importing pymusepipe modules
 from init_musepipe import InitMuseParameters
-from recipes_pipe import PipeRecipes
+from recipes_pipe import PipeRecipes, create_time_name
+from create_sof import SofPipe
 
 # Likwid command
 likwid = "likwid-pin -c N:"
@@ -111,28 +112,6 @@ default_raw_table = "rawfiles_table.fits"
 ############################################################
 #                      END
 ############################################################
-def run_oscommand(text, logfile=None, verbose=False, fakemode=True) :
-    """Running an os.system shell command
-    Fake mode will just spit out the command but not actually do it.
-    """
-    if verbose : 
-        print(text)
-
-    if logfile is not None :
-       fout = open(logile, 'a')
-       fout.write(text + "\n")
-       fout.close()
-
-    if not fakemode :
-        os.system(command)
-
-def create_time_name() :
-    """Create a time-link name for file saving purposes
-
-    Return: a string including the time, hence a priori unique
-    """
-    return str(time.time())
-
 def safely_create_folder(path, verbose=True):
     """Create a folder given by the input path
     This small function tries to create it and if it fails
@@ -156,24 +135,12 @@ def get_date_inD(indate) :
     """
     return np.datetime64(indate).astype('datetime64[D]')
 
-def changeto_dir(path) :
-    """Changing directory and keeping memory of the old working one
-    """
-    prev_folder = os.getcwd()
-    try: 
-        os.chdir(path)
-    except OSError:
-        if not os.path.isdir(path):
-            raise
-
-    return prev_folder
-
 #########################################################################
 # Main class
 #                           MusePipe
 #########################################################################
     
-class MusePipe(PipeRecipes):
+class MusePipe(PipeRecipes, SofPipe):
     """Main Class to define and run the MUSE pipeline, given a certain galaxy name
     
     musep = MusePipe(galaxyname='NGC1087', rc_filename="", cal_filename="", 
@@ -182,7 +149,7 @@ class MusePipe(PipeRecipes):
     """
 
     def __init__(self, galaxyname=None, pointing=0, objectlist=[], rc_filename=None, cal_filename=None, 
-            outlog=None, verbose=True, redo=False, align_file=None, mode="WFM-NOAO-N", 
+            outlog=None, logfile="MusePipe.log", verbose=True, redo=False, align_file=None, mode="WFM-NOAO-N", 
             checkmode=True, strong_checkmode=False, create_raw_table=True):
         """Initialise the file parameters to be used during the run
 
@@ -236,12 +203,13 @@ class MusePipe(PipeRecipes):
 
         # Go to the data directory
         # and Recording the folder where we start
-        self.orig_wd = changeto_dir(self.paths.fulldata)
+        self.paths.orig = os.getcwd()
+        self.goto_folder(self.paths.fulldata)
 
         # Making the output folders in a safe mode
         if self.verbose:
             print("Creating directory structure")
-            print("Going to the data folder {0}".format(self.paths.fulldata))
+            print("Going to the Work folder {0}".format(self.paths.fulldata))
 
         # Init the Master folder
         safely_create_folder(self.my_params.mastercalib_folder)
@@ -251,7 +219,6 @@ class MusePipe(PipeRecipes):
             [masterfolder, mastername] = listMaster_dic[mastertype]
             safely_create_folder(joinpath(self.my_params.mastercalib_folder, masterfolder))
             self.Master[mastertype] = False
-        self.check_for_calibrations(verbose=False)
 
         # Reduced folder
         safely_create_folder(self.my_params.reducedfiles_folder)
@@ -261,16 +228,33 @@ class MusePipe(PipeRecipes):
         safely_create_folder(self.my_params.cubes_folder)
         # Log file folder
         safely_create_folder(outlog)
+        self.logfile = joinpath(self.outlog, logfile)
 
         # First, list all the files and find out which types they are
         if create_raw_table :
             self.create_raw_table()
 
-        # Selecting the ones which 
-        self.select_run_tables()
         # Going back to initial working directory
-        old_folder = changeto_dir(self.orig_wd)
+        if self.verbose :
+            print("Going back to the original folder {0}".format(self.paths._prev_folder))
+        self.goto_prevfolder()
 
+    def goto_prevfolder(self) :
+        """Go back to previous folder
+        """
+        self.goto_folder(self.paths._prev_folder)
+            
+    def goto_folder(self, newpath) :
+        """Changing directory and keeping memory of the old working one
+        """
+        try: 
+            prev_folder = os.getcwd()
+            os.chdir(newpath)
+            self.paths._prev_folder = prev_folder 
+        except OSError:
+            if not os.path.isdir(newpath):
+                raise
+    
     def set_fullpath_names(self) :
         """Create full path names to be used
         """
@@ -295,9 +279,11 @@ class MusePipe(PipeRecipes):
         self.paths.cubes = joinpath(self.paths.fulldata, self.my_params.cubes_folder)
         # Maps folder
         self.paths.maps = joinpath(self.paths.fulldata, self.my_params.maps_folder)
+        # Figures folder
+        self.paths.figures = joinpath(self.paths.fulldata, self.my_params.fig_folder)
 
         # Creating the filenames for Master files
-        self.filenames = lambda:None
+        self.masterfiles = lambda:None
         self.paths.dic_master_folder_names = {}
         self.dic_attr_master = {}
         for mastertype in listMaster_dic.keys() :
@@ -307,7 +293,7 @@ class MusePipe(PipeRecipes):
             # Adding the path of the folder
             setattr(self.paths, name_attr, joinpath(self.paths.master, masterfolder))
             # Adding the full path name for the master files
-            setattr(self.filenames, name_attr, joinpath(self.paths.master, masterfolder, mastername))
+            setattr(self.masterfiles, name_attr, joinpath(self.paths.master, masterfolder, mastername))
 
     def get_master(self, mastertype, **kwargs) :
         """Getting the master type
@@ -318,10 +304,10 @@ class MusePipe(PipeRecipes):
             return None
 
         attr_master = self.dic_attr_master[mastertype]
-        if os.path.isfile(getattr(self.filenames, attr_master)) :
-            return MuseImage(filename=self.filenames.attr_master, title=mastertype, **kwargs)
+        if os.path.isfile(getattr(self.masterfiles, attr_master)) :
+            return MuseImage(filename=getattr(self.masterfiles, attr_master), title=mastertype, **kwargs)
         else :
-            print("ERROR: file {0} not found".format(self.filenames.attr_master))
+            print("ERROR: file {0} not found".format(getattr(self.masterfiles, attr_master)))
             return None
 
     def create_raw_table(self, name_table=None, rawfolder=None, verbose=None) :
@@ -340,7 +326,8 @@ class MusePipe(PipeRecipes):
         self.name_table = name_table
 
         # Check the raw folder
-        prev_folder = changeto_dir(joinpath(self.paths.fulldata, rawfolder))
+        self.goto_folder(joinpath(self.paths.fulldata, rawfolder))
+
         # Get the list of files from the Raw data folder
         files = os.listdir(".")
 
@@ -363,7 +350,7 @@ class MusePipe(PipeRecipes):
                     [namecol, keyword, func, form] = listexpo_files[k]
                     MUSE_infodic[k].append(func(header[keyword]))
 
-        # Transforming into numpy arrays
+        # Transforming into numpy arrayimport pymusepipe
         for k in fulldic.keys() :
             MUSE_infodic[k] = np.array(MUSE_infodic[k])
 
@@ -387,7 +374,7 @@ class MusePipe(PipeRecipes):
         # Sorting the type
         self.sort_types()
         # Going back to the original folder
-        os.chdir(prev_folder)
+        self.goto_prevfolder()
 
     def reset_expotypes(self) :
         """Reseting all lists of expotypes
@@ -408,14 +395,71 @@ class MusePipe(PipeRecipes):
         if strong_checkmode is not None : self.strong_checkmode = strong_checkmode
         else : strong_checkmode = self.strong_checkmode
 
+        self.files = lambda:None
         # Sorting alphabetically (thus by date)
         for expotype in listexpo_types.values() :
             expotype = expotype.upper()
             try :
                 mask = self.rawfiles['type'] == expotype
-                setattr(self, expotype, self.rawfiles[mask])
+                setattr(self.files, expotype, self.rawfiles[mask])
             except AttributeError:
                 pass
+
+    def select_tpl_files(self, expotype=None, tpl="ALL") :
+        """Selecting a subset of files from a certain type
+        """
+        if expotype not in listexpo_types.values() :
+            print("ERROR: input expotype is not in the list of possible values")
+            return
+
+        MUSE_subtable = getattr(self.files, expotype)
+        MUSE_files = MUSE_subtable['filename']
+        MUSE_tpls = MUSE_subtable['tpls']
+        MUSE_tplnexp = MUSE_subtable['tplnexp']
+
+        dicout = {}
+        if tpl == "ALL" :
+            all_tpl = np.unique(MUSE_tpls)
+            for mytpl in MUSE_tpls :
+                select_TPL = (MUSE_tpls == mytpl) 
+                # Checking that we have all files
+                if MUSE_tplnexp[select_TPL][0] == np.sum(select_TPL) :
+                    dicout[mytpl] = MUSE_files[select_TPL]
+        else :
+            select_TPL = (MUSE_tpls == tpl) 
+            # Checking that we have all files
+            if MUSE_tplnexp[select_TPL][0] == np.sum(select_TPL) :
+                dicout[tpl] = MUSE_files[select_TPL]
+
+        return dicout
+
+    def run_bias(self, sof_filename='bias', tpl="ALL") :
+        """Reducing the Bias files and creating a Master Bias
+        Will run the esorex muse_bias command on all Biases
+
+        Parameters
+        ----------
+        sof_filename: string (without the file extension)
+            Name of the SOF file which will contain the Bias frames
+        tpl: ALL by default or a special tpl time
+
+        """
+        # First selecting the files
+        dic_tpl = self.select_tpl_files(tpl)
+
+        # Go to the data folder
+        self.goto_folder(self.paths.fulldata)
+
+        for tpl in dic_bias.keys() :
+            # Setting the dictionary
+            dic_bias['BIAS'] = dic_tpl[tpl]
+            # Writing the sof file
+            self.write_sof(sof_filename=sof_filename + "_" + tpl, dic_files=dic_bias, new=True)
+            # Run the recipe
+            self.recipe_bias(sof_filename)
+
+        # Go back to original folder
+        self.goto_prevfolder()
 
     def create_calibrations(self):
         self.check_for_calibrations()
@@ -433,7 +477,7 @@ class MusePipe(PipeRecipes):
         if not ((self.redo==0) and (self.Master['STD']==1)):
             self.create_standard_star()
             self.run_standard_int()
-        
+
     def check_for_calibrations(self, verbose=None):
         """This function checks which calibration file are present, just in case
         you do not wish to redo them. Variables are named: 
@@ -531,43 +575,3 @@ class MusePipe(PipeRecipes):
             mask = (DeltaTime==np.min(DeltaTime))
             self.final_illumlist.append(illumlist[mask][0])
         
-    def shellrun_bias(self, sof_filename='bias.sof', expoBIAS=None) :
-        """Reducing the Bias files and creating a Master Bias
-        Will run the esorex muse_bias command on all Biases
-
-        self.BIAS contains all the detected RAW biases
-        expoBIAS can 
-        
-        Parameters
-        ----------
-        sof_filename: string
-            Name of the SOF file which will contain the Bias frames
-        expoBIAS: list of strings
-            List of Names for the bias to be considered
-            The names provided should be part of the self.BIAS list
-            If None, will use the full list in self.BIAS
-
-        Returns
-        -------
-        """
-
-        # Checking the list of files if None
-        if expoBIAS is not None :
-            if expoBIAS not in self.BIAS :
-                print("ERROR: {0} not in given BIAS list".format(expoBIAS))
-                return
-        else : expoBIAS = self.BIAS
-
-        # Go to the data folder
-        prev_folder = changeto_dir(self.paths.fulldata)
-        # Feeding the sof input file
-        feed_sof(sof_filename, sof_folder=self.paths.sof, 
-                folderin=self.my_params.rawdata_folder, list_files=expoBIAS, type_files="BIAS")
-
-        command = ("{likwid}{CPU0}-{CPU1} esorex --no-checksum "
-                   "--log-file={outlog}/bias.log --output_dir muse_bias --nifu=-1 "
-                   "--merge {sof}".format(likwid=likwid, CPU0=self.cpu0, CPU1=self.cpu1, 
-                       outlog=self.outlog, sof=sof_filename))
-        run_oscommand(command)
-        # Go back to original folder
-        os.chdir(prev_folder)

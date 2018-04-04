@@ -4,6 +4,7 @@
     This package is a wrapper around MUSE pipeline commands to reduce
     muse dataframes.
 """
-import musepipe
-__all__ = ['init_musepipe', 'musepipe', 'muse_alignment', 'graph_pipe', 'mpdaf_pipe', 'check_pipe',
-        'emission_lines']
+from pymusepipe import * 
+from musepipe import *
+__all__ = ['init_musepipe', 'musepipe', 'graph_pipe', 'mpdaf_pipe', 'check_pipe',
+        'emission_lines', 'recipes_pipe', 'create_sof']
