@@ -29,7 +29,7 @@ class SofPipe(object) :
         """Feeding an sof file with input filenames from a dictionary
         """
         # Setting the default SOF folder if not provided
-        if sof_folder is None : sof_folder = self.paths.sof_folder
+        if sof_folder is None : sof_folder = self.paths.sof
 
         # Removing the extension of the file if already set
         if sof_filename.lower().endswith(".sof") :

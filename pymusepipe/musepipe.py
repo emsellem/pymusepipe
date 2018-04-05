@@ -50,7 +50,7 @@ except ImportError :
     raise Exception("astropy.table.Table is required for this module")
 
 # Importing pymusepipe modules
-from init_musepipe import InitMuseParameters, dic_folders, list_folders_creation
+from init_musepipe import InitMuseParameters
 from recipes_pipe import PipeRecipes, create_time_name
 from create_sof import SofPipe
 
@@ -170,19 +170,16 @@ class MusePipe(PipeRecipes, SofPipe):
                          or exclude DARK/BIAS if False
         """
 
-        # Setting up the folders and names for the calibration files
-        # Can be initialised by either an rc_file, a default rc_file or harcoded defaults.
-        self.my_params = InitMuseParameters(rc_filename=rc_filename, 
-                            cal_filename=cal_filename)
-
-        # Set up the default parameters
+        # Setting the default attibutes #####################
         self.galaxyname = galaxyname
         self.pointing = pointing
 
+        # Setting other default attributes
         if outlog is None : 
             outlog = "log_{timestamp}".format(timestamp=create_time_name())
             print("The Log folder will be {log}".format(outlog))
         self.outlog = outlog
+        self.logfile = joinpath(self.outlog, logfile)
 
         self.verbose = verbose
         self.redo = redo
@@ -197,7 +194,18 @@ class MusePipe(PipeRecipes, SofPipe):
 
         # Set of objects to reduced
         self.objectlist = objectlist
-        
+        # End of parameter settings #########################
+
+        # =========================================================== #
+        # Setting up the folders and names for the data reduction
+        # Can be initialised by either an rc_file, 
+        # or a default rc_file or harcoded defaults.
+        self.my_params = InitMuseParameters(rc_filename=rc_filename, 
+                            cal_filename=cal_filename)
+
+        # Setting up the relative path for the data, using Galaxy Name + Pointing
+        self.my_params.data = "{0}/P{1:02d}/".format(self.galaxyname, self.pointing)
+
         # Create full path folder 
         self.set_fullpath_names()
 
@@ -208,32 +216,31 @@ class MusePipe(PipeRecipes, SofPipe):
         # Making the output folders in a safe mode
         if self.verbose:
             print("Creating directory structure")
-        self.goto_folder(self.paths.fulldata)
+        self.goto_folder(self.paths.data)
 
-        # Creating the folder structure
-        for folder in list_folders_creation :
-            if folder in dic_folders.keys() :
-                safely_create_folder(dic_folders[folder], verbose=verbose)
-            else :
-                print("WARNING: item {0} in list_folders_creation "
-                    "(init_musepipe) is not in dic_folders".format(folder))
+        # ==============================================
+        # Creating the folder structure itself if needed
+        for folder in self.my_params._dic_folders.keys() :
+            safely_create_folder(self.my_params._dic_folders[folder], verbose=verbose)
 
         # Init the Master exposure flag dictionary
         self.Master = {}
         for mastertype in dic_listMaster.keys() :
             [masterfolder, mastername] = dic_listMaster[mastertype]
-            safely_create_folder(joinpath(self.my_params.mastercalib_folder, masterfolder),
+            safely_create_folder(joinpath(self.my_params.master, masterfolder), 
                     verbose=self.verbose)
             self.Master[mastertype] = False
+        # ==============================================
 
         # Going back to initial working directory
         self.goto_prevfolder()
 
-        self.logfile = joinpath(self.outlog, logfile)
-
-        # First, list all the files and find out which types they are
+        # ===========================================================
+        # Now creating the raw table, and attribute containing the
+        # astropy dataset probing the rawdata folder
         if create_raw_table :
             self.create_raw_table()
+        # ===========================================================
 
     def goto_prevfolder(self, verbose=True) :
         """Go back to previous folder
@@ -258,32 +265,14 @@ class MusePipe(PipeRecipes, SofPipe):
         """Create full path names to be used
         """
         # initialisation of the full paths 
-        # Basic folder with Galaxy name and Pointing number
-        self.my_params.data_folder = "{0}/P{1:02d}/".format(self.galaxyname, self.pointing)
-        # Creating the attribute paths
         self.paths = lambda:None
-        # Root folder for all data
-        self.paths.root = self.my_params.root_folder
-        # Main data folder joining Root and Data
-        self.paths.fulldata = joinpath(self.paths.root, self.my_params.data_folder)
-        # Master folder
-        self.paths.master = joinpath(self.paths.fulldata, self.my_params.mastercalib_folder)
-        # Sky folder
-        self.paths.sky = joinpath(self.paths.fulldata, self.my_params.sky_folder)
-        # Reduced folder
-        self.paths.reduced = joinpath(self.paths.fulldata, self.my_params.reducedfiles_folder)
-        # Raw data folder
-        self.paths.raw = joinpath(self.paths.fulldata, self.my_params.rawdata_folder)
-        # Reduced Cubes folder
-        self.paths.cubes = joinpath(self.paths.fulldata, self.my_params.cubes_folder)
-        # Maps folder
-        self.paths.maps = joinpath(self.paths.fulldata, self.my_params.maps_folder)
-        # Figures folder
-        self.paths.figures = joinpath(self.paths.fulldata, self.my_params.fig_folder)
+        self.paths.root = self.my_params.root
+        self.paths.data = joinpath(self.paths.root, self.my_params.data)
+        for name in self.my_params._dic_folders.keys() + self.my_params._dic_input_folders.keys():
+            setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
 
         # Creating the filenames for Master files
         self.masterfiles = lambda:None
-        self.paths.dic_master_folder_names = {}
         self.dic_attr_master = {}
         for mastertype in dic_listMaster.keys() :
             name_attr = "master{0}".format(mastertype.lower())
@@ -309,23 +298,19 @@ class MusePipe(PipeRecipes, SofPipe):
             print("ERROR: file {0} not found".format(getattr(self.masterfiles, attr_master)))
             return None
 
-    def create_raw_table(self, name_table=None, rawfolder=None, verbose=None) :
+    def create_raw_table(self, name_table=None, verbose=None) :
         """ Create a fits table with all the information from
         the Raw files
         Also create an astropy table with the same info
         """
         if verbose is None: verbose = self.verbose
-        if rawfolder is None :
-            rawfolder = self.my_params.rawdata_folder
-        else :
-            # Changing the raw folder default
-            self.my_params.rawdata_folder = rawfolder
+        rawfolder = self.paths.rawdata
 
         if name_table is None : name_table = default_raw_table
         self.name_table = name_table
 
         # Check the raw folder
-        self.goto_folder(joinpath(self.paths.fulldata, rawfolder))
+        self.goto_folder(self.paths.rawdata)
 
         # Get the list of files from the Raw data folder
         files = os.listdir(".")
@@ -447,7 +432,7 @@ class MusePipe(PipeRecipes, SofPipe):
         dic_tpl = self.select_tpl_files(expotype='BIAS', tpl=tpl)
 
         # Go to the data folder
-        self.goto_folder(self.paths.fulldata)
+        self.goto_folder(self.paths.data)
 
         dic_bias = {}
         for tpl in dic_tpl.keys() :
@@ -484,7 +469,7 @@ class MusePipe(PipeRecipes, SofPipe):
         masterbias, masterdark, standard, masterflat, mastertwilight
         """
         
-        outcal = self.my_params.mastercalib_folder
+        outcal = getattr(self.my_params, "master" + suffix_folder)
         if verbose is None: verbose = self.verbose
 
         for mastertype in dic_listMaster.keys() :
@@ -555,9 +540,9 @@ class MusePipe(PipeRecipes, SofPipe):
         if verbose is None: verbose = self.verbose
         if verbose:
             print "Using geometry calibration data from MUSE runs %s\n"%finalkey
-        self.geo_table = joinpath(self.my_params.musecalib_folderr, 
+        self.geo_table = joinpath(getattr(self.my_params, "musecalib" + suffix_folder), 
                 "geometry_table_wfm_{runname}.fits".format(runname=runname)) 
-        self.astro_table = joinpath(self.my_params.musecalib_folder, 
+        self.astro_table = joinpath(getattr(self.my_params, "musecalib" + suffix_folder), 
                 "astrometry_wcs_wfm_{runname}.fits".format(runname=runname))
 
     def select_illumfiles(self):

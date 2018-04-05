@@ -61,7 +61,6 @@ class MuseCube(Cube):
     """Wrapper around the mpdaf Cube functionalities
     """
     
-#    def __init__(self, cube_folder="./", cube_name=None, source=None, verbose=False, **kwargs) :
     def __init__(self, source=None, verbose=False, **kwargs) :
         """Initialisation of the opening of a Cube
         """

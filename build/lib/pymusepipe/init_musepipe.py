@@ -22,47 +22,13 @@ import copy
 # the specific pipeline to be used
 ############################################################
 # Default hard-coded folders
-dic_folders = {
+dic_user_folders = {
         # values provide the folder and whether or not this should be attempted to create
             # Muse calibration files (common to all)
-            "musecalib_folder": "/home/mcelroy/reflex/install/calib/muse-2.2/cal/'",
+            "musecalib": "/home/mcelroy/reflex/install/calib/muse-2.2/cal/'",
             # Calibration files (specific to OBs)
-            "root_folder" : "/mnt/fhgfs/PHANGS/MUSE/LP_131117/",
-            # Raw Data files
-            "rawdata_folder" : "Raw/",
-            # Master Calibration files
-            "mastercalib_folder" : "Master/",
-            # Reduced files
-            "reducedfiles_folder" : "Reduced/",
-            # Sky Flat files
-            "sky_folder" : "Sky/",
-            # Cubes
-            "cubes_folder" : "Cubes/",
-            # Reconstructed Maps
-            "maps_folder" : "Maps/",
-            # SOF folder 
-            "sof_folder" : "SOF/", 
-            # Config files
-            "config_folder" : "Config/",
-            # Figure
-            "fig_folder" : "Figures/",
+            "root" : "/mnt/fhgfs/PHANGS/MUSE/LP_131117/",
             }
-
-# This list is the list of folders the routine should attempt to create
-# Please make sure, if you add one folder in the dic_folders to consider
-# adding it here
-list_folders_creation = [
-            "mastercalib_folder",
-            "reducedfiles_folder",
-            "sky_folder",
-            "cubes_folder",
-            "maps_folder",
-            "sof_folder",
-            "fig_folder",
-            ]
-
-# Default initialisation file
-default_rc_filename = "~/.musepiperc"
 
 # Default hard-coded fits files - Calibration Tables
 # This should be replaced by an ascii file reading at some point
@@ -102,6 +68,47 @@ MUSEPIPE_runs = {
 ############################################################
 #                      END
 ############################################################
+
+############################################################
+# Some fixed parameters for the structure
+############################################################
+def add_suffix_tokeys(dic, suffix="_folder") :
+    newdic = {}
+    for key in dic.keys() :
+        setattr(newdic, key + suffix, dic[key])
+
+# Default initialisation file
+default_rc_filename = "~/.musepiperc"
+
+dic_input_folders = {
+            # Raw Data files
+            "rawdata" : "Raw/",
+            # Config files
+            "config" : "Config/",
+            }
+
+dic_folders = {
+        # values provide the folder and whether or not this should be attempted to create
+            # Master Calibration files
+            "master" : "Master/",
+            # Reduced files
+            "reduced" : "Reduced/",
+            # Sky Flat files
+            "sky" : "Sky/",
+            # Cubes
+            "cubes" : "Cubes/",
+            # Reconstructed Maps
+            "maps" : "Maps/",
+            # SOF folder 
+            "sof" : "SOF/", 
+            # Figure
+            "figures" : "Figures/",
+            }
+
+############################################################
+# Main class InitMuseParameters
+############################################################
+
 class InitMuseParameters(object) :
     def __init__(self, dirname="Config/", rc_filename=None, cal_filename=None, verbose=True, **kwargs) :
         """Define the default parameters (folders/calibration files) 
@@ -111,26 +118,43 @@ class InitMuseParameters(object) :
         # Will first test if there is an rc_file provided
         # If not, it will look for a default rc_filename, the name of which is provided
         # above. If not, the hardcoded default will be used.
+
+        # First adding the suffix to the dictionaries
+        # attributing the dictionaries
+        self._dic_folders = dic_folders
+        self._dic_input_folders = dic_input_folders
+        self._dic_user_folders = dic_input_folders
+
         if rc_filename is None :
             if not os.path.isfile(default_rc_filename):
                 warnings.warn(("WARNING: No filename or {default_rc} file "
                      "to initialise from. We will use the default hardcoded " 
                      "in the init_musepipe.py module").format(default_rc=default_rc_filename), RuntimeWarning)
-                self.init_default_param("rcfile", dic_folders)
+                self.init_default_param(dic_user_folders)
 
             else :
-                self.read_param_file("rc_file", default_rc_filename, dic_folders) 
+                self.read_param_file(default_rc_filename, dic_user_folders) 
+            self.rcfile = "default_values"
         else :
-            self.read_param_file("rc_file", joinpath(dirname, rc_filename), dic_folders)
+            rcfile = joinpath(dirname, rc_filename)
+            self.read_param_file(rcfile, dic_user_folders)
+            self.rcfile = rcfile
+
+        # Initialisation of fixed attributes for the structure
+        self.init_default_param(dic_folders)
+        self.init_default_param(dic_input_folders)
 
         # Same happens with the calibration files.
         # If filename is provided, will use that, otherwise use the hard coded values.
         if cal_filename is None :
-            self.init_default_param("cal_file", dic_calib_tables)
+            self.init_default_param(dic_calib_tables)
+            self.calfile = "default_values"
         else :
-            self.read_param_file("cal_file", joinpath(dirname, cal_filename), dic_calib_tables)
+            calfile = joinpath(dirname, cal_filename)
+            self.read_param_file(calfile, dic_calib_tables)
+            self.calfile = calfile
 
-    def init_default_param(self, name_initfile, dic_param) :
+    def init_default_param(self, dic_param) :
         """Initialise the parameters as defined in the input dictionary
         Hardcoded in init_musepipe.py
         """
@@ -139,12 +163,9 @@ class InitMuseParameters(object) :
                 print("Default initialisation of attribute {0}".format(key))
             setattr(self, key, dic_param[key])
 
-        setattr(self, name_initfile, "Hard coded value, see init_musepipe.py")
-
-    def read_param_file(self, name_initfile, filename, dic_param) :
+    def read_param_file(self, filename, dic_param) :
         """Reading an input parameter initialisation file 
         """
-
         # Testing existence of filename
         if not os.path.isfile(filename) :
             warnings.warn(("ERROR: input parameter {inputname} cannot be found. "
@@ -154,7 +175,6 @@ class InitMuseParameters(object) :
             return
 
         # If it exists, open and read it
-        setattr(self, name_initfile, filename)
         f_param = open(filename)
         lines = f_param.readlines()
 
