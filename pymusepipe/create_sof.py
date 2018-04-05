@@ -48,8 +48,8 @@ class SofPipe(object) :
                 print("Appending in file {0}".format(sof))
     
         # Use dictionary to write up the lines
-        for key in dic_file.keys() :
-            for item in dic_file[key] :
+        for key in dic_files.keys() :
+            for item in dic_files[key] :
                 text_to_write = "{0} {1}\n".format(item, key)
                 sof_file.write(text_to_write)
                 if verbose :
