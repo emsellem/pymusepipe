@@ -169,6 +169,8 @@ class MusePipe(PipeRecipes, SofPipe):
         strong_checkmode: (default is False) Enforce the checkmode for all if True, 
                          or exclude DARK/BIAS if False
         """
+        self.verbose = verbose
+        PipeRecipes.__init__(self)
 
         # Setting the default attibutes #####################
         self.galaxyname = galaxyname
@@ -181,7 +183,6 @@ class MusePipe(PipeRecipes, SofPipe):
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
 
-        self.verbose = verbose
         self.redo = redo
         self.align_file = align_file
 
