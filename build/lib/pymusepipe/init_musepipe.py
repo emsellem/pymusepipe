@@ -51,7 +51,7 @@ dic_folders = {
 # This list is the list of folders the routine should attempt to create
 # Please make sure, if you add one folder in the dic_folders to consider
 # adding it here
-dic_folders_creation = [
+list_folders_creation = [
             "mastercalib_folder",
             "reducedfiles_folder",
             "sky_folder",

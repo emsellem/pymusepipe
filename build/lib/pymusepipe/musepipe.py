@@ -50,7 +50,7 @@ except ImportError :
     raise Exception("astropy.table.Table is required for this module")
 
 # Importing pymusepipe modules
-from init_musepipe import InitMuseParameters, dic_folders_creation
+from init_musepipe import InitMuseParameters, dic_folders, list_folders_creation
 from recipes_pipe import PipeRecipes, create_time_name
 from create_sof import SofPipe
 
@@ -79,7 +79,7 @@ listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT,LAMP': 'FLAT',
         }
 
 # This dictionary contains the types
-listMaster_dic = {'DARK': ['Dark', 'MASTER_DARK'], 
+dic_listMaster = {'DARK': ['Dark', 'MASTER_DARK'], 
         'BIAS': ['Bias', 'MASTER_BIAS'], 
         'FLAT': ['Flat', 'MASTER_FLAT'],
         'TWILIGHT': ['Twilight', 'TWILIGHT_CUBE'], 
@@ -212,12 +212,17 @@ class MusePipe(PipeRecipes, SofPipe):
             print("Going to the Work folder {0}".format(self.paths.fulldata))
 
         # Creating the folder structure
-        self.create_structure(dic_folders_creation, verbose=verbose)
+        for folder in list_folders_creation :
+            if folder in dic_folders.keys() :
+                safely_create_folder(dic_folders[folder], verbose=verbose)
+            else :
+                print("WARNING: item {0} in list_folders_creation "
+                    "(init_musepipe) is not in dic_folders".format(folder))
 
         # Init the Master exposure flag dictionary
         self.Master = {}
-        for mastertype in listMaster_dic.keys() :
-            [masterfolder, mastername] = listMaster_dic[mastertype]
+        for mastertype in dic_listMaster.keys() :
+            [masterfolder, mastername] = dic_listMaster[mastertype]
             safely_create_folder(joinpath(self.my_params.mastercalib_folder, masterfolder),
                     verbose=self.verbose)
             self.Master[mastertype] = False
@@ -232,12 +237,6 @@ class MusePipe(PipeRecipes, SofPipe):
         if self.verbose :
             print("Going back to the original folder {0}".format(self.paths._prev_folder))
         self.goto_prevfolder()
-
-    def create_structure(self, list_folders, verbose=True) :
-        """Attempt to create the structure folders
-        """
-        for folder in list_folders :
-            safely_create_folder(folder, verbose=verbose)
 
     def goto_prevfolder(self) :
         """Go back to previous folder
@@ -286,10 +285,10 @@ class MusePipe(PipeRecipes, SofPipe):
         self.masterfiles = lambda:None
         self.paths.dic_master_folder_names = {}
         self.dic_attr_master = {}
-        for mastertype in listMaster_dic.keys() :
+        for mastertype in dic_listMaster.keys() :
             name_attr = "master{0}".format(mastertype.lower())
             self.dic_attr_master[mastertype] = name_attr
-            [masterfolder, mastername] = listMaster_dic[mastertype]
+            [masterfolder, mastername] = dic_listMaster[mastertype]
             # Adding the path of the folder
             setattr(self.paths, name_attr, joinpath(self.paths.master, masterfolder))
             # Adding the full path name for the master files
@@ -369,7 +368,7 @@ class MusePipe(PipeRecipes, SofPipe):
 
         # Writing up the table
         table = pyfits.BinTableHDU.from_columns(columns)
-        table.writeto(self.name_table, clobber=True)
+        table.writeto(self.name_table, overwrite=True)
 
         # Sorting the type
         self.sort_types()
@@ -487,8 +486,8 @@ class MusePipe(PipeRecipes, SofPipe):
         outcal = self.my_params.mastercalib_folder
         if verbose is None: verbose = self.verbose
 
-        for mastertype in listMaster_dic.keys() :
-            [fout, suffix] = listMaster_dic[mastertype]
+        for mastertype in dic_listMaster.keys() :
+            [fout, suffix] = dic_listMaster[mastertype]
             # If TWILIGHT = only one cube
             if mastertype == "TWILIGHT" :
                 if not os.path.isfile(joinpath(outcal, fout, "{suffix}.fits".format(suffix=suffix))):
@@ -555,8 +554,10 @@ class MusePipe(PipeRecipes, SofPipe):
         if verbose is None: verbose = self.verbose
         if verbose:
             print "Using geometry calibration data from MUSE runs %s\n"%finalkey
-        self.geo_table = joinpath(self.my_params.musecalib_folderr, "geometry_table_wfm_{runname}.fits".format(runname=runname)) 
-        self.astro_table = joinpath(self.my_params.musecalib_folder, "astrometry_wcs_wfm_{runname}.fits".format(runname=runname))
+        self.geo_table = joinpath(self.my_params.musecalib_folderr, 
+                "geometry_table_wfm_{runname}.fits".format(runname=runname)) 
+        self.astro_table = joinpath(self.my_params.musecalib_folder, 
+                "astrometry_wcs_wfm_{runname}.fits".format(runname=runname))
 
     def select_illumfiles(self):
         """Minimise the difference between the OBJECT and ILLUM files
