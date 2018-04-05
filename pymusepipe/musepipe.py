@@ -444,7 +444,7 @@ class MusePipe(PipeRecipes, SofPipe):
 
         """
         # First selecting the files
-        dic_tpl = self.select_tpl_files(tpl)
+        dic_tpl = self.select_tpl_files(expotype='BIAS', tpl=tpl)
 
         # Go to the data folder
         self.goto_folder(self.paths.fulldata)
