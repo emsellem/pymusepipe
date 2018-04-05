@@ -443,7 +443,7 @@ class MusePipe(PipeRecipes, SofPipe):
             self.write_sof(sof_filename=sof_filename + "_" + tpl, 
                     dic_files=dic_bias, new=True)
             # Run the recipe
-            self.recipe_bias(self.current_sof)
+            self.recipe_bias(self.current_sof, tpl)
 
         # Go back to original folder
         self.goto_prevfolder()
