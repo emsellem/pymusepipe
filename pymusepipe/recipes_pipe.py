@@ -48,7 +48,7 @@ class PipeRecipes(object) :
         self._set_cpu(first_cpu, ncpu, list_cpu)
         self.merge = merge
 
-    def esorex(self) :
+    def get_esorex(self) :
         return "{likwid}{list_cpu} {nocache} exorex".format(likwid=self.likwid, 
                 list_cpu=self.list_cpu, nocache=self.nocache)
 
@@ -91,7 +91,7 @@ class PipeRecipes(object) :
         """Running the esorex muse_bias recipe
         """
         # Runing the recipe
-        self.run_oscommand('{esorex} muse_bias --nifu={nifu} {merge} {sof}'.format(exorex=self.esorex(), 
+        self.run_oscommand('{esorex} muse_bias --nifu={nifu} {merge} {sof}'.format(exorex=self.get_esorex(), 
             nifu=self.nifu, merge=self.get_merge(), sof=sof))
         attr = self.dic_attr_master['BIAS']
         # Moving the MASTER BIAS
@@ -101,40 +101,40 @@ class PipeRecipes(object) :
     def recipe_flat(self, sof):
         """Running the esorex muse_flat recipe
         """
-        os.system('{esorex} muse_flat --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.esorex(), 
+        os.system('{esorex} muse_flat --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.get_esorex(), 
             nifu=self.nifu, merge=self.get_merge(), sof=sof))
     
     def recipe_wave(self, sof):
         """Running the esorex muse_wavecal recipe
         """
-        os.system('{esorex} muse_wavecal --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.esorex(), 
+        os.system('{esorex} muse_wavecal --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.get_esorex(), 
             nifu=self.nifu, merge=self.get_merge(), sof=sof))
     
     def recipe_lsf(self, sof):
         """Running the esorex muse_lsf recipe
         """
-        os.system('{esorex} muse_lsf --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.esorex(), 
+        os.system('{esorex} muse_lsf --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.get_esorex(), 
             nifu=self.nifu, merge=self.get_merge(), sof=sof))
     
     def recipe_twilight(self, sof):
         """Running the esorex muse_twilight recipe
         """
-        os.system('{esorex} muse_twilight sof'.format(exorex=self.esorex(), sof=sof))
+        os.system('{esorex} muse_twilight sof'.format(exorex=self.get_esorex(), sof=sof))
 
     def recipe_std(self, sof):
         """Running the esorex muse_stc recipe
         """
         os.system("{esorex} muse_scibasic --nifu={nifu} --saveimage=FALSE "
-            "--merge={merge} {sof}".format(exorex=self.esorex(), nifu=self.nifu, 
+            "--merge={merge} {sof}".format(exorex=self.get_esorex(), nifu=self.nifu, 
                 merge=self.get_merge, sof=sof))
         create_sof_standard('std.sof')
-        os.system('{esorex} muse_standard std.sof'.format(esorex=self.esorex()))
+        os.system('{esorex} muse_standard std.sof'.format(esorex=self.get_esorex()))
     
     def recipe_scibasic(self, sof):
         """Running the esorex muse_scibasic recipe
         """
         os.system("{esorex} muse_scibasic --nifu={nifu} "
-                "--saveimage=FALSE --merge={merge} {sof}".format(esorex=self.esorex(), 
+                "--saveimage=FALSE --merge={merge} {sof}".format(esorex=self.get_esorex(), 
                     nifu=self.nifu, merge=self.get_merge(), sof=sof))
     
     def recipe_scipost(self, sof, save='cube', filter_list='white', skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE'):
@@ -143,7 +143,7 @@ class PipeRecipes(object) :
         os.system("{esorex} muse_scipost --astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darcheck={darkcheck} --skymodel_frac={model:02f} "
-                "{sof}".format(esorex=self.esorex(), astro=astrometry, save=save, 
+                "{sof}".format(esorex=self.get_esorex(), astro=astrometry, save=save, 
                     pixfrac=pixfrac, filt=filter_list, sky=skymethod, 
                     darkcheck=darcheck, model=skymodel_frac, sof=sof))
     
@@ -151,14 +151,14 @@ class PipeRecipes(object) :
         """Running the muse_exp_align recipe
         """
         os.system("{esorex} muse_exp_align --srcmin={srcmin} "
-                "--srcmax={srcmax} {sof}".format(exorex=self.esorex(), 
+                "--srcmax={srcmax} {sof}".format(exorex=self.get_esorex(), 
                     srcmin=srcmin, srcmax=srcmax, sof=sof))
     
     def recipe_cube(self, sof, save='cube', pixfrac=0.8, format_out='Cube', filter_FOV='SDSS_g,SDSS_r,SDSS_i'):
         """Running the muse_exp_combine recipe
         """
         os.system("{esorex} muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
-        "--format={form} --filter={filt} {sof}".format(esorex=self.esorex(), save=save, 
+        "--format={form} --filter={filt} {sof}".format(esorex=self.get_esorex(), save=save, 
             pixfrac=pixfrac, form=format_out, filt=filter_FOV, sof=sof))
 
 
