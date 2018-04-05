@@ -227,6 +227,7 @@ class MusePipe(PipeRecipes, SofPipe):
                     verbose=self.verbose)
             self.Master[mastertype] = False
 
+        self.goto_prevfolder()
         self.logfile = joinpath(self.outlog, logfile)
 
         # First, list all the files and find out which types they are
@@ -236,7 +237,6 @@ class MusePipe(PipeRecipes, SofPipe):
         # Going back to initial working directory
         if self.verbose :
             print("Going back to the original folder {0}".format(self.paths._prev_folder))
-        self.goto_prevfolder()
 
     def goto_prevfolder(self) :
         """Go back to previous folder

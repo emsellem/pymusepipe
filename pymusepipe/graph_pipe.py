@@ -79,8 +79,11 @@ class GraphMuse(object):
         separation for images (default is 2 per line, each image taking 2 lines)
         and spectra (1 spectrum per line over 2 columns)
         """
+        if len(list_data) == 0 :
+            print("WARNING: datalist is empty, no plots will be created")
+            return
+
         self.start_page()
-        nblocks = len(list_data)
         nspectra_blocks, nimages_blocks = 0, 0
         nlines = 0
         if isinstance(list_data, MuseSetSpectra) | isinstance(list_data, MuseSetImages) :
