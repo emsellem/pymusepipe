@@ -70,21 +70,21 @@ class PipeRecipes(object) :
         if self.verbose:
             print("LIST_CPU: {0}".format(list_cpu))
 
-    def run_oscommand(self, text, log=True) :
+    def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
         Fake mode will just spit out the command but not actually do it.
         """
         if self.verbose : 
-            print(text)
+            print(command)
     
         if log :
-            fout = open(self.logile, 'a')
+            fout = open(self.logfile, 'a')
             time_name = create_time_name()
             fout.write("At : " + timename + "\n")
-            fout.write(text + "\n")
+            fout.write(command + "\n")
             fout.close()
 
-        if not fakemode :
+        if not self.fakemode :
             os.system(command)
 
     def recipe_bias(self, sof, tpl):
