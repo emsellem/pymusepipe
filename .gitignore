@@ -9,3 +9,6 @@
 
 # Old files
 *.old
+
+# gvim swap
+*.py.swp
