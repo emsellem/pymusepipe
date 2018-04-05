@@ -55,7 +55,7 @@ class SofPipe(object) :
                 if verbose :
                     print(text_to_write)
 
-        self.filenames.current_sof = sof
+        self.current_sof = sof
 
     def add_XX_tosof(self) :
         pass
