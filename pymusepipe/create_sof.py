@@ -32,10 +32,10 @@ class SofPipe(object) :
         if sof_folder is None : sof_folder = self.paths.sof
 
         # Removing the extension of the file if already set
-        if sof_filename.lower().endswith(".sof") :
-            sof_filename = sof_filename[:-4]
+        if not sof_filename.lower().endswith(".sof") :
+            sof_filename = sof_filename + ".sof"
 
-        sof = joinpath(sof_folder, sof_filename, ".sof")
+        sof = joinpath(sof_folder, sof_filename)
         # If new file, start from scratch (overwrite)
         if new :
             sof_file = open(sof, "w+")
@@ -54,6 +54,8 @@ class SofPipe(object) :
                 sof_file.write(text_to_write)
                 if verbose :
                     print(text_to_write)
+
+        self.filenames.current_sof = sof
 
     def add_XX_tosof(self) :
         pass

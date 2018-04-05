@@ -439,9 +439,10 @@ class MusePipe(PipeRecipes, SofPipe):
             # Setting the dictionary
             dic_bias['BIAS'] = dic_tpl[tpl]
             # Writing the sof file
-            self.write_sof(sof_filename=sof_filename + "_" + tpl, dic_files=dic_bias, new=True)
+            self.write_sof(sof_filename=sof_filename + "_" + tpl, 
+                    dic_files=dic_bias, new=True)
             # Run the recipe
-            self.recipe_bias(sof_filename)
+            self.recipe_bias(self.current_sof)
 
         # Go back to original folder
         self.goto_prevfolder()
