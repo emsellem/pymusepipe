@@ -204,12 +204,11 @@ class MusePipe(PipeRecipes, SofPipe):
         # Go to the data directory
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
-        self.goto_folder(self.paths.fulldata)
 
         # Making the output folders in a safe mode
         if self.verbose:
             print("Creating directory structure")
-            print("Going to the Work folder {0}".format(self.paths.fulldata))
+        self.goto_folder(self.paths.fulldata)
 
         # Creating the folder structure
         for folder in list_folders_creation :
@@ -227,28 +226,29 @@ class MusePipe(PipeRecipes, SofPipe):
                     verbose=self.verbose)
             self.Master[mastertype] = False
 
+        # Going back to initial working directory
         self.goto_prevfolder()
+
         self.logfile = joinpath(self.outlog, logfile)
 
         # First, list all the files and find out which types they are
         if create_raw_table :
             self.create_raw_table()
 
-        # Going back to initial working directory
-        if self.verbose :
-            print("Going back to the original folder {0}".format(self.paths._prev_folder))
-
-    def goto_prevfolder(self) :
+    def goto_prevfolder(self, verbose=True) :
         """Go back to previous folder
         """
-        self.goto_folder(self.paths._prev_folder)
+        print("Going back to the original folder {0}".format(self.paths._prev_folder))
+        self.goto_folder(self.paths._prev_folder, verbose=False)
             
-    def goto_folder(self, newpath) :
+    def goto_folder(self, newpath, verbose=True) :
         """Changing directory and keeping memory of the old working one
         """
         try: 
             prev_folder = os.getcwd()
             os.chdir(newpath)
+            if verbose :
+                print("Going to folder {0}".format(newpath))
             self.paths._prev_folder = prev_folder 
         except OSError:
             if not os.path.isdir(newpath):

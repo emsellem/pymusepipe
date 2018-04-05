@@ -239,7 +239,7 @@ class MusePipe(PipeRecipes, SofPipe):
         """Go back to previous folder
         """
         print("Going back to the original folder {0}".format(self.paths._prev_folder))
-        self.goto_folder(self.paths._prev_folder)
+        self.goto_folder(self.paths._prev_folder, verbose=False)
             
     def goto_folder(self, newpath, verbose=True) :
         """Changing directory and keeping memory of the old working one
