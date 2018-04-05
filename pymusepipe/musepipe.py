@@ -449,7 +449,8 @@ class MusePipe(PipeRecipes, SofPipe):
         # Go to the data folder
         self.goto_folder(self.paths.fulldata)
 
-        for tpl in dic_bias.keys() :
+        dic_bias = {}
+        for tpl in dic_tpl.keys() :
             # Setting the dictionary
             dic_bias['BIAS'] = dic_tpl[tpl]
             # Writing the sof file
