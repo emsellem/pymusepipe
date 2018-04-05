@@ -91,11 +91,11 @@ class PipeRecipes(object) :
         """Running the esorex muse_bias recipe
         """
         # Runing the recipe
-        self.run_oscommand('{esorex} muse_bias --nifu={nifu} {merge} {sof}'.format(exorex=self.get_esorex(), 
+        self.run_oscommand("{esorex} muse_bias --nifu={nifu} {merge} {sof}".format(exorex=self.get_esorex(), 
             nifu=self.nifu, merge=self.get_merge(), sof=sof))
         attr = self.dic_attr_master['BIAS']
         # Moving the MASTER BIAS
-        self.run_oscommand('{nocache} cp {name}.fits {name}_{tpl}.fits'.format(nocache=self.nocache, 
+        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
             name=getattr(self.masterfiles, attr), times=tpl))
 
     def recipe_flat(self, sof):
