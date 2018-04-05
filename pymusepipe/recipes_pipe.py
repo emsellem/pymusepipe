@@ -91,6 +91,7 @@ class PipeRecipes(object) :
         """Running the esorex muse_bias recipe
         """
         # Runing the recipe
+        print(self.get_esorex(), nifu, self.get_merge(), sof)
         self.run_oscommand("{esorex} muse_bias --nifu={nifu} {merge} {sof}".format(exorex=self.get_esorex(), 
             nifu=self.nifu, merge=self.get_merge(), sof=sof))
         attr = self.dic_attr_master['BIAS']
