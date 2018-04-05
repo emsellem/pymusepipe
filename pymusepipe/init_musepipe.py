@@ -23,6 +23,7 @@ import copy
 ############################################################
 # Default hard-coded folders
 dic_folders = {
+        # values provide the folder and whether or not this should be attempted to create
             # Muse calibration files (common to all)
             "musecalib_folder": "/home/mcelroy/reflex/install/calib/muse-2.2/cal/'",
             # Calibration files (specific to OBs)
@@ -46,6 +47,19 @@ dic_folders = {
             # Figure
             "fig_folder" : "Figures/",
             }
+
+# This list is the list of folders the routine should attempt to create
+# Please make sure, if you add one folder in the dic_folders to consider
+# adding it here
+dic_folders_creation = [
+            "mastercalib_folder",
+            "reducedfiles_folder",
+            "sky_folder",
+            "cubes_folder",
+            "maps_folder",
+            "sof_folder",
+            "fig_folder",
+            ]
 
 # Default initialisation file
 default_rc_filename = "~/.musepiperc"
@@ -112,7 +126,7 @@ class InitMuseParameters(object) :
         # Same happens with the calibration files.
         # If filename is provided, will use that, otherwise use the hard coded values.
         if cal_filename is None :
-            self.init_default_param("cal_file", dic_calib_tables, self.musecalib_folder)
+            self.init_default_param("cal_file", dic_calib_tables)
         else :
             self.read_param_file("cal_file", joinpath(dirname, cal_filename), dic_calib_tables)
 

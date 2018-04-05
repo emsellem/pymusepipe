@@ -50,7 +50,7 @@ except ImportError :
     raise Exception("astropy.table.Table is required for this module")
 
 # Importing pymusepipe modules
-from init_musepipe import InitMuseParameters
+from init_musepipe import InitMuseParameters, dic_folders_creation
 from recipes_pipe import PipeRecipes, create_time_name
 from create_sof import SofPipe
 
@@ -112,6 +112,11 @@ default_raw_table = "rawfiles_table.fits"
 ############################################################
 #                      END
 ############################################################
+def get_date_inD(indate) :
+    """Transform date in Y-M-D
+    """
+    return np.datetime64(indate).astype('datetime64[D]')
+
 def safely_create_folder(path, verbose=True):
     """Create a folder given by the input path
     This small function tries to create it and if it fails
@@ -129,11 +134,6 @@ def safely_create_folder(path, verbose=True):
     except OSError:
         if not os.path.isdir(path):
             raise
-
-def get_date_inD(indate) :
-    """Transform date in Y-M-D
-    """
-    return np.datetime64(indate).astype('datetime64[D]')
 
 #########################################################################
 # Main class
@@ -211,23 +211,17 @@ class MusePipe(PipeRecipes, SofPipe):
             print("Creating directory structure")
             print("Going to the Work folder {0}".format(self.paths.fulldata))
 
-        # Init the Master folder
-        safely_create_folder(self.my_params.mastercalib_folder)
+        # Creating the folder structure
+        self.create_structure(dic_folders_creation, verbose=verbose)
+
         # Init the Master exposure flag dictionary
         self.Master = {}
         for mastertype in listMaster_dic.keys() :
             [masterfolder, mastername] = listMaster_dic[mastertype]
-            safely_create_folder(joinpath(self.my_params.mastercalib_folder, masterfolder))
+            safely_create_folder(joinpath(self.my_params.mastercalib_folder, masterfolder),
+                    verbose=self.verbose)
             self.Master[mastertype] = False
 
-        # Reduced folder
-        safely_create_folder(self.my_params.reducedfiles_folder)
-        # Sky folder
-        safely_create_folder(self.my_params.sky_folder)
-        # Cubes folder
-        safely_create_folder(self.my_params.cubes_folder)
-        # Log file folder
-        safely_create_folder(outlog)
         self.logfile = joinpath(self.outlog, logfile)
 
         # First, list all the files and find out which types they are
@@ -238,6 +232,12 @@ class MusePipe(PipeRecipes, SofPipe):
         if self.verbose :
             print("Going back to the original folder {0}".format(self.paths._prev_folder))
         self.goto_prevfolder()
+
+    def create_structure(self, list_folders, verbose=True) :
+        """Attempt to create the structure folders
+        """
+        for folder in list_folders :
+            safely_create_folder(folder, verbose=verbose)
 
     def goto_prevfolder(self) :
         """Go back to previous folder
