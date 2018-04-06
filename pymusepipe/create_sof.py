@@ -55,7 +55,9 @@ class SofPipe(object) :
                 if verbose :
                     print(text_to_write)
 
-        self.current_sof = sof
+        sof_file.close()
+        # Returning the current sof as relative path
+        self.current_sof = os.path.relpath(sof)
 
     def add_XX_tosof(self) :
         pass

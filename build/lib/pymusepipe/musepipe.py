@@ -22,6 +22,7 @@ import numpy as np
 # Standard modules
 import os
 from os.path import join as joinpath
+import time
 
 # cpl module to link with esorex
 try :
@@ -145,6 +146,18 @@ def safely_create_folder(path, verbose=True):
         if not os.path.isdir(path):
             raise
 
+def append_file(filename, content):
+    """Append in ascii file
+    """
+    with open(filename, "a") as myfile:
+        myfile.write(content)
+        
+def overwrite_file(filename, content):
+    """Overwite in ascii file
+    """
+    with open(filename, "w+") as myfile:
+        myfile.write(content)
+        
 #########################################################################
 # Main class
 #                           MusePipe
@@ -253,13 +266,13 @@ class MusePipe(PipeRecipes, SofPipe):
             self.create_raw_table()
         # ===========================================================
 
-    def goto_prevfolder(self, verbose=True) :
+    def goto_prevfolder(self, logfile=False, verbose=True) :
         """Go back to previous folder
         """
         print("Going back to the original folder {0}".format(self.paths._prev_folder))
         self.goto_folder(self.paths._prev_folder, verbose=False)
             
-    def goto_folder(self, newpath, verbose=True) :
+    def goto_folder(self, newpath, logfile=False, verbose=True) :
         """Changing directory and keeping memory of the old working one
         """
         try: 
@@ -267,6 +280,8 @@ class MusePipe(PipeRecipes, SofPipe):
             os.chdir(newpath)
             if verbose :
                 print("Going to folder {0}".format(newpath))
+            if logfile :
+                append_file(self.logfile, "cd {0}".format(newpath))
             self.paths._prev_folder = prev_folder 
         except OSError:
             if not os.path.isdir(newpath):
@@ -443,7 +458,7 @@ class MusePipe(PipeRecipes, SofPipe):
         dic_tpl = self.select_tpl_files(expotype='BIAS', tpl=tpl)
 
         # Go to the data folder
-        self.goto_folder(self.paths.data)
+        self.goto_folder(self.paths.data, logfile=True)
 
         dic_bias = {}
         for tpl in dic_tpl.keys() :
@@ -456,7 +471,7 @@ class MusePipe(PipeRecipes, SofPipe):
             self.recipe_bias(self.current_sof, tpl)
 
         # Go back to original folder
-        self.goto_prevfolder()
+        self.goto_prevfolder(logfile=True)
 
     def create_calibrations(self):
         self.check_for_calibrations()
