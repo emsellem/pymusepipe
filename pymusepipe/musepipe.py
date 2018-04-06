@@ -22,8 +22,6 @@ import numpy as np
 # Standard modules
 import os
 from os.path import join as joinpath
-import time
-import copy
 
 # cpl module to link with esorex
 try :

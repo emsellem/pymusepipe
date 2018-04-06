@@ -13,6 +13,9 @@ __contact__   = " <eric.emsellem@eso.org>"
 # and further rewritten by Mark van den Brok. 
 # Thanks to all !
 
+# Importing modules
+import time
+
 # Likwid command
 default_likwid = "likwid-pin -c N:"
 
