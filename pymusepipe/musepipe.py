@@ -158,6 +158,11 @@ def overwrite_file(filename, content):
     with open(filename, "w+") as myfile:
         myfile.write(content)
         
+def normpath(path) :
+    """Normalise the path to get it short
+    """
+    return os.path.relpath(os.path.realpath(path))
+
 #########################################################################
 # Main class
 #                           MusePipe
@@ -263,7 +268,13 @@ class MusePipe(PipeRecipes, SofPipe):
         # Now creating the raw table, and attribute containing the
         # astropy dataset probing the rawdata folder
         if create_raw_table :
+            if verbose :
+                print("Creating the astropy fits raw data table")
             self.create_raw_table()
+        else :
+            if verbose :
+                print("Reading the existing astropy fits raw data table")
+            self.read_raw_table()
         # ===========================================================
 
     def goto_prevfolder(self, logfile=False, verbose=True) :
@@ -325,6 +336,29 @@ class MusePipe(PipeRecipes, SofPipe):
             print("ERROR: file {0} not found".format(getattr(self.masterfiles, attr_master)))
             return None
 
+    def read_raw_table(self, name_table=None, verbose=None) :
+        """Read an existing RAW data table to start the pipeline
+        """
+        if verbose is None: 
+            verbose = self.verbose
+        rawfolder = self.paths.rawdata
+        if name_table is None: 
+            name_table = default_raw_table
+
+        # Check the raw folder
+        self.goto_folder(self.paths.rawdata)
+
+        # Read the astropy table
+        if not os.path.isfile(name_table):
+            print("ERROR: raw data table {0} does not exist".format(name_table))
+        self.rawfiles = Table.read(name_table, format="fits")
+        
+        # Sorting the type
+        self.sort_types()
+
+        # Going back to the original folder
+        self.goto_prevfolder()
+
     def create_raw_table(self, name_table=None, verbose=None) :
         """ Create a fits table with all the information from
         the Raw files
@@ -372,15 +406,17 @@ class MusePipe(PipeRecipes, SofPipe):
         self.rawfiles = Table([MUSE_infodic['FILENAME'][idxsort]], names=['filename'], meta={'name': 'raw file table'})
 
         # Creating the columns
-        columns=[]
+#        columns=[]
         for k in fulldic.keys() :
             [namecol, keyword, func, form] = fulldic[k]
             self.rawfiles[namecol] = MUSE_infodic[k][idxsort]
-            columns.append(pyfits.Column(name=namecol, format=form, array=MUSE_infodic[k][idxsort]))
+#            columns.append(pyfits.Column(name=namecol, format=form, array=MUSE_infodic[k][idxsort]))
 
         # Writing up the table
-        table = pyfits.BinTableHDU.from_columns(columns)
-        table.writeto(self.name_table, overwrite=True)
+        self.rawfiles.write(self.name_table, format="fits")
+
+#        table = pyfits.BinTableHDU.from_columns(columns)
+#        table.writeto(self.name_table, overwrite=True)
 
         # Sorting the type
         self.sort_types()

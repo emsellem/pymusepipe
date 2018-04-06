@@ -16,6 +16,7 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Standard modules
 import os
 from os.path import join as joinpath
+import musepipe as mpipe
 
 class SofPipe(object) :
     """SofPipe class containing all the SOF writing modules
@@ -57,7 +58,7 @@ class SofPipe(object) :
 
         sof_file.close()
         # Returning the current sof as relative path
-        self.current_sof = os.path.relpath(sof)
+        self.current_sof = mpipe.normpath(os.path.relpath(sof))
 
     def add_XX_tosof(self) :
         pass

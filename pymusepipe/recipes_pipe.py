@@ -101,7 +101,7 @@ class PipeRecipes(object) :
         attr = self.dic_attr_master['BIAS']
         # Moving the MASTER BIAS
         self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
-            name=os.path.relpath(getattr(self.masterfiles, attr)), tpl=tpl))
+            name=mpipe.normpath(getattr(self.masterfiles, attr)), tpl=tpl))
 
     def recipe_flat(self, sof):
         """Running the esorex muse_flat recipe
