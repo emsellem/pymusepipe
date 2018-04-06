@@ -277,11 +277,12 @@ class MusePipe(PipeRecipes, SofPipe):
         """
         try: 
             prev_folder = os.getcwd()
+            newpath = os.path.normpath(newpath)
             os.chdir(newpath)
             if verbose :
                 print("Going to folder {0}".format(newpath))
             if logfile :
-                append_file(self.logfile, "cd {0}".format(newpath))
+                append_file(self.logfile, "cd {0}\n".format(newpath))
             self.paths._prev_folder = prev_folder 
         except OSError:
             if not os.path.isdir(newpath):
