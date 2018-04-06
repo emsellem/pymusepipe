@@ -178,7 +178,7 @@ class MusePipe(PipeRecipes, SofPipe):
 
     def __init__(self, galaxyname=None, pointing=0, objectlist=[], rc_filename=None, cal_filename=None, 
             outlog=None, logfile="MusePipe.log", verbose=True, redo=False, align_file=None, mode="WFM-NOAO-N", 
-            checkmode=True, strong_checkmode=False, create_raw_table=True):
+            checkmode=True, strong_checkmode=False, create_raw_table=True, **kwargs):
         """Initialise the file parameters to be used during the run
 
         Input
@@ -198,7 +198,7 @@ class MusePipe(PipeRecipes, SofPipe):
                          or exclude DARK/BIAS if False
         """
         self.verbose = verbose
-        PipeRecipes.__init__(self)
+        PipeRecipes.__init__(self, **kwargs)
 
         # Setting the default attibutes #####################
         self.galaxyname = galaxyname
