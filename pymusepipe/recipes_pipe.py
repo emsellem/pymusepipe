@@ -85,7 +85,7 @@ class PipeRecipes(object) :
         if log :
             fout = open(self.logfile, 'a')
             time_name = create_time_name()
-            fout.write("At : " + timename + "\n")
+            fout.write("At : " + time_name + "\n")
             fout.write(command + "\n")
             fout.close()
 
