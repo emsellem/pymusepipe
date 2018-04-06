@@ -13,21 +13,17 @@ __contact__   = " <eric.emsellem@eso.org>"
 # and further rewritten by Mark van den Brok. 
 # Thanks to all !
 
+# Importing modules
+import musepipe as mpipe
+
 # Likwid command
 default_likwid = "likwid-pin -c N:"
-
-def create_time_name() :
-    """Create a time-link name for file saving purposes
-
-    Return: a string including the time, hence a priori unique
-    """
-    return str(time.time())
 
 class PipeRecipes(object) :
     """PipeRecipes class containing all the esorex recipes for MUSE data reduction
     """
     def __init__(self, nifu=-1, first_cpu=0, ncpu=24, list_cpu=[], nocache=True, likwid=default_likwid,
-            fakemode=True) :
+            fakemode=True, domerge=True) :
         """Initialisation of PipeRecipes
         """
 
@@ -46,10 +42,19 @@ class PipeRecipes(object) :
         self.likwid = likwid
         self.nifu = nifu
         self._set_cpu(first_cpu, ncpu, list_cpu)
+        self.domerge = domerge
 
-    def esorex(self) :
+    @property
+    def esorex(self):
         return "{likwid}{list_cpu} {nocache} exorex".format(likwid=self.likwid, 
                 list_cpu=self.list_cpu, nocache=self.nocache)
+
+    @property
+    def merge(self):
+        if self.domerge: 
+            return "--merge"
+        else : 
+            return ""
 
     def _set_cpu(self, first_cpu=0, ncpu=24, list_cpu=None) :
         """Setting the cpu format for calling the esorex command
@@ -63,71 +68,75 @@ class PipeRecipes(object) :
         if self.verbose:
             print("LIST_CPU: {0}".format(list_cpu))
 
-    def run_oscommand(self, text, log=True) :
+    def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
         Fake mode will just spit out the command but not actually do it.
         """
         if self.verbose : 
-            print(text)
+            print(command)
     
         if log :
-            fout = open(self.logile, 'a')
-            time_name = create_time_name()
-            fout.write("At : " + timename + "\n")
-            fout.write(text + "\n")
+            fout = open(self.logfile, 'a')
+            text = "# At : " + mpipe.formatted_time()
+            if self.fakemode : 
+                text += " FAKEMODE\n"
+            else :
+                text += "\n"
+            fout.write(text)
+            fout.write(command + "\n")
             fout.close()
 
-        if not fakemode :
+        if not self.fakemode :
             os.system(command)
 
     def recipe_bias(self, sof, tpl):
         """Running the esorex muse_bias recipe
         """
         # Runing the recipe
-        self.run_oscommand('{esorex} muse_bias --nifu={nifu} {merge} {sof}'.format(exorex=self.esorex(), 
+        self.run_oscommand("{esorex} muse_bias --nifu={nifu} {merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
         attr = self.dic_attr_master['BIAS']
         # Moving the MASTER BIAS
-        self.run_oscommand('{nocache} cp {name}.fits {name}_{tpl}.fits'.format(nocache=self.nocache, 
-            name=getattr(self.masterfiles, attr), times=tpl))
+        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+            name=getattr(self.masterfiles, attr), tpl=tpl))
 
     def recipe_flat(self, sof):
         """Running the esorex muse_flat recipe
         """
-        os.system('{esorex} muse_flat --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.esorex(), 
+        os.system('{esorex} muse_flat --nifu={nifu} --merge={merge} {sof}'.format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
     
     def recipe_wave(self, sof):
         """Running the esorex muse_wavecal recipe
         """
-        os.system('{esorex} muse_wavecal --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.esorex(), 
+        os.system('{esorex} muse_wavecal --nifu={nifu} --merge={merge} {sof}'.format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
     
     def recipe_lsf(self, sof):
         """Running the esorex muse_lsf recipe
         """
-        os.system('{esorex} muse_lsf --nifu={nifu} --merge={merge} {sof}'.format(exorex=self.esorex(), 
+        os.system('{esorex} muse_lsf --nifu={nifu} --merge={merge} {sof}'.format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
     
     def recipe_twilight(self, sof):
         """Running the esorex muse_twilight recipe
         """
-        os.system('{esorex} muse_twilight sof'.format(exorex=self.esorex(), sof=sof))
+        os.system('{esorex} muse_twilight sof'.format(esorex=self.esorex, sof=sof))
 
     def recipe_std(self, sof):
         """Running the esorex muse_stc recipe
         """
         os.system("{esorex} muse_scibasic --nifu={nifu} --saveimage=FALSE "
-            "--merge={merge} {sof}".format(exorex=self.esorex(), nifu=self.nifu, 
-                merge=self.merge, sof=sof))
+            "--merge={merge} {sof}".format(esorex=self.esorex, nifu=self.nifu, 
+                merge=self.merges, sof=sof))
         create_sof_standard('std.sof')
-        os.system('{esorex} muse_standard std.sof'.format(esorex=self.esorex()))
+        os.system('{esorex} muse_standard std.sof'.format(esorex=self.esorex))
     
     def recipe_scibasic(self, sof):
         """Running the esorex muse_scibasic recipe
         """
         os.system("{esorex} muse_scibasic --nifu={nifu} "
-                "--saveimage=FALSE --merge={merge} {sof}".format(esorex=self.esorex(), 
+                "--saveimage=FALSE --merge={merge} {sof}".format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof))
     
     def recipe_scipost(self, sof, save='cube', filter_list='white', skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE'):
@@ -136,7 +145,7 @@ class PipeRecipes(object) :
         os.system("{esorex} muse_scipost --astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darcheck={darkcheck} --skymodel_frac={model:02f} "
-                "{sof}".format(esorex=self.esorex(), astro=astrometry, save=save, 
+                "{sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
                     pixfrac=pixfrac, filt=filter_list, sky=skymethod, 
                     darkcheck=darcheck, model=skymodel_frac, sof=sof))
     
@@ -144,14 +153,14 @@ class PipeRecipes(object) :
         """Running the muse_exp_align recipe
         """
         os.system("{esorex} muse_exp_align --srcmin={srcmin} "
-                "--srcmax={srcmax} {sof}".format(exorex=self.esorex(), 
+                "--srcmax={srcmax} {sof}".format(esorex=self.esorex, 
                     srcmin=srcmin, srcmax=srcmax, sof=sof))
     
     def recipe_cube(self, sof, save='cube', pixfrac=0.8, format_out='Cube', filter_FOV='SDSS_g,SDSS_r,SDSS_i'):
         """Running the muse_exp_combine recipe
         """
         os.system("{esorex} muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
-        "--format={form} --filter={filt} {sof}".format(esorex=self.esorex(), save=save, 
+        "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, save=save, 
             pixfrac=pixfrac, form=format_out, filt=filter_FOV, sof=sof))
 
 

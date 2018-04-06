@@ -14,7 +14,7 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Thanks to all !
 
 # Importing modules
-from musepipe import formatted_time
+import musepipe as mpipe
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"
@@ -77,7 +77,7 @@ class PipeRecipes(object) :
     
         if log :
             fout = open(self.logfile, 'a')
-            text = "# At : " + formatted_time()
+            text = "# At : " + mpipe.formatted_time()
             if self.fakemode : 
                 text += " FAKEMODE\n"
             else :

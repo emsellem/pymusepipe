@@ -22,8 +22,6 @@ import numpy as np
 # Standard modules
 import os
 from os.path import join as joinpath
-import time
-import copy
 
 # cpl module to link with esorex
 try :
@@ -51,7 +49,7 @@ except ImportError :
 
 # Importing pymusepipe modules
 from init_musepipe import InitMuseParameters
-from recipes_pipe import PipeRecipes, create_time_name
+from recipes_pipe import PipeRecipes
 from create_sof import SofPipe
 
 # Likwid command
@@ -112,6 +110,18 @@ default_raw_table = "rawfiles_table.fits"
 ############################################################
 #                      END
 ############################################################
+def create_time_name() :
+    """Create a time-link name for file saving purposes
+
+    Return: a string including the YearMonthDay_HourMinSec
+    """
+    return str(time.strftime("%Y%m%d_%H%M%S", time.localtime()))
+
+def formatted_time() :
+    """ Return: a string including the formatted time
+    """
+    return str(time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()))
+
 def get_date_inD(indate) :
     """Transform date in Y-M-D
     """
@@ -443,7 +453,7 @@ class MusePipe(PipeRecipes, SofPipe):
             self.write_sof(sof_filename=sof_filename + "_" + tpl, 
                     dic_files=dic_bias, new=True)
             # Run the recipe
-            self.recipe_bias(self.current_sof)
+            self.recipe_bias(self.current_sof, tpl)
 
         # Go back to original folder
         self.goto_prevfolder()
