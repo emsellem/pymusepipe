@@ -14,6 +14,9 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Thanks to all !
 
 # Importing modules
+import os
+
+# pymusepipe modules
 import musepipe as mpipe
 
 # Likwid command
