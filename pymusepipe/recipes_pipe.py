@@ -14,17 +14,10 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Thanks to all !
 
 # Importing modules
-import time
+from musepipe import formatted_time
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"
-
-def create_time_name() :
-    """Create a time-link name for file saving purposes
-
-    Return: a string including the time, hence a priori unique
-    """
-    return str(time.time())
 
 class PipeRecipes(object) :
     """PipeRecipes class containing all the esorex recipes for MUSE data reduction
@@ -84,8 +77,12 @@ class PipeRecipes(object) :
     
         if log :
             fout = open(self.logfile, 'a')
-            time_name = create_time_name()
-            fout.write("At : " + time_name + "\n")
+            text = "# At : " + formatted_time()
+            if self.fakemode : 
+                text += " FAKEMODE\n"
+            else :
+                text += "\n"
+            fout.write(text)
             fout.write(command + "\n")
             fout.close()
 

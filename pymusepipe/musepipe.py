@@ -49,7 +49,7 @@ except ImportError :
 
 # Importing pymusepipe modules
 from init_musepipe import InitMuseParameters
-from recipes_pipe import PipeRecipes, create_time_name
+from recipes_pipe import PipeRecipes
 from create_sof import SofPipe
 
 # Likwid command
@@ -110,6 +110,18 @@ default_raw_table = "rawfiles_table.fits"
 ############################################################
 #                      END
 ############################################################
+def create_time_name() :
+    """Create a time-link name for file saving purposes
+
+    Return: a string including the YearMonthDay_HourMinSec
+    """
+    return str(time.strftime("%Y%m%d_%H%M%S", time.localtime()))
+
+def formatted_time() :
+    """ Return: a string including the formatted time
+    """
+    return str(time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()))
+
 def get_date_inD(indate) :
     """Transform date in Y-M-D
     """
