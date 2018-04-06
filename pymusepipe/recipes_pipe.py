@@ -27,7 +27,7 @@ class PipeRecipes(object) :
     """PipeRecipes class containing all the esorex recipes for MUSE data reduction
     """
     def __init__(self, nifu=-1, first_cpu=0, ncpu=24, list_cpu=[], nocache=True, likwid=default_likwid,
-            fakemode=True, merge=True) :
+            fakemode=True, domerge=True) :
         """Initialisation of PipeRecipes
         """
 
@@ -46,7 +46,7 @@ class PipeRecipes(object) :
         self.likwid = likwid
         self.nifu = nifu
         self._set_cpu(first_cpu, ncpu, list_cpu)
-        self.merge = merge
+        self.domerge = domerge
 
     @property
     def esorex(self):
@@ -55,7 +55,7 @@ class PipeRecipes(object) :
 
     @property
     def merge(self):
-        if self.merge: 
+        if self.domerge: 
             return "--merge"
         else : 
             return ""
