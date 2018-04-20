@@ -92,34 +92,44 @@ class PipeRecipes(object) :
         if not self.fakemode :
             os.system(command)
 
-    def recipe_bias(self, sof, tpl):
+    def recipe_bias(self, sof, name_master, tpl):
         """Running the esorex muse_bias recipe
         """
         # Runing the recipe
         self.run_oscommand("{esorex} muse_bias --nifu={nifu} {merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
-        attr = self.dic_attr_master['BIAS']
         # Moving the MASTER BIAS
         self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
-            name=mpipe.normpath(getattr(self.masterfiles, attr)), tpl=tpl))
+            name=name_master, tpl=tpl))
 
-    def recipe_flat(self, sof):
+    def recipe_flat(self, sof, name_master, name_trace, tpl):
         """Running the esorex muse_flat recipe
         """
-        os.system('{esorex} muse_flat --nifu={nifu} --merge={merge} {sof}'.format(esorex=self.esorex,
+        self.run_oscommand("{esorex} muse_flat --nifu={nifu} --merge={merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
-    
-    def recipe_wave(self, sof):
+        # Moving the MASTER FLAT and TRACE_TABLE
+        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+            name=name_master, tpl=tpl))
+        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+            name=name_trace, tpl=tpl))
+
+    def recipe_wave(self, sof, name_master, tpl):
         """Running the esorex muse_wavecal recipe
         """
-        os.system('{esorex} muse_wavecal --nifu={nifu} --merge={merge} {sof}'.format(esorex=self.esorex,
+        self.run_oscommand("{esorex} muse_wavecal --nifu={nifu} --merge={merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
+        # Moving the MASTER WAVE
+        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+            name=name_master, tpl=tpl))
     
-    def recipe_lsf(self, sof):
+    def recipe_lsf(self, sof, name_master, tpl):
         """Running the esorex muse_lsf recipe
         """
-        os.system('{esorex} muse_lsf --nifu={nifu} --merge={merge} {sof}'.format(esorex=self.esorex,
+        self.run_oscommand("{esorex} muse_lsf --nifu={nifu} --merge={merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
+        # Moving the MASTER WAVE
+        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+            name=name_master, tpl=tpl))
     
     def recipe_twilight(self, sof):
         """Running the esorex muse_twilight recipe

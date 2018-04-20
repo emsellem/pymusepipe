@@ -45,6 +45,8 @@ dic_calib_tables = {
             "std_flux_Table" : "std_flux_table.fits",
             # Sky Flat files
             "extinct_table" : "extinct_table.fits",
+            # Line Catalog
+            "line_catalog" : "line_catalog.fits",
             }
 
 # ----------------- Galaxies and Pointings ----------------#
@@ -82,7 +84,7 @@ default_rc_filename = "~/.musepiperc"
 
 dic_input_folders = {
             # Raw Data files
-            "rawdata" : "Raw/",
+            "rawfiles" : "Raw/",
             # Config files
             "config" : "Config/",
             }
@@ -185,9 +187,6 @@ class InitMuseParameters(object) :
 
             sline = line.split()
             if sline[0] in dic_param.keys() :
-                if sline[1][:] != "/" :
-                    sline[1] += "/"
-
                 if self.verbose :
                     print("Initialisation of attribute {0}".format(sline[0]))
                 setattr(self, sline[0], sline[1]) 
