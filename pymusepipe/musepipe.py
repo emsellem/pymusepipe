@@ -121,6 +121,13 @@ dic_files_tables = {'rawfiles': 'rawfiles_list_table.fits',
         'masterlsf': 'LSF_list_table.fits'
         }
 
+dic_files_products = {
+        'STD': ['DATACUBE_STD', 'STD_FLUXES', 
+            'STD_RESPONSE', 'STD_TELLURIC'],
+        'SKYFLAT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
+        'SKY': ['SKY_SPECTRUM', 'PIXTABLE_REDUCED']
+        }
+        
 ############################################################
 #                      END
 ############################################################
@@ -880,7 +887,8 @@ class MusePipe(PipeRecipes, SofPipe):
             # Name of final Master Wave
             name_mastertwilight = self._get_name_master('SKYFLAT')
             # Run the recipe
-            self.recipe_skyflat(self.current_sof, name_mastertwilight, tpl)
+            name_products = dic_files_products['SKYFLAT']
+            self.recipe_skyflat(self.current_sof, name_mastertwilight, name_products, tpl)
 
         # Write the MASTER SKYFLAT Table and save it
         self.save_master_table('SKYFLAT', tpl_gtable, fits_tablename)
@@ -916,7 +924,7 @@ class MusePipe(PipeRecipes, SofPipe):
             self.add_calib_to_sofdict("BADPIX_TABLE", reset=True)
             self.add_calib_to_sofdict("LINE_CATALOG")
             # Provide the list of files to the dictionary
-            dic_twilight['STD'] = add_listpath(self._get_path_master('STD'),
+            self._sofdict['STD'] = add_listpath(self._get_path_master('STD'),
                     + gtable['filename'].data.astype(np.object))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self.get_tpl_meanmjd(gtable)
@@ -935,10 +943,71 @@ class MusePipe(PipeRecipes, SofPipe):
             self.add_calib_to_sofdict("STANDARD_FLUX_TABLE")
             self._sofdict['PIXTABLE_STD'] = ['PIXTABLE_STD_0001-{i:02d}.fits'.format(i+1) for i in range(24)]
             self.write_sof(sof_filename=sof_filename + tpl, new=True)
-            self.recipe_std(self.current_sof, name_masterstandard, tpl)
+            name_products = dic_files_products['STD']
+            self.recipe_std(self.current_sof, name_products, tpl)
 
         # Write the MASTER TWILIGHT Table and save it
         self.save_master_table('STD', tpl_gtable, fits_tablename)
+
+        # Go back to original folder
+        self.goto_prevfolder(logfile=True)
+
+    def run_sky(self, sof_filename='scibasic_sky', tpl="ALL", fits_tablename=None):
+        """Reducing the SKY files and creating the SKY PIXTABLES
+        Will run the esorex muse_scibasic and muse_standard commands
+
+        Parameters
+        ----------
+        sof_filename: string (without the file extension)
+            Name of the SOF file which will contain the Bias frames
+        tpl: ALL by default or a special tpl time
+
+        """
+        # First selecting the files via the grouped table
+        tpl_gtable = self.select_tpl_files(expotype='SKY', tpl=tpl)
+        if len(tpl_gtable) == 0:
+            if self.verbose :
+                print_warning("No SKY recovered from the file Table - Aborting")
+                return
+
+        # Go to the data folder
+        self.goto_folder(self.paths.data, logfile=True)
+
+        # Create the dictionary for the LSF including
+        # the list of files to be processed for one MASTER Flat
+        for gtable in tpl_gtable.groups:
+            self.add_calib_to_sofdict("BADPIX_TABLE", reset=True)
+            self.add_calib_to_sofdict("LINE_CATALOG")
+            # Provide the list of files to the dictionary
+            self._sofdict['OBJECT'] = add_listpath(self._get_path_master('STD'),
+                    + gtable['filename'].data.astype(np.object))
+            # extract the tpl (string) and mean mjd (float) 
+            tpl, mean_mjd = self.get_tpl_meanmjd(gtable)
+            self.add_geometry_to_sofdict(tpl)
+            # Finding the best tpl for BIAS
+            self.add_list_tplmaster_to_sofdict(mean_mjd, 
+                    ['BIAS', 'ILLUM', 'FLAT', 'TRACE', 'WAVE', 'SKYFLAT'])
+            # Writing the sof file
+            self.write_sof(sof_filename=sof_filename + tpl, new=True)
+            # Name of final Master Wave
+            name_mastersky = self._get_name_master('SKY')
+            # Run the recipe to reduce the standard (muse_scibasic)
+            self.recipe_scibasic(self.current_sof)
+
+            # Now starting with the post processing for each set of PIXTABLE
+            for i in range(len(self._sofdict['OBJECT'])):
+                self.add_calib_to_sofdict("STANDARD_RESPONSE", reset=True)
+                self.add_calib_to_sofdict("STANDARD_TELLURIC")
+                self._sofdict['PIXTABLE_OBJECT'] = ['PIXTABLE_OBJECT_{i:04d}-{j:02d}.fits'.format(i+1,j+1) for j in range(24)]
+                self.write_sof(sof_filename="scipost_sky" + "{i:04d}".format(i+1) + tpl, new=True)
+                self.recipe_scipost(self.current_sof, 
+                        save='individual,skymodel', skymethod='simple', 
+                        darcheck='none', skymodel_frac=0.9, astrometry='TRUE')
+                name_products = dic_files_products['SKYFLAT']
+                self.recipe_scipost_sky(name_products)
+
+        # Write the MASTER TWILIGHT Table and save it
+        self.save_master_table('SKY', tpl_gtable, fits_tablename)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)

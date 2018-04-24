@@ -131,29 +131,31 @@ class PipeRecipes(object) :
         self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
             name=name_master, tpl=tpl))
     
-    def recipe_twilight(self, sof, name_master, tpl):
+    def recipe_twilight(self, sof, name_master, name_products, tpl):
         """Running the esorex muse_twilight recipe
         """
         self.run_oscommand("{esorex} muse_twilight {sof}".format(esorex=self.esorex, sof=sof))
         # Moving the TWILIGHT CUBE
         self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
             name=name_master, tpl=tpl))
-        self.run_oscommand('rm DATACUBE_SKYFLAT*.fits')
-        self.run_oscommand('rm TWILIGHT_CUBE*.fits')
+        [name_cube_skyflat, name_twilight_cube] = name_products
+        self.run_oscommand('rm {name}*.fits'.format(name=name_cube_skyflat))
+        self.run_oscommand('rm {name}*.fits'.format(name=name_twilight_cube))
 
-    def recipe_std(self, sof, name_cube, name_flux, name_response, name_telluric, tpl):
+    def recipe_std(self, sof, name_products, tpl):
         """Running the esorex muse_stc recipe
         """
+        [name_cube, name_flux, name_response, name_telluric] = name_products
         self.run_oscommand("{esorex} muse_standard {sof}".format(esorex=self.esorex,
                 sof=sof))
-        self.run_oscommand('{nocache} cp DATACUBE_STD_0001.fits DATACUBE_STD_{tpl}.fits'.format(nocache=self.nocache,
-            tpl=tpl))
-        self.run_oscommand('{nocache} cp STD_FLUXES_0001.fits STD_FLUXES_{tpl}.fits'.format(nocache=self.nocache,
-            tpl=tpl))
-        self.run_oscommand('{nocache} cp STD_RESPONSE_0001.fits STD_RESPONSE_{tpl}.fits'.format(nocache=self.nocache,
-            tpl=tpl))
-        self.run_oscommand('{nocache} cp STD_TELLURIC_0001.fits STD_TELLURIC_{tpl}.fits'.format(nocache=self.nocache,
-            tpl=tpl))
+        self.run_oscommand('{nocache} cp {name_cube}_0001.fits {name_cube}_{tpl}.fits'.format(nocache=self.nocache,
+            name_cube=name_cube, tpl=tpl))
+        self.run_oscommand('{nocache} cp {name_flux}_0001.fits {name_flux}_{tpl}.fits'.format(nocache=self.nocache,
+            name_flux=name_flux, tpl=tpl))
+        self.run_oscommand('{nocache} cp {name_response}_0001.fits {name_response}_{tpl}.fits'.format(nocache=self.nocache,
+            name_response=name_response, tpl=tpl))
+        self.run_oscommand('{nocache} cp {name_telluric}_0001.fits {name_telluric}_{tpl}.fits'.format(nocache=self.nocache,
+            name_telluric=name_telluric, tpl=tpl))
 
     def recipe_scibasic(self, sof):
         """Running the esorex muse_scibasic recipe
@@ -172,6 +174,12 @@ class PipeRecipes(object) :
                     pixfrac=pixfrac, filt=filter_list, sky=skymethod, 
                     darkcheck=darcheck, model=skymodel_frac, sof=sof))
     
+    def recipe_scipost_sky(self, name_products, tpl, expno):
+        [namespc, name_pixtable] = name_products
+        self.run_oscommand('{nocache} cp {name}_0001.fits {name}_{tpl}_{no:02d}.fits'.format(name=namespec, tpl=tpl, no=expno))
+        self.run_oscommand('{nocache} cp {name}_0001.fits {name}_{tpl}_{no:02d}.fits'.format(name=name_pixtable, tpl=tpl, no=expno))
+        self.run_oscommand('rm {name}_0001.fits'.format(name=name_pixtable))
+
     def recipe_align(self, sof, srcmin=1, srcmax=10):
         """Running the muse_exp_align recipe
         """
