@@ -16,17 +16,27 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Standard modules
 import os
 from os.path import join as joinpath
+import collections
+from collections import OrderedDict
 import musepipe as mpipe
+
+class SofDict(OrderedDict) :
+    """New Dictionary for the SOF writing
+    Inheriting from ordered Dictionary
+    """
+    def __init__(self) :
+        OrderedDict.__init__(self)
 
 class SofPipe(object) :
     """SofPipe class containing all the SOF writing modules
     """
-    def __init__(self, verbose=True) :
+    def __init__(self) :
         """Initialisation of SofPipe
         """
-        self.verbose = verbose
+        # Creating an empty dictionary for the SOF writing
+        self._sofdict = SofDict()
 
-    def write_sof(self, sof_filename, sof_folder=None, dic_files={}, new=False, verbose=None) :
+    def write_sof(self, sof_filename, sof_folder=None, new=False, verbose=None) :
         """Feeding an sof file with input filenames from a dictionary
         """
         # Setting the default SOF folder if not provided
@@ -41,20 +51,20 @@ class SofPipe(object) :
         if new :
             sof_file = open(sof, "w+")
             if verbose :
-                print("Writing in file {0}".format(sof))
+                mpipe.print_info("Writing in file {0}".format(sof))
         # if not new, then append
         else :
             sof_file = open(sof, "a")
             if verbose :
-                print("Appending in file {0}".format(sof))
+                mpipe.print_info("Appending in file {0}".format(sof))
     
         # Use dictionary to write up the lines
-        for key in dic_files.keys() :
-            for item in dic_files[key] :
+        for key in self._sofdict.keys() :
+            for item in self._sofdict[key] :
                 text_to_write = "{0} {1}\n".format(item, key)
                 sof_file.write(text_to_write)
                 if verbose :
-                    print(text_to_write)
+                    mpipe.print_info(text_to_write)
 
         sof_file.close()
         # Returning the current sof as relative path

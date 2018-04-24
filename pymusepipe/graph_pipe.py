@@ -36,7 +36,11 @@ __version__ = '0.0.1 (23 March 2018)'
 ############################################################
 #                      END
 ############################################################
+PLOT = '\033[1;35;20m'
+ENDC = '\033[0m'
 
+def print_fig(text) :
+    print(PLOT + "# GraphPipeInfo " + ENDC + text)
 
 #########################################################################
 # Main class
@@ -69,7 +73,7 @@ class GraphMuse(object):
         """Start the page
         """
         if self.verbose :
-            print("Starting page {0}".format(self.npages+1))
+            print_fig("Starting page {0}".format(self.npages+1))
         plt.figure(figsize=self.figsize)
 
     def plot_page(self, list_data) :
@@ -80,7 +84,7 @@ class GraphMuse(object):
         and spectra (1 spectrum per line over 2 columns)
         """
         if len(list_data) == 0 :
-            print("WARNING: datalist is empty, no plots will be created")
+            print_fig("WARNING: datalist is empty, no plots will be created")
             return
 
         self.start_page()
@@ -118,7 +122,7 @@ class GraphMuse(object):
         sky_lines = [5577., 6300., 6864., 7914., 8344., 8827.]
 
         if set_of_spectra is None :
-            print("ERROR: list of spectra is empty")
+            print_fig("ERROR: list of spectra is empty")
             return
 
         for spec in set_of_spectra :
@@ -137,7 +141,7 @@ class GraphMuse(object):
         Skipping the ones that are 'None'
         """
         if set_of_images is None :
-            print("ERROR: list of images is empty")
+            print_fig("ERROR: list of images is empty")
             return
 
         for i in range(set_of_images.__len__()) :

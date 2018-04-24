@@ -8,13 +8,11 @@ __copyright__ = "(c) 2017, ESO + CRAL"
 __license__   = "3-clause BSD License"
 __contact__   = " <eric.emsellem@eso.org>"
 
-# Importing modules
-import warnings
-
 # Standard modules
 import os
 from os.path import join as joinpath
 import copy
+import musepipe as mpipe
 
 ############################################################
 #                      BEGIN
@@ -40,9 +38,9 @@ dic_calib_tables = {
             # Raw Data files
             "badpix_table" : "badpix_table_2015-06-02.fits",
             # Reduced files
-            "vignetting_table" : "vignetting_mask.fits",
+            "vignetting_mask" : "vignetting_mask.fits",
             # Pixel tables
-            "std_flux_Table" : "std_flux_table.fits",
+            "std_flux_table" : "std_flux_table.fits",
             # Sky Flat files
             "extinct_table" : "extinct_table.fits",
             # Line Catalog
@@ -107,6 +105,7 @@ dic_folders = {
             "figures" : "Figures/",
             }
 
+
 ############################################################
 # Main class InitMuseParameters
 ############################################################
@@ -129,9 +128,9 @@ class InitMuseParameters(object) :
 
         if rc_filename is None :
             if not os.path.isfile(default_rc_filename):
-                warnings.warn(("WARNING: No filename or {default_rc} file "
+                mpipe.print_warning(("No filename or {default_rc} file "
                      "to initialise from. We will use the default hardcoded " 
-                     "in the init_musepipe.py module").format(default_rc=default_rc_filename), RuntimeWarning)
+                     "in the init_musepipe.py module").format(default_rc=default_rc_filename))
                 self.init_default_param(dic_user_folders)
 
             else :
@@ -162,7 +161,7 @@ class InitMuseParameters(object) :
         """
         for key in dic_param.keys() :
             if self.verbose :
-                print("Default initialisation of attribute {0}".format(key))
+                mpipe.print_info("Default initialisation of attribute {0}".format(key))
             setattr(self, key, dic_param[key])
 
     def read_param_file(self, filename, dic_param) :
@@ -170,10 +169,9 @@ class InitMuseParameters(object) :
         """
         # Testing existence of filename
         if not os.path.isfile(filename) :
-            warnings.warn(("ERROR: input parameter {inputname} cannot be found. "
+            mpipe.print_info(("ERROR: input parameter {inputname} cannot be found. "
                     "We will use the default hardcoded in the "
-                    "init_musepipe.py module").format(inputname=filename),
-                    RuntimeWarning)
+                    "init_musepipe.py module").format(inputname=filename))
             return
 
         # If it exists, open and read it
@@ -188,7 +186,7 @@ class InitMuseParameters(object) :
             sline = line.split()
             if sline[0] in dic_param.keys() :
                 if self.verbose :
-                    print("Initialisation of attribute {0}".format(sline[0]))
+                    mpipe.print_info("Initialisation of attribute {0}".format(sline[0]))
                 setattr(self, sline[0], sline[1]) 
                 # Here we drop the item which was initialised
                 val = dummy_dic_param.pop(sline[0])
@@ -199,7 +197,7 @@ class InitMuseParameters(object) :
         not_initialised_param = dummy_dic_param.keys()
         # Listing them as warning and using the hardcoded default
         for key in not_initialised_param :
-            warnings.warn(("WARNING: parameter {param} not initialised "
+            mpipe.print_info(("WARNING: parameter {param} not initialised "
                    "We will use the default hardcoded value from "
                    "init_musepipe.py").format(param=key))
             setattr(self, key, dic_param[key])
@@ -216,14 +214,14 @@ class MusepipeSample(object) :
 class MusepipeTarget(object) :
     def __init__(self, galaxyname=None, pointing=1) :
         if galaxyname not in MUSEPIPE_sample.keys() :
-            print("ERROR: no Galaxy named {gal} in the defined sample".format(gal=galaxyname))
+            mpipe.print_error("ERROR: no Galaxy named {gal} in the defined sample".format(gal=galaxyname))
             return
 
-        print("Initialising Target {name}".format(name=galaxyname))
+        mpipe.print_info("Initialising Target {name}".format(name=galaxyname))
         self.targetname = galaxyname
         self.info_pointings = MUSEPIPE_sample[galaxyname]
         if pointing not in self.info_pointings.keys() :
-            print("ERROR: no pointing {pointing} for the Galaxy".format(pointing))
+            mpipe.print_error("ERROR: no pointing {pointing} for the Galaxy".format(pointing))
             return
         self.pointing = pointing
         self.run = self.info_pointings[pointing]

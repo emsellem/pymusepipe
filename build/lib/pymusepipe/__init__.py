@@ -5,6 +5,7 @@
     muse dataframes.
 """
 from pymusepipe import * 
+import musepipe as mpipe
 from musepipe import *
 __all__ = ['init_musepipe', 'musepipe', 'graph_pipe', 'mpdaf_pipe', 'check_pipe',
         'emission_lines', 'recipes_pipe', 'create_sof']

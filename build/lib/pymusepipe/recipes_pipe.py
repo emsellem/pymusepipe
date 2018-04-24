@@ -32,8 +32,8 @@ class PipeRecipes(object) :
 
         self.fakemode = fakemode
         if self.verbose :
-            if fakemode : print("WARNING: running in FAKE mode")
-            else : print("WARNING: running actual recipes")
+            if fakemode : mpipe.print_warning("WARNING: running in FAKE mode")
+            else : mpipe.print_warning("WARNING: running actual recipes")
 
         # Addressing CPU by number (cpu0=start, cpu1=end)
         self.first_cpu = first_cpu
@@ -69,7 +69,7 @@ class PipeRecipes(object) :
             for i in range(1, len(list_cpu)) :
                 self.list_cpu += ":{0}".format(list_cpu[i])
         if self.verbose:
-            print("LIST_CPU: {0}".format(list_cpu))
+            mpipe.print_info("LIST_CPU: {0}".format(list_cpu))
 
     def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
@@ -127,35 +127,45 @@ class PipeRecipes(object) :
         """
         self.run_oscommand("{esorex} muse_lsf --nifu={nifu} --merge={merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
-        # Moving the MASTER WAVE
+        # Moving the MASTER LST PROFILE
         self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
             name=name_master, tpl=tpl))
     
-    def recipe_twilight(self, sof):
+    def recipe_twilight(self, sof, name_master, tpl):
         """Running the esorex muse_twilight recipe
         """
-        os.system('{esorex} muse_twilight sof'.format(esorex=self.esorex, sof=sof))
+        self.run_oscommand("{esorex} muse_twilight {sof}".format(esorex=self.esorex, sof=sof))
+        # Moving the TWILIGHT CUBE
+        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+            name=name_master, tpl=tpl))
+        self.run_oscommand('rm DATACUBE_SKYFLAT*.fits')
+        self.run_oscommand('rm TWILIGHT_CUBE*.fits')
 
-    def recipe_std(self, sof):
+    def recipe_std(self, sof, name_cube, name_flux, name_response, name_telluric, tpl):
         """Running the esorex muse_stc recipe
         """
-        os.system("{esorex} muse_scibasic --nifu={nifu} --saveimage=FALSE "
-            "--merge={merge} {sof}".format(esorex=self.esorex, nifu=self.nifu, 
-                merge=self.merges, sof=sof))
-        create_sof_standard('std.sof')
-        os.system('{esorex} muse_standard std.sof'.format(esorex=self.esorex))
-    
+        self.run_oscommand("{esorex} muse_standard {sof}".format(esorex=self.esorex,
+                sof=sof))
+        self.run_oscommand('{nocache} cp DATACUBE_STD_0001.fits DATACUBE_STD_{tpl}.fits'.format(nocache=self.nocache,
+            tpl=tpl))
+        self.run_oscommand('{nocache} cp STD_FLUXES_0001.fits STD_FLUXES_{tpl}.fits'.format(nocache=self.nocache,
+            tpl=tpl))
+        self.run_oscommand('{nocache} cp STD_RESPONSE_0001.fits STD_RESPONSE_{tpl}.fits'.format(nocache=self.nocache,
+            tpl=tpl))
+        self.run_oscommand('{nocache} cp STD_TELLURIC_0001.fits STD_TELLURIC_{tpl}.fits'.format(nocache=self.nocache,
+            tpl=tpl))
+
     def recipe_scibasic(self, sof):
         """Running the esorex muse_scibasic recipe
         """
-        os.system("{esorex} muse_scibasic --nifu={nifu} "
+        self.run_oscommand("{esorex} muse_scibasic --nifu={nifu} "
                 "--saveimage=FALSE --merge={merge} {sof}".format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof))
     
     def recipe_scipost(self, sof, save='cube', filter_list='white', skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE'):
         """Running the esorex muse_scipost recipe
         """
-        os.system("{esorex} muse_scipost --astrometry={astro} --save={save} "
+        self.run_oscommand("{esorex} muse_scipost --astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darcheck={darkcheck} --skymodel_frac={model:02f} "
                 "{sof}".format(esorex=self.esorex, astro=astrometry, save=save, 

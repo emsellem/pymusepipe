@@ -17,10 +17,13 @@ import glob
 __version__ = '0.0.1 (15 March 2018)'
 
 from graph_pipe import GraphMuse
-from mpdaf_pipe import *
-from musepipe import *
 
 name_final_datacube = "DATACUBE_FINAL.fits"
+PLOT = '\033[1;34;20m'
+ENDC = '\033[0m'
+
+def print_plot(text) :
+    print(PLOT + "# CheckPipeInfo " + ENDC + text)
 
 class CheckPipe(MusePipe) :
     """Checking the outcome of the data reduction
@@ -60,7 +63,7 @@ class CheckPipe(MusePipe) :
     def check_quadrants(self) :
         """Checking spectra from the 4 quadrants
         """
-        print("Plotting the 4 quadrants-spectra")
+        mpipe.print_plot("Plotting the 4 quadrants-spectra")
         self.pdf.plot_page(self.cube.spec_4quad)
 
     def check_master_bias_flat(self) :
@@ -69,7 +72,7 @@ class CheckPipe(MusePipe) :
         bias = self.get_master(mastertype="Bias", scale='arcsinh', title="Master Bias")
         flat = self.get_master(mastertype="Flat", scale='arcsing', title="Master Flat")
         tocheck = MuseSetImages(bias, flat, subtitle="Master Bias - Master Flat")
-        print("Plotting the Master Bias and Flat")
+        mpipe.print_plot("Plotting the Master Bias and Flat")
         self.pdf.plot_page(tocheck)
 
     def check_white_Ha_image(self, velocity=0.) :
@@ -79,7 +82,7 @@ class CheckPipe(MusePipe) :
         white = self.cube.get_whiteimage_from_cube()
         Ha = self.cube.get_emissionline_image(line="Ha", velocity=velocity)
         tocheck = MuseSetImages(white, Ha, subtitle="White and Halpha images")
-        print("Plotting the White and Ha images")
+        mpipe.print_plot("Plotting the White and Ha images")
         self.pdf.plot_page(tocheck)
 
     def check_sky_spectra(self) :
@@ -93,7 +96,7 @@ class CheckPipe(MusePipe) :
                 add_sky_lines=True))
             counter += 1
 
-        print("Plotting the sky spectra")
+        mpipe.print_plot("Plotting the sky spectra")
         self.pdf.plot_page(tocheck)
 
     def check_Ha_images(self) :
@@ -106,6 +109,6 @@ class CheckPipe(MusePipe) :
             tocheck.append(MuseImage(filename=imaname, title="Ha {0:2d}".format(counter)))
             counter += 1
 
-        print("Plotting the set of Ha images")
+        mpipe.print_plot("Plotting the set of Ha images")
         self.pdf.plot_page(tocheck)
 
