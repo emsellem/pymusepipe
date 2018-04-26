@@ -45,6 +45,8 @@ dic_calib_tables = {
             "extinct_table" : "extinct_table.fits",
             # Line Catalog
             "line_catalog" : "line_catalog.fits",
+            # Filter List
+            "filter_list" : "filter_list.fits",
             }
 
 # ----------------- Galaxies and Pointings ----------------#
@@ -93,7 +95,9 @@ dic_folders = {
             "master" : "Master/",
             # Reduced files
             "reduced" : "Reduced/",
-            # Sky Flat files
+            # Object files
+            "object" : "Object/",
+            # Sky files
             "sky" : "Sky/",
             # Cubes
             "cubes" : "Cubes/",

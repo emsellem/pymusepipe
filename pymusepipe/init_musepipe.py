@@ -45,7 +45,26 @@ dic_calib_tables = {
             "extinct_table" : "extinct_table.fits",
             # Line Catalog
             "line_catalog" : "line_catalog.fits",
+            # Filter List
+            "filter_list" : "filter_list.fits",
             }
+
+import dateutils
+from dateutil import parser
+dic_geo_table = {
+        '2000-01-01': "geometry_table_wfm.fits",
+        '2014-12-01': "geometry_table_wfm.fits",
+        '2015-04-16': "geometry_table_wfm.fits",
+        '2015-09-08': "geometry_table_wfm.fits",
+        }
+
+dic_astro_table = {
+        '2000-01-01': "astrometry_table_wfm.fits",
+        '2014-12-01': "astrometry_table_wfm.fits",
+        '2015-04-16': "astrometry_table_wfm.fits",
+        '2015-09-08': "astrometry_table_wfm.fits",
+        }
+
 
 # ----------------- Galaxies and Pointings ----------------#
 
@@ -93,7 +112,9 @@ dic_folders = {
             "master" : "Master/",
             # Reduced files
             "reduced" : "Reduced/",
-            # Sky Flat files
+            # Object files
+            "object" : "Object/",
+            # Sky files
             "sky" : "Sky/",
             # Cubes
             "cubes" : "Cubes/",
