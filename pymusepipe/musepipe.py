@@ -24,9 +24,6 @@ import os
 from os.path import join as joinpath
 import time
 
-import dateutils
-from dateutil import parser
-
 # cpl module to link with esorex
 try :
     import cpl
@@ -63,10 +60,10 @@ from create_sof import SofPipe
 likwid = "likwid-pin -c N:"
 
 # Included an astropy table
-__version__ = '0.1.0 (03 April    2018)'
-
-__version__ = '0.0.2 (08 March    2018)'
-__version__ = '0.0.1 (21 November 2017)'
+__version__ = '0.2.0 (22 May 2018)'
+#__version__ = '0.1.0 (03 April    2018)'
+#__version__ = '0.0.2 (08 March    2018)'
+#__version__ = '0.0.1 (21 November 2017)'
 
 ############################################################
 #                      BEGIN
@@ -78,7 +75,7 @@ __version__ = '0.0.1 (21 November 2017)'
 # init_musepipe.py for consistency.
 
 listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT,LAMP': 'FLAT',
-        'FLAT,LAMP,ILLUM' : 'ILLUM', 'FLAT,SKY': 'SKYFLAT', 
+        'FLAT,LAMP,ILLUM' : 'ILLUM', 'FLAT,SKY': 'TWILIGHT', 
         'WAVE': 'WAVE', 'STD': 'STD', 'AST': 'AST',
         'OBJECT': 'OBJECT', 'SKY': 'SKY'
         }
@@ -88,10 +85,12 @@ dic_listMaster = {'DARK': ['Dark', 'MASTER_DARK'],
         'BIAS': ['Bias', 'MASTER_BIAS'], 
         'FLAT': ['Flat', 'MASTER_FLAT'],
         'TRACE': ['Trace', 'TRACE_TABLE'],
-        'SKYFLAT': ['Twilight', 'TWILIGHT_CUBE'], 
+        'TWILIGHT': ['Twilight', 'TWILIGHT_CUBE'], 
         'WAVE': ['Wave', 'WAVECAL_TABLE'], 
         'LSF': ['Lsf', 'LSF_PROFILE'], 
         'STD': ['Std', 'PIXTABLE_STD'], 
+        'OBJECT': ['Object', 'DUMMY'], 
+        'SKY': ['Sky', 'DUMMY'], 
         }
 
 # listexpo_files = {"TYPE" : ['Type', 'ESO DPR TYPE', "raw_hdr_dprtype.txt"],
@@ -120,7 +119,7 @@ dic_files_tables = {'rawfiles': 'rawfiles_list_table.fits',
         'mastertrace': 'MASTER_TRACE_list_table.fits',
         'masterwave': 'WAVE_list_table.fits',
         'mastertwilight': 'TWILIGHT_list_table.fits',
-        'masterstandard': 'STD_list_table.fits',
+        'masterstd': 'STD_list_table.fits',
         'masterlsf': 'LSF_list_table.fits',
         'mastersky': 'SKY_list_table.fits',
         'masterobject': 'OBJECT_list_table.fits'
@@ -129,12 +128,30 @@ dic_files_tables = {'rawfiles': 'rawfiles_list_table.fits',
 dic_files_products = {
         'STD': ['DATACUBE_STD', 'STD_FLUXES', 
             'STD_RESPONSE', 'STD_TELLURIC'],
-        'SKYFLAT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
+        'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
         'SKY': ['SKY_SPECTRUM', 'PIXTABLE_REDUCED']
         }
 
 list_scibasic = ['OBJECT', 'SKY', 'STD']
         
+dic_geo_table = {
+        '1900-01-01': "geometry_table_wfm.fits",
+        '2000-01-01': "geometry_table_wfm.fits",
+        '2014-12-01': "geometry_table_wfm.fits",
+        '2015-04-16': "geometry_table_wfm.fits",
+        '2015-09-08': "geometry_table_wfm.fits",
+        }
+
+dic_astro_table = {
+        '1900-01-01': "astrometry_table_wfm.fits",
+        '2000-01-01': "astrometry_table_wfm.fits",
+        '2014-12-01': "astrometry_table_wfm.fits",
+        '2015-04-16': "astrometry_table_wfm.fits",
+        '2015-09-08': "astrometry_table_wfm.fits",
+        }
+
+future_date = '2099-01-01'
+
 ############################################################
 #                      END
 ############################################################
@@ -262,7 +279,7 @@ class MusePipe(PipeRecipes, SofPipe):
     def __init__(self, galaxyname=None, pointing=0, objectlist=[], rc_filename=None, 
             cal_filename=None, outlog=None, logfile="MusePipe.log", reset_log=False,
             verbose=True, mode="WFM-NOAO-N", checkmode=True, 
-            strong_checkmode=False, overwrite_table=False, create_raw_table=True, **kwargs):
+            strong_checkmode=False, **kwargs):
         """Initialise the file parameters to be used during the run
 
         Input
@@ -274,15 +291,34 @@ class MusePipe(PipeRecipes, SofPipe):
         cal_filename: filename to initiale FIXED calibration MUSE files
         outlog: string, output directory for the log files
         verbose: boolean. Give more information as output (default is True)
-        mode: (default is WFM_N) String to define the mode to be considered
-        checkmode: (default is True) Check the mode or not when reducing
-        strong_checkmode: (default is False) Enforce the checkmode for all if True, 
+        mode: string (default is WFM_N) String to define the mode to be considered
+        checkmode: boolean (default is True) Check the mode or not when reducing
+        strong_checkmode: boolean (default is False) Enforce the checkmode for all if True, 
                          or exclude DARK/BIAS if False
+
+        Other possible entries
+        ----------------------
+        overwrite_astropy_table: boolean (default is False). Overwrite the astropy table even when
+            it exists.
+        warnings: strong  ('ignore'by default. If set to ignore, will ignore the Astropy Warnings.
+        time_geo_table: boolean (default is True). Use the time dependent geo_table
+        time_astro_table: boolean (default is True). Use the time dependent astro_table
+
         """
+        # Verbose option
         self.verbose = verbose
+
+        # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')
         if self.warnings == 'ignore':
            warnings.simplefilter('ignore', category=AstropyWarning)
+
+        # Overwriting option for the astropy table
+        self._overwrite_astropy_table = kwargs.pop("overwrite_astropy_table", False)
+
+        # Use time dependent geo_table
+        self._time_geo_table = kwargs.pop("time_geo_table", True)
+        self._time_astro_table = kwargs.pop("time_astro_table", True)
 
         PipeRecipes.__init__(self, **kwargs)
         SofPipe.__init__(self)
@@ -298,7 +334,6 @@ class MusePipe(PipeRecipes, SofPipe):
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
 
-        self.overwrite_table = overwrite_table
 
         # Mode of the observations
         self.mode = mode
@@ -354,16 +389,12 @@ class MusePipe(PipeRecipes, SofPipe):
         # Now creating the raw table, and attribute containing the
         # astropy dataset probing the rawfiles folder
         self._reset_tables()
-        self.Tables = PipeObject(info="File astropy tables")
-        if create_raw_table :
-            if verbose :
-                print_info("Creating the astropy fits raw data table")
-            self.create_raw_table()
-        else :
-            if verbose :
-                print_info("Reading the existing astropy fits raw data table")
-            self.read_file_table(filetype='rawfiles')
-            self.sort_types()
+        if verbose :
+            print_info("Creating the astropy fits raw data table")
+        # When creating the table, if the table already exists
+        # it will read the old one, except if an overwrite_astropy_table
+        # is set to True.
+        self.create_raw_table()
         # ===========================================================
 
     def goto_prevfolder(self, logfile=False) :
@@ -455,13 +486,13 @@ class MusePipe(PipeRecipes, SofPipe):
         # Going back to the original folder
         self.goto_prevfolder()
 
-    def create_raw_table(self, overwrite_table=None, verbose=None, **kwargs) :
+    def create_raw_table(self, overwrite_astropy_table=None, verbose=None, **kwargs) :
         """ Create a fits table with all the information from
         the Raw files
         Also create an astropy table with the same info
         """
         if verbose is None: verbose = self.verbose
-        if overwrite_table is not None: self.overwrite_table = overwrite_table
+        if overwrite_astropy_table is not None: self._overwrite_astropy_table = overwrite_astropy_table
         name_table = kwargs.pop('name_table', dic_files_tables['rawfiles'])
 
         rawfolder = self.paths.rawfiles
@@ -471,12 +502,12 @@ class MusePipe(PipeRecipes, SofPipe):
 
         # Testing if raw table exists
         if os.path.isfile(name_table) :
-            if self.overwrite_table :
+            if self._overwrite_astropy_table :
                 print_warning("The raw-files table will be overwritten")
             else :
                 print_warning("The raw files table already exists")
                 print_warning("If you wish to overwrite it, "
-                      " please turn on the 'overwrite_table' option to 'True'")
+                      " please turn on the 'overwrite_astropy_table' option to 'True'")
                 print_warning("In the meantime, the existing table will be read and used")
                 self.goto_prevfolder()
                 self.read_file_table(filetype='rawfiles', folder=self.paths.rawfiles)
@@ -521,7 +552,7 @@ class MusePipe(PipeRecipes, SofPipe):
             self.Tables.rawfiles[namecol] = MUSE_infodic[k][idxsort]
 
         # Writing up the table
-        self.Tables.rawfiles.write(name_table, format="fits", overwrite=self.overwrite_table)
+        self.Tables.rawfiles.write(name_table, format="fits", overwrite=self._overwrite_astropy_table)
 
         # Sorting the type
         self.sort_types()
@@ -576,7 +607,7 @@ class MusePipe(PipeRecipes, SofPipe):
         return normpath(getattr(self.paths, self.dic_attr_master[expotype]))
 
     def _get_path_files(self, expotype) :
-        return normpath(getattr(self.paths, self.my_params.dic_folders[expotype.lower()]))
+        return normpath(getattr(self.paths, expotype.lower()))
 
     def select_closest_mjd(self, mjdin, group_table) :
         """Get the closest frame within the expotype
@@ -586,7 +617,7 @@ class MusePipe(PipeRecipes, SofPipe):
         # Get the closest tpl
         index = np.argmin((mjdin - group_table['mjd'])**2)
         closest_tpl = group_table[index]['tpls']
-        return closest_tpl
+        return index, closest_tpl
 
     def add_list_tplmaster_to_sofdict(self, mean_mjd, list_expotype):
         """Add a list of masterfiles to the SOF
@@ -599,8 +630,26 @@ class MusePipe(PipeRecipes, SofPipe):
         """
         if reset: self._sofdict.clear()
         # Finding the best tpl for this master
-        this_tpl = self.select_closest_mjd(mean_mjd, self._get_table_master(expotype)) 
+        index, this_tpl = self.select_closest_mjd(mean_mjd, self._get_table_master(expotype)) 
         self._sofdict[dic_listMaster[expotype][1]] = [self._get_name_master(expotype) + "_" + this_tpl + ".fits"]
+
+    def add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
+        """ Add item to dictionary for the sof writing
+        """
+        if reset: self._sofdict.clear()
+        # Finding the best tpl for this raw file type
+        expo_table = getattr(self.Tables, expotype)
+        index, this_tpl = self.select_closest_mjd(mean_mjd, expo_table) 
+        self._sofdict[expotype] = [expo_table['filename'][index]]
+
+    def add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, reset=False):
+        """ Add item to dictionary for the sof writing
+        """
+        if reset: self._sofdict.clear()
+        # Finding the best tpl for this sky calib file type
+        expo_table = getattr(self.Tables, expotype)
+        index, this_tpl = self.select_closest_mjd(mean_mjd, expo_table) 
+        self._sofdict[tag] = ["{0}_{1}.fits".format(tag, this_tpl)]
 
     def add_calib_to_sofdict(self, calibtype, reset=False):
         """Adding a calibration file for the SOF 
@@ -614,14 +663,12 @@ class MusePipe(PipeRecipes, SofPipe):
         for the SOF file
         """
         calfolder = self.my_params.musecalib
-        for key in dic_geo_table.keys():
-
-        if tpls < '2014-12-01':
-            geofile = self.my_params.geo_table
-        elif tpls >= '2014-12-01' and tpls<'2015-04-15':
-            geofile = self.my_params.geo_table
-        elif tpls >= '2015-04-16' and tpls<'2015-09-08':
-            geofile = self.my_params.geo_table
+        if self._time_geo_table :
+            listkeys = list(dic_geo_table.keys())
+            listkeys.append(future_date)
+            for ikey in range(len(listkeys) - 1):
+                if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
+                    geofile = dic_geo_table[listkeys[ikey]]
         else:
             geofile = self.my_params.geo_table
 
@@ -632,14 +679,15 @@ class MusePipe(PipeRecipes, SofPipe):
         for the SOF file
         """
         calfolder = self.my_params.musecalib
-        if tpls < '2014-12-01':
+        if self._time_geo_table :
+            listkeys = list(dic_astro_table.keys())
+            listkeys.append(future_date)
+            for ikey in range(len(listkeys) - 1):
+                if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
+                    astrofile = dic_astro_table[listkeys[ikey]]
+        else :
             astrofile = self.my_params.astro_table
-        elif tpls >= '2014-12-01' and tpls<'2015-04-15':
-            astrofile = self.my_params.astro_table
-        elif tpls >= '2015-04-16' and tpls<'2015-09-08':
-            astrofile = self.my_params.astro_table
-        else:
-            astrofile = self.my_params.astro_table
+
         self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]
 
     def save_master_table(self, expotype, tpl_gtable, fits_tablename=None):
@@ -651,13 +699,12 @@ class MusePipe(PipeRecipes, SofPipe):
         setattr(self.Tables, mastertype, tpl_gtable.groups.aggregate(np.mean)['tpls','mjd', 'tplnexp'])
         full_tablename = joinpath(getattr(self.paths, mastertype), fits_tablename)
         setattr(self.Tables, mastertype + "name", full_tablename)
-        print(full_tablename)
-        if (not self.overwrite_table) and os.path.isfile(full_tablename):
-            print_warning("Table {0} already exists, "
-                " use overwrite_table to overwrite it".format(mastertype.upper()))
+        if (not self._overwrite_astropy_table) and os.path.isfile(full_tablename):
+            print_warning("Astropy Table {0} already exists, "
+                " use overwrite_astropy_table to overwrite it".format(mastertype.upper()))
         else :
             getattr(self.Tables, mastertype).write(full_tablename, 
-                format="fits", overwrite=self.overwrite_table)
+                format="fits", overwrite=self._overwrite_astropy_table)
 
     def get_tpl_meanmjd(self, gtable):
         """Get tpl of the group and mean mjd of the group
@@ -677,7 +724,7 @@ class MusePipe(PipeRecipes, SofPipe):
         if len(MUSE_subtable) == 0:
             if self.verbose :
                 print_warning("Empty file table of type {0}".format(expotype))
-                print_warning("Returning an empty Table from the tpl selection")
+                print_warning("Returning an empty Table from the tpl -astropy- selection")
             return MUSE_subtable
 
         group_table = MUSE_subtable.group_by('tpls')
@@ -701,7 +748,7 @@ class MusePipe(PipeRecipes, SofPipe):
         tpl_gtable = self.select_tpl_files(expotype='BIAS', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                print_warning("No BIAS recovered from the file Table - Aborting")
+                print_warning("No BIAS recovered from the astropy Table - Aborting")
                 return
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -744,7 +791,7 @@ class MusePipe(PipeRecipes, SofPipe):
         tpl_gtable = self.select_tpl_files(expotype='FLAT,LAMP', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                print_warning("No FLAT recovered from the file Table - Aborting")
+                print_warning("No FLAT recovered from the astropy Table - Aborting")
                 return
 
         # Go to the data folder
@@ -792,7 +839,7 @@ class MusePipe(PipeRecipes, SofPipe):
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                print_warning("No WAVE recovered from the file Table - Aborting")
+                print_warning("No WAVE recovered from the astropy file Table - Aborting")
                 return
 
         # Go to the data folder
@@ -839,7 +886,7 @@ class MusePipe(PipeRecipes, SofPipe):
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                print_warning("No WAVE recovered from the file Table - Aborting")
+                print_warning("No WAVE recovered from the astropy file Table - Aborting")
                 return
 
         # Go to the data folder
@@ -871,9 +918,9 @@ class MusePipe(PipeRecipes, SofPipe):
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def run_twilight(self, sof_filename='skyflat', tpl="ALL", fits_tablename=None):
+    def run_twilight(self, sof_filename='twilight', tpl="ALL", fits_tablename=None):
         """Reducing the  files and creating the TWILIGHT CUBE.
-        Will run the esorex muse_twilight command on all SKYFLAT
+        Will run the esorex muse_twilight command on all TWILIGHT
 
         Parameters
         ----------
@@ -886,7 +933,7 @@ class MusePipe(PipeRecipes, SofPipe):
         tpl_gtable = self.select_tpl_files(expotype='FLAT,SKY', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                print_warning("No SKYFLAT recovered from the file Table - Aborting")
+                print_warning("No TWILIGHT recovered from the astropy file Table - Aborting")
                 return
 
         # Go to the data folder
@@ -901,21 +948,22 @@ class MusePipe(PipeRecipes, SofPipe):
             tpl, mean_mjd = self.get_tpl_meanmjd(gtable)
             self.add_geometry_to_sofdict(tpl)
             # Provide the list of files to the dictionary
-            self._sofdict['SKYFLAT'] = add_listpath(self._get_path_master('SKYFLAT'),
+            self._sofdict['TWILIGHT'] = add_listpath(self._get_path_master('TWILIGHT'),
                     + gtable['filename'].data.astype(np.object))
             # Finding the best tpl for BIAS, ILLUM, FLAT, TRACE, WAVE
-            self.add_list_tplmaster_to_sofdict(mean_mjd, 
-                    ['BIAS', 'ILLUM', 'FLAT', 'TRACE', 'WAVE'])
+            self.add_tplraw_to_sofdict(mean_mjd, "ILLUM")
+            self.add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 'TRACE', 'WAVE'])
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Wave
-            name_mastertwilight = self._get_name_master('SKYFLAT')
+            name_mastertwilight = self._get_name_master('TWILIGHT')
             # Run the recipe
-            name_products = dic_files_products['SKYFLAT']
-            self.recipe_twilight(self.current_sof, name_mastertwilight, name_products, tpl)
+            name_products = dic_files_products['TWILIGHT']
+            dir_products = self._get_path_master('TWILIGHT')
+            self.recipe_twilight(self.current_sof, name_mastertwilight, dir_products, name_products, tpl)
 
-        # Write the MASTER SKYFLAT Table and save it
-        self.save_master_table('SKYFLAT', tpl_gtable, fits_tablename)
+        # Write the MASTER TWILIGHT Table and save it
+        self.save_master_table('TWILIGHT', tpl_gtable, fits_tablename)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -926,7 +974,7 @@ class MusePipe(PipeRecipes, SofPipe):
         """
         for expotype in list_object:
             sof_filename = 'scibasic_{0}'.format(expotype.lower())
-            run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl)
+            self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl)
 
     def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL", fits_tablename=None):
         """Reducing the files of a certain category and creating the PIXTABLES
@@ -943,7 +991,7 @@ class MusePipe(PipeRecipes, SofPipe):
         tpl_gtable = self.select_tpl_files(expotype=expotype, tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                print_warning("No {0} recovered from the file Table - Aborting".format(expotype))
+                print_warning("No {0} recovered from the astropy file Table - Aborting".format(expotype))
                 return
 
         # Go to the data folder
@@ -958,15 +1006,23 @@ class MusePipe(PipeRecipes, SofPipe):
             tpl, mean_mjd = self.get_tpl_meanmjd(gtable)
             self.add_geometry_to_sofdict(tpl)
             # Provide the list of files to the dictionary
-            self._sofdict[expotype] = add_listpath(self._get_path_files(expotype)
+            self._sofdict[expotype] = add_listpath(self._get_path_files(expotype),
                     + gtable['filename'].data.astype(np.object))
             # Finding the best tpl for BIAS
-            self.add_list_tplmaster_to_sofdict(mean_mjd, 
-                    ['BIAS', 'ILLUM', 'FLAT', 'TRACE', 'WAVE', 'SKYFLAT'])
+            self.add_tplraw_to_sofdict(mean_mjd, "ILLUM") 
+            self.add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 
+                'TRACE', 'WAVE', 'TWILIGHT'])
             # Writing the sof file
-            self.write_sof(sof_filename=sof_filename + tpl, new=True)
+            self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Run the recipe to reduce the standard (muse_scibasic)
-            self.recipe_scibasic(self.current_sof)
+            if expotype == 'STD':
+                dir_products = self._get_path_master('STD')
+                name_products = [joinpath(dir_products, 
+                    'PIXTABLE_STD_0001-{0:02d}.fits'.format(j+1)) for j in range(24)]
+            else:
+                dir_products = None
+                name_products=None
+            self.recipe_scibasic(self.current_sof, dir_products, name_products, tpl)
 
         # Write the MASTER files Table and save it
         self.save_master_table(expotype, tpl_gtable, fits_tablename)
@@ -974,7 +1030,7 @@ class MusePipe(PipeRecipes, SofPipe):
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def run_std(self, sof_filename='standard', tpl="ALL", fits_tablename=None):
+    def run_std(self, sof_filename='standard', tpl="ALL"):
         """Reducing the STD files after they have been obtained
         Running the muse_standard routine
 
@@ -986,30 +1042,34 @@ class MusePipe(PipeRecipes, SofPipe):
 
         """
         # First selecting the files via the grouped table
-        std_table = self.Tables.masterstandard
+        std_table = self.Tables.masterstd
         if len(std_table) == 0:
             if self.verbose :
-                print_warning("No STD recovered from the file Table - Aborting")
+                print_warning("No STD recovered from the astropy file Table - Aborting")
                 return
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
 
-        # Create the dictionary for the LSF including
-        # the list of files to be processed for one MASTER Flat
+        # Create the dictionary for the STD Sof
         for i in range(len(std_table)):
+            mytpl = std_table['tpls'][i]
+            if tpl != "ALL" and tpl != mytpl :
+                continue
             # Now starting with the standard recipe
             self.add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
-            self.add_calib_to_sofdict("STANDARD_FLUX_TABLE")
-            self._sofdict['PIXTABLE_STD'] = ['PIXTABLE_STD_0001-{i:02d}.fits'.format(j+1) for j in range(24)]
-            self.write_sof(sof_filename=sof_filename + tpl, new=True)
+            self.add_calib_to_sofdict("STD_FLUX_TABLE")
+            dir_products = self._get_path_master('STD')
+            self._sofdict['PIXTABLE_STD'] = [joinpath(dir_products, 
+                'PIXTABLE_STD_{0}-{1:02d}.fits'.format(mytpl, j+1)) for j in range(24)]
+            self.write_sof(sof_filename=sof_filename + "_" + mytpl, new=True)
             name_products = dic_files_products['STD']
-            self.recipe_std(self.current_sof, name_products, tpl)
+            self.recipe_std(self.current_sof, dir_products, name_products, mytpl)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def run_sky(self, sof_filename='sky', tpl="ALL", fits_tablename=None):
+    def run_sky(self, sof_filename='sky', tpl="ALL", fraction=0.8):
         """Reducing the SKY after they have been scibasic reduced
         Will run the esorex muse_create_sky routine
 
@@ -1024,7 +1084,7 @@ class MusePipe(PipeRecipes, SofPipe):
         sky_table = self.Tables.mastersky
         if len(sky_table) == 0:
             if self.verbose :
-                print_warning("No SKY recovered from the file Table - Aborting")
+                print_warning("No SKY recovered from the astropy file Table - Aborting")
                 return
 
         # Go to the data folder
@@ -1033,16 +1093,33 @@ class MusePipe(PipeRecipes, SofPipe):
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
         for i in range(len(sky_table)):
+            mytpl = sky_table['tpls'][i]
+            mymjd = sky_table['mjd'][i]
+            if tpl != "ALL" and tpl != mytpl :
+                continue
             # Now starting with the standard recipe
-            self.add_calib_to_sofdict("STANDARD_RESPONSE", reset=True)
-            self.add_calib_to_sofdict("STANDARD_TELLURIC")
-            self._sofdict['PIXTABLE_SKY'] = ['PIXTABLE_SKY{i:04d}-{j:02d}.fits'.format(i+1,j+1) for j in range(24)]
-            self.write_sof(sof_filename=sof_filename + "{i:02d}".format(i+1) + tpl, new=True)
-            name_products = dic_files_products['SKYFLAT']
-            self.recipe_sky(self.current_sof, name_products)
+            self.add_skycalib_to_sofdict("STD_RESPONSE", mymjd, 'STD', reset=True)
+            self.add_skycalib_to_sofdict("STD_TELLURIC", mymjd, 'STD')
+            self._sofdict['PIXTABLE_SKY'] = ['PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(i+1,j+1) for j in range(24)]
+            self.write_sof(sof_filename=sof_filename + "{0:02d}".format(i+1) + "_" + mytpl, new=True)
+            name_products = dic_files_products['SKY']
+            dir_products = self._get_path_master('SKY')
+            self.recipe_sky(self.current_sof, dir_products, name_products, mytpl, fraction=fraction)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
+
+    def run_all_recipes(self, fraction=0.8):
+        """Running all recipes in one shot
+        """
+        self.run_bias()
+        self.run_flat()
+        self.run_wave()
+        self.run_lsf()
+        self.run_twilight()
+        self.run_scibasic_all()
+        self.run_std()
+        self.run_sky(fraction=fraction)
 
 #    def create_calibrations(self):
 #        self.check_for_calibrations()

@@ -24,6 +24,9 @@ import os
 from os.path import join as joinpath
 import time
 
+import dateutils
+from dateutil import parser
+
 # cpl module to link with esorex
 try :
     import cpl
@@ -607,24 +610,37 @@ class MusePipe(PipeRecipes, SofPipe):
         self._sofdict[calibtype] = [joinpath(self.my_params.musecalib, calibfile)]
 
     def add_geometry_to_sofdict(self, tpls):
+        """Extract the geometry table and add it to the dictionary
+        for the SOF file
+        """
+        calfolder = self.my_params.musecalib
+        for key in dic_geo_table.keys():
+
         if tpls < '2014-12-01':
-            self._sofdict['GEOMETRY_TABLE']=['%s/geometry_table_wfm_comm2b.fits'%(calib_dir)]
+            geofile = self.my_params.geo_table
         elif tpls >= '2014-12-01' and tpls<'2015-04-15':
-            self._sofdict['GEOMETRY_TABLE']=['%s/geometry_table_wfm_2014-12-01.fits'%(calib_dir)]
+            geofile = self.my_params.geo_table
         elif tpls >= '2015-04-16' and tpls<'2015-09-08':
-            self._sofdict['GEOMETRY_TABLE']=['%s/geometry_table_wfm_2015-04-16.fits'%(calib_dir)]
+            geofile = self.my_params.geo_table
         else:
-            self._sofdict['GEOMETRY_TABLE']=['%s/geometry_table_wfm.fits'%(calib_dir)]
+            geofile = self.my_params.geo_table
+
+        self._sofdict['GEOMETRY_TABLE']=["{folder}{geo}".format(folder=calfolder, geo=geofile)]
 
     def add_astrometry_to_sofdict(self, tpls):
+        """Extract the astrometry table and add it to the dictionary
+        for the SOF file
+        """
+        calfolder = self.my_params.musecalib
         if tpls < '2014-12-01':
-            self._sofdict['ASTROMETRY_WCS']=['%s/astrometry_wcs_wfm_comm2b.fits'%(calib_dir)]
+            astrofile = self.my_params.astro_table
         elif tpls >= '2014-12-01' and tpls<'2015-04-15':
-            self._sofdict['ASTROMETRY_WCS']=['%s/astrometry_wcs_wfm_2014-12-01.fits'%(calib_dir)]
+            astrofile = self.my_params.astro_table
         elif tpls >= '2015-04-16' and tpls<'2015-09-08':
-            self._sofdict['ASTROMETRY_WCS']=['%s/astrometry_wcs_wfm_2015-04-16.fits'%(calib_dir)]
+            astrofile = self.my_params.astro_table
         else:
-            self._sofdict['ASTROMETRY_WCS']=['%s/astrometry_wcs_wfm.fits'%(calib_dir)]
+            astrofile = self.my_params.astro_table
+        self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]
 
     def save_master_table(self, expotype, tpl_gtable, fits_tablename=None):
         """Save the Master Table corresponding to the mastertype

@@ -69,7 +69,7 @@ class PipeRecipes(object) :
             for i in range(1, len(list_cpu)) :
                 self.list_cpu += ":{0}".format(list_cpu[i])
         if self.verbose:
-            mpipe.print_info("LIST_CPU: {0}".format(list_cpu))
+            mpipe.print_info("LIST_CPU: {0}".format(self.list_cpu))
 
     def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
