@@ -50,7 +50,7 @@ class PipeRecipes(object) :
 
     @property
     def esorex(self):
-        return "{likwid}{list_cpu} {nocache} exorex".format(likwid=self.likwid, 
+        return "{likwid}{list_cpu} {nocache} esorex".format(likwid=self.likwid, 
                 list_cpu=self.list_cpu, nocache=self.nocache)
 
     @property
