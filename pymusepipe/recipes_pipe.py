@@ -100,33 +100,33 @@ class PipeRecipes(object) :
         self.run_oscommand("{esorex} muse_bias --nifu={nifu} {merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
         # Moving the MASTER BIAS
-        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+        self.run_oscommand("{nocache} mv {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
             name=name_master, tpl=tpl))
 
     def recipe_flat(self, sof, name_master, name_trace, tpl):
         """Running the esorex muse_flat recipe
         """
-        self.run_oscommand("{esorex} muse_flat --nifu={nifu} --merge={merge} {sof}".format(esorex=self.esorex,
+        self.run_oscommand("{esorex} muse_flat --nifu={nifu} {merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
         # Moving the MASTER FLAT and TRACE_TABLE
-        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+        self.run_oscommand("{nocache} mv {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
             name=name_master, tpl=tpl))
-        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+        self.run_oscommand("{nocache} mv {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
             name=name_trace, tpl=tpl))
 
     def recipe_wave(self, sof, name_master, tpl):
         """Running the esorex muse_wavecal recipe
         """
-        self.run_oscommand("{esorex} muse_wavecal --nifu={nifu} --resample --residuals --merge={merge} {sof}".format(esorex=self.esorex,
+        self.run_oscommand("{esorex} muse_wavecal --nifu={nifu} --resample --residuals {merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
         # Moving the MASTER WAVE
-        self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
+        self.run_oscommand("{nocache} mv {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
             name=name_master, tpl=tpl))
     
     def recipe_lsf(self, sof, name_master, tpl):
         """Running the esorex muse_lsf recipe
         """
-        self.run_oscommand("{esorex} muse_lsf --nifu={nifu} --merge={merge} {sof}".format(esorex=self.esorex,
+        self.run_oscommand("{esorex} muse_lsf --nifu={nifu} {merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof))
         # Moving the MASTER LST PROFILE
         self.run_oscommand("{nocache} cp {name}.fits {name}_{tpl}.fits".format(nocache=self.nocache, 
@@ -173,7 +173,7 @@ class PipeRecipes(object) :
         """Running the esorex muse_scibasic recipe
         """
         self.run_oscommand("{esorex} muse_scibasic --nifu={nifu} "
-                "--saveimage=FALSE --merge={merge} {sof}".format(esorex=self.esorex, 
+                "--saveimage=FALSE {merge} {sof}".format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof))
 
         if name_products is not None :

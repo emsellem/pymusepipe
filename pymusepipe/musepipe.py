@@ -2,12 +2,13 @@
 
 """MUSE-PHANGS core module
 """
+# For print - see compatibility with Python 3
+from __future__ import print_function
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
 __license__   = "3-clause BSD License"
 __contact__   = " <eric.emsellem@eso.org>"
-
 
 # This module has been largely inspired by one developed 
 # by Kyriakos and Martina from the GTO MUSE MAD team
@@ -81,16 +82,16 @@ listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT,LAMP': 'FLAT',
         }
 
 # This dictionary contains the types
-dic_listMaster = {'DARK': ['Dark', 'MASTER_DARK'], 
-        'BIAS': ['Bias', 'MASTER_BIAS'], 
-        'FLAT': ['Flat', 'MASTER_FLAT'],
-        'TRACE': ['Trace', 'TRACE_TABLE'],
-        'TWILIGHT': ['Twilight', 'TWILIGHT_CUBE'], 
-        'WAVE': ['Wave', 'WAVECAL_TABLE'], 
-        'LSF': ['Lsf', 'LSF_PROFILE'], 
-        'STD': ['Std', 'PIXTABLE_STD'], 
-        'OBJECT': ['Object', 'DUMMY'], 
-        'SKY': ['Sky', 'DUMMY'], 
+dic_listMaster = {'DARK': 'MASTER_DARK', 
+        'BIAS': 'MASTER_BIAS', 
+        'FLAT': 'MASTER_FLAT',
+        'TRACE': 'TRACE_TABLE',
+        'TWILIGHT': 'TWILIGHT_CUBE', 
+        'WAVE': 'WAVECAL_TABLE', 
+        'LSF': 'LSF_PROFILE', 
+        'STD': 'PIXTABLE_STD', 
+        'OBJECT': 'DUMMY', 
+        'SKY': 'DUMMY', 
         }
 
 # listexpo_files = {"TYPE" : ['Type', 'ESO DPR TYPE', "raw_hdr_dprtype.txt"],
@@ -113,16 +114,16 @@ exclude_list_checkmode = ['BIAS', 'DARK']
 
 esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
 # Fits Raw table (default)
-dic_files_tables = {'rawfiles': 'rawfiles_list_table.fits',
-        'masterbias': 'MASTER_BIAS_list_table.fits',
-        'masterflat': 'MASTER_FLAT_list_table.fits',
-        'mastertrace': 'MASTER_TRACE_list_table.fits',
-        'masterwave': 'WAVE_list_table.fits',
-        'mastertwilight': 'TWILIGHT_list_table.fits',
-        'masterstd': 'STD_list_table.fits',
-        'masterlsf': 'LSF_list_table.fits',
-        'mastersky': 'SKY_list_table.fits',
-        'masterobject': 'OBJECT_list_table.fits'
+dic_files_tables = {'RAWFILES': 'RAWFILES_list_table.fits',
+        'BIAS': 'MASTER_BIAS_list_table.fits',
+        'FLAT': 'MASTER_FLAT_list_table.fits',
+        'TRACE': 'MASTER_TRACE_list_table.fits',
+        'WAVE': 'WAVE_list_table.fits',
+        'TWILIGHT': 'TWILIGHT_list_table.fits',
+        'STD': 'STD_list_table.fits',
+        'LSF': 'LSF_list_table.fits',
+        'SKY': 'SKY_list_table.fits',
+        'OBJECT': 'OBJECT_list_table.fits'
         }
 
 dic_files_products = {
@@ -155,6 +156,11 @@ future_date = '2099-01-01'
 ############################################################
 #                      END
 ############################################################
+def lower_allbutfirst_letter(mystring):
+    """Lowercase all letters except the first one
+    """
+    return mystring[0].upper() + mystring[1:].lower()
+
 def create_time_name() :
     """Create a time-link name for file saving purposes
 
@@ -183,12 +189,17 @@ def safely_create_folder(path, verbose=True):
         if verbose : print_info("Input path is None, not doing anything")
         return
     if verbose : 
-        print_info("Trying to create {folder} folder".format(folder=path))
+        print_info("Trying to create {folder} folder".format(folder=path), end='')
     try: 
         os.makedirs(path)
+        print_endline("... Done", end='\n')
     except OSError:
         if not os.path.isdir(path):
+            print_error("Failed to create folder! Please check the path")
             raise
+            return
+        if os.path.isdir(path):
+            print_endline("... Folder already exists, doing nothing.")
 
 def append_file(filename, content):
     """Append in ascii file
@@ -232,15 +243,17 @@ INFO = '\033[1;32;20m'
 ERROR = '\033[91m'
 ENDC = '\033[0m'
 BOLD = "\033[1m"
-def print_warning(text) :
-    print(WARNING + "# MusePipeWarning " + ENDC + text)
+def print_endline(text, **kwargs) :
+    print(INFO + text + ENDC, **kwargs)
 
-def print_info(text) :
-    print(INFO + "# MusePipeInfo " + ENDC + text)
+def print_warning(text, **kwargs) :
+    print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
 
-def print_error(text) :
-    print(ERROR + "# MusePipeError " + ENDC + text)
+def print_info(text, **kwargs) :
+    print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
+def print_error(text, **kwargs) :
+    print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
 #########################################################################
 # Useful Classes for the Musepipe
@@ -334,7 +347,6 @@ class MusePipe(PipeRecipes, SofPipe):
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
 
-
         # Mode of the observations
         self.mode = mode
         # Checking if mode is correct
@@ -368,6 +380,11 @@ class MusePipe(PipeRecipes, SofPipe):
             print_info("Creating directory structure")
         self.goto_folder(self.paths.data)
 
+        # ----------------------------------------------
+        # Creating the Astropy file Table folder
+        # ----------------------------------------------
+        safely_create_folder(self.my_params.folder_filetables, verbose=verbose)
+
         # ==============================================
         # Creating the folder structure itself if needed
         for folder in self.my_params._dic_folders.keys() :
@@ -376,9 +393,7 @@ class MusePipe(PipeRecipes, SofPipe):
         # Init the Master exposure flag dictionary
         self.Master = {}
         for mastertype in dic_listMaster.keys() :
-            [masterfolder, mastername] = dic_listMaster[mastertype]
-            safely_create_folder(joinpath(self.my_params.master, masterfolder), 
-                    verbose=self.verbose)
+            safely_create_folder(self._get_path_master(mastertype), verbose=self.verbose)
             self.Master[mastertype] = False
         # ==============================================
 
@@ -426,52 +441,26 @@ class MusePipe(PipeRecipes, SofPipe):
         self.paths = PipeObject("All Paths useful for the pipeline")
         self.paths.root = self.my_params.root
         self.paths.data = joinpath(self.paths.root, self.my_params.data)
+        self.paths.filetables = joinpath(self.paths.data, self.my_params.folder_filetables)
         for name in self.my_params._dic_folders.keys() + self.my_params._dic_input_folders.keys():
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
 
         # Creating the filenames for Master files
         self.masterfiles = PipeObject("Information pertaining to the Masterfiles")
-        self.dic_attr_master = {}
-        for mastertype in dic_listMaster.keys() :
-            name_attr = "master{0}".format(mastertype.lower())
-            self.dic_attr_master[mastertype] = name_attr
-            [masterfolder, mastername] = dic_listMaster[mastertype]
+        for expotype in dic_listMaster.keys() :
+            name_attr = self._get_attr_master(expotype)
             # Adding the path of the folder
-            setattr(self.paths, name_attr, joinpath(self.paths.master, masterfolder))
+            setattr(self.paths, name_attr, joinpath(self.paths.data, self._get_path_master(expotype)))
             # Adding the full path name for the master files
-            setattr(self.masterfiles, name_attr, joinpath(self.paths.master, masterfolder, mastername))
+            setattr(self.masterfiles, expotype.lower(), self._get_suffix_master(expotype))
 
-#    def get_master(self, mastertype, **kwargs) :
-#        """Getting the master type MuseImage
-#        Return None if not found or mastertype does not match
-#        """
-#        if mastertype.upper() not in self.dic_attr_master.keys() :
-#            print_info("ERROR: mastertype not in the list of predefined types")
-#            return None
-#
-#        attr_master = self.dic_attr_master[mastertype]
-#        if os.path.isfile(getattr(self.masterfiles, attr_master)) :
-#            return MuseImage(filename=getattr(self.masterfiles, attr_master), title=mastertype, **kwargs)
-#        else :
-#            print_info("ERROR: file {0} not found".format(getattr(self.masterfiles, attr_master)))
-#            return None
-
-#    def read_master_table(self, expotype, name_table=None, verbose=None):
-#        if verbose is None: 
-#            verbose = self.verbose
-#        if name_table is None: 
-#            name_table = default_Master_table
-#
-#        setattr(self.Table, expotype, XX)
-
-    def read_file_table(self, filetype=None, folder=None, **kwargs):
+    def read_file_table(self, filetype=None, **kwargs):
         """Read an existing RAW data table to start the pipeline
         """
 
-        l_filetype = lower_rep(filetype)
-        if folder is None :
-            folder = getattr(self.paths, l_filetype)
-        name_table = kwargs.pop('name_table', dic_files_tables[l_filetype])
+        l_filetype = lower_allbutfirst_letter(filetype)
+        folder = self.paths.filetables
+        name_table = kwargs.pop('name_table', dic_files_tables[filetype])
 
         # Check the raw folder
         self.goto_folder(folder)
@@ -481,7 +470,7 @@ class MusePipe(PipeRecipes, SofPipe):
             print_info("ERROR: file table {0} does not exist".format(name_table))
         else :
             if self.verbose : print_info("Reading fits Table {0}".format(name_table))
-            setattr(self.Tables, filetype, Table.read(name_table, format="fits"))
+            setattr(self.Tables, l_filetype, Table.read(name_table, format="fits"))
         
         # Going back to the original folder
         self.goto_prevfolder()
@@ -493,12 +482,10 @@ class MusePipe(PipeRecipes, SofPipe):
         """
         if verbose is None: verbose = self.verbose
         if overwrite_astropy_table is not None: self._overwrite_astropy_table = overwrite_astropy_table
-        name_table = kwargs.pop('name_table', dic_files_tables['rawfiles'])
+        name_table = kwargs.pop('name_table', dic_files_tables['RAWFILES'])
+        name_table = joinpath(self.paths.filetables, name_table)
 
         rawfolder = self.paths.rawfiles
-
-        # Check the raw folder
-        self.goto_folder(self.paths.rawfiles)
 
         # Testing if raw table exists
         if os.path.isfile(name_table) :
@@ -509,11 +496,12 @@ class MusePipe(PipeRecipes, SofPipe):
                 print_warning("If you wish to overwrite it, "
                       " please turn on the 'overwrite_astropy_table' option to 'True'")
                 print_warning("In the meantime, the existing table will be read and used")
-                self.goto_prevfolder()
-                self.read_file_table(filetype='rawfiles', folder=self.paths.rawfiles)
+                self.read_file_table(filetype='RAWFILES')
                 self.sort_types()
                 return
 
+        # Check the raw folder
+        self.goto_folder(self.paths.rawfiles)
         # Get the list of files from the Raw data folder
         files = os.listdir(".")
 
@@ -544,15 +532,15 @@ class MusePipe(PipeRecipes, SofPipe):
         idxsort = np.argsort(MUSE_infodic['FILENAME'])
 
         # Creating the astropy table
-        self.Tables.rawfiles = Table([MUSE_infodic['FILENAME'][idxsort]], names=['filename'], meta={'name': 'raw file table'})
+        self.Tables.Rawfiles = Table([MUSE_infodic['FILENAME'][idxsort]], names=['filename'], meta={'name': 'raw file table'})
 
         # Creating the columns
         for k in fulldic.keys() :
             [namecol, keyword, func, form] = fulldic[k]
-            self.Tables.rawfiles[namecol] = MUSE_infodic[k][idxsort]
+            self.Tables.Rawfiles[namecol] = MUSE_infodic[k][idxsort]
 
         # Writing up the table
-        self.Tables.rawfiles.write(name_table, format="fits", overwrite=self._overwrite_astropy_table)
+        self.Tables.Rawfiles.write(name_table, format="fits", overwrite=self._overwrite_astropy_table)
 
         # Sorting the type
         self.sort_types()
@@ -583,8 +571,8 @@ class MusePipe(PipeRecipes, SofPipe):
         for keytype in listexpo_types.keys() :
             expotype = listexpo_types[keytype].upper()
             try :
-                mask = (self.Tables.rawfiles['type'] == keytype)
-                setattr(self.Tables, expotype, self.Tables.rawfiles[mask])
+                mask = (self.Tables.Rawfiles['type'] == keytype)
+                setattr(self.Tables, expotype, self.Tables.Rawfiles[mask])
             except AttributeError:
                 pass
 
@@ -594,17 +582,24 @@ class MusePipe(PipeRecipes, SofPipe):
         """
         return getattr(self.Tables, expotype)
 
-    def _get_mastertype(self, expotype) :
-        return self.dic_attr_master[expotype]
+    def _get_attr_master(self, expotype):
+        return "master{0}".format(expotype.lower())
 
     def _get_table_master(self, expotype) :
-        return getattr(self.Tables, self._get_mastertype(expotype))
+        return getattr(self.Tables, self._get_attr_master(expotype))
 
     def _get_name_master(self, expotype) :
-        return normpath(getattr(self.masterfiles, self.dic_attr_master[expotype]))
+        return normpath(getattr(self.masterfiles, expotype.lower()))
 
-    def _get_path_master(self, expotype) :
-        return normpath(getattr(self.paths, self.dic_attr_master[expotype]))
+    def _get_suffix_master(self, expotype):
+        return dic_listMaster[expotype]
+
+    def _get_path_master(self, expotype):
+        masterfolder = lower_allbutfirst_letter(expotype)
+        return joinpath(self.my_params.master, masterfolder)
+    
+    def _get_fullpath_master(self, expotype) :
+        return normpath(getattr(self.paths, self._get_attr_master(expotype)))
 
     def _get_path_files(self, expotype) :
         return normpath(getattr(self.paths, expotype.lower()))
@@ -631,7 +626,8 @@ class MusePipe(PipeRecipes, SofPipe):
         if reset: self._sofdict.clear()
         # Finding the best tpl for this master
         index, this_tpl = self.select_closest_mjd(mean_mjd, self._get_table_master(expotype)) 
-        self._sofdict[dic_listMaster[expotype][1]] = [self._get_name_master(expotype) + "_" + this_tpl + ".fits"]
+        dir_master = self._get_fullpath_master(expotype)
+        self._sofdict[self._get_suffix_master(expotype)] = [joinpath(dir_master, self._get_name_master(expotype) + "_" + this_tpl + ".fits")]
 
     def add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
         """ Add item to dictionary for the sof writing
@@ -649,7 +645,8 @@ class MusePipe(PipeRecipes, SofPipe):
         # Finding the best tpl for this sky calib file type
         expo_table = getattr(self.Tables, expotype)
         index, this_tpl = self.select_closest_mjd(mean_mjd, expo_table) 
-        self._sofdict[tag] = ["{0}_{1}.fits".format(tag, this_tpl)]
+        dir_master = self._get_fullpath_master(expotype)
+        self._sofdict[tag] = [joinpath(dir_master, "{0}_{1}.fits".format(tag, this_tpl))]
 
     def add_calib_to_sofdict(self, calibtype, reset=False):
         """Adding a calibration file for the SOF 
@@ -693,9 +690,9 @@ class MusePipe(PipeRecipes, SofPipe):
     def save_master_table(self, expotype, tpl_gtable, fits_tablename=None):
         """Save the Master Table corresponding to the mastertype
         """
-        mastertype = self._get_mastertype(expotype)
+        mastertype = self._get_attr_master(expotype)
         if fits_tablename is None :
-            fits_tablename = dic_files_tables[mastertype]
+            fits_tablename = dic_files_tables[expotype]
         setattr(self.Tables, mastertype, tpl_gtable.groups.aggregate(np.mean)['tpls','mjd', 'tplnexp'])
         full_tablename = joinpath(getattr(self.paths, mastertype), fits_tablename)
         setattr(self.Tables, mastertype + "name", full_tablename)
@@ -759,14 +756,15 @@ class MusePipe(PipeRecipes, SofPipe):
         self.add_calib_to_sofdict("BADPIX_TABLE", reset=True)
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
-            self._sofdict['BIAS'] = add_listpath(self._get_path_master('BIAS'),
-                    + gtable['filename'].data.astype(np.object))
+            self._sofdict['BIAS'] = add_listpath(self.paths.rawfiles,
+                    gtable['filename'].data.astype(np.object))
             # extract the tpl (string)
             tpl = gtable['tpls'][0]
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Bias
-            name_masterbias = self._get_name_master('BIAS')
+            name_masterbias = self._get_suffix_master('BIAS')
+            self._get_name_master('BIAS')
             # Run the recipe
             self.recipe_bias(self.current_sof, name_masterbias, tpl)
 
@@ -803,8 +801,8 @@ class MusePipe(PipeRecipes, SofPipe):
         self.add_calib_to_sofdict("BADPIX_TABLE", reset=True)
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
-            self._sofdict['FLAT'] = add_listpath(self._get_path_master('FLAT'),
-                    + gtable['filename'].data.astype(np.object))
+            self._sofdict['FLAT'] = add_listpath(self.paths.rawfiles,
+                    gtable['filename'].data.astype(np.object))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self.get_tpl_meanmjd(gtable)
             # Adding the best tpc MASTER_BIAS
@@ -812,8 +810,8 @@ class MusePipe(PipeRecipes, SofPipe):
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Flat and Trace Table
-            name_masterflat = self._get_name_master('FLAT')
-            name_tracetable = self._get_name_master('TRACE')
+            name_masterflat =  self._get_suffix_master('FLAT')
+            name_tracetable = self._get_suffix_master('TRACE')
             # Run the recipe
             self.recipe_flat(self.current_sof, name_masterflat, name_tracetable, tpl)
 
@@ -852,8 +850,8 @@ class MusePipe(PipeRecipes, SofPipe):
         self.add_calib_to_sofdict("LINE_CATALOG")
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
-            self._sofdict['ARC'] = add_listpath(self._get_path_master('WAVE'),
-                    + gtable['filename'].data.astype(np.object))
+            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles,
+                    gtable['filename'].data.astype(np.object))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self.get_tpl_meanmjd(gtable)
             # Finding the best tpl for BIAS + TRACE
@@ -861,7 +859,7 @@ class MusePipe(PipeRecipes, SofPipe):
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Wave
-            name_masterwave = self._get_name_master('WAVE')
+            name_masterwave = self._get_suffix_master('WAVE')
             # Run the recipe
             self.recipe_wave(self.current_sof, name_masterwave, tpl)
 
@@ -899,8 +897,8 @@ class MusePipe(PipeRecipes, SofPipe):
         self.add_calib_to_sofdict("LINE_CATALOG")
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
-            self._sofdict['ARC'] = add_listpath(self._get_path_master('WAVE'),
-                    + gtable['filename'].data.astype(np.object))
+            self._sofdict['ARC'] = add_listpath(self._get_fullpath_master('WAVE'),
+                    gtable['filename'].data.astype(np.object))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self.get_tpl_meanmjd(gtable)
             # Finding the best tpl for BIAS, TRACE, WAVE
@@ -908,7 +906,7 @@ class MusePipe(PipeRecipes, SofPipe):
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Wave
-            name_masterlsf = self._get_name_master('LSF')
+            name_masterlsf = self._get_suffix_master('LSF')
             # Run the recipe
             self.recipe_lsf(self.current_sof, name_masterlsf, tpl)
 
@@ -948,18 +946,18 @@ class MusePipe(PipeRecipes, SofPipe):
             tpl, mean_mjd = self.get_tpl_meanmjd(gtable)
             self.add_geometry_to_sofdict(tpl)
             # Provide the list of files to the dictionary
-            self._sofdict['TWILIGHT'] = add_listpath(self._get_path_master('TWILIGHT'),
-                    + gtable['filename'].data.astype(np.object))
+            self._sofdict['TWILIGHT'] = add_listpath(self._get_fullpath_master('TWILIGHT'),
+                    gtable['filename'].data.astype(np.object))
             # Finding the best tpl for BIAS, ILLUM, FLAT, TRACE, WAVE
             self.add_tplraw_to_sofdict(mean_mjd, "ILLUM")
             self.add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 'TRACE', 'WAVE'])
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Wave
-            name_mastertwilight = self._get_name_master('TWILIGHT')
+            name_mastertwilight = self._get_suffix_master('TWILIGHT')
             # Run the recipe
             name_products = dic_files_products['TWILIGHT']
-            dir_products = self._get_path_master('TWILIGHT')
+            dir_products = self._get_fullpath_master('TWILIGHT')
             self.recipe_twilight(self.current_sof, name_mastertwilight, dir_products, name_products, tpl)
 
         # Write the MASTER TWILIGHT Table and save it
@@ -1007,7 +1005,7 @@ class MusePipe(PipeRecipes, SofPipe):
             self.add_geometry_to_sofdict(tpl)
             # Provide the list of files to the dictionary
             self._sofdict[expotype] = add_listpath(self._get_path_files(expotype),
-                    + gtable['filename'].data.astype(np.object))
+                    gtable['filename'].data.astype(np.object))
             # Finding the best tpl for BIAS
             self.add_tplraw_to_sofdict(mean_mjd, "ILLUM") 
             self.add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 
@@ -1016,9 +1014,8 @@ class MusePipe(PipeRecipes, SofPipe):
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Run the recipe to reduce the standard (muse_scibasic)
             if expotype == 'STD':
-                dir_products = self._get_path_master('STD')
-                name_products = [joinpath(dir_products, 
-                    'PIXTABLE_STD_0001-{0:02d}.fits'.format(j+1)) for j in range(24)]
+                dir_products = self._get_fullpath_master('STD')
+                name_products = ['PIXTABLE_STD_0001-{0:02d}.fits'.format(j+1) for j in range(24)]
             else:
                 dir_products = None
                 name_products=None
@@ -1059,7 +1056,7 @@ class MusePipe(PipeRecipes, SofPipe):
             # Now starting with the standard recipe
             self.add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
             self.add_calib_to_sofdict("STD_FLUX_TABLE")
-            dir_products = self._get_path_master('STD')
+            dir_products = self._get_fullpath_master('STD')
             self._sofdict['PIXTABLE_STD'] = [joinpath(dir_products, 
                 'PIXTABLE_STD_{0}-{1:02d}.fits'.format(mytpl, j+1)) for j in range(24)]
             self.write_sof(sof_filename=sof_filename + "_" + mytpl, new=True)
@@ -1098,12 +1095,16 @@ class MusePipe(PipeRecipes, SofPipe):
             if tpl != "ALL" and tpl != mytpl :
                 continue
             # Now starting with the standard recipe
-            self.add_skycalib_to_sofdict("STD_RESPONSE", mymjd, 'STD', reset=True)
+            self.add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
+            self.add_calib_to_sofdict("SKY_LINES")
+            self.add_skycalib_to_sofdict("STD_RESPONSE", mymjd, 'STD')
             self.add_skycalib_to_sofdict("STD_TELLURIC", mymjd, 'STD')
-            self._sofdict['PIXTABLE_SKY'] = ['PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(i+1,j+1) for j in range(24)]
+            self.add_tplmaster_to_sofdict(mymjd, 'LSF')
+            dir_products = self._get_fullpath_master('SKY')
+            self._sofdict['PIXTABLE_SKY'] = [joinpath(dir_products,
+                'PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(i+1,j+1)) for j in range(24)]
             self.write_sof(sof_filename=sof_filename + "{0:02d}".format(i+1) + "_" + mytpl, new=True)
             name_products = dic_files_products['SKY']
-            dir_products = self._get_path_master('SKY')
             self.recipe_sky(self.current_sof, dir_products, name_products, mytpl, fraction=fraction)
 
         # Go back to original folder

@@ -45,10 +45,14 @@ dic_calib_tables = {
             "extinct_table" : "extinct_table.fits",
             # Line Catalog
             "line_catalog" : "line_catalog.fits",
+            # Sky lines
+            "sky_lines" : "sky_lines.fits",
             # Filter List
             "filter_list" : "filter_list.fits",
             }
 
+# Folder where astropy file tables will be stored
+dic_tables = {'folder_filetables' : "FileTables"}
 
 # ----------------- Galaxies and Pointings ----------------#
 
@@ -131,7 +135,6 @@ class InitMuseParameters(object) :
         # attributing the dictionaries
         self._dic_folders = dic_folders
         self._dic_input_folders = dic_input_folders
-        self._dic_user_folders = dic_input_folders
 
         if rc_filename is None :
             if not os.path.isfile(default_rc_filename):
@@ -151,6 +154,7 @@ class InitMuseParameters(object) :
         # Initialisation of fixed attributes for the structure
         self.init_default_param(dic_folders)
         self.init_default_param(dic_input_folders)
+        self.init_default_param(dic_tables)
 
         # Same happens with the calibration files.
         # If filename is provided, will use that, otherwise use the hard coded values.
