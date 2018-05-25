@@ -51,9 +51,6 @@ dic_calib_tables = {
             "filter_list" : "filter_list.fits",
             }
 
-# Folder where astropy file tables will be stored
-dic_tables = {'folder_filetables' : "FileTables"}
-
 # ----------------- Galaxies and Pointings ----------------#
 
 # Sample of galaxies
@@ -92,6 +89,12 @@ dic_input_folders = {
             "rawfiles" : "Raw/",
             # Config files
             "config" : "Config/",
+            # Tables
+            "filetables" : "FileTables/",
+            # esores log files
+            "esorexlog" : "esorex_log/",
+            # Data Products - first writing
+            "products": "Pipe_Products/"
             }
 
 dic_folders = {
@@ -154,7 +157,6 @@ class InitMuseParameters(object) :
         # Initialisation of fixed attributes for the structure
         self.init_default_param(dic_folders)
         self.init_default_param(dic_input_folders)
-        self.init_default_param(dic_tables)
 
         # Same happens with the calibration files.
         # If filename is provided, will use that, otherwise use the hard coded values.
