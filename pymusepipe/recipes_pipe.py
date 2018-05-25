@@ -46,7 +46,7 @@ class PipeRecipes(object) :
 
     @property
     def esorex(self):
-        return ("{likwid}{list_cpu} {nocache} esorex --output-dir {outputdir} {checksum}" 
+        return ("{likwid}{list_cpu} {nocache} esorex --output-dir={outputdir} {checksum}" 
                     " --log-dir={logdir}").format(likwid=self.likwid, 
                     list_cpu=self.list_cpu, nocache=self.nocache, outputdir=self.paths.products, 
                     checksum=self.checksum, logdir=self.paths.esorexlog)
