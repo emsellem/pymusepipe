@@ -104,7 +104,7 @@ class PipeRecipes(object) :
         """Running the esorex muse_bias recipe
         """
         # Runing the recipe
-        self.run_oscommand(("{esorex} --log-file bias_{tpl}.log muse_bias " 
+        self.run_oscommand(("{esorex} --log-file=bias_{tpl}.log muse_bias " 
                 "--nifu={nifu} {merge} {sof}").format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
         # Moving the MASTER BIAS
@@ -114,7 +114,7 @@ class PipeRecipes(object) :
     def recipe_flat(self, sof, dir_flat, name_flat, dir_trace, name_trace, tpl):
         """Running the esorex muse_flat recipe
         """
-        self.run_oscommand(("{esorex} --log-file flat_{tpl}.log muse_flat " 
+        self.run_oscommand(("{esorex} --log-file=flat_{tpl}.log muse_flat " 
                 "--nifu={nifu} {merge} {sof}").format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
         # Moving the MASTER FLAT and TRACE_TABLE
@@ -126,7 +126,7 @@ class PipeRecipes(object) :
     def recipe_wave(self, sof, dir_wave, name_wave, tpl):
         """Running the esorex muse_wavecal recipe
         """
-        self.run_oscommand(("{esorex} --log-file wave_{tpl}.log muse_wavecal --nifu={nifu} "
+        self.run_oscommand(("{esorex} --log-file=wave_{tpl}.log muse_wavecal --nifu={nifu} "
                 "--resample --residuals {merge} {sof}").format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
         # Moving the MASTER WAVE
@@ -136,7 +136,7 @@ class PipeRecipes(object) :
     def recipe_lsf(self, sof, dir_lsf, name_lsf, tpl):
         """Running the esorex muse_lsf recipe
         """
-        self.run_oscommand("{esorex} --log-file wave_{tpl}.log muse_lsf --nifu={nifu} {merge} {sof}".format(esorex=self.esorex,
+        self.run_oscommand("{esorex} --log-file=wave_{tpl}.log muse_lsf --nifu={nifu} {merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
         # Moving the MASTER LST PROFILE
         self.run_oscommand("{nocache} cp {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
@@ -145,7 +145,7 @@ class PipeRecipes(object) :
     def recipe_twilight(self, sof, dir_twilight, name_twilight, name_products, tpl):
         """Running the esorex muse_twilight recipe
         """
-        self.run_oscommand("{esorex} --log-file twilight_{tpl}.log muse_twilight {sof}".format(esorex=self.esorex, 
+        self.run_oscommand("{esorex} --log-file=twilight_{tpl}.log muse_twilight {sof}".format(esorex=self.esorex, 
             sof=sof, tpl=tpl))
         # Moving the TWILIGHT CUBE
         self.run_oscommand("{nocache} cp {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
@@ -158,7 +158,7 @@ class PipeRecipes(object) :
         """Running the esorex muse_stc recipe
         """
         [name_cube, name_flux, name_response, name_telluric] = name_std
-        self.run_oscommand("{esorex} --log-file std_{tpl}.log muse_standard --filter=white {sof}".format(esorex=self.esorex,
+        self.run_oscommand("{esorex} --log-file=std_{tpl}.log muse_standard --filter=white {sof}".format(esorex=self.esorex,
                 sof=sof, tpl=tpl))
 
         self.run_oscommand('{nocache} mv {name_cubein}_0001.fits {name_cubeout}_{tpl}.fits'.format(nocache=self.nocache,
@@ -174,7 +174,7 @@ class PipeRecipes(object) :
         """Running the esorex muse_stc recipe
         """
         [name_spec, name_pixtable] = name_sky
-        self.run_oscommand("{esorex} --log-file sky_{tpl}.log muse_create_sky --fraction={fraction} {sof}".format(esorex=self.esorex,
+        self.run_oscommand("{esorex} --log-file=sky_{tpl}.log muse_create_sky --fraction={fraction} {sof}".format(esorex=self.esorex,
                 sof=sof, fraction=fraction, tpl=tpl))
 
         self.run_oscommand('{nocache} cp {name_spec}_0001.fits {name_spec}_{tpl}.fits'.format(nocache=self.nocache,
@@ -185,7 +185,7 @@ class PipeRecipes(object) :
     def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=None):
         """Running the esorex muse_scibasic recipe
         """
-        self.run_oscommand("{esorex} --log-file scibasic_expotype_{tpl}.log muse_scibasic --nifu={nifu} "
+        self.run_oscommand("{esorex} --log-file=scibasic_expotype_{tpl}.log muse_scibasic --nifu={nifu} "
                 "--saveimage=FALSE {merge} {sof}".format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
 
