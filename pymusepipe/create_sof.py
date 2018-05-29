@@ -13,11 +13,16 @@ __contact__   = " <eric.emsellem@eso.org>"
 # and further rewritten by Mark van den Brok. 
 # Thanks to all !
 
+# Numpy
+import numpy as np
+
 # Standard modules
 import os
 from os.path import join as joinpath
+
 import collections
 from collections import OrderedDict
+
 import musepipe as mpipe
 
 class SofDict(OrderedDict) :
@@ -36,17 +41,15 @@ class SofPipe(object) :
         # Creating an empty dictionary for the SOF writing
         self._sofdict = SofDict()
 
-    def write_sof(self, sof_filename, sof_folder=None, new=False, verbose=None) :
+    def write_sof(self, sof_filename, new=False, verbose=None) :
         """Feeding an sof file with input filenames from a dictionary
         """
-        # Setting the default SOF folder if not provided
-        if sof_folder is None : sof_folder = self.paths.sof
 
         # Removing the extension of the file if already set
         if not sof_filename.lower().endswith(".sof") :
             sof_filename = sof_filename + ".sof"
 
-        sof = joinpath(sof_folder, sof_filename)
+        sof = joinpath(self.paths.sof, sof_filename)
         # If new file, start from scratch (overwrite)
         if new :
             sof_file = open(sof, "w+")
@@ -70,5 +73,86 @@ class SofPipe(object) :
         # Returning the current sof as relative path
         self.current_sof = mpipe.normpath(os.path.relpath(sof))
 
-    def add_XX_tosof(self) :
-        pass
+    def _select_closest_mjd(self, mjdin, group_table) :
+        """Get the closest frame within the expotype
+        If the attribute does not exist in Tables, it tries to read
+        the table from the folder
+        """
+        # Get the closest tpl
+        index = np.argmin((mjdin - group_table['mjd'])**2)
+        closest_tpl = group_table[index]['tpls']
+        return index, closest_tpl
+    
+    def _add_list_tplmaster_to_sofdict(self, mean_mjd, list_expotype):
+        """Add a list of masterfiles to the SOF
+        """
+        for expotype in list_expotype :
+            self._add_tplmaster_to_sofdict(mean_mjd, expotype)
+
+    def _add_tplmaster_to_sofdict(self, mean_mjd, expotype, reset=False):
+        """ Add item to dictionary for the sof writing
+        """
+        if reset: self._sofdict.clear()
+        # Finding the best tpl for this master
+        index, this_tpl = self._select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
+        dir_master = self._get_fullpath_expo(expotype)
+        self._sofdict[self._get_suffix_expo(expotype)] = [joinpath(dir_master, self._get_suffix_expo(expotype) + "_" + this_tpl + ".fits")]
+
+    def _add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
+        """ Add item to dictionary for the sof writing
+        """
+        if reset: self._sofdict.clear()
+        # Finding the best tpl for this raw file type
+        expo_table = self._get_table_expo(expotype, "raw")
+        index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
+        self._sofdict[expotype] = [expo_table['filename'][index]]
+
+    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, reset=False):
+        """ Add item to dictionary for the sof writing
+        """
+        if reset: self._sofdict.clear()
+        # Finding the best tpl for this sky calib file type
+        expo_table = self._get_table_expo(expotype, "master")
+        index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
+        dir_master = self._get_fullpath_expo(expotype)
+        self._sofdict[tag] = [joinpath(dir_master, "{0}_{1}.fits".format(tag, this_tpl))]
+
+    def _add_calib_to_sofdict(self, calibtype, reset=False):
+        """Adding a calibration file for the SOF 
+        """
+        if reset: self._sofdict.clear()
+        calibfile = getattr(self.my_params, calibtype.lower())
+        self._sofdict[calibtype] = [joinpath(self.my_params.musecalib, calibfile)]
+
+    def _add_geometry_to_sofdict(self, tpls):
+        """Extract the geometry table and add it to the dictionary
+        for the SOF file
+        """
+        calfolder = self.my_params.musecalib
+        if self._time_geo_table :
+            listkeys = list(mpipe.dic_geo_table.keys())
+            listkeys.append(mpipe.future_date)
+            for ikey in range(len(listkeys) - 1):
+                if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
+                    geofile = mpipe.dic_geo_table[listkeys[ikey]]
+        else:
+            geofile = self.my_params.geo_table
+
+        self._sofdict['GEOMETRY_TABLE']=["{folder}{geo}".format(folder=calfolder, geo=geofile)]
+
+    def _add_astrometry_to_sofdict(self, tpls):
+        """Extract the astrometry table and add it to the dictionary
+        for the SOF file
+        """
+        calfolder = self.my_params.musecalib
+        if self._time_geo_table :
+            listkeys = list(dic_astro_table.keys())
+            listkeys.append(mpipe.future_date)
+            for ikey in range(len(listkeys) - 1):
+                if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
+                    astrofile = dic_astro_table[listkeys[ikey]]
+        else :
+            astrofile = self.my_params.astro_table
+
+        self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]
+

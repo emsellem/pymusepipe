@@ -90,11 +90,11 @@ dic_input_folders = {
             # Config files
             "config" : "Config/",
             # Tables
-            "filetables" : "FileTables/",
+            "astro_tables" : "Astro_tables/",
             # esores log files
-            "esorexlog" : "esorex_log/",
+            "esorex_log" : "Esorex_log/",
             # Data Products - first writing
-            "products": "Pipe_Products/"
+            "pipe_products": "Pipe_products/"
             }
 
 dic_folders = {
@@ -114,7 +114,7 @@ dic_folders = {
             # Reconstructed Maps
             "maps" : "Maps/",
             # SOF folder 
-            "sof" : "SOF/", 
+            "sof" : "Sof/", 
             # Figure
             "figures" : "Figures/",
             }

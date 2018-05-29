@@ -56,7 +56,6 @@ from astropy.utils.exceptions import AstropyWarning
 from init_musepipe import InitMuseParameters
 from recipes_pipe import PipeRecipes
 from prep_recipes_pipe import PipePrep
-from create_sof import SofPipe
 
 # Likwid command
 likwid = "likwid-pin -c N:"
@@ -76,8 +75,8 @@ __version__ = '0.2.0 (22 May 2018)'
 # NOTE: most of the parameters have now been migrated to
 # init_musepipe.py for consistency.
 
-listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT,LAMP': 'FLAT',
-        'FLAT,LAMP,ILLUM' : 'ILLUM', 'FLAT,SKY': 'TWILIGHT', 
+listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
+        'ILLUM': 'FLAT,LAMP,ILLUM', 'TWILIGHT': 'FLAT,SKY', 
         'WAVE': 'WAVE', 'STD': 'STD', 'AST': 'AST',
         'OBJECT': 'OBJECT', 'SKY': 'SKY'
         }
@@ -97,11 +96,6 @@ dic_listObject = {'OBJECT': 'PIXTABLE_OBJECT',
         'SKY': 'PIXTABLE_SKY', 
         }
 
-# listexpo_files = {"TYPE" : ['Type', 'ESO DPR TYPE', "raw_hdr_dprtype.txt"],
-#         "DATE": ['MJD-OBS', "raw_hdr_mjd.txt"],
-#         "MODE": ['HIERARCH ESO INS MODE', "raw_hdr_mode.txt"]
-#         "TPLS": ['HIERARCH ESO TPL START', "raw_hdr_tpls.txt"]
-#          }
 listexpo_files = {
         "OBJECT" : ['object', 'OBJECT', str, '20A'],
         "TYPE" : ['type', 'ESO DPR TYPE', str, '20A'],
@@ -116,18 +110,6 @@ listexpo_files = {
 exclude_list_checkmode = ['BIAS', 'DARK']
 
 esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
-# Fits Raw table (default)
-dic_files_tables = {'RAWFILES': 'RAWFILES_list_table.fits',
-        'BIAS': 'MASTER_BIAS_list_table.fits',
-        'FLAT': 'MASTER_FLAT_list_table.fits',
-        'TRACE': 'MASTER_TRACE_list_table.fits',
-        'WAVE': 'WAVE_list_table.fits',
-        'TWILIGHT': 'TWILIGHT_list_table.fits',
-        'STD': 'STD_list_table.fits',
-        'LSF': 'LSF_list_table.fits',
-        'SKY': 'SKY_list_table.fits',
-        'OBJECT': 'OBJECT_list_table.fits'
-        }
         
 dic_geo_table = {
         '1900-01-01': "geometry_table_wfm.fits",
@@ -258,7 +240,7 @@ def lower_rep(text) :
 #                           MusePipe
 #########################################################################
     
-class MusePipe(PipePrep, PipeRecipes, SofPipe):
+class MusePipe(PipePrep, PipeRecipes):
     """Main Class to define and run the MUSE pipeline, given a certain galaxy name
     
     musep = MusePipe(galaxyname='NGC1087', rc_filename="", cal_filename="", 
@@ -268,7 +250,7 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
 
     def __init__(self, galaxyname=None, pointing=0, objectlist=[], rc_filename=None, 
             cal_filename=None, outlog=None, logfile="MusePipe.log", reset_log=False,
-            verbose=True, mode="WFM-NOAO-N", checkmode=True, 
+            verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
             strong_checkmode=False, **kwargs):
         """Initialise the file parameters to be used during the run
 
@@ -281,7 +263,7 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
         cal_filename: filename to initiale FIXED calibration MUSE files
         outlog: string, output directory for the log files
         verbose: boolean. Give more information as output (default is True)
-        mode: string (default is WFM_N) String to define the mode to be considered
+        musemode: string (default is WFM_N) String to define the mode to be considered
         checkmode: boolean (default is True) Check the mode or not when reducing
         strong_checkmode: boolean (default is False) Enforce the checkmode for all if True, 
                          or exclude DARK/BIAS if False
@@ -310,10 +292,9 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
         self._time_geo_table = kwargs.pop("time_geo_table", True)
         self._time_astro_table = kwargs.pop("time_astro_table", True)
 
-        nocache = kwargs.pop("nocache", False)
-        PipePrep.__init__(self, nocache=nocache)
-        PipeRecipes.__init__(self, **kwargs)
-        SofPipe.__init__(self)
+        PipePrep.__init__(self)
+        PipeRecipes.__init__(self)
+#        super(MusePipe, self).__init__(**kwargs)
 
         # Setting the default attibutes #####################
         self.galaxyname = galaxyname
@@ -332,7 +313,7 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
 
         # Further reduction options =====================================
         # Mode of the observations
-        self.mode = mode
+        self.musemode = musemode
         # Checking if mode is correct
         self.checkmode = checkmode
         # Checking if mode is correct also for BIAS & DARK
@@ -384,6 +365,8 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
         # Init the Object folder
         for objecttype in dic_listObject.keys() :
             safely_create_folder(self._get_path_expo(objecttype), verbose=self.verbose)
+
+        self._dic_listMasterObject = dict(dic_listMaster.items() + dic_listObject.items())
         # ==============================================
 
         # Going back to initial working directory
@@ -392,9 +375,6 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
         # ===========================================================
         # Now creating the raw table, and attribute containing the
         # astropy dataset probing the rawfiles folder
-        self._reset_tables()
-        if verbose :
-            print_info("Creating the astropy fits raw data table")
         # When creating the table, if the table already exists
         # it will read the old one, except if an overwrite_astropy_table
         # is set to True.
@@ -430,61 +410,47 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
         self.paths = PipeObject("All Paths useful for the pipeline")
         self.paths.root = self.my_params.root
         self.paths.data = joinpath(self.paths.root, self.my_params.data)
-        self.paths.filetables = joinpath(self.paths.data, self.my_params.filetables)
+
         for name in self.my_params._dic_folders.keys() + self.my_params._dic_input_folders.keys():
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
 
         # Creating the filenames for Master files
-        self.masterfiles = PipeObject("Information pertaining to the Masterfiles")
+        self.paths.Master = PipeObject("All Paths for Master files useful for the pipeline")
         for expotype in dic_listMaster.keys() :
-            name_attr = self._get_attr_expo(expotype)
             # Adding the path of the folder
-            setattr(self.paths, name_attr, joinpath(self.paths.data, self._get_path_expo(expotype)))
-            # Adding the full path name for the master files
-            setattr(self.masterfiles, expotype.lower(), self._get_suffix_expo(expotype))
+            setattr(self.paths.Master, self._get_attr_expo(expotype), 
+                    joinpath(self.paths.data, self._get_path_expo(expotype)))
 
-        self.files = PipeObject("Information pertaining to the reduced files")
-        for expotype in dic_listObject.keys() :
-            name_attr = self._get_attr_expo(expotype)
-            # Adding the path of the folder
-            setattr(self.paths, name_attr, joinpath(self.paths.data, self._get_path_expo(expotype)))
-            # Adding the full path name for the object files
-            setattr(self.files, expotype.lower(), self._get_suffix_expo(expotype))
+        self._dic_paths = {"master": self.paths.Master, "processed": self.paths}
 
-    def read_file_table(self, filetype=None, **kwargs):
-        """Read an existing RAW data table to start the pipeline
+    def read_astropy_table(self, expotype=None, stage="master"):
+        """Read an existing Masterfile data table to start the pipeline
         """
-
-        l_filetype = lower_allbutfirst_letter(filetype)
-        folder = self.paths.filetables
-        name_table = kwargs.pop('name_table', dic_files_tables[filetype])
-
-        # Check the raw folder
-        self.goto_folder(folder)
-
         # Read the astropy table
+        name_table = joinpath(self.paths.astro_tables, self._get_fitstablename_expo(expotype, stage))
         if not os.path.isfile(name_table):
-            print_info("ERROR: file table {0} does not exist".format(name_table))
+            print_info("ERROR: Astropy table {0} does not exist".format(name_table))
         else :
-            if self.verbose : print_info("Reading fits Table {0}".format(name_table))
-            setattr(self.Tables, l_filetype, Table.read(name_table, format="fits"))
+            if self.verbose : print_info("Reading Astropy fits Table {0}".format(name_table))
+            return Table.read(name_table, format="fits")
         
-        # Going back to the original folder
-        self.goto_prevfolder()
-
-    def create_raw_table(self, overwrite_astropy_table=None, verbose=None, **kwargs) :
+    def create_raw_table(self, overwrite_astropy_table=None, verbose=None, reset=True) :
         """ Create a fits table with all the information from
         the Raw files
         Also create an astropy table with the same info
         """
         if verbose is None: verbose = self.verbose
         if overwrite_astropy_table is not None: self._overwrite_astropy_table = overwrite_astropy_table
-        name_table = kwargs.pop('name_table', dic_files_tables['RAWFILES'])
-        name_table = joinpath(self.paths.filetables, name_table)
+        if verbose :
+            print_info("Creating the astropy fits raw data table")
 
-        rawfolder = self.paths.rawfiles
+        if reset:
+            self._reset_tables()
 
         # Testing if raw table exists
+        name_table = joinpath(self.paths.astro_tables, self._get_fitstablename_expo('RAWFILES', "raw"))
+
+        # ---- File exists - we READ it ------------------- #
         if os.path.isfile(name_table) :
             if self._overwrite_astropy_table :
                 print_warning("The raw-files table will be overwritten")
@@ -493,64 +459,91 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
                 print_warning("If you wish to overwrite it, "
                       " please turn on the 'overwrite_astropy_table' option to 'True'")
                 print_warning("In the meantime, the existing table will be read and used")
-                self.read_file_table(filetype='RAWFILES')
-                self.sort_types()
-                return
+                self.Tables.Rawfiles = self.read_astropy_table('RAWFILES', "raw")
 
-        # Check the raw folder
-        self.goto_folder(self.paths.rawfiles)
-        # Get the list of files from the Raw data folder
-        files = os.listdir(".")
+        # ---- File does not exist - we create it ---------- #
+        else:
+            # Check the raw folder
+            self.goto_folder(self.paths.rawfiles)
+            # Get the list of files from the Raw data folder
+            files = os.listdir(".")
 
-        smalldic = {"FILENAME" : ['filename', '', str, '100A']}
-        fulldic = listexpo_files.copy()
-        fulldic.update(smalldic)
+            smalldic = {"FILENAME" : ['filename', '', str, '100A']}
+            fulldic = listexpo_files.copy()
+            fulldic.update(smalldic)
 
-        # Init the lists
-        MUSE_infodic = {}
-        for key in fulldic.keys() :
-            MUSE_infodic[key] = []
+            # Init the lists
+            MUSE_infodic = {}
+            for key in fulldic.keys() :
+                MUSE_infodic[key] = []
 
-        # Looping over the files
-        for f in files:
-            # Excluding the files without MUSE and fits.fz
-            if ('MUSE' in f) and ('.fits.fz')  in f:
-                MUSE_infodic['FILENAME'].append(f)
-                header = pyfits.getheader(f, 0)
-                for k in listexpo_files.keys() :
-                    [namecol, keyword, func, form] = listexpo_files[k]
-                    MUSE_infodic[k].append(func(header[keyword]))
+            # Looping over the files
+            for f in files:
+                # Excluding the files without MUSE and fits.fz
+                if ('MUSE' in f) and ('.fits.fz')  in f:
+                    MUSE_infodic['FILENAME'].append(f)
+                    header = pyfits.getheader(f, 0)
+                    for k in listexpo_files.keys() :
+                        [namecol, keyword, func, form] = listexpo_files[k]
+                        MUSE_infodic[k].append(func(header[keyword]))
 
-        # Transforming into numpy arrayimport pymusepipe
-        for k in fulldic.keys() :
-            MUSE_infodic[k] = np.array(MUSE_infodic[k])
+            # Transforming into numpy arrayimport pymusepipe
+            for k in fulldic.keys() :
+                MUSE_infodic[k] = np.array(MUSE_infodic[k])
 
-        # Getting a sorted array with indices
-        idxsort = np.argsort(MUSE_infodic['FILENAME'])
+            # Getting a sorted array with indices
+            idxsort = np.argsort(MUSE_infodic['FILENAME'])
 
-        # Creating the astropy table
-        self.Tables.Rawfiles = Table([MUSE_infodic['FILENAME'][idxsort]], names=['filename'], meta={'name': 'raw file table'})
+            # Creating the astropy table
+            self.Tables.Rawfiles = Table([MUSE_infodic['FILENAME'][idxsort]], 
+                    names=['filename'], meta={'name': 'raw file table'})
 
-        # Creating the columns
-        for k in fulldic.keys() :
-            [namecol, keyword, func, form] = fulldic[k]
-            self.Tables.Rawfiles[namecol] = MUSE_infodic[k][idxsort]
+            # Creating the columns
+            for k in fulldic.keys() :
+                [namecol, keyword, func, form] = fulldic[k]
+                self.Tables.Rawfiles[namecol] = MUSE_infodic[k][idxsort]
 
-        # Writing up the table
-        self.Tables.Rawfiles.write(name_table, format="fits", overwrite=self._overwrite_astropy_table)
+            # Writing up the table
+            self.Tables.Rawfiles.write(name_table, format="fits", 
+                    overwrite=self._overwrite_astropy_table)
+            # Going back to the original folder
+            self.goto_prevfolder()
 
-        # Sorting the type
+        # Sorting the types ====================================
         self.sort_types()
-        # Going back to the original folder
-        self.goto_prevfolder()
+
+    def save_expo_table(self, expotype, tpl_gtable, stage="master", fits_tablename=None):
+        """Save the Expo (Master or not) Table corresponding to the expotype
+        """
+        if fits_tablename is None :
+            fits_tablename = self._get_fitstablename_expo(expotype, stage)
+
+        attr_expo = self._get_attr_expo(expotype)
+        setattr(self._dic_tables[stage], attr_expo, tpl_gtable.groups.aggregate(np.mean)['tpls','mjd', 'tplnexp'])
+        full_tablename = joinpath(self.paths.astro_tables, fits_tablename)
+        if (not self._overwrite_astropy_table) and os.path.isfile(full_tablename):
+            print_warning("Astropy Table {0} already exists, "
+                " use overwrite_astropy_table to overwrite it".format(fits_tablename))
+        else :
+            getattr(self._dic_tables[stage], attr_expo).write(full_tablename, 
+                format="fits", overwrite=self._overwrite_astropy_table)
 
     def _reset_tables(self) :
         """Reseting the astropy Tables for expotypes
         """
         # Reseting the select_type item
-        self.Tables = PipeObject("File astropy tables")
-        for expotype in listexpo_types.values() :
-            setattr(self.Tables, expotype, [])
+        self.Tables = PipeObject("Astropy Tables")
+        # Creating the other two Tables categories
+        self.Tables.Raw = PipeObject("Astropy Tables for each raw expotype")
+        self.Tables.Master = PipeObject("Astropy Tables for each mastertype")
+        self.Tables.Processed = PipeObject("Astropy Tables for each processed type")
+        self._dic_tables = {"raw": self.Tables.Raw, "master": self.Tables.Master,
+                "processed": self.Tables.Processed}
+        self._dic_attr_suffix = {"raw": "", "master": "master",
+                "processed": ""}
+
+        for expotype in listexpo_types.keys() :
+            setattr(self.Tables.Raw, self._get_attr_expo(expotype), [])
 
     def sort_types(self, checkmode=None, strong_checkmode=None, reset=False) :
         """Provide lists of exposures with types defined in the dictionary
@@ -565,176 +558,42 @@ class MusePipe(PipePrep, PipeRecipes, SofPipe):
         else : strong_checkmode = self.strong_checkmode
 
         # Sorting alphabetically (thus by date)
-        for keytype in listexpo_types.keys() :
-            expotype = listexpo_types[keytype].upper()
+        for expotype in listexpo_types.keys() :
             try :
-                mask = (self.Tables.Rawfiles['type'] == keytype)
-                setattr(self.Tables, expotype, self.Tables.Rawfiles[mask])
+                mask = (self.Tables.Rawfiles['type'] == listexpo_types[expotype])
+                setattr(self.Tables.Raw, self._get_attr_expo(expotype), 
+                        self.Tables.Rawfiles[mask])
             except AttributeError:
                 pass
 
-    def select_expotype_fromraw(self, expotype=None):
-        """ This will return the info Table of raw files corresponding 
-        to the given expotype.
-        """
-        return getattr(self.Tables, expotype)
-
     def _get_attr_expo(self, expotype):
-        if expotype in dic_listMaster.keys():
-            return "master{0}".format(expotype.lower())
-        else :
-            return expotype.lower()
+        return expotype.lower()
 
-    def _get_table_expo(self, expotype) :
-        return getattr(self.Tables, self._get_attr_expo(expotype))
+    def _get_fitstablename_expo(self, expotype, stage="master"):
+        """Get the name of the fits table covering
+        a certain expotype
+        """
+        nametable = "{0}_list_table.fits".format(expotype)
+        if stage.lower() == "master":
+            nametable = "MASTER_" + nametable
+        return nametable
 
-    def _get_name_expo(self, expotype) :
-        if expotype in dic_listMaster.keys():
-            return normpath(getattr(self.masterfiles, expotype.lower()))
-        else:
-            return normpath(getattr(self.files, expotype.lower()))
+    def _get_table_expo(self, expotype, stage="master"):
+        return getattr(self._dic_tables[stage], self._get_attr_expo(expotype))
 
     def _get_suffix_expo(self, expotype):
-        if expotype in dic_listMaster.keys():
-            return dic_listMaster[expotype]
-        else:
-            return dic_listObject[expotype]
+        return self._dic_listMasterObject[expotype]
+ 
+    def _get_path_expo(self, expotype, stage="master"):
+        masterfolder = lower_allbutfirst_letter(expotype)
+        if stage.lower() == "master":
+            masterfolder = joinpath(self.my_params.master, masterfolder)
+        return masterfolder
 
-    def _get_path_expo(self, expotype):
-        if expotype in dic_listMaster.keys():
-            masterfolder = lower_allbutfirst_letter(expotype)
-            return joinpath(self.my_params.master, masterfolder)
-        else:
-            return lower_allbutfirst_letter(expotype)
-
-    def _get_fullpath_expo(self, expotype) :
-        return normpath(getattr(self.paths, self._get_attr_expo(expotype)))
+    def _get_fullpath_expo(self, expotype, stage="master"):
+        return normpath(getattr(self._dic_paths[stage], self._get_attr_expo(expotype)))
 
     def _get_path_files(self, expotype) :
         return normpath(getattr(self.paths, expotype.lower()))
 
-    def select_closest_mjd(self, mjdin, group_table) :
-        """Get the closest frame within the expotype
-        If the attribute does not exist in Tables, it tries to read
-        the table from the folder
-        """
-        # Get the closest tpl
-        index = np.argmin((mjdin - group_table['mjd'])**2)
-        closest_tpl = group_table[index]['tpls']
-        return index, closest_tpl
 
-    def add_list_tplmaster_to_sofdict(self, mean_mjd, list_expotype):
-        """Add a list of masterfiles to the SOF
-        """
-        for expotype in list_expotype :
-            self.add_tplmaster_to_sofdict(mean_mjd, expotype)
-
-    def add_tplmaster_to_sofdict(self, mean_mjd, expotype, reset=False):
-        """ Add item to dictionary for the sof writing
-        """
-        if reset: self._sofdict.clear()
-        # Finding the best tpl for this master
-        index, this_tpl = self.select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
-        dir_master = self._get_fullpath_expo(expotype)
-        self._sofdict[self._get_suffix_expo(expotype)] = [joinpath(dir_master, self._get_name_expo(expotype) + "_" + this_tpl + ".fits")]
-
-    def add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
-        """ Add item to dictionary for the sof writing
-        """
-        if reset: self._sofdict.clear()
-        # Finding the best tpl for this raw file type
-        expo_table = getattr(self.Tables, expotype)
-        index, this_tpl = self.select_closest_mjd(mean_mjd, expo_table) 
-        self._sofdict[expotype] = [expo_table['filename'][index]]
-
-    def add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, reset=False):
-        """ Add item to dictionary for the sof writing
-        """
-        if reset: self._sofdict.clear()
-        # Finding the best tpl for this sky calib file type
-        expo_table = getattr(self.Tables, expotype)
-        index, this_tpl = self.select_closest_mjd(mean_mjd, expo_table) 
-        dir_master = self._get_fullpath_expo(expotype)
-        self._sofdict[tag] = [joinpath(dir_master, "{0}_{1}.fits".format(tag, this_tpl))]
-
-    def add_calib_to_sofdict(self, calibtype, reset=False):
-        """Adding a calibration file for the SOF 
-        """
-        if reset: self._sofdict.clear()
-        calibfile = getattr(self.my_params, calibtype.lower())
-        self._sofdict[calibtype] = [joinpath(self.my_params.musecalib, calibfile)]
-
-    def add_geometry_to_sofdict(self, tpls):
-        """Extract the geometry table and add it to the dictionary
-        for the SOF file
-        """
-        calfolder = self.my_params.musecalib
-        if self._time_geo_table :
-            listkeys = list(dic_geo_table.keys())
-            listkeys.append(future_date)
-            for ikey in range(len(listkeys) - 1):
-                if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
-                    geofile = dic_geo_table[listkeys[ikey]]
-        else:
-            geofile = self.my_params.geo_table
-
-        self._sofdict['GEOMETRY_TABLE']=["{folder}{geo}".format(folder=calfolder, geo=geofile)]
-
-    def add_astrometry_to_sofdict(self, tpls):
-        """Extract the astrometry table and add it to the dictionary
-        for the SOF file
-        """
-        calfolder = self.my_params.musecalib
-        if self._time_geo_table :
-            listkeys = list(dic_astro_table.keys())
-            listkeys.append(future_date)
-            for ikey in range(len(listkeys) - 1):
-                if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
-                    astrofile = dic_astro_table[listkeys[ikey]]
-        else :
-            astrofile = self.my_params.astro_table
-
-        self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]
-
-    def save_master_table(self, expotype, tpl_gtable, fits_tablename=None):
-        """Save the Master Table corresponding to the mastertype
-        """
-        mastertype = self._get_attr_expo(expotype)
-        if fits_tablename is None :
-            fits_tablename = dic_files_tables[expotype]
-        setattr(self.Tables, mastertype, tpl_gtable.groups.aggregate(np.mean)['tpls','mjd', 'tplnexp'])
-        full_tablename = joinpath(getattr(self.paths, mastertype), fits_tablename)
-        setattr(self.Tables, mastertype + "name", full_tablename)
-        if (not self._overwrite_astropy_table) and os.path.isfile(full_tablename):
-            print_warning("Astropy Table {0} already exists, "
-                " use overwrite_astropy_table to overwrite it".format(mastertype.upper()))
-        else :
-            getattr(self.Tables, mastertype).write(full_tablename, 
-                format="fits", overwrite=self._overwrite_astropy_table)
-
-    def get_tpl_meanmjd(self, gtable):
-        """Get tpl of the group and mean mjd of the group
-        """
-        tpl = gtable['tpls'][0]
-        mean_mjd = gtable.groups.aggregate(np.mean)['mjd'].data[0]
-        return tpl, mean_mjd
-
-    def select_tpl_files(self, expotype=None, tpl="ALL"):
-        """Selecting a subset of files from a certain type
-        """
-        if expotype not in listexpo_types.keys() :
-            print_info("ERROR: input expotype is not in the list of possible values")
-            return 
-
-        MUSE_subtable = self.select_expotype_fromraw(listexpo_types[expotype])
-        if len(MUSE_subtable) == 0:
-            if self.verbose :
-                print_warning("Empty file table of type {0}".format(expotype))
-                print_warning("Returning an empty Table from the tpl -astropy- selection")
-            return MUSE_subtable
-
-        group_table = MUSE_subtable.group_by('tpls')
-        if tpl == "ALL":
-            return group_table
-        else :
-            return group_table.groups[group_table.groups.key['tpls'] == tpl]

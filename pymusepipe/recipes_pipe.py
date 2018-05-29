@@ -27,13 +27,17 @@ class PipeRecipes(object) :
     """PipeRecipes class containing all the esorex recipes for MUSE data reduction
     """
     def __init__(self, nifu=-1, first_cpu=0, ncpu=24, list_cpu=[], likwid=default_likwid,
-            fakemode=True, domerge=True) :
+            fakemode=True, domerge=True, nocache=True) :
         """Initialisation of PipeRecipes
         """
+        # Fake mode
         self.fakemode = fakemode
         if self.verbose :
             if fakemode : mpipe.print_warning("WARNING: running in FAKE mode")
             else : mpipe.print_warning("WARNING: running actual recipes")
+
+        if nocache : self.nocache = "nocache"
+        else : self.nocache = ""
 
         # Addressing CPU by number (cpu0=start, cpu1=end)
         self.first_cpu = first_cpu
@@ -42,14 +46,14 @@ class PipeRecipes(object) :
         self.likwid = likwid
         self.nifu = nifu
         self._set_cpu(first_cpu, ncpu, list_cpu)
-        self.domerge = domerge
+        self._domerge = domerge
 
     @property
     def esorex(self):
         return ("{likwid}{list_cpu} {nocache} esorex --output-dir={outputdir} {checksum}" 
                     " --log-dir={logdir}").format(likwid=self.likwid, 
-                    list_cpu=self.list_cpu, nocache=self.nocache, outputdir=self.paths.products, 
-                    checksum=self.checksum, logdir=self.paths.esorexlog)
+                    list_cpu=self.list_cpu, nocache=self.nocache, outputdir=self.paths.pipe_products, 
+                    checksum=self.checksum, logdir=self.paths.esorex_log)
 
     @property
     def checksum(self):
@@ -59,7 +63,7 @@ class PipeRecipes(object) :
             return ""
     @property
     def merge(self):
-        if self.domerge: 
+        if self._domerge: 
             return "--merge"
         else : 
             return ""
@@ -98,7 +102,7 @@ class PipeRecipes(object) :
             os.system(command)
 
     def joinprod(self, name):
-        return joinpath(self.paths.products, name)
+        return joinpath(self.paths.pipe_products, name)
 
     def recipe_bias(self, sof, dir_bias, name_bias, tpl):
         """Running the esorex muse_bias recipe
@@ -177,9 +181,9 @@ class PipeRecipes(object) :
         self.run_oscommand("{esorex} --log-file=sky_{tpl}.log muse_create_sky --fraction={fraction} {sof}".format(esorex=self.esorex,
                 sof=sof, fraction=fraction, tpl=tpl))
 
-        self.run_oscommand('{nocache} cp {name_spec}_0001.fits {name_spec}_{tpl}.fits'.format(nocache=self.nocache,
+        self.run_oscommand('{nocache} cp {name_specin}_0001.fits {name_specout}_{tpl}.fits'.format(nocache=self.nocache,
             name_specin=self.joinprod(name_spec), name_specout=joinpath(dir_sky, name_spec), tpl=tpl))
-        self.run_oscommand('{nocache} cp {name_pixtable}_0001.fits {name_pixtable}_{tpl}.fits'.format(nocache=self.nocache,
+        self.run_oscommand('{nocache} cp {name_pixtablein}_0001.fits {name_pixtableout}_{tpl}.fits'.format(nocache=self.nocache,
             name_pixtablein=self.joinprod(name_pixtable), name_pixtableout=joinpath(dir_sky, name_pixtable), tpl=tpl))
 
     def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=None):
