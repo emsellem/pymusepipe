@@ -94,6 +94,7 @@ dic_listMaster = {'DARK': 'MASTER_DARK',
 
 dic_listObject = {'OBJECT': 'PIXTABLE_OBJECT', 
         'SKY': 'PIXTABLE_SKY', 
+        'STD': 'PIXTABLE_STD', 
         }
 
 listexpo_files = {
@@ -358,12 +359,12 @@ class MusePipe(PipePrep, PipeRecipes):
         # Init the Master exposure flag dictionary
         self.Master = {}
         for mastertype in dic_listMaster.keys() :
-            safely_create_folder(self._get_path_expo(mastertype), verbose=self.verbose)
+            safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=self.verbose)
             self.Master[mastertype] = False
 
         # Init the Object folder
         for objecttype in dic_listObject.keys() :
-            safely_create_folder(self._get_path_expo(objecttype), verbose=self.verbose)
+            safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=self.verbose)
 
         self._dic_listMasterObject = dict(dic_listMaster.items() + dic_listObject.items())
         # ==============================================
@@ -377,7 +378,8 @@ class MusePipe(PipePrep, PipeRecipes):
         # When creating the table, if the table already exists
         # it will read the old one, except if an overwrite_astropy_table
         # is set to True.
-        self.create_raw_table()
+        self.init_raw_table()
+        self.read_all_astro_tables()
         # ===========================================================
 
     def goto_prevfolder(self, logfile=False) :
@@ -418,22 +420,51 @@ class MusePipe(PipePrep, PipeRecipes):
         for expotype in dic_listMaster.keys() :
             # Adding the path of the folder
             setattr(self.paths.Master, self._get_attr_expo(expotype), 
-                    joinpath(self.paths.data, self._get_path_expo(expotype)))
+                    joinpath(self.paths.data, self._get_path_expo(expotype, "master")))
 
         self._dic_paths = {"master": self.paths.Master, "processed": self.paths}
+
+    def _reset_tables(self) :
+        """Reseting the astropy Tables for expotypes
+        """
+        # Reseting the select_type item
+        self.Tables = PipeObject("Astropy Tables")
+        # Creating the other two Tables categories
+        self.Tables.Raw = PipeObject("Astropy Tables for each raw expotype")
+        self.Tables.Master = PipeObject("Astropy Tables for each mastertype")
+        self.Tables.Processed = PipeObject("Astropy Tables for each processed type")
+        self._dic_tables = {"raw": self.Tables.Raw, "master": self.Tables.Master,
+                "processed": self.Tables.Processed}
+        self._dic_attr_suffix = {"raw": "", "master": "master",
+                "processed": ""}
+
+        for expotype in listexpo_types.keys() :
+            setattr(self.Tables.Raw, self._get_attr_expo(expotype), [])
+
+    def read_all_astro_tables(self) :
+        """Initialise all existing Astropy Tables
+        """
+        for mastertype in dic_listMaster.keys():
+            setattr(self._dic_tables["master"], self._get_attr_expo(mastertype),
+                self.read_astropy_table(mastertype, stage="master"))
+
+        for expotype in dic_listObject.keys():
+            setattr(self._dic_tables["processed"], self._get_attr_expo(expotype),
+                self.read_astropy_table(expotype, stage="processed"))
 
     def read_astropy_table(self, expotype=None, stage="master"):
         """Read an existing Masterfile data table to start the pipeline
         """
         # Read the astropy table
-        name_table = joinpath(self.paths.astro_tables, self._get_fitstablename_expo(expotype, stage))
+        name_table = self._get_fitstablename_expo(expotype, stage)
         if not os.path.isfile(name_table):
-            print_info("ERROR: Astropy table {0} does not exist".format(name_table))
+            print_warning("Astropy table {0} does not exist - setting up an empty one".format(name_table))
+            return Table([[],[],[]], names=['tpls','mjd', 'tplnexp'])
         else :
             if self.verbose : print_info("Reading Astropy fits Table {0}".format(name_table))
             return Table.read(name_table, format="fits")
         
-    def create_raw_table(self, overwrite_astropy_table=None, verbose=None, reset=True) :
+    def init_raw_table(self, overwrite_astropy_table=None, verbose=None, reset=False) :
         """ Create a fits table with all the information from
         the Raw files
         Also create an astropy table with the same info
@@ -443,11 +474,11 @@ class MusePipe(PipePrep, PipeRecipes):
         if verbose :
             print_info("Creating the astropy fits raw data table")
 
-        if reset:
+        if reset or not hasattr(self, "Tables"):
             self._reset_tables()
 
         # Testing if raw table exists
-        name_table = joinpath(self.paths.astro_tables, self._get_fitstablename_expo('RAWFILES', "raw"))
+        name_table = self._get_fitstablename_expo('RAWFILES', "raw")
 
         # ---- File exists - we READ it ------------------- #
         if os.path.isfile(name_table) :
@@ -509,7 +540,7 @@ class MusePipe(PipePrep, PipeRecipes):
             self.goto_prevfolder()
 
         # Sorting the types ====================================
-        self.sort_types()
+        self.sort_raw_tables()
 
     def save_expo_table(self, expotype, tpl_gtable, stage="master", fits_tablename=None):
         """Save the Expo (Master or not) Table corresponding to the expotype
@@ -527,29 +558,9 @@ class MusePipe(PipePrep, PipeRecipes):
             getattr(self._dic_tables[stage], attr_expo).write(full_tablename, 
                 format="fits", overwrite=self._overwrite_astropy_table)
 
-    def _reset_tables(self) :
-        """Reseting the astropy Tables for expotypes
-        """
-        # Reseting the select_type item
-        self.Tables = PipeObject("Astropy Tables")
-        # Creating the other two Tables categories
-        self.Tables.Raw = PipeObject("Astropy Tables for each raw expotype")
-        self.Tables.Master = PipeObject("Astropy Tables for each mastertype")
-        self.Tables.Processed = PipeObject("Astropy Tables for each processed type")
-        self._dic_tables = {"raw": self.Tables.Raw, "master": self.Tables.Master,
-                "processed": self.Tables.Processed}
-        self._dic_attr_suffix = {"raw": "", "master": "master",
-                "processed": ""}
-
-        for expotype in listexpo_types.keys() :
-            setattr(self.Tables.Raw, self._get_attr_expo(expotype), [])
-
-    def sort_types(self, checkmode=None, strong_checkmode=None, reset=False) :
+    def sort_raw_tables(self, checkmode=None, strong_checkmode=None) :
         """Provide lists of exposures with types defined in the dictionary
         """
-        # Reseting the list if reset is True (default)
-        if reset: self._reset_tables()
-
         if checkmode is not None : self.checkmode = checkmode
         else : checkmode = self.checkmode
 
@@ -572,10 +583,10 @@ class MusePipe(PipePrep, PipeRecipes):
         """Get the name of the fits table covering
         a certain expotype
         """
-        nametable = "{0}_list_table.fits".format(expotype)
+        fitstablename = "{0}_list_table.fits".format(expotype)
         if stage.lower() == "master":
-            nametable = "MASTER_" + nametable
-        return nametable
+            fitstablename = "MASTER_" + fitstablename
+        return joinpath(self.paths.astro_tables, fitstablename)
 
     def _get_table_expo(self, expotype, stage="master"):
         return getattr(self._dic_tables[stage], self._get_attr_expo(expotype))

@@ -105,7 +105,8 @@ class SofPipe(object) :
         # Finding the best tpl for this raw file type
         expo_table = self._get_table_expo(expotype, "raw")
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-        self._sofdict[expotype] = [expo_table['filename'][index]]
+        self._sofdict[expotype] = [joinpath(self.paths.rawfiles, 
+            expo_table['filename'][index])]
 
     def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, reset=False):
         """ Add item to dictionary for the sof writing
@@ -114,7 +115,7 @@ class SofPipe(object) :
         # Finding the best tpl for this sky calib file type
         expo_table = self._get_table_expo(expotype, "master")
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-        dir_master = self._get_fullpath_expo(expotype)
+        dir_master = self._get_fullpath_expo(expotype, "master")
         self._sofdict[tag] = [joinpath(dir_master, "{0}_{1}.fits".format(tag, this_tpl))]
 
     def _add_calib_to_sofdict(self, calibtype, reset=False):
