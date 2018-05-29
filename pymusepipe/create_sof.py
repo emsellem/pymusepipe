@@ -96,7 +96,8 @@ class SofPipe(object) :
         # Finding the best tpl for this master
         index, this_tpl = self._select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
         dir_master = self._get_fullpath_expo(expotype)
-        self._sofdict[self._get_suffix_expo(expotype)] = [joinpath(dir_master, self._get_suffix_expo(expotype) + "_" + this_tpl + ".fits")]
+        self._sofdict[self._get_suffix_expo(expotype)] = [mpipe.normpath(joinpath(dir_master, 
+            self._get_suffix_expo(expotype) + "_" + this_tpl + ".fits"))]
 
     def _add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
         """ Add item to dictionary for the sof writing
@@ -105,8 +106,8 @@ class SofPipe(object) :
         # Finding the best tpl for this raw file type
         expo_table = self._get_table_expo(expotype, "raw")
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-        self._sofdict[expotype] = [joinpath(self.paths.rawfiles, 
-            expo_table['filename'][index])]
+        self._sofdict[expotype] = [mpipe.normpath(joinpath(self.paths.rawfiles, 
+            expo_table['filename'][index]))]
 
     def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, reset=False):
         """ Add item to dictionary for the sof writing
