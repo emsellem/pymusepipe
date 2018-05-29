@@ -292,8 +292,6 @@ class MusePipe(PipePrep, PipeRecipes):
         self._time_geo_table = kwargs.pop("time_geo_table", True)
         self._time_astro_table = kwargs.pop("time_astro_table", True)
 
-        PipePrep.__init__(self)
-        PipeRecipes.__init__(self)
 #        super(MusePipe, self).__init__(**kwargs)
 
         # Setting the default attibutes #####################
@@ -307,10 +305,6 @@ class MusePipe(PipePrep, PipeRecipes):
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
 
-        # Esorex options ================================================
-        # checksum on the FITS files
-        self.nochecksum = kwargs.pop("nochecksum", True) 
-
         # Further reduction options =====================================
         # Mode of the observations
         self.musemode = musemode
@@ -321,7 +315,12 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Set of objects to reduced
         self.objectlist = objectlist
+
         # End of parameter settings #########################
+
+        # Init of the subclasses
+        PipePrep.__init__(self)
+        PipeRecipes.__init__(self, **kwargs)
 
         # =========================================================== #
         # Setting up the folders and names for the data reduction
