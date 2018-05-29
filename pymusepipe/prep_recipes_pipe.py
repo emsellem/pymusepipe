@@ -325,9 +325,9 @@ class PipePrep(SofPipe) :
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             self._add_geometry_to_sofdict(tpl)
             # Provide the list of files to the dictionary
-            self._sofdict['TWILIGHT'] = add_listpath(self.paths.rawfiles,
+            self._sofdict['SKYFLAT'] = add_listpath(self.paths.rawfiles,
                     gtable['filename'].data.astype(np.object))
-            # Finding the best tpl for BIAS, ILLUM, FLAT, TRACE, WAVE
+            # Finding the best tpl for BIAS, FLAT, ILLUM, TRACE, WAVE
             self._add_tplraw_to_sofdict(mean_mjd, "ILLUM")
             self._add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 'TRACE', 'WAVE'])
             # Writing the sof file
