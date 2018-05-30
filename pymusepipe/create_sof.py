@@ -96,8 +96,8 @@ class SofPipe(object) :
         # Finding the best tpl for this master
         index, this_tpl = self._select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
         dir_master = self._get_fullpath_expo(expotype)
-        self._sofdict[self._get_suffix_expo(expotype)] = [mpipe.normpath(joinpath(dir_master, 
-            self._get_suffix_expo(expotype) + "_" + this_tpl + ".fits"))]
+        self._sofdict[self._get_suffix_product(expotype)] = [mpipe.normpath(joinpath(dir_master, 
+            self._get_suffix_product(expotype) + "_" + this_tpl + ".fits"))]
 
     def _add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
         """ Add item to dictionary for the sof writing
@@ -109,15 +109,15 @@ class SofPipe(object) :
         self._sofdict[expotype] = [mpipe.normpath(joinpath(self.paths.rawfiles, 
             expo_table['filename'][index]))]
 
-    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, reset=False):
+    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", reset=False):
         """ Add item to dictionary for the sof writing
         """
         if reset: self._sofdict.clear()
         # Finding the best tpl for this sky calib file type
-        expo_table = self._get_table_expo(expotype, "master")
+        expo_table = self._get_table_expo(expotype, stage)
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-        dir_master = self._get_fullpath_expo(expotype, "master")
-        self._sofdict[tag] = [joinpath(dir_master, "{0}_{1}.fits".format(tag, this_tpl))]
+        dir_calib = self._get_fullpath_expo(expotype, stage)
+        self._sofdict[tag] = [joinpath(dir_calib, "{0}_{1}.fits".format(tag, this_tpl))]
 
     def _add_calib_to_sofdict(self, calibtype, reset=False):
         """Adding a calibration file for the SOF 

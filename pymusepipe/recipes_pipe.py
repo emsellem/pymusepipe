@@ -148,17 +148,15 @@ class PipeRecipes(object) :
         self.run_oscommand("{nocache} cp {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
             namein=self.joinprod(name_lsf), nameout=joinpath(dir_lsf, name_lsf), tpl=tpl))
     
-    def recipe_twilight(self, sof, dir_twilight, name_twilight, name_products, tpl):
+    def recipe_twilight(self, sof, dir_twilight, name_twilight, tpl):
         """Running the esorex muse_twilight recipe
         """
         self.run_oscommand("{esorex} --log-file=twilight_{tpl}.log muse_twilight {sof}".format(esorex=self.esorex, 
             sof=sof, tpl=tpl))
         # Moving the TWILIGHT CUBE
-        self.run_oscommand("{nocache} cp {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
-            namein=self.joinprod(name_twilight), nameout=joinpath(dir_twilight, name_twilight), tpl=tpl))
-        [name_cube_skyflat, name_twilight_cube] = name_products
-        self.run_oscommand('rm {name}*.fits'.format(name=self.joinprod(name_cube_skyflat)))
-        self.run_oscommand('rm {name}*.fits'.format(name=self.joinprod(name_twilight_cube)))
+        for name_prod in name_twilight:
+            self.run_oscommand("{nocache} mv {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
+                namein=self.joinprod(name_prod), nameout=joinpath(dir_twilight, name_prod), tpl=tpl))
 
     def recipe_std(self, sof, dir_std, name_std, tpl):
         """Running the esorex muse_stc recipe
@@ -167,50 +165,48 @@ class PipeRecipes(object) :
         self.run_oscommand("{esorex} --log-file=std_{tpl}.log muse_standard --filter=white {sof}".format(esorex=self.esorex,
                 sof=sof, tpl=tpl))
 
-        self.run_oscommand('{nocache} mv {name_cubein}_0001.fits {name_cubeout}_{tpl}.fits'.format(nocache=self.nocache,
-            name_cubein=self.joinprod(name_cube), name_cubeout=joinpath(dir_std, name_cube), tpl=tpl))
-        self.run_oscommand('{nocache} mv {name_fluxin}_0001.fits {name_fluxout}_{tpl}.fits'.format(nocache=self.nocache,
-            name_fluxin=self.joinprod(name_flux), name_fluxout=joinpath(dir_std, name_flux), tpl=tpl))
-        self.run_oscommand('{nocache} mv {name_responsein}_0001.fits {name_responseout}_{tpl}.fits'.format(nocache=self.nocache,
-            name_responsein=self.joinprod(name_response), name_responseout=joinpath(dir_std, name_response), tpl=tpl))
-        self.run_oscommand('{nocache} mv {name_telluricin}_0001.fits {name_telluricout}_{tpl}.fits'.format(nocache=self.nocache,
-            name_telluricin=self.joinprod(name_telluric), name_telluricout=joinpath(dir_std, name_telluric), tpl=tpl))
+        for name_prod in name_std:
+            self.run_oscommand('{nocache} mv {name_prodin}_0001.fits {name_prodout}_{tpl}.fits'.format(nocache=self.nocache,
+                name_prodin=self.joinprod(name_prod), name_prodout=joinpath(dir_std, name_prod), tpl=tpl))
 
-    def recipe_sky(self, sof, dir_sky, name_sky, tpl, fraction=0.8):
+    def recipe_sky(self, sof, dir_sky, name_sky, tpl, iexpo=1, fraction=0.8):
         """Running the esorex muse_stc recipe
         """
-        [name_spec, name_pixtable] = name_sky
         self.run_oscommand("{esorex} --log-file=sky_{tpl}.log muse_create_sky --fraction={fraction} {sof}".format(esorex=self.esorex,
                 sof=sof, fraction=fraction, tpl=tpl))
 
-        self.run_oscommand('{nocache} cp {name_specin}_0001.fits {name_specout}_{tpl}.fits'.format(nocache=self.nocache,
-            name_specin=self.joinprod(name_spec), name_specout=joinpath(dir_sky, name_spec), tpl=tpl))
-        self.run_oscommand('{nocache} cp {name_pixtablein}_0001.fits {name_pixtableout}_{tpl}.fits'.format(nocache=self.nocache,
-            name_pixtablein=self.joinprod(name_pixtable), name_pixtableout=joinpath(dir_sky, name_pixtable), tpl=tpl))
+        for name_prod in name_sky:
+            self.run_oscommand('{nocache} mv {name_prodin}_0001.fits {name_prodout}_{iexpo:04d}_{tpl}.fits'.format(nocache=self.nocache,
+                name_prodin=self.joinprod(name_prod), name_prodout=joinpath(dir_sky, name_prod), iexpo=iexpo, tpl=tpl))
 
-    def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=None):
+    def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=[]):
         """Running the esorex muse_scibasic recipe
         """
         self.run_oscommand("{esorex} --log-file=scibasic_expotype_{tpl}.log muse_scibasic --nifu={nifu} "
                 "--saveimage=FALSE {merge} {sof}".format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
 
-        if name_products is not None :
-            for prod in name_products :
-                # newprod = prod.replace("0001", tpl)
-                self.run_oscommand('{nocache} mv {prod} {newprod}'.format(nocache=self.nocache,
-                    prod=self.joinprod(prod), newprod=joinpath(dir_products, prod)))
+        for prod in name_products :
+            # newprod = prod.replace("0001", tpl)
+            self.run_oscommand('{nocache} mv {prod} {newprod}'.format(nocache=self.nocache,
+                prod=self.joinprod(prod), newprod=joinpath(dir_products, prod)))
     
-    def recipe_scipost(self, sof, save='cube', filter_list='white', skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE'):
+    def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
+            save='cube', filter_list='white', skymethod='model',
+            pixfrac=0.8, darkcheck='none', skymodel_frac=0.05, astrometry='TRUE'):
         """Running the esorex muse_scipost recipe
         """
         self.run_oscommand("{esorex} muse_scipost --astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
-                "--darcheck={darkcheck} --skymodel_frac={model:02f} "
+                "--darkcheck={darkcheck} --skymodel_frac={model:02f} "
                 "{sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
-                    pixfrac=pixfrac, filt=filter_list, sky=skymethod, 
-                    darkcheck=darcheck, model=skymodel_frac, sof=sof))
-    
+                    pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
+                    darkcheck=darkcheck, model=skymodel_frac, sof=sof))
+
+        for name_prod in name_products :
+            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}_{tpl}.fits'.format(nocache=self.nocache,
+                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod), tpl=tpl))
+   
     def recipe_align(self, sof, srcmin=1, srcmax=10):
         """Running the muse_exp_align recipe
         """

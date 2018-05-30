@@ -433,10 +433,11 @@ class MusePipe(PipePrep, PipeRecipes):
         self.Tables.Raw = PipeObject("Astropy Tables for each raw expotype")
         self.Tables.Master = PipeObject("Astropy Tables for each mastertype")
         self.Tables.Processed = PipeObject("Astropy Tables for each processed type")
+        self.Tables.Reduced = PipeObject("Astropy Tables for each reduced type")
         self._dic_tables = {"raw": self.Tables.Raw, "master": self.Tables.Master,
-                "processed": self.Tables.Processed}
-        self._dic_attr_suffix = {"raw": "", "master": "master",
-                "processed": ""}
+                "processed": self.Tables.Processed, "reduced": self.Tables.Reduced}
+        self._dic_suffix_astro = {"raw": "RAW", "master": "MASTER", 
+                "processed": "PRO", "reduced": "RED"}
 
         for expotype in listexpo_types.keys() :
             setattr(self.Tables.Raw, self._get_attr_expo(expotype), [])
@@ -542,14 +543,18 @@ class MusePipe(PipePrep, PipeRecipes):
         # Sorting the types ====================================
         self.sort_raw_tables()
 
-    def save_expo_table(self, expotype, tpl_gtable, stage="master", fits_tablename=None):
+    def save_expo_table(self, expotype, tpl_gtable, stage="master", 
+            fits_tablename=None, aggregate=True, suffix=""):
         """Save the Expo (Master or not) Table corresponding to the expotype
         """
         if fits_tablename is None :
-            fits_tablename = self._get_fitstablename_expo(expotype, stage)
+            fits_tablename = self._get_fitstablename_expo(expotype, stage, suffix)
 
         attr_expo = self._get_attr_expo(expotype)
-        setattr(self._dic_tables[stage], attr_expo, tpl_gtable.groups.aggregate(np.mean)['tpls','mjd', 'tplnexp'])
+        if aggregate :
+            setattr(self._dic_tables[stage], attr_expo, tpl_gtable.groups.aggregate(np.mean)['tpls', 'mjd', 'tplnexp'])
+        else:
+            setattr(self._dic_tables[stage], attr_expo, tpl_gtable)
         full_tablename = joinpath(self.paths.astro_tables, fits_tablename)
         if (not self._overwrite_astropy_table) and os.path.isfile(full_tablename):
             print_warning("Astropy Table {0} already exists, "
@@ -579,19 +584,22 @@ class MusePipe(PipePrep, PipeRecipes):
     def _get_attr_expo(self, expotype):
         return expotype.lower()
 
-    def _get_fitstablename_expo(self, expotype, stage="master"):
+    def _get_fitstablename_expo(self, expotype, stage="master", suffix=""):
         """Get the name of the fits table covering
         a certain expotype
         """
-        fitstablename = "{0}_list_table.fits".format(expotype)
-        if stage.lower() == "master":
-            fitstablename = "MASTER_" + fitstablename
+        fitstablename = "{0}_{1}_{2}list_table.fits".format(self._dic_suffix_astro[stage], 
+                expotype.lower(), suffix)
         return joinpath(self.paths.astro_tables, fitstablename)
 
     def _get_table_expo(self, expotype, stage="master"):
-        return getattr(self._dic_tables[stage], self._get_attr_expo(expotype))
+        try:
+            return getattr(self._dic_tables[stage], self._get_attr_expo(expotype))
+        except AttributeError:
+            print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
+            return Table()
 
-    def _get_suffix_expo(self, expotype):
+    def _get_suffix_product(self, expotype):
         return self._dic_listMasterObject[expotype]
  
     def _get_path_expo(self, expotype, stage="master"):

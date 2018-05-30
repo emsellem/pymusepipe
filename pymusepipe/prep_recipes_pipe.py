@@ -30,7 +30,8 @@ dic_files_products = {
         'STD': ['DATACUBE_STD', 'STD_FLUXES', 
             'STD_RESPONSE', 'STD_TELLURIC'],
         'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
-        'SKY': ['SKY_SPECTRUM', 'PIXTABLE_REDUCED']
+        'SKY': ['SKY_MASK', 'IMAGE_FOV', 'SKY_SPECTRUM', 
+            'SKY_CONTINUUM', 'PIXTABLE_REDUCED']
         }
 # =======================================================
 # Few useful functions
@@ -137,7 +138,7 @@ class PipePrep(SofPipe) :
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Bias
-            name_bias = self._get_suffix_expo('BIAS')
+            name_bias = self._get_suffix_product('BIAS')
             dir_bias = self._get_fullpath_expo('BIAS', "master")
             # Run the recipe
             self.recipe_bias(self.current_sof, dir_bias, name_bias, tpl)
@@ -185,10 +186,10 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Flat and Trace Table
             dir_flat = self._get_fullpath_expo('FLAT', "master")
-            name_flat =  self._get_suffix_expo('FLAT')
+            name_flat =  self._get_suffix_product('FLAT')
 
             dir_trace = self._get_fullpath_expo('TRACE', "master")
-            name_tracetable = self._get_suffix_expo('TRACE')
+            name_tracetable = self._get_suffix_product('TRACE')
             # Run the recipe
             self.recipe_flat(self.current_sof, dir_flat, name_flat, dir_trace, name_tracetable, tpl)
 
@@ -237,7 +238,7 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Wave
             dir_wave = self._get_fullpath_expo('WAVE', "master")
-            name_wave = self._get_suffix_expo('WAVE')
+            name_wave = self._get_suffix_product('WAVE')
             # Run the recipe
             self.recipe_wave(self.current_sof, dir_wave, name_wave, tpl)
 
@@ -285,7 +286,7 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Wave
             dir_lsf = self._get_fullpath_expo('LSF', "master")
-            name_lsf = self._get_suffix_expo('LSF')
+            name_lsf = self._get_suffix_product('LSF')
             # Run the recipe
             self.recipe_lsf(self.current_sof, dir_lsf, name_lsf, tpl)
 
@@ -333,10 +334,9 @@ class PipePrep(SofPipe) :
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Names and folder of final Master Wave
-            name_products = dic_files_products['TWILIGHT']
             dir_twilight = self._get_fullpath_expo('TWILIGHT', "master")
-            name_twilight = self._get_suffix_expo('TWILIGHT')
-            self.recipe_twilight(self.current_sof, dir_twilight, name_twilight, name_products, tpl)
+            name_twilight = dic_files_products['TWILIGHT']
+            self.recipe_twilight(self.current_sof, dir_twilight, name_twilight, tpl)
 
         # Write the MASTER TWILIGHT Table and save it
         self.save_expo_table('TWILIGHT', tpl_gtable, "master")
@@ -364,7 +364,7 @@ class PipePrep(SofPipe) :
 
         """
         # First selecting the files via the grouped table
-        tpl_gtable = self.select_tpl_files(expotype=expotype, tpl=tpl)
+        tpl_gtable = self.select_tpl_files(expotype=expotype, tpl=tpl, stage="raw")
         if len(tpl_gtable) == 0:
             if self.verbose :
                 mpipe.print_warning("No {0} recovered from the astropy file Table - Aborting".format(expotype))
@@ -397,14 +397,16 @@ class PipePrep(SofPipe) :
             # Run the recipe to reduce the standard (muse_scibasic)
 
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            suffix = self._get_suffix_expo(expotype)
+            suffix = self._get_suffix_product(expotype)
             name_products = []
-            for i in range(Nexpo):
-                name_products += ['{0}_{1:04d}-{2:02d}.fits'.format(suffix, i+1, j+1) for j in range(24)]
+            list_expo = np.arange(Nexpo).astype(np.int) + 1
+            for iexpo in list_expo:
+                name_products += ['{0}_{1:04d}-{2:02d}.fits'.format(suffix, iexpo, j+1) for j in range(24)]
             self.recipe_scibasic(self.current_sof, tpl, expotype, dir_products, name_products)
 
-        # Write the MASTER files Table and save it
-        self.save_expo_table(expotype, tpl_gtable, "processed")
+            # Write the Processed files Table and save it
+            gtable['iexpo'] = list_expo
+            self.save_expo_table(expotype, gtable, "processed", suffix=tpl + "_", aggregate=False)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -446,7 +448,7 @@ class PipePrep(SofPipe) :
             self.recipe_std(self.current_sof, dir_std, name_std, mytpl)
 
         # Write the MASTER files Table and save it
-        self.save_expo_table("STD", std_table, "master")
+        self.save_expo_table("STD", std_table, "master", aggregate=False)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -463,7 +465,7 @@ class PipePrep(SofPipe) :
 
         """
         # First selecting the files via the grouped table
-        sky_table = self._get_table_expo("SKY", "raw")
+        sky_table = self._get_table_expo("SKY", "processed")
         if len(sky_table) == 0:
             if self.verbose :
                 mpipe.print_warning("No SKY recovered from the astropy file Table - Aborting")
@@ -477,6 +479,7 @@ class PipePrep(SofPipe) :
         for i in range(len(sky_table)):
             mytpl = sky_table['tpls'][i]
             mymjd = sky_table['mjd'][i]
+            iexpo = np.int(sky_table['iexpo'][i])
             if tpl != "ALL" and tpl != mytpl :
                 continue
             # Now starting with the standard recipe
@@ -486,14 +489,134 @@ class PipePrep(SofPipe) :
             self._add_skycalib_to_sofdict("STD_TELLURIC", mymjd, 'STD')
             self._add_tplmaster_to_sofdict(mymjd, 'LSF')
             self._sofdict['PIXTABLE_SKY'] = [joinpath(self._get_fullpath_expo("SKY", "processed"),
-                'PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(i+1,j+1)) for j in range(24)]
-            self.write_sof(sof_filename=sof_filename + "{0:02d}".format(i+1) + "_" + mytpl, new=True)
+                'PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(iexpo,j+1)) for j in range(24)]
+            self.write_sof(sof_filename=sof_filename + "{0:02d}".format(iexpo) + "_" + mytpl, new=True)
             dir_sky = self._get_fullpath_expo('SKY', "processed")
             name_sky = dic_files_products['SKY']
-            self.recipe_sky(self.current_sof, dir_sky, name_sky, mytpl, fraction=fraction)
+            self.recipe_sky(self.current_sof, dir_sky, name_sky, mytpl, iexpo, fraction)
+
+        # Write the MASTER files Table and save it
+        self.save_expo_table("SKY", sky_table, "processed", aggregate=False)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
+
+    def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, **kwargs):
+        # First selecting the files via the grouped table
+        object_table = self._get_table_expo("OBJECT", "processed")
+
+        for i in range(len(object_table)):
+            iexpo = np.int(object_table['iexpo'][i])
+            suffix = "_{0:04d}".format(iexpo)
+            self.run_scipost(sof_filename='scipost', expotype="OBJECT", 
+                    tpl="ALL", list_expo=[iexpo], suffix=suffix)
+
+    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, suffix="", **kwargs):
+        """Scipost treatment of the objects
+        Will run the esorex muse_scipost routine
+
+        Parameters
+        ----------
+        sof_filename: string (without the file extension)
+            Name of the SOF file which will contain the Bias frames
+        tpl: ALL by default or a special tpl time
+
+        """
+        # First selecting the files via the grouped table
+        tpl_table = self.select_tpl_files(expotype, tpl=tpl, stage="processed")
+
+        # Selecting the table with the right iexpo
+        if list_expo is None: 
+            list_expo = scipost_gtable['iexpo'].data
+        scipost_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)]
+        
+        if len(scipost_table) == 0:
+            if self.verbose :
+                mpipe.print_warning("No {0} recovered from the processed astropy file Table - Aborting".format(expotype))
+                return
+
+        # Go to the data folder
+        self.goto_folder(self.paths.data, logfile=True)
+
+        # Create the dictionary for scipost
+        # Selecting either one or all of the exposures
+        for gtable in scipost_table.groups:
+            # extract the tpl (string) and mean mjd (float) 
+            tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
+            # Now starting with the standard recipe
+            self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
+            self._add_calib_to_sofdict("SKY_LINES")
+            self._add_calib_to_sofdict("FILTER_LIST")
+            self._add_calib_to_sofdict("ASTRO_TABLE")
+            self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
+            self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
+            self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', "processed")
+            self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
+            # Selecting only exposures to be treated
+            pixtable_name = self._get_suffix_product(expotype)
+            self._sofdict[pixtable_name] = []
+            for iexpo in list_expo:
+                self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                    '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name, iexpo, j+1)) for j in range(24)]
+            self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, suffix, tpl), new=True)
+            # products
+            dir_products = self._get_fullpath_expo(expotype, "processed")
+            name_products = ['IMAGE_FOV_{0}_{1:04d}'.format(expotype, i) for i in list_expo]
+            self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, name_products, **kwargs)
+
+        # Write the MASTER files Table and save it
+        self.save_expo_table(expotype, scipost_table, "reduced", 
+                "IMAGES_FOV_{0}{1}_list_table.fits".format(expotype, suffix), aggregate=False)
+
+        # Go back to original folder
+        self.goto_prevfolder(logfile=True)
+
+    def run_align(self, sof_filename='exp_align', tpl="ALL"):
+        """Aligning the individual exposures from a dataset
+        using the emission line region 
+        With the muse exp_align routine
+
+        Parameters
+        ----------
+        sof_filename: string (without the file extension)
+            Name of the SOF file which will contain the Bias frames
+        tpl: ALL by default or a special tpl time
+
+        """
+        # First selecting the files via the grouped table
+        align_table = self._get_table_expo("OBJECT", "processed")
+        if len(align_table) == 0:
+            if self.verbose :
+                mpipe.print_warning("No OBJECT [to align] recovered from the astropy file Table - Aborting")
+                return
+
+        # Go to the data folder
+        self.goto_folder(self.paths.data, logfile=True)
+
+        # Create the dictionary for the LSF including
+        # the list of files to be processed for one MASTER Flat
+        for i in range(len(sky_table)):
+            mytpl = align_table['tpls'][i]
+            mymjd = align_table['mjd'][i]
+            if tpl != "ALL" and tpl != mytpl :
+                continue
+            # Now starting with the standard recipe
+            self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
+            self._add_calib_to_sofdict("SKY_LINES")
+            self._add_skycalib_to_sofdict("STD_RESPONSE", mymjd, 'STD')
+            self._add_skycalib_to_sofdict("STD_TELLURIC", mymjd, 'STD')
+            self._add_tplmaster_to_sofdict(mymjd, 'LSF')
+            self._sofdict['PIXTABLE_OBJECT'] = [joinpath(self._get_fullpath_expo("SKY", "processed"),
+                'PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(i+1,j+1)) for j in range(24)]
+            self.write_sof(sof_filename=sof_filename + "{0:02d}".format(i+1) + "_" + mytpl, new=True)
+            dir_scipost = self._get_fullpath_expo('SKY', "processed")
+            name_scipost = dic_files_products['SKY']
+            self.recipe_sky(self.current_sof, dir_scipost, name_scipost, mytpl)
+
+        # Go back to original folder
+        self.goto_prevfolder(logfile=True)
+
+
 
 ################### OLD ############################################
 #    def create_calibrations(self):
