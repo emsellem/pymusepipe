@@ -102,7 +102,7 @@ class PipePrep(SofPipe) :
         self.run_lsf()
         self.run_twilight()
         self.run_scibasic_all()
-        self.run_std()
+        self.run_standard()
         self.run_sky(fraction=fraction)
 
     def run_bias(self, sof_filename='bias', tpl="ALL"):
@@ -411,7 +411,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def run_std(self, sof_filename='standard', tpl="ALL"):
+    def run_standard(self, sof_filename='standard', tpl="ALL"):
         """Reducing the STD files after they have been obtained
         Running the muse_standard routine
 
@@ -435,13 +435,14 @@ class PipePrep(SofPipe) :
         # Create the dictionary for the STD Sof
         for i in range(len(std_table)):
             mytpl = std_table['tpls'][i]
+            iexpo = np.int(std_table['iexpo'][i])
             if tpl != "ALL" and tpl != mytpl :
                 continue
             # Now starting with the standard recipe
             self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
             self._add_calib_to_sofdict("STD_FLUX_TABLE")
             self._sofdict['PIXTABLE_STD'] = [joinpath(self._get_fullpath_expo("STD", "processed"),
-                'PIXTABLE_STD_{0}-{1:02d}.fits'.format(mytpl, j+1)) for j in range(24)]
+                'PIXTABLE_STD_{0:04d}-{1:02d}.fits'.format(iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename=sof_filename + "_" + mytpl, new=True)
             name_std = dic_files_products['STD']
             dir_std = self._get_fullpath_expo('STD', "master")
