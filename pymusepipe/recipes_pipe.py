@@ -145,7 +145,7 @@ class PipeRecipes(object) :
         self.run_oscommand("{esorex} --log-file=wave_{tpl}.log muse_lsf --nifu={nifu} {merge} {sof}".format(esorex=self.esorex,
             nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
         # Moving the MASTER LST PROFILE
-        self.run_oscommand("{nocache} cp {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
+        self.run_oscommand("{nocache} mv {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
             namein=self.joinprod(name_lsf), nameout=joinpath(dir_lsf, name_lsf), tpl=tpl))
     
     def recipe_twilight(self, sof, dir_twilight, name_twilight, tpl):

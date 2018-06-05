@@ -32,7 +32,7 @@ dic_files_products = {
             'STD_RESPONSE', 'STD_TELLURIC'],
         'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
         'SKY': ['SKY_MASK', 'IMAGE_FOV', 'SKY_SPECTRUM', 
-            'SKY_CONTINUUM', 'PIXTABLE_REDUCED']
+            'SKY_CONTINUUM']
         }
 # =======================================================
 # Few useful functions
