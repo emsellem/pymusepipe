@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-"""MUSE-PHANGS utility functions
+"""MUSE-PHANGS utility functions for pymusepipe
 """
 
 __authors__   = "Eric Emsellem"
