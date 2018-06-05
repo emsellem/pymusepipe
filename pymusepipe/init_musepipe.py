@@ -12,7 +12,7 @@ __contact__   = " <eric.emsellem@eso.org>"
 import os
 from os.path import join as joinpath
 import copy
-from . import musepipe as mpipe
+from pymusepipe import util_pipe as upipe
 
 ############################################################
 #                      BEGIN
@@ -141,7 +141,7 @@ class InitMuseParameters(object) :
 
         if rc_filename is None :
             if not os.path.isfile(default_rc_filename):
-                mpipe.print_warning(("No filename or {default_rc} file "
+                upipe.print_warning(("No filename or {default_rc} file "
                      "to initialise from. We will use the default hardcoded " 
                      "in the init_musepipe.py module").format(default_rc=default_rc_filename))
                 self.init_default_param(dic_user_folders)
@@ -174,7 +174,7 @@ class InitMuseParameters(object) :
         """
         for key in dic_param.keys() :
             if self.verbose :
-                mpipe.print_info("Default initialisation of attribute {0}".format(key))
+                upipe.print_info("Default initialisation of attribute {0}".format(key))
             setattr(self, key, dic_param[key])
 
     def read_param_file(self, filename, dic_param) :
@@ -182,7 +182,7 @@ class InitMuseParameters(object) :
         """
         # Testing existence of filename
         if not os.path.isfile(filename) :
-            mpipe.print_info(("ERROR: input parameter {inputname} cannot be found. "
+            upipe.print_info(("ERROR: input parameter {inputname} cannot be found. "
                     "We will use the default hardcoded in the "
                     "init_musepipe.py module").format(inputname=filename))
             return
@@ -199,7 +199,7 @@ class InitMuseParameters(object) :
             sline = line.split()
             if sline[0] in dic_param.keys() :
                 if self.verbose :
-                    mpipe.print_info("Initialisation of attribute {0}".format(sline[0]))
+                    upipe.print_info("Initialisation of attribute {0}".format(sline[0]))
                 setattr(self, sline[0], sline[1]) 
                 # Here we drop the item which was initialised
                 val = dummy_dic_param.pop(sline[0])
@@ -210,7 +210,7 @@ class InitMuseParameters(object) :
         not_initialised_param = dummy_dic_param.keys()
         # Listing them as warning and using the hardcoded default
         for key in not_initialised_param :
-            mpipe.print_info(("WARNING: parameter {param} not initialised "
+            upipe.print_info(("WARNING: parameter {param} not initialised "
                    "We will use the default hardcoded value from "
                    "init_musepipe.py").format(param=key))
             setattr(self, key, dic_param[key])
@@ -227,14 +227,14 @@ class MusepipeSample(object) :
 class MusepipeTarget(object) :
     def __init__(self, galaxyname=None, pointing=1) :
         if galaxyname not in MUSEPIPE_sample.keys() :
-            mpipe.print_error("ERROR: no Galaxy named {gal} in the defined sample".format(gal=galaxyname))
+            upipe.print_error("ERROR: no Galaxy named {gal} in the defined sample".format(gal=galaxyname))
             return
 
-        mpipe.print_info("Initialising Target {name}".format(name=galaxyname))
+        upipe.print_info("Initialising Target {name}".format(name=galaxyname))
         self.targetname = galaxyname
         self.info_pointings = MUSEPIPE_sample[galaxyname]
         if pointing not in self.info_pointings.keys() :
-            mpipe.print_error("ERROR: no pointing {pointing} for the Galaxy".format(pointing))
+            upipe.print_error("ERROR: no pointing {pointing} for the Galaxy".format(pointing))
             return
         self.pointing = pointing
         self.run = self.info_pointings[pointing]

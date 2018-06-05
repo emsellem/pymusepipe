@@ -23,7 +23,8 @@ from os.path import join as joinpath
 import collections
 from collections import OrderedDict
 
-from . import musepipe as mpipe
+from pymusepipe import util_pipe as upipe
+from pymusepipe import musepipe
 
 class SofDict(OrderedDict) :
     """New Dictionary for the SOF writing
@@ -54,12 +55,12 @@ class SofPipe(object) :
         if new :
             sof_file = open(sof, "w+")
             if verbose :
-                mpipe.print_info("Writing in file {0}".format(sof))
+                upipe.print_info("Writing in file {0}".format(sof))
         # if not new, then append
         else :
             sof_file = open(sof, "a")
             if verbose :
-                mpipe.print_info("Appending in file {0}".format(sof))
+                upipe.print_info("Appending in file {0}".format(sof))
     
         # Use dictionary to write up the lines
         for key in self._sofdict.keys() :
@@ -67,11 +68,11 @@ class SofPipe(object) :
                 text_to_write = "{0} {1}\n".format(item, key)
                 sof_file.write(text_to_write)
                 if verbose :
-                    mpipe.print_info(text_to_write)
+                    upipe.print_info(text_to_write)
 
         sof_file.close()
         # Returning the current sof as relative path
-        self.current_sof = mpipe.normpath(os.path.relpath(sof))
+        self.current_sof = upipe.normpath(os.path.relpath(sof))
 
     def _select_closest_mjd(self, mjdin, group_table) :
         """Get the closest frame within the expotype
@@ -96,7 +97,7 @@ class SofPipe(object) :
         # Finding the best tpl for this master
         index, this_tpl = self._select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
         dir_master = self._get_fullpath_expo(expotype)
-        self._sofdict[self._get_suffix_product(expotype)] = [mpipe.normpath(joinpath(dir_master, 
+        self._sofdict[self._get_suffix_product(expotype)] = [upipe.normpath(joinpath(dir_master, 
             self._get_suffix_product(expotype) + "_" + this_tpl + ".fits"))]
 
     def _add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
@@ -106,7 +107,7 @@ class SofPipe(object) :
         # Finding the best tpl for this raw file type
         expo_table = self._get_table_expo(expotype, "raw")
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-        self._sofdict[expotype] = [mpipe.normpath(joinpath(self.paths.rawfiles, 
+        self._sofdict[expotype] = [upipe.normpath(joinpath(self.paths.rawfiles, 
             expo_table['filename'][index]))]
 
     def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", reset=False):
@@ -132,11 +133,11 @@ class SofPipe(object) :
         """
         calfolder = self.my_params.musecalib
         if self._time_geo_table :
-            listkeys = list(mpipe.dic_geo_table.keys())
-            listkeys.append(mpipe.future_date)
+            listkeys = list(musepipe.dic_geo_table.keys())
+            listkeys.append(musepipe.future_date)
             for ikey in range(len(listkeys) - 1):
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
-                    geofile = mpipe.dic_geo_table[listkeys[ikey]]
+                    geofile = musepipe.dic_geo_table[listkeys[ikey]]
         else:
             geofile = self.my_params.geo_table
 
@@ -149,7 +150,7 @@ class SofPipe(object) :
         calfolder = self.my_params.musecalib
         if self._time_geo_table :
             listkeys = list(dic_astro_table.keys())
-            listkeys.append(mpipe.future_date)
+            listkeys.append(musepipe.future_date)
             for ikey in range(len(listkeys) - 1):
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
                     astrofile = dic_astro_table[listkeys[ikey]]

@@ -24,7 +24,6 @@ import numpy as np
 import os
 from os.path import join as joinpath
 import copy
-import time
 
 # cpl module to link with esorex
 #try :
@@ -54,9 +53,10 @@ import warnings
 from astropy.utils.exceptions import AstropyWarning
 
 # Importing pymusepipe modules
-from .init_musepipe import InitMuseParameters
-from .recipes_pipe import PipeRecipes
-from .prep_recipes_pipe import PipePrep
+from pymusepipe.init_musepipe import InitMuseParameters
+from pymusepipe.recipes_pipe import PipeRecipes
+from pymusepipe.prep_recipes_pipe import PipePrep
+import pymusepipe.util_pipe as upipe
 
 # Likwid command
 likwid = "likwid-pin -c N:"
@@ -134,87 +134,6 @@ future_date = '2099-01-01'
 ############################################################
 #                      END
 ############################################################
-def lower_allbutfirst_letter(mystring):
-    """Lowercase all letters except the first one
-    """
-    return mystring[0].upper() + mystring[1:].lower()
-
-def create_time_name() :
-    """Create a time-link name for file saving purposes
-
-    Return: a string including the YearMonthDay_HourMinSec
-    """
-    return str(time.strftime("%Y%m%d_%H%M%S", time.localtime()))
-
-def formatted_time() :
-    """ Return: a string including the formatted time
-    """
-    return str(time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()))
-
-def get_date_inD(indate) :
-    """Transform date in Y-M-D
-    """
-    return np.datetime64(indate).astype('datetime64[D]')
-
-def safely_create_folder(path, verbose=True):
-    """Create a folder given by the input path
-    This small function tries to create it and if it fails
-    it checks whether the reason is because it is not a path
-    and then warn the user
-    and then warn the user
-    """
-    if path is None :
-        if verbose : print_info("Input path is None, not doing anything")
-        return
-    if verbose : 
-        print_info("Trying to create {folder} folder".format(folder=path), end='')
-    try: 
-        os.makedirs(path)
-        print_endline("... Done", end='\n')
-    except OSError:
-        if not os.path.isdir(path):
-            print_error("Failed to create folder! Please check the path")
-            raise
-            return
-        if os.path.isdir(path):
-            print_endline("... Folder already exists, doing nothing.")
-
-def append_file(filename, content):
-    """Append in ascii file
-    """
-    with open(filename, "a") as myfile:
-        myfile.write(content)
-        
-def overwrite_file(filename, content):
-    """Overwite in ascii file
-    """
-    with open(filename, "w+") as myfile:
-        myfile.write(content)
-
-def normpath(path) :
-    """Normalise the path to get it short
-    """
-    return os.path.relpath(os.path.realpath(path))
-
-HEADER = '\033[95m'
-OKBLUE = '\033[94m'
-OKGREEN = '\033[92m'
-WARNING = '\033[1;31;20m'
-INFO = '\033[1;32;20m'
-ERROR = '\033[91m'
-ENDC = '\033[0m'
-BOLD = "\033[1m"
-def print_endline(text, **kwargs) :
-    print(INFO + text + ENDC, **kwargs)
-
-def print_warning(text, **kwargs) :
-    print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
-
-def print_info(text, **kwargs) :
-    print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
-
-def print_error(text, **kwargs) :
-    print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
 #########################################################################
 # Useful Classes for the Musepipe
@@ -269,6 +188,7 @@ class MusePipe(PipePrep, PipeRecipes):
         checkmode: boolean (default is True) Check the mode or not when reducing
         strong_checkmode: boolean (default is False) Enforce the checkmode for all if True, 
                          or exclude DARK/BIAS if False
+        vsystemic: float (default is 0), indicating the systemic velocity of the galaxy [in km/s]
 
         Other possible entries
         ----------------------
@@ -301,11 +221,12 @@ class MusePipe(PipePrep, PipeRecipes):
         # Setting the default attibutes #####################
         self.galaxyname = galaxyname
         self.pointing = pointing
+        self.vsys = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
         if outlog is None : 
-            outlog = "log_{timestamp}".format(timestamp=create_time_name())
-            print_info("The Log folder will be {log}".format(outlog))
+            outlog = "log_{timestamp}".format(timestamp = upipe.create_time_name())
+            upipe.print_info("The Log folder will be {log}".format(outlog))
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
 
@@ -345,29 +266,29 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Making the output folders in a safe mode
         if self.verbose:
-            print_info("Creating directory structure")
+            upipe.print_info("Creating directory structure")
         self.goto_folder(self.paths.data)
 
         # ==============================================
         # Creating the extra pipeline folder structure
         for folder in self.my_params._dic_input_folders.keys() :
-            safely_create_folder(self.my_params._dic_input_folders[folder], verbose=verbose)
+            upipe.safely_create_folder(self.my_params._dic_input_folders[folder], verbose=verbose)
 
         # ==============================================
         # Creating the folder structure itself if needed
         for folder in self.my_params._dic_folders.keys() :
-            safely_create_folder(self.my_params._dic_folders[folder], verbose=verbose)
+            upipe.safely_create_folder(self.my_params._dic_folders[folder], verbose=verbose)
 
         # ==============================================
         # Init the Master exposure flag dictionary
         self.Master = {}
         for mastertype in dic_listMaster.keys() :
-            safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=self.verbose)
+            upipe.safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=self.verbose)
             self.Master[mastertype] = False
 
         # Init the Object folder
         for objecttype in dic_listObject.keys() :
-            safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=self.verbose)
+            upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=self.verbose)
 
         self._dic_listMasterObject = {**dic_listMaster, **dic_listObject}
         # ==============================================
@@ -394,7 +315,7 @@ class MusePipe(PipePrep, PipeRecipes):
     def goto_prevfolder(self, logfile=False) :
         """Go back to previous folder
         """
-        print_info("Going back to the original folder {0}".format(self.paths._prev_folder))
+        upipe.print_info("Going back to the original folder {0}".format(self.paths._prev_folder))
         self.goto_folder(self.paths._prev_folder, logfile=logfile, verbose=False)
             
     def goto_folder(self, newpath, logfile=False, verbose=True) :
@@ -405,9 +326,9 @@ class MusePipe(PipePrep, PipeRecipes):
             newpath = os.path.normpath(newpath)
             os.chdir(newpath)
             if verbose :
-                print_info("Going to folder {0}".format(newpath))
+                upipe.print_info("Going to folder {0}".format(newpath))
             if logfile :
-                append_file(joinpath(self.paths.data, self.logfile), "cd {0}\n".format(newpath))
+                upipe.append_file(joinpath(self.paths.data, self.logfile), "cd {0}\n".format(newpath))
             self.paths._prev_folder = prev_folder 
         except OSError:
             if not os.path.isdir(newpath):
@@ -468,10 +389,10 @@ class MusePipe(PipePrep, PipeRecipes):
         # Read the astropy table
         name_table = self._get_fitstablename_expo(expotype, stage)
         if not os.path.isfile(name_table):
-            print_warning("Astropy table {0} does not exist - setting up an empty one".format(name_table))
+            upipe.print_warning("Astropy table {0} does not exist - setting up an empty one".format(name_table))
             return Table([[],[],[]], names=['tpls','mjd', 'tplnexp'])
         else :
-            if self.verbose : print_info("Reading Astropy fits Table {0}".format(name_table))
+            if self.verbose : upipe.print_info("Reading Astropy fits Table {0}".format(name_table))
             return Table.read(name_table, format="fits")
         
     def init_raw_table(self, reset=False):
@@ -480,7 +401,7 @@ class MusePipe(PipePrep, PipeRecipes):
         Also create an astropy table with the same info
         """
         if self.verbose :
-            print_info("Creating the astropy fits raw data table")
+            upipe.print_info("Creating the astropy fits raw data table")
 
         if reset or not hasattr(self, "Tables"):
             self._reset_tables()
@@ -492,12 +413,12 @@ class MusePipe(PipePrep, PipeRecipes):
         overwrite = True
         if os.path.isfile(name_table) :
             if self._overwrite_astropy_table :
-                print_warning("The raw-files table will be overwritten")
+                upipe.print_warning("The raw-files table will be overwritten")
             else :
-                print_warning("The raw files table already exists")
-                print_warning("If you wish to overwrite it, "
+                upipe.print_warning("The raw files table already exists")
+                upipe.print_warning("If you wish to overwrite it, "
                       " please turn on the 'overwrite_astropy_table' option to 'True'")
-                print_warning("In the meantime, the existing table will be read and used")
+                upipe.print_warning("In the meantime, the existing table will be read and used")
                 self.Tables.Rawfiles = self.read_astropy_table('RAWFILES', "raw")
                 overwrite = False
 
@@ -574,20 +495,20 @@ class MusePipe(PipePrep, PipeRecipes):
             # Check if we update
             if self._update_astropy_table:
                 # Reading the existing table
-                print_warning("Reading the existing Astropy table {0}".format(fits_tablename))
+                upipe.print_warning("Reading the existing Astropy table {0}".format(fits_tablename))
                 existing_table = Table.read(full_tablename, format="fits")
                 # first try to see if they are compatible by using vstack
                 try: 
                     stack_temptable = vstack(existing_table, table_to_save, join_type='exact')
-                    print_warning("Updating the existing Astropy table {0}".format(fits_tablename))
+                    upipe.print_warning("Updating the existing Astropy table {0}".format(fits_tablename))
                     table_to_save = astropy.table.unique(stack_temptable, keep='first')
                 except TableMergeError:
-                    print_warning("Astropy Table cannot be joined to the existing one")
+                    upipe.print_warning("Astropy Table cannot be joined to the existing one")
                     return
 
             # Check if we want to overwrite or add the line in
             elif not self._overwrite_astropy_table:
-                print_warning("Astropy Table {0} already exists, "
+                upipe.print_warning("Astropy Table {0} already exists, "
                     " use overwrite_astropy_table to overwrite it".format(fits_tablename))
                 return
 
@@ -607,6 +528,10 @@ class MusePipe(PipePrep, PipeRecipes):
         for expotype in listexpo_types.keys() :
             try :
                 mask = (self.Tables.Rawfiles['type'] == listexpo_types[expotype])
+                if self.checkmode: 
+                    maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
+                    if (expotype.upper() not in exclude_list_checkmode) or self.strong_checkmode:
+                        mask = maskmode & mask
                 setattr(self.Tables.Raw, self._get_attr_expo(expotype), 
                         self.Tables.Rawfiles[mask])
             except AttributeError:
@@ -627,22 +552,22 @@ class MusePipe(PipePrep, PipeRecipes):
         try:
             return getattr(self._dic_tables[stage], self._get_attr_expo(expotype))
         except AttributeError:
-            print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
+            upipe.print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
             return Table()
 
     def _get_suffix_product(self, expotype):
         return self._dic_listMasterObject[expotype]
  
     def _get_path_expo(self, expotype, stage="master"):
-        masterfolder = lower_allbutfirst_letter(expotype)
+        masterfolder = upipe.lower_allbutfirst_letter(expotype)
         if stage.lower() == "master":
             masterfolder = joinpath(self.my_params.master, masterfolder)
         return masterfolder
 
     def _get_fullpath_expo(self, expotype, stage="master"):
-        return normpath(getattr(self._dic_paths[stage], self._get_attr_expo(expotype)))
+        return upipe.normpath(getattr(self._dic_paths[stage], self._get_attr_expo(expotype)))
 
     def _get_path_files(self, expotype) :
-        return normpath(getattr(self.paths, expotype.lower()))
+        return upipe.normpath(getattr(self.paths, expotype.lower()))
 
 

@@ -18,7 +18,7 @@ import os
 from os.path import join as joinpath
 
 # pymusepipe modules
-from . import musepipe as mpipe
+from pymusepipe import util_pipe as upipe
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"
@@ -33,8 +33,8 @@ class PipeRecipes(object) :
         # Fake mode
         self.fakemode = fakemode
         if self.verbose :
-            if fakemode : mpipe.print_warning("WARNING: running in FAKE mode")
-            else : mpipe.print_warning("WARNING: running actual recipes")
+            if fakemode : upipe.print_warning("WARNING: running in FAKE mode")
+            else : upipe.print_warning("WARNING: running actual recipes")
 
         if nocache : self.nocache = "nocache"
         else : self.nocache = ""
@@ -80,7 +80,7 @@ class PipeRecipes(object) :
             for i in range(1, len(list_cpu)) :
                 self.list_cpu += ":{0}".format(list_cpu[i])
         if self.verbose:
-            mpipe.print_info("LIST_CPU: {0}".format(self.list_cpu))
+            upipe.print_info("LIST_CPU: {0}".format(self.list_cpu))
 
     def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
@@ -91,7 +91,7 @@ class PipeRecipes(object) :
     
         if log :
             fout = open(self.logfile, 'a')
-            text = "# At : " + mpipe.formatted_time()
+            text = "# At : " + upipe.formatted_time()
             if self.fakemode : 
                 text += " FAKEMODE\n"
             else :
@@ -176,7 +176,7 @@ class PipeRecipes(object) :
                 sof=sof, fraction=fraction, tpl=tpl))
 
         for name_prod in name_sky:
-            self.run_oscommand('{nocache} mv {name_prodin}_0001.fits {name_prodout}_{iexpo:04d}_{tpl}.fits'.format(nocache=self.nocache,
+            self.run_oscommand('{nocache} mv {name_prodin}.fits {name_prodout}_{iexpo:04d}_{tpl}.fits'.format(nocache=self.nocache,
                 name_prodin=self.joinprod(name_prod), name_prodout=joinpath(dir_sky, name_prod), iexpo=iexpo, tpl=tpl))
 
     def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=[]):

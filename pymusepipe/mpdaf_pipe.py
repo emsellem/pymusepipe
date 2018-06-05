@@ -32,8 +32,8 @@ from astropy.io import fits as pyfits
 from astropy import constants as const
 from astropy import units as units
 
-from . emission_lines import list_emission_lines
-from . import musepipe as mpipe
+from pymusepipe.emission_lines import list_emission_lines
+from pymusepipe import util_pipe as upipe
 
 __version__ = '0.0.1 (15 March 2018)'
 
@@ -138,12 +138,12 @@ class MuseCube(Cube):
         if redshift is not None : velocity = redshift * const.c
 
         if line not in list_emission_lines :
-            mpipe.print_error("Could not guess the emission line you wish to use")
-            mpipe.print_error("Please review the 'emission_line' dictionary")
+            upipe.print_error("Could not guess the emission line you wish to use")
+            upipe.print_error("Please review the 'emission_line' dictionary")
             return
 
         if medium not in index_line.keys() :
-            mpipe.print_error("Please choose between one of these media: {0}".format(index_line.key()))
+            upipe.print_error("Please choose between one of these media: {0}".format(index_line.key()))
             return
 
         wavel = list_emission_lines[line][index_line[medium]]
@@ -211,7 +211,7 @@ class MuseSetImages(list) :
         # 1 required attribute
         if not hasattr(self, 'subtitle') :
             if 'subtitle' in kwargs :
-                mpipe.print_warning("Overiding subtitle")
+                upipe.print_warning("Overiding subtitle")
             self.subtitle = kwargs.get('subtitle', "")
 
 class MuseSpectrum(Spectrum): 
@@ -257,6 +257,6 @@ class MuseSetSpectra(list) :
         ## 1 required attribute
         if not hasattr(self, 'subtitle') :
             if 'subtitle' in kwargs :
-                mpipe.print_warning("Overiding subtitle")
+                upipe.print_warning("Overiding subtitle")
             self.subtitle = kwargs.get('subtitle', "")
 
