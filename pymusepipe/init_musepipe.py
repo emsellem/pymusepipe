@@ -12,7 +12,7 @@ __contact__   = " <eric.emsellem@eso.org>"
 import os
 from os.path import join as joinpath
 import copy
-import musepipe as mpipe
+from . import musepipe as mpipe
 
 ############################################################
 #                      BEGIN

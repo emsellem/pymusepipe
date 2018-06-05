@@ -18,7 +18,7 @@ import os
 from os.path import join as joinpath
 
 # pymusepipe modules
-import musepipe as mpipe
+from . import musepipe as mpipe
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"

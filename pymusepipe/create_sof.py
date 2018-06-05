@@ -23,7 +23,7 @@ from os.path import join as joinpath
 import collections
 from collections import OrderedDict
 
-import musepipe as mpipe
+from . import musepipe as mpipe
 
 class SofDict(OrderedDict) :
     """New Dictionary for the SOF writing

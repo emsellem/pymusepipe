@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.gridspec as gridspec
 
-from mpdaf_pipe import MuseImage, MuseSpectrum, MuseSetImages, MuseSetSpectra
+from . mpdaf_pipe import MuseImage, MuseSpectrum, MuseSetImages, MuseSetSpectra
 
 __version__ = '0.0.1 (23 March 2018)'
 

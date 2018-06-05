@@ -16,7 +16,7 @@ import glob
 
 __version__ = '0.0.1 (15 March 2018)'
 
-from graph_pipe import GraphMuse
+from . graph_pipe import GraphMuse
 
 name_final_datacube = "DATACUBE_FINAL.fits"
 PLOT = '\033[1;34;20m'

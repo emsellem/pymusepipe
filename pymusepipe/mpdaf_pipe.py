@@ -32,8 +32,8 @@ from astropy.io import fits as pyfits
 from astropy import constants as const
 from astropy import units as units
 
-from emission_lines import list_emission_lines
-import musepipe as mpipe
+from . emission_lines import list_emission_lines
+from . import musepipe as mpipe
 
 __version__ = '0.0.1 (15 March 2018)'
 

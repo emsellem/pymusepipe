@@ -23,13 +23,14 @@ import numpy as np
 # Standard modules
 import os
 from os.path import join as joinpath
+import copy
 import time
 
 # cpl module to link with esorex
-try :
-    import cpl
-except ImportError :
-    raise Exception("cpl is required for this - MUSE related - module")
+#try :
+#    import cpl
+#except ImportError :
+#    raise Exception("cpl is required for this - MUSE related - module")
 
 # Pyfits from astropy
 try :
@@ -45,7 +46,7 @@ except ImportError :
     raise Exception("astropy.io.ascii is required for this module")
 
 try :
-    from astropy.table import Table
+    from astropy.table import Table, setdiff, vstack
 except ImportError :
     raise Exception("astropy.table.Table is required for this module")
 
@@ -53,9 +54,9 @@ import warnings
 from astropy.utils.exceptions import AstropyWarning
 
 # Importing pymusepipe modules
-from init_musepipe import InitMuseParameters
-from recipes_pipe import PipeRecipes
-from prep_recipes_pipe import PipePrep
+from .init_musepipe import InitMuseParameters
+from .recipes_pipe import PipeRecipes
+from .prep_recipes_pipe import PipePrep
 
 # Likwid command
 likwid = "likwid-pin -c N:"
@@ -288,6 +289,8 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Overwriting option for the astropy table
         self._overwrite_astropy_table = kwargs.pop("overwrite_astropy_table", False)
+        # Updating the astropy table
+        self._update_astropy_table = kwargs.pop("update_astropy_table", False)
 
         # Use time dependent geo_table
         self._time_geo_table = kwargs.pop("time_geo_table", True)
@@ -366,7 +369,7 @@ class MusePipe(PipePrep, PipeRecipes):
         for objecttype in dic_listObject.keys() :
             safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=self.verbose)
 
-        self._dic_listMasterObject = dict(dic_listMaster.items() + dic_listObject.items())
+        self._dic_listMasterObject = {**dic_listMaster, **dic_listObject}
         # ==============================================
 
         # Going back to initial working directory
@@ -381,6 +384,12 @@ class MusePipe(PipePrep, PipeRecipes):
         self.init_raw_table()
         self.read_all_astro_tables()
         # ===========================================================
+
+    def _set_option_astropy_table(self, overwrite=None, update=None):
+        """Set the options for overwriting or updating the astropy tables
+        """
+        if overwrite is not None: self._overwrite_astropy_table = overwrite
+        if update is not None: self._update_astropy_table = update
 
     def goto_prevfolder(self, logfile=False) :
         """Go back to previous folder
@@ -412,7 +421,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self.paths.root = self.my_params.root
         self.paths.data = joinpath(self.paths.root, self.my_params.data)
 
-        for name in self.my_params._dic_folders.keys() + self.my_params._dic_input_folders.keys():
+        for name in list(self.my_params._dic_folders.keys()) + list(self.my_params._dic_input_folders.keys()):
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
 
         # Creating the filenames for Master files
@@ -465,14 +474,12 @@ class MusePipe(PipePrep, PipeRecipes):
             if self.verbose : print_info("Reading Astropy fits Table {0}".format(name_table))
             return Table.read(name_table, format="fits")
         
-    def init_raw_table(self, overwrite_astropy_table=None, verbose=None, reset=False) :
+    def init_raw_table(self, reset=False):
         """ Create a fits table with all the information from
         the Raw files
         Also create an astropy table with the same info
         """
-        if verbose is None: verbose = self.verbose
-        if overwrite_astropy_table is not None: self._overwrite_astropy_table = overwrite_astropy_table
-        if verbose :
+        if self.verbose :
             print_info("Creating the astropy fits raw data table")
 
         if reset or not hasattr(self, "Tables"):
@@ -544,24 +551,46 @@ class MusePipe(PipePrep, PipeRecipes):
         self.sort_raw_tables()
 
     def save_expo_table(self, expotype, tpl_gtable, stage="master", 
-            fits_tablename=None, aggregate=True, suffix=""):
+            fits_tablename=None, aggregate=True, suffix="", overwrite=None, update=None):
         """Save the Expo (Master or not) Table corresponding to the expotype
         """
+        self._set_option_astropy_table(overwrite, update)
+
         if fits_tablename is None :
             fits_tablename = self._get_fitstablename_expo(expotype, stage, suffix)
 
         attr_expo = self._get_attr_expo(expotype)
-        if aggregate :
-            setattr(self._dic_tables[stage], attr_expo, tpl_gtable.groups.aggregate(np.mean)['tpls', 'mjd', 'tplnexp'])
-        else:
-            setattr(self._dic_tables[stage], attr_expo, tpl_gtable)
         full_tablename = joinpath(self.paths.astro_tables, fits_tablename)
-        if (not self._overwrite_astropy_table) and os.path.isfile(full_tablename):
-            print_warning("Astropy Table {0} already exists, "
-                " use overwrite_astropy_table to overwrite it".format(fits_tablename))
+
+        if aggregate:
+            table_to_save = tpl_gtable.groups.aggregate(np.mean)['tpls', 'mjd', 'tplnexp']
         else :
-            getattr(self._dic_tables[stage], attr_expo).write(full_tablename, 
-                format="fits", overwrite=self._overwrite_astropy_table)
+            table_to_save = copy.copy(tpl_gtable)
+
+        # If the file already exists
+        if os.path.isfile(full_tablename):
+            # Check if we update
+            if self._update_astropy_table:
+                # Reading the existing table
+                print_warning("Reading the existing Astropy table {0}".format(fits_tablename))
+                existing_table = Table.read(full_tablename, format="fits")
+                # first try to see if they are compatible by using vstack
+                try: 
+                    stack_temptable = vstack(existing_table, table_to_save, join_type='exact')
+                    print_warning("Updating the existing Astropy table {0}".format(fits_tablename))
+                    table_to_save = astropy.table.unique(stack_temptable, keep='first')
+                except TableMergeError:
+                    print_warning("Astropy Table cannot be joined to the existing one")
+                    return
+
+            # Check if we want to overwrite or add the line in
+            elif not self._overwrite_astropy_table:
+                print_warning("Astropy Table {0} already exists, "
+                    " use overwrite_astropy_table to overwrite it".format(fits_tablename))
+                return
+
+        table_to_save.write(full_tablename, format="fits", overwrite=True)
+        setattr(self._dic_tables[stage], attr_expo, table_to_save)
 
     def sort_raw_tables(self, checkmode=None, strong_checkmode=None) :
         """Provide lists of exposures with types defined in the dictionary

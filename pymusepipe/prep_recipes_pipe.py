@@ -16,8 +16,8 @@ from os.path import join as joinpath
 import numpy as np
 
 # pymusepipe modules
-import musepipe as mpipe
-from create_sof import SofPipe
+from . import musepipe as mpipe
+from . create_sof import SofPipe
 
 # =======================================================
 # List of recipes
@@ -132,7 +132,7 @@ class PipePrep(SofPipe) :
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
             self._sofdict['BIAS'] = add_listpath(self.paths.rawfiles,
-                    gtable['filename'].data.astype(np.object))
+                    list(gtable['filename']))
             # extract the tpl (string)
             tpl = gtable['tpls'][0]
             # Writing the sof file
@@ -177,7 +177,7 @@ class PipePrep(SofPipe) :
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
             self._sofdict['FLAT'] = add_listpath(self.paths.rawfiles,
-                    gtable['filename'].data.astype(np.object))
+                    list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Adding the best tpc MASTER_BIAS
@@ -229,7 +229,7 @@ class PipePrep(SofPipe) :
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
             self._sofdict['ARC'] = add_listpath(self.paths.rawfiles,
-                    gtable['filename'].data.astype(np.object))
+                    list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Finding the best tpl for BIAS + TRACE
@@ -277,7 +277,7 @@ class PipePrep(SofPipe) :
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
             self._sofdict['ARC'] = add_listpath(self.paths.rawfiles,
-                    gtable['filename'].data.astype(np.object))
+                    list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Finding the best tpl for BIAS, TRACE, WAVE
@@ -327,7 +327,7 @@ class PipePrep(SofPipe) :
             self._add_geometry_to_sofdict(tpl)
             # Provide the list of files to the dictionary
             self._sofdict['SKYFLAT'] = add_listpath(self.paths.rawfiles,
-                    gtable['filename'].data.astype(np.object))
+                    list(gtable['filename']))
             # Finding the best tpl for BIAS, FLAT, ILLUM, TRACE, WAVE
             self._add_tplraw_to_sofdict(mean_mjd, "ILLUM")
             self._add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 'TRACE', 'WAVE'])
@@ -383,7 +383,7 @@ class PipePrep(SofPipe) :
             self._add_geometry_to_sofdict(tpl)
             # Provide the list of files to the dictionary
             self._sofdict[expotype] = add_listpath(self.paths.rawfiles,
-                    gtable['filename'].data.astype(np.object))
+                    list(gtable['filename']))
             # Number of objects
             Nexpo = len(self._sofdict[expotype])
             if self.verbose:
@@ -406,7 +406,7 @@ class PipePrep(SofPipe) :
 
             # Write the Processed files Table and save it
             gtable['iexpo'] = list_expo
-            self.save_expo_table(expotype, gtable, "processed", suffix=tpl + "_", aggregate=False)
+            self.save_expo_table(expotype, gtable, "processed", aggregate=False)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
