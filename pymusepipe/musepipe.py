@@ -490,17 +490,19 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # ---- File exists - we READ it ------------------- #
         if os.path.isfile(name_table) :
-            if self._overwrite_astropy_table :
+            if not self._overwrite_astropy_table :
                 print_warning("The raw-files table will be overwritten")
+                overwrite = True
             else :
                 print_warning("The raw files table already exists")
                 print_warning("If you wish to overwrite it, "
                       " please turn on the 'overwrite_astropy_table' option to 'True'")
                 print_warning("In the meantime, the existing table will be read and used")
                 self.Tables.Rawfiles = self.read_astropy_table('RAWFILES', "raw")
+                overwrite = False
 
         # ---- File does not exist - we create it ---------- #
-        else:
+        if overwrite:
             # Check the raw folder
             self.goto_folder(self.paths.rawfiles)
             # Get the list of files from the Raw data folder
