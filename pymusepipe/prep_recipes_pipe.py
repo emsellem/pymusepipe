@@ -532,7 +532,7 @@ class PipePrep(SofPipe) :
 
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
-            suffix = "_{0}_{1:04d}".format(line, iexpo)
+            suffix = "_{0}".format(line)
             self.run_scipost(sof_filename='scipost', expotype="OBJECT", 
                     tpl="ALL", list_expo=[iexpo], suffix=suffix, 
                     lambdaminmax=[lmin, lmax], save='individual', **kwargs)
@@ -566,6 +566,8 @@ class PipePrep(SofPipe) :
         if list_expo is None: 
             list_expo = tpl_table['iexpo'].data
         scipost_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)]
+        if len(list_expo) == 1: 
+            suffix += "_{0:04d}".format(list_expo[0])
         
         if len(scipost_table) == 0:
             if self.verbose :
@@ -600,7 +602,8 @@ class PipePrep(SofPipe) :
             for iexpo in list_expo:
                 self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
                     '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name, iexpo, j+1)) for j in range(24)]
-            self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, suffix, tpl), new=True)
+            self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
+                suffix, tpl), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products = self._get_scipost_products(save)
