@@ -117,9 +117,11 @@ class SofPipe(object) :
         # Finding the best tpl for this sky calib file type
         expo_table = self._get_table_expo(expotype, stage)
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-        iexpo = expo_table[index]['iexpo']
         dir_calib = self._get_fullpath_expo(expotype, stage)
-        self._sofdict[tag] = [joinpath(dir_calib, "{0}{2}_{3}.fits".format(tag, iexpo, suffix, this_tpl))]
+        if stage == "processed": 
+            iexpo = expo_table[index]['iexpo']
+            suffix += "_{0:04d}".format(iexpo)
+        self._sofdict[tag] = [joinpath(dir_calib, "{0}{1}_{2}.fits".format(tag, suffix, this_tpl))]
 
     def _add_calib_to_sofdict(self, calibtype, reset=False):
         """Adding a calibration file for the SOF 
