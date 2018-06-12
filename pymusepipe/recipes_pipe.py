@@ -186,38 +186,48 @@ class PipeRecipes(object) :
                 "--saveimage=FALSE {merge} {sof}".format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
 
-        for prod in name_products :
+        for name_prod in name_products :
             # newprod = prod.replace("0001", tpl)
             self.run_oscommand('{nocache} mv {prod} {newprod}'.format(nocache=self.nocache,
-                prod=self.joinprod(prod), newprod=joinpath(dir_products, prod)))
+                prod=self.joinprod(name_prod), newprod=joinpath(dir_products, name_prod)))
     
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
-            save='cube', filter_list='white', skymethod='model',
-            pixfrac=0.8, darkcheck='none', skymodel_frac=0.05, astrometry='TRUE'):
+            list_expo=[1], save='cube,skymodel', filter_list='white', skymethod='model',
+            pixfrac=0.8, darkcheck='none', skymodel_frac=0.05, astrometry='TRUE',
+            lambdamin=4000., lambdamax=10000., suffix=""):
         """Running the esorex muse_scipost recipe
         """
         self.run_oscommand("{esorex} muse_scipost --astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darkcheck={darkcheck} --skymodel_frac={model:02f} "
+                "--lambdamin={lmin} --lambdamax={lmax} "
                 "{sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
                     pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
-                    darkcheck=darkcheck, model=skymodel_frac, sof=sof))
+                    darkcheck=darkcheck, model=skymodel_frac, lmin=lambdamin,
+                    lmax=lambdamax, sof=sof))
 
         for name_prod in name_products :
-            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}_{tpl}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod), tpl=tpl))
+            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
+                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod), tpl=tpl,
+                suffix=suffix))
    
-    def recipe_align(self, sof, srcmin=1, srcmax=10):
+    def recipe_align(self, sof, dir_products, name_products, tpl, 
+            suffix="", srcmin=1, srcmax=10):
         """Running the muse_exp_align recipe
         """
-        os.system("{esorex} muse_exp_align --srcmin={srcmin} "
+        self.run_oscommand("{esorex} muse_exp_align --srcmin={srcmin} "
                 "--srcmax={srcmax} {sof}".format(esorex=self.esorex, 
                     srcmin=srcmin, srcmax=srcmax, sof=sof))
     
+        for name_prod in name_products :
+            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
+                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod), tpl=tpl,
+                suffix=suffix))
+
     def recipe_cube(self, sof, save='cube', pixfrac=0.8, format_out='Cube', filter_FOV='SDSS_g,SDSS_r,SDSS_i'):
         """Running the muse_exp_combine recipe
         """
-        os.system("{esorex} muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
+        self.run_oscommand("{esorex} muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
         "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, save=save, 
             pixfrac=pixfrac, form=format_out, filt=filter_FOV, sof=sof))
 

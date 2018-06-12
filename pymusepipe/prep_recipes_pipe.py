@@ -12,6 +12,8 @@ __contact__   = " <eric.emsellem@eso.org>"
 import os
 from os.path import join as joinpath
 
+import copy
+
 # Numpy
 import numpy as np
 
@@ -26,13 +28,24 @@ from pymusepipe import musepipe
 list_recipes = ['bias', 'flat', 'wave', 'lsf', 
         'twilight', 'scibasic_all', 'std', 'sky']
         
-
 dic_files_products = {
         'STD': ['DATACUBE_STD', 'STD_FLUXES', 
             'STD_RESPONSE', 'STD_TELLURIC'],
         'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
         'SKY': ['SKY_MASK', 'IMAGE_FOV', 'SKY_SPECTRUM', 
-            'SKY_CONTINUUM']
+            'SKY_CONTINUUM'],
+        'OBJECT': ['DATACUBE_FINAL', 'IMAGE_FOV'],
+        'ALIGN': ['SOURCE_LIST', 'OFFSET_LIST']
+        }
+
+dic_products_scipost = {
+        'individual': 'PIXTABLE_REDUCED',
+        'stacked': 'OBJECT_RESAMPLED',
+        'positioned': 'PIXTABLE_POSITIONED',
+        'combined': 'PIXTABLE_COMBINED',
+        'skymodel': ['SKY_MASK', 'SKY_SPECTRUM', 
+            'SKY_LINES', 'SKY_CONTINUUM'],
+        'raman': 'RAMAN_IMAGES'
         }
 # =======================================================
 # Few useful functions
@@ -504,17 +517,38 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, **kwargs):
+    def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
+            line='Ha', window=10.0, list_expo=None, **kwargs):
+        """Launch the scipost command to get individual exposures in a narrow
+        band filter
+        """
         # First selecting the files via the grouped table
         object_table = self._get_table_expo("OBJECT", "processed")
 
+        # Getting the band corresponding to the line
+        [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=self.vsystemic, window=window)
+        if lmin == lmax:
+            lmin, lmax = 4000., 10000.
+
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
-            suffix = "_{0:04d}".format(iexpo)
+            suffix = "_{0}_{1:04d}".format(line, iexpo)
             self.run_scipost(sof_filename='scipost', expotype="OBJECT", 
-                    tpl="ALL", list_expo=[iexpo], suffix=suffix)
+                    tpl="ALL", list_expo=[iexpo], suffix=suffix, 
+                    lambdaminmax=[lmin, lmax], save='individual', **kwargs)
 
-    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, suffix="", **kwargs):
+    def _get_scipost_products(self, save='cube,skymodel'):
+        """Provide a set of key output products depending on the save mode
+        for scipost
+        """
+        name_products = copy.copy(dic_files_products['OBJECT'])
+        list_options = save.split(',')
+        for option in list_options:
+            name_products.append(dic_products_scipost[option])
+        return name_products
+
+    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, 
+            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
 
@@ -523,20 +557,25 @@ class PipePrep(SofPipe) :
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
-
+        list_expo: list of integers providing the exposure numbers
         """
         # First selecting the files via the grouped table
         tpl_table = self.select_tpl_files(expotype, tpl=tpl, stage="processed")
 
         # Selecting the table with the right iexpo
         if list_expo is None: 
-            list_expo = scipost_gtable['iexpo'].data
+            list_expo = tpl_table['iexpo'].data
         scipost_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)]
         
         if len(scipost_table) == 0:
             if self.verbose :
                 upipe.print_warning("No {0} recovered from the processed astropy file Table - Aborting".format(expotype))
                 return
+
+        # Lambda min and max?
+        [lambdamin, lambdamax] = lambdaminmax
+        # Save options
+        save = kwargs.pop("save", "cube,skymodel")
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -564,17 +603,19 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, suffix, tpl), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            name_products = ['IMAGE_FOV_{0}_{1:04d}'.format(expotype, i) for i in list_expo]
-            self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, name_products, **kwargs)
+            name_products = self._get_scipost_products(save)
+            self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
+                    name_products, lambdamin=lambdamin, lambdamax=lambdamax, 
+                    save=save, list_expo=list_expo, suffix=suffix, **kwargs)
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, scipost_table, "reduced", 
-                "IMAGES_FOV_{0}{1}_list_table.fits".format(expotype, suffix), aggregate=False)
+                "IMAGES_FOV_{0}{1}_{2}_list_table.fits".format(expotype, suffix, tpl), aggregate=False)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def run_align(self, sof_filename='exp_align', tpl="ALL"):
+    def run_align(self, sof_filename='exp_align', expotype="OBJECT", list_expo=None, line="Ha", tpl="ALL"):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -587,7 +628,14 @@ class PipePrep(SofPipe) :
 
         """
         # First selecting the files via the grouped table
-        align_table = self._get_table_expo("OBJECT", "processed")
+        tpl_table = self.select_tpl_files(expotype, tpl=tpl, stage="processed")
+
+        # Selecting the table with the right iexpo
+        if list_expo is None: 
+            list_expo = tpl_table['iexpo'].data
+        align_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)]
+
+        # First selecting the files via the grouped table
         if len(align_table) == 0:
             if self.verbose :
                 upipe.print_warning("No OBJECT [to align] recovered from the astropy file Table - Aborting")
@@ -598,24 +646,22 @@ class PipePrep(SofPipe) :
 
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
-        for i in range(len(sky_table)):
-            mytpl = align_table['tpls'][i]
-            mymjd = align_table['mjd'][i]
-            if tpl != "ALL" and tpl != mytpl :
-                continue
+        for gtable in align_table.groups:
+            # extract the tpl (string) and mean mjd (float) 
+            mytpl, mymjd = self._get_tpl_meanmjd(gtable)
             # Now starting with the standard recipe
-            self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
-            self._add_calib_to_sofdict("SKY_LINES")
-            self._add_skycalib_to_sofdict("STD_RESPONSE", mymjd, 'STD')
-            self._add_skycalib_to_sofdict("STD_TELLURIC", mymjd, 'STD')
-            self._add_tplmaster_to_sofdict(mymjd, 'LSF')
-            self._sofdict['PIXTABLE_OBJECT'] = [joinpath(self._get_fullpath_expo("SKY", "processed"),
-                'PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(i+1,j+1)) for j in range(24)]
-            self.write_sof(sof_filename=sof_filename + "{0:02d}".format(i+1) + "_" + mytpl, new=True)
-            dir_scipost = self._get_fullpath_expo('SKY', "processed")
-            name_scipost = dic_files_products['SKY']
-            self.recipe_sky(self.current_sof, dir_scipost, name_scipost, mytpl)
+            self._sofdict.clear()
+            self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
+                'IMAGE_FOV_{0}_{1:04d}_{2}.fits'.format(line, iexpo, mytpl)) for iexpo in list_expo]
+            self.write_sof(sof_filename=sof_filename + "_{0}_{1}".format(line, mytpl), new=True)
+            dir_align = self._get_fullpath_expo('OBJECT', "processed")
+            name_align = dic_files_products['ALIGN']
+            self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix="_"+line)
 
+        # Write the MASTER files Table and save it
+        self.save_expo_table(expotype, align_table, "reduced", 
+                "ALIGNED_IMAGES_{0}_{1}_{2}_list_table.fits".format(expotype, line, mytpl), aggregate=False)
+        
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 

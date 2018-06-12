@@ -12,6 +12,14 @@ __contact__   = " <eric.emsellem@eso.org>"
 import os
 import time
 
+# Numpy
+import numpy as np
+
+from astropy import constants as const
+
+# Import package modules
+from pymusepipe.emission_lines import list_emission_lines
+
 ############    PRINTING FUNCTIONS #########################
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
@@ -96,3 +104,45 @@ def normpath(path) :
 #     with open(filename, "w+") as myfile:
 #         myfile.write(content)
 
+def doppler_shift(wavelength, velocity=0.):
+    """Return the redshifted wavelength
+    """
+    doppler_factor = np.sqrt((1. + velocity / const.c.value) / (1. - velocity / const.c.value))
+    return wavelength * doppler_factor
+
+def get_emissionline_wavelength(line="Ha", velocity=0., redshift=None, medium='air'):
+    """Get the wavelength of an emission line, including a correction
+    for the redshift (or velocity)
+    """
+    index_line = {'vacuum': 0, 'air': 1}
+    # Get the velocity
+    if redshift is not None : velocity = redshift * const.c
+
+    if line not in list_emission_lines.keys() :
+        upipe.print_error("Could not guess the emission line you wish to use")
+        upipe.print_error("Please review the 'emission_line' dictionary")
+        return -1.
+
+    if medium not in index_line.keys() :
+        upipe.print_error("Please choose between one of these media: {0}".format(index_line.key()))
+        return -1.
+
+    wavel = list_emission_lines[line][index_line[medium]]
+    return doppler_shift(wavel, velocity)
+
+def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', window=10.0):
+    """Get the wavelengths of an emission line, including a correction
+    for the redshift (or velocity) and a window around that line (in Angstroems)
+
+    Parameters
+    ----------
+    line: name of the line (string). Default is 'Ha'
+    velocity: shift in velocity (km/s)
+    medium: 'air' or 'vacuum'
+    window: window in Angstroem
+    """
+    red_wavel = get_emissionline_wavelength(line=line, velocity=velocity, redshift=redshift, medium=medium)
+    if red_wavel < 0 :
+        return [0., 0.]
+    else:
+        return [red_wavel - window/2., red_wavel + window/2.]

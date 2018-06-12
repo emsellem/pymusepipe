@@ -29,10 +29,8 @@ from mpdaf.obj import Spectrum, WaveCoord
 
 # Astropy
 from astropy.io import fits as pyfits
-from astropy import constants as const
 from astropy import units as units
 
-from pymusepipe.emission_lines import list_emission_lines
 from pymusepipe import util_pipe as upipe
 
 __version__ = '0.0.1 (15 March 2018)'
@@ -46,12 +44,6 @@ __version__ = '0.0.1 (15 March 2018)'
 ############################################################
 #                      END
 ############################################################
-
-def doppler_shift(wavelength, velocity=0.):
-    """Return the redshifted wavelength
-    """
-    doppler_factor = np.sqrt((1. + velocity / const.c.value) / (1. - velocity / const.c.value))
-    return wavelength * doppler_factor
 
 #########################################################################
 # Main class
@@ -122,7 +114,7 @@ class MuseCube(Cube):
         spec4 = self.get_spectrum_from_cube(nx34, ny34, width, title="Quadrant 4") 
         return MuseSetSpectra(spec1, spec2, spec3, spec4, subtitle="4 Quadrants")
 
-    def get_emissionline_image(self, line=None, velocity=0., redshift=None, width=10, medium='vacuum') :
+    def get_emissionline_image(self, line=None, velocity=0., redshift=None, width=10., medium='vacuum') :
         """Get a narrow band image around Ha
 
         Input
@@ -133,24 +125,12 @@ class MuseCube(Cube):
         redshift: default is None. Overwrite velocity if provided.
         line: name of the emission line (see emission_lines dictionary)
         """
-        index_line = {'vacuum': 0, 'air': 1}
-        # Get the velocity
-        if redshift is not None : velocity = redshift * const.c
 
-        if line not in list_emission_lines :
-            upipe.print_error("Could not guess the emission line you wish to use")
-            upipe.print_error("Please review the 'emission_line' dictionary")
-            return
-
-        if medium not in index_line.keys() :
-            upipe.print_error("Please choose between one of these media: {0}".format(index_line.key()))
-            return
-
-        wavel = list_emission_lines[line][index_line[medium]]
-        red_wavel = doppler_shift(wavel, velocity)
+        [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=velocity, 
+                redshift=redshift, medium=medium, width=width)
         
-        return MuseImage(self.select_lambda(red_wavel - width/2., red_wavel + width/2.).sum(axis=0), 
-                      title="{0} map".format(line))
+        return MuseImage(self.select_lambda(lmin, lmax).sum(axis=0), 
+                title="{0} map".format(line))
 
 def get_sky_spectrum(filename) :
     """Read sky spectrum from MUSE data reduction

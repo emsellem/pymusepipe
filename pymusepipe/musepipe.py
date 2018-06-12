@@ -221,7 +221,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # Setting the default attibutes #####################
         self.galaxyname = galaxyname
         self.pointing = pointing
-        self.vsys = np.float(kwargs.pop("vsystemic", 0.))
+        self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
         if outlog is None : 
