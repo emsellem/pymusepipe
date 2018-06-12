@@ -119,7 +119,7 @@ class SofPipe(object) :
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
         iexpo = expo_table[index]['iexpo']
         dir_calib = self._get_fullpath_expo(expotype, stage)
-        self._sofdict[tag] = [joinpath(dir_calib, "{0}_{1:04d}{2}_{3}.fits".format(tag, iexpo, suffix, this_tpl))]
+        self._sofdict[tag] = [joinpath(dir_calib, "{0}{2}_{3}.fits".format(tag, iexpo, suffix, this_tpl))]
 
     def _add_calib_to_sofdict(self, calibtype, reset=False):
         """Adding a calibration file for the SOF 
