@@ -39,13 +39,13 @@ dic_files_products = {
 
 dic_products_scipost = {
         'cube': ['DATACUBE_FINAL', 'IMAGE_FOV'],
-        'individual': 'PIXTABLE_REDUCED',
-        'stacked': 'OBJECT_RESAMPLED',
-        'positioned': 'PIXTABLE_POSITIONED',
-        'combined': 'PIXTABLE_COMBINED',
+        'individual': ['PIXTABLE_REDUCED'],
+        'stacked': ['OBJECT_RESAMPLED'],
+        'positioned': ['PIXTABLE_POSITIONED'],
+        'combined': ['PIXTABLE_COMBINED'],
         'skymodel': ['SKY_MASK', 'SKY_SPECTRUM', 
             'SKY_LINES', 'SKY_CONTINUUM'],
-        'raman': 'RAMAN_IMAGES'
+        'raman': ['RAMAN_IMAGES']
         }
 # =======================================================
 # Few useful functions
@@ -518,7 +518,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line='Ha', window=10.0, list_expo=None, filter='white', **kwargs):
+            line='Ha', window=10.0, list_expo=None, filter_list='white', **kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -537,7 +537,7 @@ class PipePrep(SofPipe) :
                     tpl="ALL", list_expo=[iexpo], suffix=suffix, 
                     lambdaminmax=[lmin, lmax], save='cube', **kwargs)
 
-    def _get_scipost_products(self, save='cube,skymodel'):
+    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list='white'):
         """Provide a set of key output products depending on the save mode
         for scipost
         """
@@ -545,7 +545,14 @@ class PipePrep(SofPipe) :
         list_options = save.split(',')
         for option in list_options:
             for prod in dic_products_scipost[option]:
-                name_products.append(prod)
+                if prod == "IMAGE_FOV":
+                    for i in range(len(filter_list.split(','))):
+                        name_products.append(prod + "_{0:04d}".format(i+1))
+                elif ('PIXTABLE' in prod) or (prod == 'RAMAN'):
+                    for i in range(len(list_expo)):
+                        name_products.append(prod + "_{0:04d}".format(i+1))
+                else :
+                    name_products.append(prod)
         return name_products
 
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, 
@@ -579,6 +586,8 @@ class PipePrep(SofPipe) :
         [lambdamin, lambdamax] = lambdaminmax
         # Save options
         save = kwargs.pop("save", "cube,skymodel")
+        # Filters
+        filter_list = kwargs.pop("filter_list", "white")
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -607,10 +616,10 @@ class PipePrep(SofPipe) :
                 suffix, tpl), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            name_products = self._get_scipost_products(save)
+            name_products = self._get_scipost_products(save, list_expo, filter_list) 
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, lambdamin=lambdamin, lambdamax=lambdamax, 
-                    save=save, list_expo=list_expo, suffix=suffix, **kwargs)
+                    save=save, list_expo=list_expo, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, scipost_table, "reduced", 
