@@ -542,18 +542,22 @@ class PipePrep(SofPipe) :
         for scipost
         """
         name_products = []
+        suffix_products = []
         list_options = save.split(',')
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 if prod == "IMAGE_FOV":
                     for i in range(len(filter_list.split(','))):
-                        name_products.append(prod + "_{0:04d}".format(i+1))
+                        suffix_products.append("_{0:04d}".format(i+1))
+                        name_products.append(prod)
                 elif ('PIXTABLE' in prod) or (prod == 'RAMAN'):
                     for i in range(len(list_expo)):
-                        name_products.append(prod + "_{0:04d}".format(i+1))
+                        suffix_products.append("_{0:04d}".format(i+1))
+                        name_products.append(prod)
                 else :
                     name_products.append(prod)
-        return name_products
+                    suffix_products.append("")
+        return name_products, suffix_products
 
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
@@ -616,9 +620,9 @@ class PipePrep(SofPipe) :
                 suffix, tpl), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            name_products = self._get_scipost_products(save, list_expo, filter_list) 
+            name_products, suffix_products = self._get_scipost_products(save, list_expo, filter_list) 
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
-                    name_products, lambdamin=lambdamin, lambdamax=lambdamax, 
+                    name_products, suffix_products, lambdamin=lambdamin, lambdamax=lambdamax, 
                     save=save, list_expo=list_expo, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Write the MASTER files Table and save it
