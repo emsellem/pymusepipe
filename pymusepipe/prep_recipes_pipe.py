@@ -34,11 +34,11 @@ dic_files_products = {
         'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
         'SKY': ['SKY_MASK', 'IMAGE_FOV', 'SKY_SPECTRUM', 
             'SKY_CONTINUUM'],
-        'OBJECT': ['DATACUBE_FINAL', 'IMAGE_FOV'],
         'ALIGN': ['SOURCE_LIST', 'OFFSET_LIST']
         }
 
 dic_products_scipost = {
+        'cube': ['DATACUBE_FINAL', 'IMAGE_FOV'],
         'individual': 'PIXTABLE_REDUCED',
         'stacked': 'OBJECT_RESAMPLED',
         'positioned': 'PIXTABLE_POSITIONED',
@@ -518,7 +518,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line='Ha', window=10.0, list_expo=None, **kwargs):
+            line='Ha', window=10.0, list_expo=None, filter='white', **kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -535,16 +535,17 @@ class PipePrep(SofPipe) :
             suffix = "_{0}".format(line)
             self.run_scipost(sof_filename='scipost', expotype="OBJECT", 
                     tpl="ALL", list_expo=[iexpo], suffix=suffix, 
-                    lambdaminmax=[lmin, lmax], save='individual', **kwargs)
+                    lambdaminmax=[lmin, lmax], save='cube', **kwargs)
 
     def _get_scipost_products(self, save='cube,skymodel'):
         """Provide a set of key output products depending on the save mode
         for scipost
         """
-        name_products = copy.copy(dic_files_products['OBJECT'])
+        name_products = []
         list_options = save.split(',')
         for option in list_options:
-            name_products.append(dic_products_scipost[option])
+            for prod in dic_products_scipost[option]:
+                name_products.append(prod)
         return name_products
 
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, 
