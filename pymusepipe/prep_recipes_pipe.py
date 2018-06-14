@@ -119,6 +119,8 @@ class PipePrep(SofPipe) :
         self.run_standard()
         self.run_sky(fraction=fraction)
         self.run_prep_align()
+        self.run_align()
+        self.run_scipost()
 
     def run_bias(self, sof_filename='bias', tpl="ALL"):
         """Reducing the Bias files and creating a Master Bias

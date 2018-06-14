@@ -1,4 +1,0 @@
-pymusepipe
---------
-
-    >>> import pymusepipe
