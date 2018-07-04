@@ -520,7 +520,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line='Ha', window=10.0, list_expo=None, filter_list='white', **kwargs):
+            line='Ha', window=10.0, filter_list='white', **kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
