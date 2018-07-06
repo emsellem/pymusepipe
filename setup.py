@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a 3-clause BSD style license - see LICENSE
 #
 from __future__ import absolute_import, division, print_function
 #
@@ -10,14 +10,14 @@ import os
 
 from setuptools import setup, find_packages
 
-with open('README.rst') as f:
+with open('README.md') as f:
     readme = f.read()
 
 with open('LICENSE') as f:
     license = f.read()
 
 setup(name='pymusepipe',
-      version='0.9.9.1',
+      version='0.9.9.2',
       description='python module to reduce MUSE LP data associated with PHANGS',
       long_description=readme,
       keywords='MUSE, PHANGS',
