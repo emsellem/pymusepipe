@@ -28,13 +28,17 @@ from pymusepipe import musepipe
 list_recipes = ['bias', 'flat', 'wave', 'lsf', 
         'twilight', 'scibasic_all', 'std', 'sky']
         
+dic_files_iexpo_products = {
+        'ALIGN': ['SOURCE_LIST']
+        }
+
 dic_files_products = {
         'STD': ['DATACUBE_STD', 'STD_FLUXES', 
             'STD_RESPONSE', 'STD_TELLURIC'],
         'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
         'SKY': ['SKY_MASK', 'IMAGE_FOV', 'SKY_SPECTRUM', 
             'SKY_CONTINUUM'],
-        'ALIGN': ['SOURCE_LIST', 'OFFSET_LIST']
+        'ALIGN': ['OFFSET_LIST']
         }
 
 dic_products_scipost = {
@@ -634,6 +638,28 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    def _get_align_products(self, list_expo=[], filter_list='white'):
+        """Provide a set of key output products for exp_align
+        """
+        name_align = dic_files_products['ALIGN']
+        name_products = []
+        suffix_products = []
+        list_options = save.split(',')
+        for option in list_options:
+            for prod in dic_products_scipost[option]:
+                if prod == "IMAGE_FOV":
+                    for i in range(len(filter_list.split(','))):
+                        suffix_products.append("_{0:04d}".format(i+1))
+                        name_products.append(prod)
+                elif ('PIXTABLE' in prod) or (prod == 'RAMAN'):
+                    for i in range(len(list_expo)):
+                        suffix_products.append("_{0:04d}".format(i+1))
+                        name_products.append(prod)
+                else :
+                    name_products.append(prod)
+                    suffix_products.append("")
+        return name_products, suffix_products
+
     def run_align(self, sof_filename='exp_align', expotype="OBJECT", list_expo=None, line="Ha", tpl="ALL"):
         """Aligning the individual exposures from a dataset
         using the emission line region 
@@ -675,6 +701,9 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_{0}_{1}".format(line, mytpl), new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             name_align = dic_files_products['ALIGN']
+            for iter_file in dic_files_iexpo_products['ALIGN']:
+                for iexpo in list_expo:
+                    name_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
             self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix="_"+line)
 
         # Write the MASTER files Table and save it

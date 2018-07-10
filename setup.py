@@ -17,7 +17,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(name='pymusepipe',
-      version='0.9.9.2',
+      version='0.9.9.3',
       description='python module to reduce MUSE LP data associated with PHANGS',
       long_description=readme,
       keywords='MUSE, PHANGS',
