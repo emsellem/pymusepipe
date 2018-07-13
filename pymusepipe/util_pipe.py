@@ -142,7 +142,8 @@ def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', w
     window: window in Angstroem
     """
     red_wavel = get_emissionline_wavelength(line=line, velocity=velocity, redshift=redshift, medium=medium)
+    # In case the line is not in the list, just return the full lambda Range
     if red_wavel < 0 :
-        return [0., 0.]
+        return [4000., 10000.]
     else:
         return [red_wavel - window/2., red_wavel + window/2.]

@@ -524,7 +524,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line='Ha', window=10.0, filter_list='white', **kwargs):
+            line='CentreMuse', window=6000.0, filter_list='white,Cousins_R', **kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -533,17 +533,16 @@ class PipePrep(SofPipe) :
 
         # Getting the band corresponding to the line
         [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=self.vsystemic, window=window)
-        if lmin == lmax:
-            lmin, lmax = 4000., 10000.
 
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
             suffix = "_{0}".format(line)
             self.run_scipost(sof_filename='scipost', expotype="OBJECT", 
                     tpl="ALL", list_expo=[iexpo], suffix=suffix, 
+                    filter_list=filter_list,
                     lambdaminmax=[lmin, lmax], save='cube', **kwargs)
 
-    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list='white'):
+    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list='white,Cousins_R'):
         """Provide a set of key output products depending on the save mode
         for scipost
         """
@@ -597,7 +596,7 @@ class PipePrep(SofPipe) :
         # Save options
         save = kwargs.pop("save", "cube,skymodel")
         # Filters
-        filter_list = kwargs.pop("filter_list", "white")
+        filter_list = kwargs.pop("filter_list", "white,Cousins_R")
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -611,7 +610,8 @@ class PipePrep(SofPipe) :
             self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
             self._add_calib_to_sofdict("SKY_LINES")
             self._add_calib_to_sofdict("FILTER_LIST")
-            self._add_calib_to_sofdict("ASTRO_TABLE")
+#            self._add_calib_to_sofdict("ASTRO_TABLE")
+            self._add_astrometry_to_sofdict(tpl)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', "processed")
@@ -638,7 +638,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def _get_align_products(self, list_expo=[], filter_list='white'):
+    def _get_align_products(self, list_expo=[], filter_list='white,Cousins_R'):
         """Provide a set of key output products for exp_align
         """
         name_align = dic_files_products['ALIGN']
@@ -660,7 +660,7 @@ class PipePrep(SofPipe) :
                     suffix_products.append("")
         return name_products, suffix_products
 
-    def run_align(self, sof_filename='exp_align', expotype="OBJECT", list_expo=None, line="Ha", tpl="ALL"):
+    def run_align(self, sof_filename='exp_align', expotype="OBJECT", list_expo=None, line="CousinsR", tpl="ALL"):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
