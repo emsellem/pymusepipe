@@ -129,6 +129,14 @@ dic_astro_table = {
         '2015-09-08': "astrometry_table_wfm.fits",
         }
 
+dic_astro_wcs = {
+        '1900-01-01': "astrometry_wcs_wfm.fits",
+        '2000-01-01': "astrometry_wcs_wfm.fits",
+        '2014-12-01': "astrometry_wcs_wfm.fits",
+        '2015-04-16': "astrometry_wcs_wfm.fits",
+        '2015-09-08': "astrometry_wcs_wfm.fits",
+        }
+
 future_date = '2099-01-01'
 
 ############################################################
