@@ -152,11 +152,11 @@ class SofPipe(object) :
         """
         calfolder = self.my_params.musecalib
         if self._time_geo_table :
-            listkeys = list(musepipe.dic_astro_table.keys())
+            listkeys = list(musepipe.dic_astro_wcs.keys())
             listkeys.append(musepipe.future_date)
             for ikey in range(len(listkeys) - 1):
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
-                    astrofile = musepipe.dic_astro_table[listkeys[ikey]]
+                    astrofile = musepipe.dic_astro_wcs[listkeys[ikey]]
         else :
             astrofile = self.my_params.astro_table
 
