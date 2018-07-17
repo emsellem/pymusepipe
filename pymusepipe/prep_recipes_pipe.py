@@ -36,7 +36,7 @@ dic_files_products = {
         'STD': ['DATACUBE_STD', 'STD_FLUXES', 
             'STD_RESPONSE', 'STD_TELLURIC'],
         'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
-        'SKY': ['SKY_MASK', 'IMAGE_FOV', 'SKY_SPECTRUM', 
+        'SKY': ['SKY_MASK', 'IMAGE_FOV', 'SKY_LINES', 'SKY_SPECTRUM', 
             'SKY_CONTINUUM'],
         'ALIGN': ['OFFSET_LIST']
         }
@@ -48,7 +48,7 @@ dic_products_scipost = {
         'positioned': ['PIXTABLE_POSITIONED'],
         'combined': ['PIXTABLE_COMBINED'],
         'skymodel': ['SKY_MASK', 'SKY_SPECTRUM', 
-            'SKY_LINES', 'SKY_CONTINUUM'],
+            'SKY_LINES', 'SKY_IMAGE'],
         'raman': ['RAMAN_IMAGES']
         }
 # =======================================================
@@ -555,7 +555,7 @@ class PipePrep(SofPipe) :
                     for i in range(len(filter_list.split(','))):
                         suffix_products.append("_{0:04d}".format(i+1))
                         name_products.append(prod)
-                elif ('PIXTABLE' in prod) or (prod == 'RAMAN'):
+                elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY']):
                     for i in range(len(list_expo)):
                         suffix_products.append("_{0:04d}".format(i+1))
                         name_products.append(prod)
@@ -651,7 +651,7 @@ class PipePrep(SofPipe) :
                     for i in range(len(filter_list.split(','))):
                         suffix_products.append("_{0:04d}".format(i+1))
                         name_products.append(prod)
-                elif ('PIXTABLE' in prod) or (prod == 'RAMAN'):
+                elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY']):
                     for i in range(len(list_expo)):
                         suffix_products.append("_{0:04d}".format(i+1))
                         name_products.append(prod)

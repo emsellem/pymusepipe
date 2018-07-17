@@ -182,9 +182,9 @@ class PipeRecipes(object) :
     def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=[]):
         """Running the esorex muse_scibasic recipe
         """
-        self.run_oscommand("{esorex} --log-file=scibasic_expotype_{tpl}.log muse_scibasic --nifu={nifu} "
+        self.run_oscommand("{esorex} --log-file=scibasic_{expotype}_{tpl}.log muse_scibasic --nifu={nifu} "
                 "--saveimage=FALSE {merge} {sof}".format(esorex=self.esorex, 
-                    nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
+                    nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl, expotype=expotype))
 
         for name_prod in name_products :
             # newprod = prod.replace("0001", tpl)
@@ -197,14 +197,15 @@ class PipeRecipes(object) :
             lambdamin=4000., lambdamax=10000., suffix=""):
         """Running the esorex muse_scipost recipe
         """
-        self.run_oscommand("{esorex} muse_scipost --astrometry={astro} --save={save} "
+        self.run_oscommand("{esorex} muse_scipost --log-file=scipost_{expotype}_{tpl}.log "
+                "--astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darcheck={darcheck} --skymodel_frac={model:02f} "
                 "--lambdamin={lmin} --lambdamax={lmax} "
                 "{sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
                     pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
                     darcheck=darcheck, model=skymodel_frac, lmin=lambdamin,
-                    lmax=lambdamax, sof=sof))
+                    lmax=lambdamax, sof=sof, expotype=expotype))
 
         for name_prod, suff_prod in zip(name_products, suffix_products) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
@@ -215,7 +216,7 @@ class PipeRecipes(object) :
             suffix="", srcmin=1, srcmax=10):
         """Running the muse_exp_align recipe
         """
-        self.run_oscommand("{esorex} muse_exp_align --srcmin={srcmin} "
+        self.run_oscommand("{esorex} muse_exp_align --log-file=exp_align_{tpl}.log --srcmin={srcmin} "
                 "--srcmax={srcmax} {sof}".format(esorex=self.esorex, 
                     srcmin=srcmin, srcmax=srcmax, sof=sof))
     
@@ -227,7 +228,7 @@ class PipeRecipes(object) :
     def recipe_cube(self, sof, save='cube', pixfrac=0.8, format_out='Cube', filter_FOV='SDSS_g,SDSS_r,SDSS_i'):
         """Running the muse_exp_combine recipe
         """
-        self.run_oscommand("{esorex} muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
+        self.run_oscommand("{esorex} muse_exp_combine --log-file=exp_combine_cube.log --save={save} --pixfrac={pixfrac:0.2f} "
         "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, save=save, 
             pixfrac=pixfrac, form=format_out, filt=filter_FOV, sof=sof))
 
