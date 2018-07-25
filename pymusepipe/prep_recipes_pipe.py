@@ -564,6 +564,26 @@ class PipePrep(SofPipe) :
                     suffix_products.append("")
         return name_products, suffix_products
 
+    def _select_list_expo(self, expotype, tpl, stage, list_expo=None):
+        """Select the expo numbers which exists for a certain expotype
+        """
+        # First selecting the files via the grouped table
+        tpl_table = self.select_tpl_files(expotype=expotype, tpl=tpl, stage=stage)
+
+        # Selecting the table with the right iexpo
+        if list_expo is None: 
+            list_expo = tpl_table['iexpo'].data
+        expo_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)]
+
+        found_expo = True
+        if len(expo_table) == 0:
+            found_expo = False
+            if self.verbose :
+                upipe.print_warning("No {0} recovered from the {1} astropy file "
+                    "Table - Aborting".format(expotype, stage))
+
+        return found_expo, list_expo, expo_table
+
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Scipost treatment of the objects
@@ -576,21 +596,14 @@ class PipePrep(SofPipe) :
         tpl: ALL by default or a special tpl time
         list_expo: list of integers providing the exposure numbers
         """
-        # First selecting the files via the grouped table
-        tpl_table = self.select_tpl_files(expotype, tpl=tpl, stage="processed")
-
         # Selecting the table with the right iexpo
-        if list_expo is None: 
-            list_expo = tpl_table['iexpo'].data
-        scipost_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)]
+        found_expo, list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        if not found_expo:
+            return
+
         if len(list_expo) == 1: 
             suffix += "_{0:04d}".format(list_expo[0])
         
-        if len(scipost_table) == 0:
-            if self.verbose :
-                upipe.print_warning("No {0} recovered from the processed astropy file Table - Aborting".format(expotype))
-                return
-
         # Lambda min and max?
         [lambdamin, lambdamax] = lambdaminmax
         # Save options
@@ -672,20 +685,11 @@ class PipePrep(SofPipe) :
         tpl: ALL by default or a special tpl time
 
         """
-        # First selecting the files via the grouped table
-        tpl_table = self.select_tpl_files(expotype, tpl=tpl, stage="processed")
-
         # Selecting the table with the right iexpo
-        if list_expo is None: 
-            list_expo = tpl_table['iexpo'].data
-        align_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)]
-
-        # First selecting the files via the grouped table
-        if len(align_table) == 0:
-            if self.verbose :
-                upipe.print_warning("No OBJECT [to align] recovered from the astropy file Table - Aborting")
-                return
-
+        found_expo, list_expo, align_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        if not found_expo:
+            return
+        
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
 
@@ -713,6 +717,23 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    def adjust_alignment(self, name_reference, list_expo=None, line="CousinsR"):
+        """Adjust the alignment using a background image
+        """
+        # Selecting the table with the right iexpo
+        found_expo, list_expo, align_table = self._select_list_expo("OBJECT", "ALL", "processed", list_expo) 
+        if not found_expo:
+            if self.verbose:
+                upipe.print_warning("No exposure recovered for the fine alignment")
+            return
+            
+        list_names_muse = []
+        for gtable in align_table.groups:
+            mytpl, mymjd = self._get_tpl_meanmjd(gtable)
+            list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
+                    'IMAGE_FOV_{0}_{1:04d}_{2}.fits'.format(line, iexpo, mytpl)) for iexpo in list_expo]
+            aligning_muse = AlignMusePointing(name_reference, list_names_muse)
+            
 ################### OLD ############################################
 #    def create_calibrations(self):
 #        self.check_for_calibrations()
