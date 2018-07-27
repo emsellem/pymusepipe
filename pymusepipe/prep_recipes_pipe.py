@@ -540,7 +540,8 @@ class PipePrep(SofPipe) :
             self.run_scipost(sof_filename='scipost', expotype="OBJECT", 
                     tpl="ALL", list_expo=[iexpo], suffix=suffix, 
                     filter_list=filter_list,
-                    lambdaminmax=[lmin, lmax], save='cube', **kwargs)
+                    lambdaminmax=[lmin, lmax], save='cube', 
+                    offset_list=False, **kwargs)
 
     def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list='white,Cousins_R'):
         """Provide a set of key output products depending on the save mode
@@ -610,6 +611,7 @@ class PipePrep(SofPipe) :
         save = kwargs.pop("save", "cube,skymodel")
         # Filters
         filter_list = kwargs.pop("filter_list", "white,Cousins_R")
+        offset_list = kwargs.pop("offset_list", "True")
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -623,12 +625,15 @@ class PipePrep(SofPipe) :
             self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
             self._add_calib_to_sofdict("SKY_LINES")
             self._add_calib_to_sofdict("FILTER_LIST")
-#            self._add_calib_to_sofdict("ASTRO_TABLE")
             self._add_astrometry_to_sofdict(tpl)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', "processed")
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
+            if offset_list :
+                self._sofdict['OFFSET_LIST'] =joinpath(self._get_fullpath_expo(expotype, "processed"),
+                        '{0}_{1}.fits'.format(dic_files_products['ALIGN'][0], tpl))
+
             # Selecting only exposures to be treated
             pixtable_name = self._get_suffix_product(expotype)
             self._sofdict[pixtable_name] = []
@@ -654,7 +659,6 @@ class PipePrep(SofPipe) :
     def _get_align_products(self, list_expo=[], filter_list='white,Cousins_R'):
         """Provide a set of key output products for exp_align
         """
-        name_align = dic_files_products['ALIGN']
         name_products = []
         suffix_products = []
         list_options = save.split(',')
@@ -717,7 +721,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def adjust_alignment(self, name_reference, list_expo=None, line="CousinsR"):
+    def adjust_alignment(self, name_ima_reference, list_expo=None, line="CousinsR"):
         """Adjust the alignment using a background image
         """
         # Selecting the table with the right iexpo
@@ -732,58 +736,4 @@ class PipePrep(SofPipe) :
             mytpl, mymjd = self._get_tpl_meanmjd(gtable)
             list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                     'IMAGE_FOV_{0}_{1:04d}_{2}.fits'.format(line, iexpo, mytpl)) for iexpo in list_expo]
-            aligning_muse = AlignMusePointing(name_reference, list_names_muse)
-            
-################### OLD ############################################
-#    def create_calibrations(self):
-#        self.check_for_calibrations()
-#        # MdB: this creates the standard calibrations, if needed
-#        if not ((self.redo==0) and (self.Master['BIAS']==1)):
-#            self.run_bias()
-#        if not ((self.redo==0) and (self.Master['DARK']==1)):
-#            self.run_dark()
-#        if not ((self.redo==0) and (self.Master['FLAT']==1)):
-#            self.run_flat()
-#        if not ((self.redo==0) and (self.Master['WAVE']==1)):
-#            self.run_wavecal()
-#        if not ((self.redo==0) and (self.Master['TWILIGHT']==1)):
-#            self.run_twilight()    
-#        if not ((self.redo==0) and (self.Master['STD']==1)):
-#            self.create_standard_star()
-#            self.run_standard_int()
-#
-#    def check_for_calibrations(self, verbose=None):
-#        """This function checks which calibration file are present, just in case
-#        you do not wish to redo them. Variables are named: 
-#        masterbias, masterdark, standard, masterflat, mastertwilight
-#        """
-#        
-#        outcal = getattr(self.my_params, "master" + suffix_folder)
-#        if verbose is None: verbose = self.verbose
-#
-#        for mastertype in dic_listMaster.keys() :
-#            [fout, suffix] = dic_listMaster[mastertype]
-#            # If TWILIGHT = only one cube
-#            if mastertype == "TWILIGHT" :
-#                if not os.path.isfile(joinpath(outcal, fout, "{suffix}.fits".format(suffix=suffix))):
-#                    self.Master[mastertype] = False
-#
-#                if verbose :
-#                    if self.Master[mastertype] :
-#                        print("WARNING: Twilight flats already made")
-#                    else :
-#                        print("WARNING: Twilight flats NOT there yet")
-#
-#            # Others = 24 IFU exposures
-#            else :
-#                for ifu in range(1,25):
-#                    if not os.path.isfile(joinpath(outcal, fout, "{0}-{1:02d}.fits".format(suffix, ifu))):
-#                        self.Master[mastertype] = False
-#                        break
-#                if verbose :
-#                    if self.Master[mastertype]:
-#                        print("WARNING: Master {0} already in place".format(mastertype))
-#                    else :
-#                        print("WARNING: Master {0} NOT yet there".format(mastertype))
-#
-
+            aligning_muse = AlignMusePointing(name_ima_reference, list_names_muse)

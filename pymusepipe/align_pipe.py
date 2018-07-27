@@ -83,6 +83,9 @@ def my_linear(B, x):
     return B[1] * (x + B[0])
 
 def get_image_norm_poly(data1, data2, chunk_size=15):
+    """Find the normalisation factor between two datasets
+    Including the background and slope
+    """
     med, std = chunk_stats([data1, data2], chunk_size=chunk_size)
     pos = (med[0] > 0.) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > 0.)
     guess_slope = np.median(med[1][pos] / med[0][pos])
@@ -96,6 +99,35 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.]):
     mydata = RealData(x.ravel(), y.ravel(), sx=sx.ravel(), sy=sy.ravel())
     myodr = ODR(mydata, linear, beta0=beta0)
     return myodr.run()
+
+def arcsec_to_pixel(hdu, xy_arcsec=[0., 0.]):
+    """Transform from arcsec to pixel for the muse image
+    """
+    # Matrix
+    input_wcs = wcs.WCS(hdu.header)
+    scale_matrix = np.linalg.inv(input_wcs.pixel_scale_matrix * 3600.)
+
+    # Transformation in Pixels
+    dels = np.array(xy_arcsec)
+    xpix = np.sum(dels * scale_matrix[0, :])
+    ypix = np.sum(dels * scale_matrix[1, :])
+    return xpix, ypix
+
+def pixel_to_arcsec(hdu, xy_pixel=[0.,0.]):
+    """ Transform pixel to arcsec for the muse image
+    """
+    # Matrix
+    input_wcs = wcs.WCS(hdu.header)
+
+    # Transformation in arcsecond
+    dels = np.array(xy_pixel)
+    xarc = np.sum(dels * input_wcs.pixel_scale_matrix[0, :] * 3600.)
+    yarc = np.sum(dels * input_wcs.pixel_scale_matrix[1, :] * 3600.)
+    return xarc, yarc
+
+#################################################################
+# ================== END Useful function ====================== #
+#################################################################
 
 # Main alignment Class
 class AlignMusePointing(object):
@@ -155,13 +187,14 @@ class AlignMusePointing(object):
         self.list_offmuse_hdu = [None] * self.nimages
         self.list_proj_refhdu = [None] * self.nimages
 
-        # Initiallise the output coordinates
-        self.cross_arcsec = np.zeros((self.nimages, 2), dtype=np.float32)
-        self.cross_pixel = np.zeros_like(self.cross_arcsec)
-        self.offset_arcsec = np.zeros_like(self.cross_arcsec)
-        self.offset_pixel = np.zeros_like(self.cross_arcsec)
-        self.cross_offset_arcsec = np.zeros_like(self.cross_arcsec)
-        self.cross_offset_pixel = np.zeros_like(self.cross_arcsec)
+        self.cross_off_pixel = np.zeros((self.nimages, 2), dtype=np.float32)
+        self.extra_off_pixel = np.zeros_like(self.cross_off_pixel)
+        self.init_off_pixel = np.zeros_like(self.cross_off_pixel)
+        self.total_off_pixel = np.zeros_like(self.cross_off_pixel)
+        self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
+        self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
+        self.init_off_arcsec = np.zeros_like(self.cross_off_pixel)
+        self.total_off_arcsec = np.zeros_like(self.cross_off_pixel)
 
         # Cross normalisation for the images
         # This contains the 2 parameters for a linear transformation
@@ -176,6 +209,101 @@ class AlignMusePointing(object):
         # find the cross correlation peaks for each image
         self.find_ncross_peak()
 
+        # Initialise the offset
+        firstguess = kwargs.pop("firstguess", "crosscorr")
+        self.init_guess_offset(firstguess, **kwargs)
+
+        self.total_off_arcsec = self.init_off_arcsec + self.extra_off_arcsec
+        self.total_off_pixel = self.init_off_pixel + self.extra_off_pixel
+
+    def init_guess_offset(self, firstguess="crosscorr", name_offset_table=None):
+        """Initialise first guess, either from cross-correlation (default)
+        or from an Offset FITS Table
+        """
+        # Implement the guess
+        if firstguess not in ["crosscorr", "fits"]:
+            firstguess = "crosscorr"
+            upipe.print_warning("Keyword 'firstguess' not recognised")
+            upipe.print_warning("Using Cross-Correlation as a first guess of the alignment")
+        if firstguess == "crosscorr":
+            self.init_off_arcsec = self.cross_off_arcsec
+            self.init_off_pixel = self.cross_off_pixel
+        elif firstguess == "fits":
+            self.name_offset_table = name_offset_table
+            self.offset_table = self.open_offset_table(self.name_offset_table)
+            self.init_off_arcsec = np.vstack((self.offset_table['RA_OFFSET'], 
+                self.offset_table['DEC_OFFSET'])).T * 3600.
+            for i in range(self.nimages):
+                self.init_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
+                        self.init_off_arcsec[nima])
+
+    def open_offset_table(self, name_offset_table=None):
+        """Read offset table from fits file
+        """
+        if name_offset_table is None:
+            if not hasattr(self, name_offset_table):
+                upipe.print_error("No FITS table name provided, Aborting Save")
+                return Table()
+        else:
+            self.name_offset_table = name_offset_table
+
+        if not os.path.isfile(self.name_offset_table):
+            upipe.print_error("FITS Table does not exist "
+                "({0})".format(self.name_offset_table))
+            return Table()
+
+        return Table.read(self.name_offset_table)
+
+    def print_offset_fromfits(self, name_offset_table=None):
+        """Print out the offset
+        """
+        fits_table = self.open_offset_table(name_offset_table)
+
+        upipe.print_info("Offset recorded in OFFSET_LIST Table")
+        upipe.print_info("Total in ARCSEC")
+        for i in self.nimages:
+            upipe.print_info("Image {0}: "
+                "{1:8.4f} {1:8.4f}".format(fits_table['RA_OFFSET']*3600,
+                    fits_table['DEC_OFFSET']*3600.))
+
+    def print_offset(self):
+        """Print out the offset
+        """
+        upipe.print_info("#---- Offset recorded so far ----#")
+        upipe.print_info("Total in ARCSEC")
+        for nima in range(self.nimages):
+            upipe.print_info("    Image {0:02d}: "
+                "{1:8.4f} {2:8.4f}".format(nima, self.total_off_arcsec[nima][0],
+                    self.total_off_arcsec[nima][1]))
+        upipe.print_info("Total in PIXEL")
+        for nima in range(self.nimages):
+            upipe.print_info("    Image {0:02d}: "
+                "{1:8.4f} {2:8.4f}".format(nima, self.total_off_pixel[nima][0],
+                    self.total_off_pixel[nima][1]))
+
+    def save_fits_offset_table(self, name_offset_table=None, overwrite=False):
+        """Save the Offsets into a fits Table
+        """
+        fits_table = self.open_offset_table(name_offset_table)
+
+        # Check if RA_OFFSET is there
+        if 'RA_OFFSET' in fits_table.columns:
+            # if yes, then check if the ORIG column is there
+            if 'RA_OFFSET_ORIG' not in fits_table.columns:
+                fits_table['RA_OFFSET_ORIG'] = fits_table['RA_OFFSET']
+                fits_table['DEC_OFFSET_ORIG'] = fits_table['DEC_OFFSET']
+            # if not, just continue
+            # as it means the ORIG columns were already done
+
+        # Saving the final values
+        fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600.
+        fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
+        fits_table['RA_CROSS_OFFSET'] = self.cross_off_arcsec[:,0] / 3600.
+        fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:,1] / 3600.
+
+        # Writing it up
+        fits_table.write(name_offset_table, overwrite=overwrite)
+
     def run(self, nima=0, **kwargs):
         """Run the offset and comparison
         """
@@ -186,14 +314,14 @@ class AlignMusePointing(object):
         # Overwrite the plot option if given
         self.plot = kwargs.pop("plot", self.plot)
 
-        if "offset_pixel" in kwargs:
-            offset_pixel = kwargs.pop("offset_pixel", [0., 0.])
-            offset_arcsec = self.pixel_to_arcsec(self.list_muse_hdu[nima], offset_pixel)
+        if "extra_pixel" in kwargs:
+            extra_pixel = kwargs.pop("extra_pixel", [0., 0.])
+            extra_arcsec = pixel_to_arcsec(self.list_muse_hdu[nima], extra_pixel)
         else:
-            offset_arcsec = kwargs.pop("offset_arcsec", [0., 0.])
+            extra_arcsec = kwargs.pop("extra_arcsec", [0., 0.])
 
         # Add the offset from user
-        self.shift_arcsecond(offset_arcsec, nima)
+        self.shift_arcsecond(extra_arcsec, nima)
 
         # Compare contours if plot is set to True
         if self.plot:
@@ -228,6 +356,7 @@ class AlignMusePointing(object):
         self.list_name_offmusehdr = ["{0}{1:02d}.hdr".format(self.name_offmusehdr, i+1) for i in range(self.nimages)]
         list_hdulist_muse = [pyfits.open(self.list_muse_images[i]) for i in range(self.nimages)]
         self.list_muse_hdu = [list_hdulist_muse[i][self.hdu_ext[1]]  for i in range(self.nimages)]
+        self.list_muse_wcs = [wcs.WCS(hdu.header) for hdu in self.list_muse_hdu]
 
     def _open_ref_hdu(self):
         """Open the reference image hdu
@@ -240,10 +369,10 @@ class AlignMusePointing(object):
         """Run the cross correlation peaks on all MUSE images
         """
         for nima in range(self.nimages):
-            self.cross_pixel[nima] = self.find_cross_peak(self.list_muse_hdu[nima], 
+            self.cross_off_pixel[nima] = self.find_cross_peak(self.list_muse_hdu[nima], 
                     self.list_name_musehdr[nima])
-            self.cross_arcsec[nima] = self.pixel_to_arcsec(self.list_muse_hdu[nima],
-                    self.cross_pixel[nima])
+            self.cross_off_arcsec[nima] = pixel_to_arcsec(self.list_muse_hdu[nima],
+                    self.cross_off_pixel[nima])
 
     def find_cross_peak(self, muse_hdu, name_musehdr):
         """Aligns the MUSE HDU to a reference HDU
@@ -355,25 +484,25 @@ class AlignMusePointing(object):
         return montage.reproject_hdu(self.reference_hdu,
                      header=name_hdr, exact_size=True)
 
-    def _add_user_arc_offset(self, offset_arcsec=[0., 0.], nima=0):
+    def _add_user_arc_offset(self, extra_arcsec=[0., 0.], nima=0):
         """Add user offset in arcseconds
         """
         # Transforming the arc into pix
-        self.offset_arcsec[nima] = offset_arcsec
+        self.extra_off_arcsec[nima] = extra_arcsec
 
         # Adding the user offset
-        self.cross_offset_arcsec[nima] = self.cross_arcsec[nima] + self.offset_arcsec[nima]
+        self.total_off_arcsec[nima] = self.init_off_arcsec[nima] + self.extra_off_arcsec[nima]
 
         # Transforming into pixels - would be better with setter
-        self.offset_pixel[nima] = self.arcsec_to_pixel(self.list_muse_hdu[nima], 
-                self.offset_arcsec[nima])
-        self.cross_offset_pixel[nima] = self.arcsec_to_pixel(self.list_muse_hdu[nima], 
-                self.cross_offset_arcsec[nima])
+        self.extra_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima], 
+                self.extra_off_arcsec[nima])
+        self.total_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima], 
+                self.total_off_arcsec[nima])
 
-    def shift_arcsecond(self, offset_arcsec=[0., 0.], nima=0):
+    def shift_arcsecond(self, extra_arcsec=[0., 0.], nima=0):
         """Apply shift in arcseconds
         """
-        self._add_user_arc_offset(offset_arcsec, nima)
+        self._add_user_arc_offset(extra_arcsec, nima)
         self.shift(nima)
 
     def shift(self, nima=0):
@@ -385,41 +514,19 @@ class AlignMusePointing(object):
         # Shift the HDU in X and Y
         if self.verbose:
             print("Shifting CRPIX1 by {0:8.4f} pixels "
-                  "/ {1:8.4f} arcsec".format(-self.cross_offset_pixel[nima][0],
-                -self.cross_offset_arcsec[nima][0]))
-        newhdr['CRPIX1'] = newhdr['CRPIX1'] - self.cross_offset_pixel[nima][0]
+                  "/ {1:8.4f} arcsec".format(-self.total_off_pixel[nima][0],
+                -self.total_off_arcsec[nima][0]))
+        newhdr['CRPIX1'] = newhdr['CRPIX1'] - self.total_off_pixel[nima][0]
         if self.verbose:
             print("Shifting CRPIX2 by {0:8.4f} pixels "
-                  "/ {1:8.4f} arcsec".format(-self.cross_offset_pixel[nima][1],
-                -self.cross_offset_arcsec[nima][1]))
-        newhdr['CRPIX2'] = newhdr['CRPIX2'] - self.cross_offset_pixel[nima][1]
+                  "/ {1:8.4f} arcsec".format(-self.total_off_pixel[nima][1],
+                -self.total_off_arcsec[nima][1]))
+        newhdr['CRPIX2'] = newhdr['CRPIX2'] - self.total_off_pixel[nima][1]
         self.list_offmuse_hdu[nima] = pyfits.PrimaryHDU(self.list_muse_hdu[nima].data, header=newhdr)
 
         tmphdr = self.list_offmuse_hdu[nima].header.totextfile(self.list_name_offmusehdr[nima], overwrite=True)
         self.list_proj_refhdu[nima] = self._project_reference_hdu(self.list_name_offmusehdr[nima])
 
-    def arcsec_to_pixel(self, hdu, xy_arcsec=[0., 0.]):
-        """Transform from arcsec to pixel for the muse image
-        """
-        # Importing theWCS from the muse image
-        w = wcs.WCS(hdu.header)
-        scale_matrix = np.linalg.inv(w.pixel_scale_matrix * 3600.)
-        # Transformation in Pixels
-        dels = np.array(xy_arcsec)
-        xpix = np.sum(dels * scale_matrix[0, :])
-        ypix = np.sum(dels * scale_matrix[1, :])
-        return xpix, ypix
-
-    def pixel_to_arcsec(self, hdu, xy_pixel=[0.,0.]):
-        """ Transform pixel to arcsec for the muse image
-        """
-        # Importing theWCS from the muse image
-        w = wcs.WCS(hdu.header)
-        # Transformation in arcsecond
-        dels = np.array(xy_pixel)
-        xarc = np.sum(dels * w.pixel_scale_matrix[0, :] * 3600.)
-        yarc = np.sum(dels * w.pixel_scale_matrix[1, :] * 3600.)
-        return xarc, yarc
 
     def compare(self, muse_hdu=None, ref_hdu=None, factor=1.0, 
             start_nfig=1, nlevels=7, levels=None, muse_smooth=1., 
