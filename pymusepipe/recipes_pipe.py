@@ -197,7 +197,7 @@ class PipeRecipes(object) :
             lambdamin=4000., lambdamax=10000., suffix=""):
         """Running the esorex muse_scipost recipe
         """
-        self.run_oscommand("{esorex} muse_scipost --log-file=scipost_{expotype}_{tpl}.log "
+        self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
                 "--astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darcheck={darcheck} --skymodel_frac={model:02f} "
