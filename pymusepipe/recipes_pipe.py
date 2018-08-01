@@ -205,7 +205,7 @@ class PipeRecipes(object) :
                 "{sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
                     pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
                     darcheck=darcheck, model=skymodel_frac, lmin=lambdamin,
-                    lmax=lambdamax, sof=sof, expotype=expotype))
+                    lmax=lambdamax, sof=sof, expotype=expotype, tpl=tpl))
 
         for name_prod, suff_prod in zip(name_products, suffix_products) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
