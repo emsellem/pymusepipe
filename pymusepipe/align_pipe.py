@@ -27,6 +27,7 @@ import astropy.wcs as wcs
 from astropy.io import fits as pyfits
 from astropy.modeling import models, fitting
 from astropy.stats import mad_std
+from astropy.table import Table
 
 # Montage
 try :
@@ -180,6 +181,8 @@ class AlignMusePointing(object):
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
         self.name_refhdr = kwargs.pop("name_refhdr", "reference.hdr")
 
+        self.flag = kwargs.pop("flag", "")
+
         self._get_list_muse_images(**kwargs)
         if self.nimages == 0: 
             upipe.print_warning("0 MUSE images detected as input")
@@ -216,7 +219,7 @@ class AlignMusePointing(object):
         self.total_off_arcsec = self.init_off_arcsec + self.extra_off_arcsec
         self.total_off_pixel = self.init_off_pixel + self.extra_off_pixel
 
-    def init_guess_offset(self, firstguess="crosscorr", name_offset_table=None):
+    def init_guess_offset(self, firstguess="crosscorr", name_input_table="OFFSET_LIST.fits"):
         """Initialise first guess, either from cross-correlation (default)
         or from an Offset FITS Table
         """
@@ -225,39 +228,49 @@ class AlignMusePointing(object):
             firstguess = "crosscorr"
             upipe.print_warning("Keyword 'firstguess' not recognised")
             upipe.print_warning("Using Cross-Correlation as a first guess of the alignment")
+
         if firstguess == "crosscorr":
             self.init_off_arcsec = self.cross_off_arcsec
             self.init_off_pixel = self.cross_off_pixel
         elif firstguess == "fits":
-            self.name_offset_table = name_offset_table
-            self.offset_table = self.open_offset_table(self.name_offset_table)
-            self.init_off_arcsec = np.vstack((self.offset_table['RA_OFFSET'], 
-                self.offset_table['DEC_OFFSET'])).T * 3600.
-            for i in range(self.nimages):
-                self.init_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
-                        self.init_off_arcsec[nima])
+            self.name_input_table = name_input_table
+            exist_table, self.offset_table = self.open_offset_table(self.name_input_table)
+            if exist_table is not True:
+                upipe.print_warning("Fits initialisation table not found, setting init value to 0")
+                self.init_off_pixel *= 0.
+                self.init_off_arcsec *= 0.
+            else:
+                self.init_off_arcsec = np.vstack((self.offset_table['RA_OFFSET'], 
+                    self.offset_table['DEC_OFFSET'])).T * 3600.
+                for i in range(self.nimages):
+                    self.init_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
+                            self.init_off_arcsec[nima])
 
-    def open_offset_table(self, name_offset_table=None):
+    def open_offset_table(self, name_table=None):
         """Read offset table from fits file
         """
-        if name_offset_table is None:
-            if not hasattr(self, name_offset_table):
-                upipe.print_error("No FITS table name provided, Aborting Save")
-                return Table()
-        else:
-            self.name_offset_table = name_offset_table
+        if name_table is None:
+            if not hasattr(self, name_table):
+                upipe.print_error("No FITS table name provided, Aborting Open")
+                return None, Table()
 
-        if not os.path.isfile(self.name_offset_table):
-            upipe.print_error("FITS Table does not exist "
-                "({0})".format(self.name_offset_table))
-            return Table()
+        if not os.path.isfile(name_table):
+            upipe.print_warning("FITS Table does not exist yet"
+                "({0})".format(name_table))
+            return False, Table()
 
-        return Table.read(self.name_offset_table)
+        return True, Table.read(name_table)
 
-    def print_offset_fromfits(self, name_offset_table=None):
+    def print_offset_fromfits(self, name_table=None):
         """Print out the offset
         """
-        fits_table = self.open_offset_table(name_offset_table)
+        exist_table, fits_table = self.open_offset_table(name_table)
+        if exist_table is None:
+            return
+
+        if ('RA_OFFSET' not in fits_table.columns) or ('DEC_OFFSET' not in fits_table.columns):
+            upipe.print_error("Table does not contain 'RA/DEC_OFFSET' columns, Aborting")
+            return
 
         upipe.print_info("Offset recorded in OFFSET_LIST Table")
         upipe.print_info("Total in ARCSEC")
@@ -281,10 +294,16 @@ class AlignMusePointing(object):
                 "{1:8.4f} {2:8.4f}".format(nima, self.total_off_pixel[nima][0],
                     self.total_off_pixel[nima][1]))
 
-    def save_fits_offset_table(self, name_offset_table=None, overwrite=False):
+    def save_fits_offset_table(self, name_output_table=self.name_input_table, overwrite=False, suffix=""):
         """Save the Offsets into a fits Table
         """
-        fits_table = self.open_offset_table(name_offset_table)
+        self.suffix = suffix
+        name_output_table = name_output_table.replace(".fits", "{0}.fits".format(self.suffix))
+
+        exist_table, fits_table = self.open_offset_table(self.name_out_table)
+        if exist_table is None:
+            upipe.print_error("Save is aborted")
+            return
 
         # Check if RA_OFFSET is there
         if 'RA_OFFSET' in fits_table.columns:
@@ -302,7 +321,14 @@ class AlignMusePointing(object):
         fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:,1] / 3600.
 
         # Writing it up
-        fits_table.write(name_offset_table, overwrite=overwrite)
+        if exist_table and not overwrite:
+            upipe.print_warning("Table already exists, but overwrite is set to False")
+            upipe.print_warning("If you wish to overwrite the table {0}, "
+                    "please set overwrite to True".format(name_output_table))
+            return
+
+        fits_table.write(self.name_output_table, overwrite=overwrite)
+        self.name_output_table = name_output_table
 
     def run(self, nima=0, **kwargs):
         """Run the offset and comparison
@@ -427,13 +453,13 @@ class AlignMusePointing(object):
 
         return xpix_cross, ypix_cross
 
-    def save_newhdu(self, newhdu_name=None, nima=0):
+    def save_image(self, newfits_name=None, nima=0):
         """Save the newly determined hdu
         """
         if hasattr(self, "list_offmuse_hdu"):
-            if newhdu_name is None:
-                newhdu_name = self.list_name_museimages[nima].replace(".fits", "_shift.fits")
-            self.list_offmuse_hdu[nima].writeto(newhdu_name, overwrite=True)
+            if newfits_name is None:
+                newfits_name = self.list_name_museimages[nima].replace(".fits", "_shift.fits")
+            self.list_offmuse_hdu[nima].writeto(newfits_name, overwrite=True)
         else:
             upipe.print_error("There are not yet any new hdu to save")
 

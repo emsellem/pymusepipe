@@ -649,9 +649,9 @@ class PipePrep(SofPipe) :
                     name_products, suffix_products, lambdamin=lambdamin, lambdamax=lambdamax, 
                     save=save, list_expo=list_expo, suffix=suffix, filter_list=filter_list, **kwargs)
 
-        # Write the MASTER files Table and save it
-        self.save_expo_table(expotype, scipost_table, "reduced", 
-                "IMAGES_FOV_{0}{1}_{2}_list_table.fits".format(expotype, suffix, tpl), aggregate=False)
+            # Write the MASTER files Table and save it
+            self.save_expo_table(expotype, scipost_table, "reduced", 
+                    "IMAGES_FOV_{0}{1}_{2}_list_table.fits".format(expotype, suffix, tpl), aggregate=False)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -714,9 +714,9 @@ class PipePrep(SofPipe) :
                     name_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
             self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix="_"+line)
 
-        # Write the MASTER files Table and save it
-        self.save_expo_table(expotype, align_table, "reduced", 
-                "ALIGNED_IMAGES_{0}_{1}_{2}_list_table.fits".format(expotype, line, mytpl), aggregate=False)
+            # Write the MASTER files Table and save it
+            self.save_expo_table(expotype, align_table, "reduced", 
+                    "ALIGNED_IMAGES_{0}_{1}_{2}_list_table.fits".format(expotype, line, mytpl), aggregate=False)
         
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -731,9 +731,9 @@ class PipePrep(SofPipe) :
                 upipe.print_warning("No exposure recovered for the fine alignment")
             return
             
-        list_names_muse = []
+        self.groupexpo = []
         for gtable in align_table.groups:
             mytpl, mymjd = self._get_tpl_meanmjd(gtable)
             list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                     'IMAGE_FOV_{0}_{1:04d}_{2}.fits'.format(line, iexpo, mytpl)) for iexpo in list_expo]
-            aligning_muse = AlignMusePointing(name_ima_reference, list_names_muse)
+            self.groupexpo.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
