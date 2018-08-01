@@ -218,7 +218,7 @@ class PipeRecipes(object) :
         """
         self.run_oscommand("{esorex} --log-file=exp_align_{tpl}.log muse_exp_align --srcmin={srcmin} "
                 "--srcmax={srcmax} {sof}".format(esorex=self.esorex, 
-                    srcmin=srcmin, srcmax=srcmax, sof=sof))
+                    srcmin=srcmin, srcmax=srcmax, sof=sof, tpl=tpl))
     
         for name_prod in name_products :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
