@@ -216,7 +216,7 @@ class PipeRecipes(object) :
             suffix="", srcmin=1, srcmax=10):
         """Running the muse_exp_align recipe
         """
-        self.run_oscommand("{esorex} muse_exp_align --log-file=exp_align_{tpl}.log --srcmin={srcmin} "
+        self.run_oscommand("{esorex} --log-file=exp_align_{tpl}.log muse_exp_align --srcmin={srcmin} "
                 "--srcmax={srcmax} {sof}".format(esorex=self.esorex, 
                     srcmin=srcmin, srcmax=srcmax, sof=sof))
     
@@ -228,7 +228,7 @@ class PipeRecipes(object) :
     def recipe_cube(self, sof, save='cube', pixfrac=0.8, format_out='Cube', filter_FOV='SDSS_g,SDSS_r,SDSS_i'):
         """Running the muse_exp_combine recipe
         """
-        self.run_oscommand("{esorex} muse_exp_combine --log-file=exp_combine_cube.log --save={save} --pixfrac={pixfrac:0.2f} "
+        self.run_oscommand("{esorex}  --log-file=exp_combine_cube.log muse_exp_combine--save={save} --pixfrac={pixfrac:0.2f} "
         "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, save=save, 
             pixfrac=pixfrac, form=format_out, filt=filter_FOV, sof=sof))
 
