@@ -554,21 +554,26 @@ class PipePrep(SofPipe) :
         """
         name_products = []
         suffix_products = []
+        suffix_finalnames = []
         list_options = save.split(',')
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 if prod == "IMAGE_FOV":
-                    for i in range(len(filter_list.split(','))):
-                        suffix_products.append("_{0:04d}".format(i+1))
+                    for i, value in enumerate(filter_list.split(','), 1):
+                        suffix_products.append("_{0:04d}".format(i))
+                        suffix_finalnames.append("_{0}".format(value))
                         name_products.append(prod)
                 elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY']):
                     for i in range(len(list_expo)):
                         suffix_products.append("_{0:04d}".format(i+1))
+                        suffix_finalnames.append("_{0:04d}".format(i+1))
                         name_products.append(prod)
                 else :
                     name_products.append(prod)
                     suffix_products.append("")
-        return name_products, suffix_products
+                    suffix_finalnames.append("")
+
+        return name_products, suffix_products, suffix_finalnames
 
     def _select_list_expo(self, expotype, tpl, stage, list_expo=None):
         """Select the expo numbers which exists for a certain expotype
@@ -649,9 +654,9 @@ class PipePrep(SofPipe) :
                 suffix, tpl), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            name_products, suffix_products = self._get_scipost_products(save, list_expo, filter_list) 
+            name_products, suffix_products, suffix_finalnames = self._get_scipost_products(save, list_expo, filter_list) 
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
-                    name_products, suffix_products, lambdamin=lambdamin, lambdamax=lambdamax, 
+                    name_products, suffix_products, suffix_finalnames, lambdamin=lambdamin, lambdamax=lambdamax, 
                     save=save, list_expo=list_expo, suffix=suffix, filter_list=filter_list, **kwargs)
 
             # Write the MASTER files Table and save it

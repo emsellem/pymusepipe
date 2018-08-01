@@ -192,7 +192,7 @@ class PipeRecipes(object) :
                 prod=self.joinprod(name_prod), newprod=joinpath(dir_products, name_prod)))
     
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
-            suffix_products=[], list_expo=[1], save='cube,skymodel', filter_list='white', skymethod='model',
+            suffix_products=[], suffix_finalnames=[], list_expo=[1], save='cube,skymodel', filter_list='white', skymethod='model',
             pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE',
             lambdamin=4000., lambdamax=10000., suffix=""):
         """Running the esorex muse_scipost recipe
@@ -207,9 +207,9 @@ class PipeRecipes(object) :
                     darcheck=darcheck, model=skymodel_frac, lmin=lambdamin,
                     lmax=lambdamax, sof=sof, expotype=expotype, tpl=tpl))
 
-        for name_prod, suff_prod in zip(name_products, suffix_products) :
+        for name_prod, suff_prod, suff_final in zip(name_products, suffix_products, suffix_finalnames) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod+suff_prod), name_imaout=joinpath(dir_products, name_prod), tpl=tpl,
+                name_imain=self.joinprod(name_prod+suff_prod), name_imaout=joinpath(dir_products, name_prod+suff_final), tpl=tpl,
                 suffix=suffix))
    
     def recipe_align(self, sof, dir_products, name_products, tpl, 
