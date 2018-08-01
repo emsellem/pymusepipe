@@ -294,9 +294,10 @@ class AlignMusePointing(object):
                 "{1:8.4f} {2:8.4f}".format(nima, self.total_off_pixel[nima][0],
                     self.total_off_pixel[nima][1]))
 
-    def save_fits_offset_table(self, name_output_table=self.name_input_table, overwrite=False, suffix=""):
+    def save_fits_offset_table(self, name_output_table=None, overwrite=False, suffix=""):
         """Save the Offsets into a fits Table
         """
+        if name_out_table is None: name_out_table = self.name_input_table
         self.suffix = suffix
         name_output_table = name_output_table.replace(".fits", "{0}.fits".format(self.suffix))
 

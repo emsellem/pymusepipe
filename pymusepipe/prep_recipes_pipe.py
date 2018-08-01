@@ -114,17 +114,22 @@ class PipePrep(SofPipe) :
     def run_all_recipes(self, fraction=0.8):
         """Running all recipes in one shot
         """
-        self.run_bias()
-        self.run_flat()
-        self.run_wave()
-        self.run_lsf()
-        self.run_twilight()
-        self.run_scibasic_all()
-        self.run_standard()
-        self.run_sky(fraction=fraction)
-        self.run_prep_align()
-        self.run_align()
-        self.run_scipost()
+        for recipe in self.list_recipes:
+#            module = "run_{0}".format(recipe)
+#            arguments = self.list_arguments[recipe]
+#            function_to_run = getattr(self, module)
+#            function_to_run(arguments)
+            self.run_bias()
+            self.run_flat()
+            self.run_wave()
+            self.run_lsf()
+            self.run_twilight()
+            self.run_scibasic_all()
+            self.run_standard()
+            self.run_sky(fraction=fraction)
+            self.run_prep_align()
+            self.run_align()
+            self.run_scipost()
 
     def run_bias(self, sof_filename='bias', tpl="ALL"):
         """Reducing the Bias files and creating a Master Bias
