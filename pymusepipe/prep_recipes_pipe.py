@@ -590,7 +590,7 @@ class PipePrep(SofPipe) :
 
         return found_expo, list_expo, expo_table
 
-    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", list_expo=None, 
+    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
@@ -682,7 +682,7 @@ class PipePrep(SofPipe) :
                     suffix_products.append("")
         return name_products, suffix_products
 
-    def run_align(self, sof_filename='exp_align', expotype="OBJECT", list_expo=None, line="CousinsR", tpl="ALL"):
+    def run_align(self, sof_filename='exp_align', expotype="OBJECT", list_expo=None, stage="processed", line="CousinsR", tpl="ALL"):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
