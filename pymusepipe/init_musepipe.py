@@ -13,7 +13,7 @@ import os
 from os.path import join as joinpath
 import copy
 from pymusepipe import util_pipe as upipe
-from pymusepipe import musepipe
+from pymusepipe.musepipe import MusePipe
 
 ############################################################
 #                      BEGIN
@@ -280,7 +280,7 @@ class MusepipeTarget(object) :
             upipe.print_info(python_command)
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
             self.history.append(python_command)
-            mypipe = musepipe.MusePipe(galaxyname=galaxyname, pointing=pointing, 
+            mypipe = MusePipe(galaxyname=galaxyname, pointing=pointing, 
                     rc_filename=rcfile, cal_filename=calfile, outlog=None, 
                     logfile=logfile, fakemode=fakemode, nocache=False)
 
