@@ -19,6 +19,7 @@ from astropy import constants as const
 
 # Import package modules
 from pymusepipe.emission_lines import list_emission_lines
+from pymusepipe.emission_lines import full_muse_wavelength_range
 
 ############    PRINTING FUNCTIONS #########################
 HEADER = '\033[95m'
@@ -118,7 +119,9 @@ def get_emissionline_wavelength(line="Ha", velocity=0., redshift=None, medium='a
     # Get the velocity
     if redshift is not None : velocity = redshift * const.c
 
-    if line not in list_emission_lines.keys() :
+    if line is None:
+        return -1.
+    elif line not in list_emission_lines.keys() :
         upipe.print_error("Could not guess the emission line you wish to use")
         upipe.print_error("Please review the 'emission_line' dictionary")
         return -1.
@@ -144,6 +147,6 @@ def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', w
     red_wavel = get_emissionline_wavelength(line=line, velocity=velocity, redshift=redshift, medium=medium)
     # In case the line is not in the list, just return the full lambda Range
     if red_wavel < 0 :
-        return [4000., 10000.]
+        return full_muse_wavelength_range
     else:
         return [red_wavel - window/2., red_wavel + window/2.]

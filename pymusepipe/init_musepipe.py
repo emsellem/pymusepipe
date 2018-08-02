@@ -13,6 +13,7 @@ import os
 from os.path import join as joinpath
 import copy
 from pymusepipe import util_pipe as upipe
+from pymusepipe import musepipe
 
 ############################################################
 #                      BEGIN
@@ -73,7 +74,7 @@ MUSEPIPE_runs = {
 #                      END
 ############################################################
 
-############################################################
+######################################################mp######
 # Some fixed parameters for the structure
 ############################################################
 def add_suffix_tokeys(dic, suffix="_folder") :
@@ -225,16 +226,66 @@ class MusepipeSample(object) :
         self.targets = MUSEPIPE_sample.keys()
 
 class MusepipeTarget(object) :
-    def __init__(self, galaxyname=None, pointing=1) :
+    def __init__(self, galaxyname=None, list_pointings=[1]) :
         if galaxyname not in MUSEPIPE_sample.keys() :
             upipe.print_error("ERROR: no Galaxy named {gal} in the defined sample".format(gal=galaxyname))
             return
 
+        # Galaxy name
         upipe.print_info("Initialising Target {name}".format(name=galaxyname))
         self.targetname = galaxyname
+
+        # Info of the pointings and extracting the observing run for each pointing
         self.info_pointings = MUSEPIPE_sample[galaxyname]
-        if pointing not in self.info_pointings.keys() :
-            upipe.print_error("ERROR: no pointing {pointing} for the Galaxy".format(pointing))
+        if any([_ not in self.info_pointings.keys() for _ in list_pointings]) :
+            upipe.print_error("ERROR: no pointing {0} for the Galaxy".format(list_pointings))
             return
-        self.pointing = pointing
-        self.run = self.info_pointings[pointing]
+        self.list_pointings = list_pointings
+        self.observing_run = [self.info_pointing[_] for _ in self.list_pointings]
+
+    def _get_file_name(self, suffix, pointing):
+        return "{0}_P{1:02d}.txt".format(suffix, pointing)
+
+    def run_pipeline(self, list_pointings=[1], fakemode=False, 
+            suffix_logfile="logfile", suffix_rcfile="rcfile", suffix_calfile="calfile"):
+        """Run the pipeline for all pointings in the list
+        """
+        if any([_ not in self.info_pointings.keys() for _ in self.list_pointings]) :
+            upipe.print_error("ERROR: some pointing are not in "
+                "the available list ({0})".format(self.list_pointings))
+            return
+
+        # Setting up the suffixes for the files
+        self.suffix_logfile = suffix_logfile
+        self.suffix_calfile = suffix_calfile
+        self.suffix_rcfile = suffix_rcfile
+
+        # Loop on the pointings
+        self.pipelines = []
+        upipe.print_info("---- Starting the Data Reduction ----"
+        self.history = []
+        for pointing in list_pointings:
+
+            # Setting up the names of the output files
+            logfile = self._get_logfile_name(self.suffix_logfile, pointing)
+            calfile = self._get_calfile_name(self.suffix_calfile, pointing)
+            rcfile = self._get_rcfile_name(self.suffix_rcfile, pointing)
+            
+            python_command = "mypipe = musepipe.MusePipe(galaxyname={0}, "
+                    "pointing={1}, rc_filename={2}, cal_filename={3}, "
+                    "outlog=None, logfile={4}, fakemode={5}, "
+                    "nocache=False)".format(galaxyname, pointing, rcfile, calfile, 
+                            logfile, fakemode)
+            upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
+            upipe.print_info(python_command)
+            upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
+            self.history.append(python_command)
+            mypipe = musepipe.MusePipe(galaxyname=galaxyname, pointing=pointing, 
+                    rc_filename=rcfile, cal_filename=calfile, outlog=None, 
+                    logfile=logfile, fakemode=fakemode, nocache=False)
+
+            self.pipelines.append(mypipe)
+            mypipe.run_all_recipes()
+
+    def combine(self):
+        pass

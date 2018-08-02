@@ -529,7 +529,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line='CentreMuse', window=6000.0, filter_list='white,Cousins_R', **kwargs):
+            line=None, filter_list='Cousins_R', **kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -537,11 +537,16 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo("OBJECT", "processed")
 
         # Getting the band corresponding to the line
+        window = kwargs.pop("window", 10.0)
         [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=self.vsystemic, window=window)
+
+        if line is not None: 
+            suffix = "_{0}".format(line)
+        else :
+            suffix = ""
 
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
-            suffix = "_{0}".format(line)
             self.run_scipost(sof_filename='scipost', expotype="OBJECT", 
                     tpl="ALL", list_expo=[iexpo], suffix=suffix, 
                     filter_list=filter_list,
@@ -687,7 +692,8 @@ class PipePrep(SofPipe) :
                     suffix_products.append("")
         return name_products, suffix_products
 
-    def run_align(self, sof_filename='exp_align', expotype="OBJECT", list_expo=None, stage="processed", line="CousinsR", tpl="ALL"):
+    def run_align(self, sof_filename='exp_align', expotype="OBJECT", 
+            list_expo=None, stage="processed", line=None, filter_name="Cousins_R", tpl="ALL"):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -707,6 +713,10 @@ class PipePrep(SofPipe) :
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
 
+        suffix = "_{0}".format(filter_name)
+        if line is not None:
+            suffix += "_{0}".format(line)
+
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
         for gtable in align_table.groups:
@@ -715,23 +725,23 @@ class PipePrep(SofPipe) :
             # Now starting with the standard recipe
             self._sofdict.clear()
             self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                'IMAGE_FOV_{0}_{1:04d}_{2}.fits'.format(line, iexpo, mytpl)) for iexpo in list_expo]
-            self.write_sof(sof_filename=sof_filename + "_{0}_{1}".format(line, mytpl), new=True)
+                'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_expo]
+            self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             name_align = dic_files_products['ALIGN']
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_expo:
                     name_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
-            self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix="_"+line)
+            self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix=suffix)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, align_table, "reduced", 
-                    "ALIGNED_IMAGES_{0}_{1}_{2}_list_table.fits".format(expotype, line, mytpl), aggregate=False)
+                    "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, suffix, mytpl), aggregate=False)
         
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
-    def adjust_alignment(self, name_ima_reference, list_expo=None, line="CousinsR"):
+    def adjust_alignment(self, name_ima_reference, list_expo=None, line=None, filter_name="CousinsR"):
         """Adjust the alignment using a background image
         """
         # Selecting the table with the right iexpo
@@ -742,8 +752,11 @@ class PipePrep(SofPipe) :
             return
             
         self.groupexpo = []
+        suffix = "_{0}".format(filter_name)
+        if line is not None:
+            suffix += "_{0}".format(line)
         for gtable in align_table.groups:
             mytpl, mymjd = self._get_tpl_meanmjd(gtable)
             list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                    'IMAGE_FOV_{0}_{1:04d}_{2}.fits'.format(line, iexpo, mytpl)) for iexpo in list_expo]
+                    'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_expo]
             self.groupexpo.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))

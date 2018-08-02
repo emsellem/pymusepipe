@@ -1,3 +1,5 @@
+full_muse_wavelength_range = [4000., 10000.]
+
 list_emission_lines = {
         "CaIIK":       [3933.663,   3934.777], 
         "CaII" :       [3968.468,   3969.591],
@@ -53,10 +55,8 @@ list_emission_lines = {
         "Pb" :         [12818.08,  12821.59],
         "Pa" :         [18751.01,  18756.13],
         "Brg" :	       [21655.29,  21661.20],
-        "CentreMuse":       [7000.00, 7000.00]
             }
 
-            
 def print_emission_lines() :
     """Printing the names of the various emission lines
     """
