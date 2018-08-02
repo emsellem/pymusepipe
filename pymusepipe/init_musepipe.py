@@ -262,7 +262,7 @@ class MusepipeTarget(object) :
 
         # Loop on the pointings
         self.pipelines = []
-        upipe.print_info("---- Starting the Data Reduction ----"
+        upipe.print_info("---- Starting the Data Reduction ----")
         self.history = []
         for pointing in list_pointings:
 
