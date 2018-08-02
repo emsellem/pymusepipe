@@ -271,11 +271,11 @@ class MusepipeTarget(object) :
             calfile = self._get_calfile_name(self.suffix_calfile, pointing)
             rcfile = self._get_rcfile_name(self.suffix_rcfile, pointing)
             
-            python_command = "mypipe = musepipe.MusePipe(galaxyname={0}, "
+            python_command = ("mypipe = musepipe.MusePipe(galaxyname={0}, "
                     "pointing={1}, rc_filename={2}, cal_filename={3}, "
                     "outlog=None, logfile={4}, fakemode={5}, "
                     "nocache=False)".format(galaxyname, pointing, rcfile, calfile, 
-                            logfile, fakemode)
+                            logfile, fakemode))
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
             upipe.print_info(python_command)
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
