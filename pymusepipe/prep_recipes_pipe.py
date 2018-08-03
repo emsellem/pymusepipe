@@ -71,6 +71,17 @@ def norm_listpath(paths) :
         newlist.append(upipe.normpath(mypath))
     return newlist
 
+import functools
+def print_my_function_name(f):
+    """Function to provide a print of the name of the function
+    Can be used as a decorator
+    """
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        upipe.print_info(f.__name__)
+        return f(*args, **kwargs)
+    return wrapped
+
 ###################################################################
 # Class for preparing the launch of recipes
 ###################################################################
@@ -111,14 +122,11 @@ class PipePrep(SofPipe) :
         else :
             return group_table.groups[group_table.groups.key['tpls'] == tpl]
         
+    @print_my_function_name
     def run_all_recipes(self, fraction=0.8):
         """Running all recipes in one shot
         """
         for recipe in self.list_recipes:
-#            module = "run_{0}".format(recipe)
-#            arguments = self.list_arguments[recipe]
-#            function_to_run = getattr(self, module)
-#            function_to_run(arguments)
             self.run_bias()
             self.run_flat()
             self.run_wave()
@@ -131,6 +139,7 @@ class PipePrep(SofPipe) :
             self.run_align()
             self.run_scipost()
 
+    @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL"):
         """Reducing the Bias files and creating a Master Bias
         Will run the esorex muse_bias command on all Biases
@@ -175,6 +184,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def run_flat(self, sof_filename='flat', tpl="ALL"):
         """Reducing the Flat files and creating a Master Flat
         Will run the esorex muse_flat command on all Flats
@@ -226,6 +236,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def run_wave(self, sof_filename='wave', tpl="ALL"):
         """Reducing the WAVE-CAL files and creating the Master Wave
         Will run the esorex muse_wave command on all Flats
@@ -274,6 +285,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def run_lsf(self, sof_filename='lsf', tpl="ALL"):
         """Reducing the LSF files and creating the LSF PROFILE
         Will run the esorex muse_lsf command on all Flats
@@ -322,6 +334,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def run_twilight(self, sof_filename='twilight', tpl="ALL"):
         """Reducing the  files and creating the TWILIGHT CUBE.
         Will run the esorex muse_twilight command on all TWILIGHT
@@ -370,6 +383,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def run_scibasic_all(self, list_object=['OBJECT', 'SKY', 'STD'], tpl="ALL"):
         """Running scibasic for all objects in list_object
         Making different sof for each category
@@ -378,6 +392,7 @@ class PipePrep(SofPipe) :
             sof_filename = 'scibasic_{0}'.format(expotype.lower())
             self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl)
 
+    @print_my_function_name
     def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL"):
         """Reducing the files of a certain category and creating the PIXTABLES
         Will run the esorex muse_scibasic 
@@ -437,6 +452,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def run_standard(self, sof_filename='standard', tpl="ALL"):
         """Reducing the STD files after they have been obtained
         Running the muse_standard routine
@@ -480,6 +496,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def run_sky(self, sof_filename='sky', tpl="ALL", fraction=0.8):
         """Reducing the SKY after they have been scibasic reduced
         Will run the esorex muse_create_sky routine
@@ -528,6 +545,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
             line=None, filter_list='Cousins_R', **kwargs):
         """Launch the scipost command to get individual exposures in a narrow
@@ -600,6 +618,7 @@ class PipePrep(SofPipe) :
 
         return found_expo, list_expo, expo_table
 
+    @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Scipost treatment of the objects
@@ -646,8 +665,8 @@ class PipePrep(SofPipe) :
             self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', "processed")
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
             if offset_list :
-                self._sofdict['OFFSET_LIST'] =joinpath(self._get_fullpath_expo(expotype, "processed"),
-                        '{0}_{1}.fits'.format(dic_files_products['ALIGN'][0], tpl))
+                self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                        '{0}_{1}.fits'.format(dic_files_products['ALIGN'][0], tpl))]
 
             # Selecting only exposures to be treated
             pixtable_name = self._get_suffix_product(expotype)
@@ -692,6 +711,7 @@ class PipePrep(SofPipe) :
                     suffix_products.append("")
         return name_products, suffix_products
 
+    @print_my_function_name
     def run_align(self, sof_filename='exp_align', expotype="OBJECT", 
             list_expo=None, stage="processed", line=None, filter_name="Cousins_R", tpl="ALL"):
         """Aligning the individual exposures from a dataset
@@ -741,6 +761,7 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
+    @print_my_function_name
     def adjust_alignment(self, name_ima_reference, list_expo=None, line=None, filter_name="CousinsR"):
         """Adjust the alignment using a background image
         """
