@@ -667,7 +667,7 @@ class PipePrep(SofPipe) :
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
             if offset_list :
                 self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                        '{0}_{1]_{2}.fits'.format(dic_files_products['ALIGN'][0], 
+                        '{0}_{1}_{2}.fits'.format(dic_files_products['ALIGN'][0], 
                             filter_for_alignment, tpl))]
 
             # Selecting only exposures to be treated
