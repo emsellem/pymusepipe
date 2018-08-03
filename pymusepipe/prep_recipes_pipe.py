@@ -645,6 +645,7 @@ class PipePrep(SofPipe) :
         save = kwargs.pop("save", "cube,skymodel")
         # Filters
         filter_list = kwargs.pop("filter_list", "white,Cousins_R")
+        filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
         offset_list = kwargs.pop("offset_list", "True")
 
         # Go to the data folder
@@ -666,7 +667,8 @@ class PipePrep(SofPipe) :
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
             if offset_list :
                 self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                        '{0}_{1}.fits'.format(dic_files_products['ALIGN'][0], tpl))]
+                        '{0}_{1]_{2}.fits'.format(dic_files_products['ALIGN'][0], 
+                            filter_for_alignment, tpl))]
 
             # Selecting only exposures to be treated
             pixtable_name = self._get_suffix_product(expotype)
@@ -678,14 +680,17 @@ class PipePrep(SofPipe) :
                 suffix, tpl), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            name_products, suffix_products, suffix_finalnames = self._get_scipost_products(save, list_expo, filter_list) 
+            name_products, suffix_products, suffix_finalnames = self._get_scipost_products(save, 
+                    list_expo, filter_list) 
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
-                    name_products, suffix_products, suffix_finalnames, lambdamin=lambdamin, lambdamax=lambdamax, 
-                    save=save, list_expo=list_expo, suffix=suffix, filter_list=filter_list, **kwargs)
+                    name_products, suffix_products, suffix_finalnames, 
+                    lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
+                    list_expo=list_expo, suffix=suffix, filter_list=filter_list, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, scipost_table, "reduced", 
-                    "IMAGES_FOV_{0}{1}_{2}_list_table.fits".format(expotype, suffix, tpl), aggregate=False)
+                    "IMAGES_FOV_{0}{1}_{2}_list_table.fits".format(expotype, 
+                        suffix, tpl), aggregate=False)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -756,7 +761,8 @@ class PipePrep(SofPipe) :
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, align_table, "reduced", 
-                    "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, suffix, mytpl), aggregate=False)
+                    "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, 
+                        suffix, mytpl), aggregate=False)
         
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
