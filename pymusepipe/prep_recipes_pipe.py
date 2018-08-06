@@ -13,6 +13,7 @@ import os
 from os.path import join as joinpath
 
 import copy
+from copy import deepcopy
 
 # Numpy
 import numpy as np
@@ -93,7 +94,7 @@ class PipePrep(SofPipe) :
         """
         SofPipe.__init__(self)
 #        super(PipePrep, self).__init__()
-        self.list_recipes = list_recipes
+        self.list_recipes = deepcopy(list_recipes)
 
     def _get_tpl_meanmjd(self, gtable):
         """Get tpl of the group and mean mjd of the group
@@ -374,7 +375,7 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Names and folder of final Master Wave
             dir_twilight = self._get_fullpath_expo('TWILIGHT', "master")
-            name_twilight = dic_files_products['TWILIGHT']
+            name_twilight = deepcopy(dic_files_products['TWILIGHT'])
             self.recipe_twilight(self.current_sof, dir_twilight, name_twilight, tpl)
 
         # Write the MASTER TWILIGHT Table and save it
@@ -486,7 +487,7 @@ class PipePrep(SofPipe) :
             self._sofdict['PIXTABLE_STD'] = [joinpath(self._get_fullpath_expo("STD", "processed"),
                 'PIXTABLE_STD_{0:04d}-{1:02d}.fits'.format(iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename=sof_filename + "_" + mytpl, new=True)
-            name_std = dic_files_products['STD']
+            name_std = deepcopy(dic_files_products['STD'])
             dir_std = self._get_fullpath_expo('STD', "master")
             self.recipe_std(self.current_sof, dir_std, name_std, mytpl)
 
@@ -536,7 +537,7 @@ class PipePrep(SofPipe) :
                 'PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(iexpo,j+1)) for j in range(24)]
             self.write_sof(sof_filename=sof_filename + "{0:02d}".format(iexpo) + "_" + mytpl, new=True)
             dir_sky = self._get_fullpath_expo('SKY', "processed")
-            name_sky = dic_files_products['SKY']
+            name_sky = deepcopy(dic_files_products['SKY'])
             self.recipe_sky(self.current_sof, dir_sky, name_sky, mytpl, iexpo, fraction)
 
         # Write the MASTER files Table and save it
@@ -753,12 +754,10 @@ class PipePrep(SofPipe) :
                 'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_expo]
             self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
-            name_align = dic_files_products['ALIGN']
+            name_align = deepcopy(dic_files_products['ALIGN'])
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_expo:
                     name_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
-            print("NAME_ALIGN is {0}".format(name_align))
-            print("LIST_EXPO is {0}".format(list_expo))
             self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix=suffix)
 
             # Write the MASTER files Table and save it
