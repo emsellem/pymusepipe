@@ -757,6 +757,7 @@ class PipePrep(SofPipe) :
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_expo:
                     name_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
+            print("NAME_ALIGN is {0}".format(name_align))
             self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix=suffix)
 
             # Write the MASTER files Table and save it
