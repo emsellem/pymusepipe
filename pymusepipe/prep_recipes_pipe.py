@@ -643,7 +643,7 @@ class PipePrep(SofPipe) :
         # Lambda min and max?
         [lambdamin, lambdamax] = lambdaminmax
         # Save options
-        save = kwargs.pop("save", "cube,skymodel")
+        save = kwargs.pop("save", "cube,skymodel,individual")
         # Filters
         filter_list = kwargs.pop("filter_list", "white,Cousins_R")
         filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
