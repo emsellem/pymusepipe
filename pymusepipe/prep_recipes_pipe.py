@@ -566,8 +566,8 @@ class PipePrep(SofPipe) :
 
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
-            self.run_scipost(sof_filename='scipost', expotype="OBJECT", 
-                    tpl="ALL", list_expo=[iexpo], suffix=suffix, 
+            self.run_scipost(sof_filename=sof_filename, expotype=expotype,
+                    tpl=tpl, list_expo=[iexpo], suffix=suffix, 
                     filter_list=filter_list,
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=False, **kwargs)
@@ -672,7 +672,9 @@ class PipePrep(SofPipe) :
                             filter_for_alignment, tpl))]
 
             # Selecting only exposures to be treated
-            pixtable_name = self._get_suffix_product(expotype)
+            # We need to force 'OBJECT' to make sure scipost will deal with the exposure
+            # even if it is e.g., a SKY
+            pixtable_name = self._get_suffix_product('OBJECT')
             self._sofdict[pixtable_name] = []
             for iexpo in list_expo:
                 self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
