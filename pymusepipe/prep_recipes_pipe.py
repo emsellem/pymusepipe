@@ -675,10 +675,11 @@ class PipePrep(SofPipe) :
             # We need to force 'OBJECT' to make sure scipost will deal with the exposure
             # even if it is e.g., a SKY
             pixtable_name = self._get_suffix_product('OBJECT')
+            pixtable_name_thisone = self._get_suffix_product(expotype)
             self._sofdict[pixtable_name] = []
             for iexpo in list_expo:
                 self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                    '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name, iexpo, j+1)) for j in range(24)]
+                    '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name_thisone, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
                 suffix, tpl), new=True)
             # products
