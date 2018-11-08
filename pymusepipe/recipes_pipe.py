@@ -66,7 +66,7 @@ class PipeRecipes(object) :
     @property
     def merge(self):
         if self._domerge: 
-            return "--merge=TRUE"
+            return "--merge"
         else : 
             return ""
 

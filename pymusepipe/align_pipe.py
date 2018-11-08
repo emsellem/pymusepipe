@@ -33,6 +33,7 @@ from astropy.table import Table
 try :
     import montage_wrapper as montage
 except ImportError :
+#    upipe.print_warning("Montage python wrapper - montage_wrapper - is required for the alignment module")
     raise Exception("montage_wrapper is required for this module")
 
 def is_sequence(arg):

@@ -141,7 +141,7 @@ class PipePrep(SofPipe) :
             self.run_scipost()
 
     @print_my_function_name
-    def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
+    def run_bias(self, sof_filename='bias', tpl="ALL"):
         """Reducing the Bias files and creating a Master Bias
         Will run the esorex muse_bias command on all Biases
 
@@ -180,13 +180,13 @@ class PipePrep(SofPipe) :
             self.recipe_bias(self.current_sof, dir_bias, name_bias, tpl)
 
         # Write the MASTER BIAS Table and save it
-        self.save_expo_table('BIAS', tpl_gtable, "master", update=update)
+        self.save_expo_table('BIAS', tpl_gtable, "master")
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def run_flat(self, sof_filename='flat', tpl="ALL", update=None):
+    def run_flat(self, sof_filename='flat', tpl="ALL"):
         """Reducing the Flat files and creating a Master Flat
         Will run the esorex muse_flat command on all Flats
 
@@ -231,14 +231,14 @@ class PipePrep(SofPipe) :
             self.recipe_flat(self.current_sof, dir_flat, name_flat, dir_trace, name_tracetable, tpl)
 
         # Write the MASTER FLAT Table and save it
-        self.save_expo_table('FLAT', tpl_gtable, "master", update=update)
-        self.save_expo_table('TRACE', tpl_gtable, "master", update=update)
+        self.save_expo_table('FLAT', tpl_gtable, "master")
+        self.save_expo_table('TRACE', tpl_gtable, "master")
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def run_wave(self, sof_filename='wave', tpl="ALL", update=None):
+    def run_wave(self, sof_filename='wave', tpl="ALL"):
         """Reducing the WAVE-CAL files and creating the Master Wave
         Will run the esorex muse_wave command on all Flats
 
@@ -281,13 +281,13 @@ class PipePrep(SofPipe) :
             self.recipe_wave(self.current_sof, dir_wave, name_wave, tpl)
 
         # Write the MASTER WAVE Table and save it
-        self.save_expo_table('WAVE', tpl_gtable, "master", update=update)
+        self.save_expo_table('WAVE', tpl_gtable, "master")
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def run_lsf(self, sof_filename='lsf', tpl="ALL", update=None):
+    def run_lsf(self, sof_filename='lsf', tpl="ALL"):
         """Reducing the LSF files and creating the LSF PROFILE
         Will run the esorex muse_lsf command on all Flats
 
@@ -330,7 +330,7 @@ class PipePrep(SofPipe) :
             self.recipe_lsf(self.current_sof, dir_lsf, name_lsf, tpl)
 
         # Write the MASTER LSF PROFILE Table and save it
-        self.save_expo_table('LSF', tpl_gtable, "master", update=update)
+        self.save_expo_table('LSF', tpl_gtable, "master")
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -498,7 +498,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def run_sky(self, sof_filename='sky', tpl="ALL", fraction=0.8, update=None):
+    def run_sky(self, sof_filename='sky', tpl="ALL", fraction=0.8):
         """Reducing the SKY after they have been scibasic reduced
         Will run the esorex muse_create_sky routine
 
@@ -541,7 +541,7 @@ class PipePrep(SofPipe) :
             self.recipe_sky(self.current_sof, dir_sky, name_sky, mytpl, iexpo, fraction)
 
         # Write the MASTER files Table and save it
-        self.save_expo_table("SKY", sky_table, "processed", aggregate=False, update=update)
+        self.save_expo_table("SKY", sky_table, "processed", aggregate=False, update=True)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -766,7 +766,7 @@ class PipePrep(SofPipe) :
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, align_table, "reduced", 
                     "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, 
-                        suffix, mytpl), aggregate=False, update=True)
+                        suffix, mytpl), aggregate=False)
         
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
