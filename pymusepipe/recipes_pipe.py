@@ -188,7 +188,7 @@ class PipeRecipes(object) :
 
         suffix_out = "{0}_{1}".format(suffix, tpl)
         for name_prod in name_products :
-            self.run_oscommand('{nocache} mv {prod} {newprod}_{tpl}'.format(nocache=self.nocache,
+            self.run_oscommand('{nocache} mv {prod} {newprod}'.format(nocache=self.nocache,
                 prod=self.joinprod("{0}_{1}".format(suffix, name_prod)), newprod=joinpath(dir_products, 
                     "{0}_{1}".format(suffix_out, name_prod))))
    
