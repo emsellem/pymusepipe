@@ -179,17 +179,19 @@ class PipeRecipes(object) :
             self.run_oscommand('{nocache} mv {name_prodin}.fits {name_prodout}_{iexpo:04d}_{tpl}.fits'.format(nocache=self.nocache,
                 name_prodin=self.joinprod(name_prod), name_prodout=joinpath(dir_sky, name_prod), iexpo=iexpo, tpl=tpl))
 
-    def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=[]):
+    def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=[], suffix=""):
         """Running the esorex muse_scibasic recipe
         """
         self.run_oscommand("{esorex} --log-file=scibasic_{expotype}_{tpl}.log muse_scibasic --nifu={nifu} "
                 "--saveimage=FALSE {merge} {sof}".format(esorex=self.esorex, 
                     nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl, expotype=expotype))
 
+        suffix_out = "{0}_{1}".format(suffix, tpl)
         for name_prod in name_products :
             # newprod = prod.replace("0001", tpl)
-            self.run_oscommand('{nocache} mv {prod} {newprod}'.format(nocache=self.nocache,
-                prod=self.joinprod(name_prod), newprod=joinpath(dir_products, name_prod)))
+            self.run_oscommand('{nocache} mv {prod} {newprod}_{tpl}'.format(nocache=self.nocache,
+                prod=self.joinprod("{0}_{1}".format(suffix, name_prod), newprod=joinpath(dir_products, 
+                    "{0}_{1}".format(suffix_out, name_prod))))
     
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
             suffix_products=[], suffix_finalnames=[], list_expo=[1], save='cube,skymodel', filter_list='white', skymethod='model',

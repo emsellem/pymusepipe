@@ -443,8 +443,8 @@ class PipePrep(SofPipe) :
             name_products = []
             list_expo = np.arange(Nexpo).astype(np.int) + 1
             for iexpo in list_expo:
-                name_products += ['{0}_{1}_{2:04d}-{3:02d}.fits'.format(suffix, tpl, iexpo, j+1) for j in range(24)]
-            self.recipe_scibasic(self.current_sof, tpl, expotype, dir_products, name_products)
+                name_products += ['{0:04d}-{1:02d}.fits'.format(iexpo, j+1) for j in range(24)]
+            self.recipe_scibasic(self.current_sof, tpl, expotype, dir_products, name_products, suffix)
 
             # Write the Processed files Table and save it
             gtable['iexpo'] = list_expo
