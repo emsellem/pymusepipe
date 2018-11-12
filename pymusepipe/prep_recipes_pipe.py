@@ -443,7 +443,7 @@ class PipePrep(SofPipe) :
             name_products = []
             list_expo = np.arange(Nexpo).astype(np.int) + 1
             for iexpo in list_expo:
-                name_products += ['{0}_{1:04d}-{2:02d}.fits'.format(suffix, iexpo, j+1) for j in range(24)]
+                name_products += ['{0}_{1}_{2:04d}-{3:02d}.fits'.format(suffix, tpl, iexpo, j+1) for j in range(24)]
             self.recipe_scibasic(self.current_sof, tpl, expotype, dir_products, name_products)
 
             # Write the Processed files Table and save it
@@ -485,7 +485,7 @@ class PipePrep(SofPipe) :
             self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
             self._add_calib_to_sofdict("STD_FLUX_TABLE")
             self._sofdict['PIXTABLE_STD'] = [joinpath(self._get_fullpath_expo("STD", "processed"),
-                'PIXTABLE_STD_{0:04d}-{1:02d}.fits'.format(iexpo, j+1)) for j in range(24)]
+                'PIXTABLE_STD_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename=sof_filename + "_" + mytpl, new=True)
             name_std = deepcopy(dic_files_products['STD'])
             dir_std = self._get_fullpath_expo('STD', "master")
@@ -534,7 +534,7 @@ class PipePrep(SofPipe) :
             self._add_skycalib_to_sofdict("STD_TELLURIC", mymjd, 'STD')
             self._add_tplmaster_to_sofdict(mymjd, 'LSF')
             self._sofdict['PIXTABLE_SKY'] = [joinpath(self._get_fullpath_expo("SKY", "processed"),
-                'PIXTABLE_SKY_{0:04d}-{1:02d}.fits'.format(iexpo,j+1)) for j in range(24)]
+                'PIXTABLE_SKY_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo,j+1)) for j in range(24)]
             self.write_sof(sof_filename=sof_filename + "{0:02d}".format(iexpo) + "_" + mytpl, new=True)
             dir_sky = self._get_fullpath_expo('SKY', "processed")
             name_sky = deepcopy(dic_files_products['SKY'])
@@ -679,7 +679,7 @@ class PipePrep(SofPipe) :
             self._sofdict[pixtable_name] = []
             for iexpo in list_expo:
                 self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                    '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name_thisone, iexpo, j+1)) for j in range(24)]
+                    '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
                 suffix, tpl), new=True)
             # products
