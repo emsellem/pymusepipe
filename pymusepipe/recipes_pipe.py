@@ -188,11 +188,10 @@ class PipeRecipes(object) :
 
         suffix_out = "{0}_{1}".format(suffix, tpl)
         for name_prod in name_products :
-            # newprod = prod.replace("0001", tpl)
             self.run_oscommand('{nocache} mv {prod} {newprod}_{tpl}'.format(nocache=self.nocache,
-                prod=self.joinprod("{0}_{1}".format(suffix, name_prod), newprod=joinpath(dir_products, 
+                prod=self.joinprod("{0}_{1}".format(suffix, name_prod)), newprod=joinpath(dir_products, 
                     "{0}_{1}".format(suffix_out, name_prod))))
-    
+   
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
             suffix_products=[], suffix_finalnames=[], list_expo=[1], save='cube,skymodel', filter_list='white', skymethod='model',
             pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE',
