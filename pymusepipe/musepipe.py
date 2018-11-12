@@ -509,7 +509,7 @@ class MusePipe(PipePrep, PipeRecipes):
                 try: 
                     stack_temptable = vstack([existing_table, table_to_save], join_type='exact')
                     upipe.print_warning("Updating the existing Astropy table {0}".format(fits_tablename))
-                    table_to_save = astropy.table.unique(stack_temptable, keep='first')
+                    table_to_save = apy.table.unique(stack_temptable, keep='first')
                 except TableMergeError:
                     upipe.print_warning("Astropy Table cannot be joined to the existing one")
                     return
