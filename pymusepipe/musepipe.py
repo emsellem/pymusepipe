@@ -45,7 +45,7 @@ except ImportError :
     raise Exception("astropy.io.ascii is required for this module")
 
 try :
-    from astropy.table import Table, setdiff, vstack
+    from astropy.table import Table, setdiff, vstack, TableMergeError
 except ImportError :
     raise Exception("astropy.table.Table is required for this module")
 
@@ -507,7 +507,7 @@ class MusePipe(PipePrep, PipeRecipes):
                 existing_table = Table.read(full_tablename, format="fits")
                 # first try to see if they are compatible by using vstack
                 try: 
-                    stack_temptable = vstack(existing_table, table_to_save, join_type='exact')
+                    stack_temptable = vstack([existing_table, table_to_save], join_type='exact')
                     upipe.print_warning("Updating the existing Astropy table {0}".format(fits_tablename))
                     table_to_save = astropy.table.unique(stack_temptable, keep='first')
                 except TableMergeError:
