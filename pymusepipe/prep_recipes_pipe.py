@@ -122,7 +122,7 @@ class PipePrep(SofPipe) :
         if tpl == "ALL":
             return group_table
         else :
-            return group_table.groups[group_table.groups.key['tpls'] == tpl]
+            return group_table.groups[group_table.groups.keys['tpls'] == tpl]
         
     @print_my_function_name
     def run_all_recipes(self, fraction=0.8):
@@ -560,7 +560,6 @@ class PipePrep(SofPipe) :
             print(object_table)
             iexpo = np.int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
-            print(iexpo, mytpl)
             if tpl != "ALL" and tpl != mytpl :
                 continue
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
