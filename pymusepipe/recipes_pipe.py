@@ -214,7 +214,7 @@ class PipeRecipes(object) :
                 suffix=suffix))
    
     def recipe_align(self, sof, dir_products, name_products, tpl, 
-            suffix="", threshold=10.0, scrmin=5, scrmax=80, fwhm=5.0):
+            suffix="", threshold=10.0, scrmin=3, scrmax=80, fwhm=5.0):
         """Running the muse_exp_align recipe
         """
         self.run_oscommand("{esorex} --log-file=exp_align_{tpl}.log muse_exp_align --srcmin={srcmin} "
