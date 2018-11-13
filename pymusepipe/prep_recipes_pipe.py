@@ -613,6 +613,9 @@ class PipePrep(SofPipe) :
         # Then we select those who exist in the table
         # And don't forget to group the table by tpls
         group_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)].group_by('tpls')
+        group_list_expo = []
+        for gtable in group_table:
+            group_list_expo.append(gtable['iexpo'].data)
 
         found_expo = True
         if len(group_table) == 0:
@@ -621,7 +624,7 @@ class PipePrep(SofPipe) :
                 upipe.print_warning("No {0} recovered from the {1} astropy file "
                     "Table - Aborting".format(expotype, stage))
 
-        return found_expo, list_expo, group_table
+        return found_expo, list_expo, group_list_expo, group_table
 
     @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
@@ -637,7 +640,7 @@ class PipePrep(SofPipe) :
         list_expo: list of integers providing the exposure numbers
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        found_expo, list_expo, group_list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
 
@@ -681,7 +684,8 @@ class PipePrep(SofPipe) :
             pixtable_name = self._get_suffix_product('OBJECT')
             pixtable_name_thisone = self._get_suffix_product(expotype)
             self._sofdict[pixtable_name] = []
-            for iexpo in list_expo:
+            list_group_expo = gtable['iexpo'].data
+            for iexpo in list_group_expo:
                 self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
                     '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
@@ -689,11 +693,11 @@ class PipePrep(SofPipe) :
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products, suffix_products, suffix_finalnames = self._get_scipost_products(save, 
-                    list_expo, filter_list) 
+                    list_group_expo, filter_list) 
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_finalnames, 
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
-                    list_expo=list_expo, suffix=suffix, filter_list=filter_list, **kwargs)
+                    list_expo=list_group_expo, suffix=suffix, filter_list=filter_list, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, scipost_table, "reduced", 
@@ -739,7 +743,7 @@ class PipePrep(SofPipe) :
 
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, align_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
         
@@ -757,13 +761,14 @@ class PipePrep(SofPipe) :
             mytpl, mymjd = self._get_tpl_meanmjd(gtable)
             # Now starting with the standard recipe
             self._sofdict.clear()
+            list_group_expo = gtable['iexpo'].data
             self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_expo]
+                'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_group_expo]
             self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             name_align = deepcopy(dic_files_products['ALIGN'])
             for iter_file in dic_files_iexpo_products['ALIGN']:
-                for iexpo in list_expo:
+                for iexpo in list_group_expo:
                     name_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
             self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix=suffix)
 
@@ -780,7 +785,7 @@ class PipePrep(SofPipe) :
         """Adjust the alignment using a background image
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, align_table = self._select_list_expo("OBJECT", "ALL", "processed", list_expo) 
+        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo("OBJECT", "ALL", "processed", list_expo) 
         if not found_expo:
             if self.verbose:
                 upipe.print_warning("No exposure recovered for the fine alignment")
@@ -792,6 +797,7 @@ class PipePrep(SofPipe) :
             suffix += "_{0}".format(line)
         for gtable in align_table.groups:
             mytpl, mymjd = self._get_tpl_meanmjd(gtable)
+            list_group_expo = gtable['iexpo'].data
             list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                    'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_expo]
+                    'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_group_expo]
             self.groupexpo.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
