@@ -142,11 +142,6 @@ class PipePrep(SofPipe) :
         self.run_scipost()
 
     @print_my_function_name
-    def run_autocal_sky(self):
-        self.run_scipost(expotype="SKY", skymethod="none", suffix="_AC", save="autocal", offset_list=False,
-                autocalib='deepfield')
-
-    @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
         """Reducing the Bias files and creating a Master Bias
         Will run the esorex muse_bias command on all Biases
