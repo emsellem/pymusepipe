@@ -608,16 +608,20 @@ class PipePrep(SofPipe) :
         # Selecting the table with the right iexpo
         if list_expo is None: 
             list_expo = tpl_table['iexpo'].data
-        expo_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)]
+        # First we isolate the unique values of iexpo from the table
+        list_expo = np.unique(list_expo)
+        # Then we select those who exist in the table
+        # And don't forget to group the table by tpls
+        group_table = tpl_table[np.isin(tpl_table['iexpo'], list_expo)].group_by('tpls')
 
         found_expo = True
-        if len(expo_table) == 0:
+        if len(group_table) == 0:
             found_expo = False
             if self.verbose :
                 upipe.print_warning("No {0} recovered from the {1} astropy file "
                     "Table - Aborting".format(expotype, stage))
 
-        return found_expo, list_expo, expo_table
+        return found_expo, list_expo, group_table
 
     @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
