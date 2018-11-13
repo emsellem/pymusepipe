@@ -562,7 +562,8 @@ class PipePrep(SofPipe) :
                 continue
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
                     tpl=mytpl, list_expo=[iexpo], save='autocal', 
-                    offset_list=False, suffix=suffix, autocalib='deepfield')
+                    offset_list=False, suffix=suffix, autocalib='deepfield', 
+                    **kwargs)
 
     @print_my_function_name
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
