@@ -714,7 +714,7 @@ class PipePrep(SofPipe) :
                 if old_naming_convention:
                    self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
                        '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name_thisone, iexpo, j+1)) for j in range(24)]
-               else:
+                else:
                    self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
                        '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
