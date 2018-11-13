@@ -119,8 +119,6 @@ class PipePrep(SofPipe) :
             return MUSE_subtable
 
         group_table = MUSE_subtable.group_by('tpls')
-        print(group_table)
-        print(tpl)
         if tpl == "ALL":
             return group_table
         else :
@@ -559,8 +557,10 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo(expotype, "processed")
 
         for i in range(len(object_table)):
+            print(object_table)
             iexpo = np.int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
+            print(iexpo, mytpl)
             if tpl != "ALL" and tpl != mytpl :
                 continue
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
