@@ -667,6 +667,7 @@ class PipePrep(SofPipe) :
         old_naming_convention = kwargs.pop("old_naming_convention", False)
 
         # Selecting the table with the right iexpo
+        print(list_expo, tpl, expotype)
         found_expo, list_expo, group_list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
