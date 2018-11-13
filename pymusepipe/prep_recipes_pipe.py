@@ -79,9 +79,9 @@ def print_my_function_name(f):
     Can be used as a decorator
     """
     @functools.wraps(f)
-    def wrapped(*args, **kwargs):
+    def wrapped(*myargs, **mykwargs):
         upipe.print_info(f.__name__)
-        return f(*args, **kwargs)
+        return f(*myargs, **mykwargs)
     return wrapped
 
 ###################################################################
