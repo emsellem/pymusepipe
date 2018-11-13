@@ -566,8 +566,11 @@ class PipePrep(SofPipe) :
 
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
+            mytpl = object_table['tpls'][i]
+            if tpl != "ALL" and tpl != mytpl :
+                continue
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
-                    tpl=tpl, list_expo=[iexpo], suffix=suffix, 
+                    tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
                     filter_list=filter_list,
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=False, **kwargs)
@@ -730,7 +733,8 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_align(self, sof_filename='exp_align', expotype="OBJECT", 
-            list_expo=None, stage="processed", line=None, filter_name="Cousins_R", tpl="ALL"):
+            list_expo=None, stage="processed", line=None, filter_name="Cousins_R", tpl="ALL",
+            **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -770,7 +774,7 @@ class PipePrep(SofPipe) :
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
                     name_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
-            self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix=suffix)
+            self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix=suffix, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, align_table, "reduced", 

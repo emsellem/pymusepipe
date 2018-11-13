@@ -214,12 +214,12 @@ class PipeRecipes(object) :
                 suffix=suffix))
    
     def recipe_align(self, sof, dir_products, name_products, tpl, 
-            suffix="", srcmin=3, srcmax=10):
+            suffix="", threshold=10.0, scrmin=5, scrmax=80, fwhm=5.0):
         """Running the muse_exp_align recipe
         """
         self.run_oscommand("{esorex} --log-file=exp_align_{tpl}.log muse_exp_align --srcmin={srcmin} "
-                "--srcmax={srcmax} {sof}".format(esorex=self.esorex, 
-                    srcmin=srcmin, srcmax=srcmax, sof=sof, tpl=tpl))
+                "--srcmax={srcmax} --threshold={threshold} --fwhm={fwhm} {sof}".format(esorex=self.esorex, 
+                    srcmin=srcmin, srcmax=srcmax, threshold=threshold, fwhm=fwhm, sof=sof, tpl=tpl))
     
         for name_prod in name_products :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
