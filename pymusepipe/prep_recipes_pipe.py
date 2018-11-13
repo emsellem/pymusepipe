@@ -697,7 +697,7 @@ class PipePrep(SofPipe) :
             self._add_calib_to_sofdict("SKY_LINES")
             self._add_calib_to_sofdict("FILTER_LIST")
             if autocalib == "user":
-                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY', "processed",
+                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY',
                         suffix=AC_suffix)
             self._add_astrometry_to_sofdict(tpl)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
