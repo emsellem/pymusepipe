@@ -548,7 +548,8 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def run_autocal_sky(self, sof_filename='scipost', expotype="SKY", suffix="_AC", tpl="ALL", **kwargs):
+    def run_autocal_sky(self, sof_filename='scipost', expotype="SKY", 
+            suffix="_AC", tpl="ALL", **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -563,11 +564,11 @@ class PipePrep(SofPipe) :
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
                     tpl=mytpl, list_expo=[iexpo], save='autocal', 
                     offset_list=False, suffix=suffix, autocalib='deepfield', 
-                    **kwargs)
+                    **extra_kwargs)
 
     @print_my_function_name
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line=None, filter_list='Cousins_R', **kwargs):
+            line=None, filter_list='Cousins_R', **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -575,7 +576,7 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo("OBJECT", "processed")
 
         # Getting the band corresponding to the line
-        window = kwargs.pop("window", 10.0)
+        window = extra_kwargs.pop("window", 10.0)
         [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=self.vsystemic, window=window)
 
         if line is not None: 
@@ -592,7 +593,7 @@ class PipePrep(SofPipe) :
                     tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
                     filter_list=filter_list,
                     lambdaminmax=[lmin, lmax], save='cube', 
-                    offset_list=False, **kwargs)
+                    offset_list=False, **extra_kwargs)
 
     def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list='white,Cousins_R'):
         """Provide a set of key output products depending on the save mode
