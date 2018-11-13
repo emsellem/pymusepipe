@@ -697,12 +697,13 @@ class PipePrep(SofPipe) :
             self._add_calib_to_sofdict("SKY_LINES")
             self._add_calib_to_sofdict("FILTER_LIST")
             if autocalib == "user":
-                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY',
-                        suffix=AC_suffix)
+                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY', 
+                        "processed", suffix=AC_suffix)
             self._add_astrometry_to_sofdict(tpl)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
-            self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', "processed")
+            self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', 
+                    "processed", perexpo=True)
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
             if offset_list :
                 self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),

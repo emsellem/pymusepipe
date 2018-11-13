@@ -110,7 +110,8 @@ class SofPipe(object) :
         self._sofdict[expotype] = [upipe.normpath(joinpath(self.paths.rawfiles, 
             expo_table['filename'][index]))]
 
-    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", suffix="", reset=False):
+    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", suffix="", 
+            perexpo=False, reset=False):
         """ Add item to dictionary for the sof writing
         """
         if reset: self._sofdict.clear()
@@ -118,7 +119,7 @@ class SofPipe(object) :
         expo_table = self._get_table_expo(expotype, stage)
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
         dir_calib = self._get_fullpath_expo(expotype, stage)
-        if stage == "processed": 
+        if perexpo:
             iexpo = expo_table[index]['iexpo']
             suffix += "_{0:04d}".format(iexpo)
         self._sofdict[tag] = [joinpath(dir_calib, "{0}{1}_{2}.fits".format(tag, suffix, this_tpl))]
