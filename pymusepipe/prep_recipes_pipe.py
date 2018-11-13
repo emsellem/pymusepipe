@@ -682,6 +682,7 @@ class PipePrep(SofPipe) :
         filter_list = kwargs.pop("filter_list", "white,Cousins_R")
         filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
         offset_list = kwargs.pop("offset_list", "True")
+        autocalib = kwargs.pop("autocalib", "none")
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -695,6 +696,8 @@ class PipePrep(SofPipe) :
             self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
             self._add_calib_to_sofdict("SKY_LINES")
             self._add_calib_to_sofdict("FILTER_LIST")
+            if autocalib == "user":
+                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY', "processed")
             self._add_astrometry_to_sofdict(tpl)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
@@ -728,7 +731,8 @@ class PipePrep(SofPipe) :
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_finalnames, 
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
-                    list_expo=list_group_expo, suffix=suffix, filter_list=filter_list, **kwargs)
+                    list_expo=list_group_expo, suffix=suffix, filter_list=filter_list, 
+                    autocalib=autocalib, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, scipost_table, "reduced", 
