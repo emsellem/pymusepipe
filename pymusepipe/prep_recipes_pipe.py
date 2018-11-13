@@ -549,7 +549,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_autocal_sky(self, sof_filename='scipost', expotype="SKY", 
-            suffix="_AC", tpl="ALL", **extra_kwargs):
+            AC_suffix="_AC", tpl="ALL", **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -563,7 +563,7 @@ class PipePrep(SofPipe) :
                 continue
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
                     tpl=mytpl, list_expo=[iexpo], save='autocal', 
-                    offset_list=False, suffix=suffix, autocalib='deepfield', 
+                    offset_list=False, suffix=AC_suffix, autocalib='deepfield', 
                     **extra_kwargs)
 
     @print_my_function_name
@@ -652,7 +652,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
-            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
+            lambdaminmax=[4000.,10000.], suffix="", AC_suffix="_AC", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
 
@@ -697,7 +697,8 @@ class PipePrep(SofPipe) :
             self._add_calib_to_sofdict("SKY_LINES")
             self._add_calib_to_sofdict("FILTER_LIST")
             if autocalib == "user":
-                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY', "processed")
+                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY', "processed",
+                        suffix=AC_suffix)
             self._add_astrometry_to_sofdict(tpl)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
