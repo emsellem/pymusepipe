@@ -51,7 +51,7 @@ dic_products_scipost = {
         'skymodel': ['SKY_MASK', 'SKY_SPECTRUM', 
             'SKY_LINES', 'SKY_IMAGE'],
         'raman': ['RAMAN_IMAGES'],
-        'autocalib': ['AUTOCAL_FACTORS']
+        'autocal': ['AUTOCAL_FACTORS']
         }
 # =======================================================
 # Few useful functions
