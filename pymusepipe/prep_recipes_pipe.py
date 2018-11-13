@@ -557,7 +557,6 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo(expotype, "processed")
 
         for i in range(len(object_table)):
-            print(object_table)
             iexpo = np.int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             if tpl != "ALL" and tpl != mytpl :
