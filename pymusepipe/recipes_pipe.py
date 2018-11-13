@@ -202,7 +202,7 @@ class PipeRecipes(object) :
                 "--astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darcheck={darcheck} --skymodel_frac={model:02f} "
-                "--lambdamin={lmin} --lambdamax={lmax} --autocalib={autocalib}"
+                "--lambdamin={lmin} --lambdamax={lmax} --autocalib={autocalib} "
                 "{sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
                     pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
                     darcheck=darcheck, model=skymodel_frac, lmin=lambdamin,
