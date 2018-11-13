@@ -105,6 +105,7 @@ class PipePrep(SofPipe) :
         return tpl, mean_mjd
 
     def select_tpl_files(self, expotype=None, tpl="ALL", stage="raw"):
+        print(expotype, tpl, stage)
         """Selecting a subset of files from a certain type
         """
         if expotype not in musepipe.listexpo_types.keys() :
@@ -667,7 +668,6 @@ class PipePrep(SofPipe) :
         old_naming_convention = kwargs.pop("old_naming_convention", False)
 
         # Selecting the table with the right iexpo
-        print(list_expo, tpl, expotype)
         found_expo, list_expo, group_list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
