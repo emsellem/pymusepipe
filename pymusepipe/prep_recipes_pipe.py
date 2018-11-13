@@ -143,7 +143,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_autocal_sky(self):
-        sel.run_scipost(expotype="SKY", skymethod="none", suffix="_AC", save="autocal", offset_list=False,
+        self.run_scipost(expotype="SKY", skymethod="none", suffix="_AC", save="autocal", offset_list=False,
                 autocalib='deepfield')
 
     @print_my_function_name
