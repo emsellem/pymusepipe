@@ -105,7 +105,6 @@ class PipePrep(SofPipe) :
         return tpl, mean_mjd
 
     def select_tpl_files(self, expotype=None, tpl="ALL", stage="raw"):
-        print(expotype, tpl, stage)
         """Selecting a subset of files from a certain type
         """
         if expotype not in musepipe.listexpo_types.keys() :
@@ -120,6 +119,8 @@ class PipePrep(SofPipe) :
             return MUSE_subtable
 
         group_table = MUSE_subtable.group_by('tpls')
+        print(group_table)
+        print(tpl)
         if tpl == "ALL":
             return group_table
         else :
