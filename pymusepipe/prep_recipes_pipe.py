@@ -553,6 +553,23 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
+    def run_autocal_sky(self, sof_filename='scipost', expotype="SKY", suffix="_AC", tpl="ALL", **kwargs):
+        """Launch the scipost command to get individual exposures in a narrow
+        band filter
+        """
+        # First selecting the files via the grouped table
+        object_table = self._get_table_expo(expotype, "processed")
+
+        for i in range(len(object_table)):
+            iexpo = np.int(object_table['iexpo'][i])
+            mytpl = object_table['tpls'][i]
+            if tpl != "ALL" and tpl != mytpl :
+                continue
+            self.run_scipost(sof_filename=sof_filename, expotype=expotype,
+                    tpl=mytpl, list_expo=[iexpo], save='autocal', 
+                    offset_list=False, suffix=suffix, autocalib='deepfield')
+
+    @print_my_function_name
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
             line=None, filter_list='Cousins_R', **kwargs):
         """Launch the scipost command to get individual exposures in a narrow
@@ -649,6 +666,9 @@ class PipePrep(SofPipe) :
         tpl: ALL by default or a special tpl time
         list_expo: list of integers providing the exposure numbers
         """
+        # Backward compatibility
+        old_naming_convention = kwargs.pop("old_naming_convention", False)
+
         # Selecting the table with the right iexpo
         found_expo, list_expo, group_list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
@@ -696,8 +716,12 @@ class PipePrep(SofPipe) :
             self._sofdict[pixtable_name] = []
             list_group_expo = gtable['iexpo'].data
             for iexpo in list_group_expo:
-                self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                    '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
+                if old_naming_convention:
+                   self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                       '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name_thisone, iexpo, j+1)) for j in range(24)]
+               else:
+                   self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                       '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
                 suffix, tpl), new=True)
             # products
