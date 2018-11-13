@@ -50,7 +50,8 @@ dic_products_scipost = {
         'combined': ['PIXTABLE_COMBINED'],
         'skymodel': ['SKY_MASK', 'SKY_SPECTRUM', 
             'SKY_LINES', 'SKY_IMAGE'],
-        'raman': ['RAMAN_IMAGES']
+        'raman': ['RAMAN_IMAGES'],
+        'autocalib': ['AUTOCAL_FACTORS']
         }
 # =======================================================
 # Few useful functions
@@ -127,18 +128,23 @@ class PipePrep(SofPipe) :
     def run_all_recipes(self, fraction=0.8):
         """Running all recipes in one shot
         """
-        for recipe in self.list_recipes:
-            self.run_bias()
-            self.run_flat()
-            self.run_wave()
-            self.run_lsf()
-            self.run_twilight()
-            self.run_scibasic_all()
-            self.run_standard()
-            self.run_sky(fraction=fraction)
-            self.run_prep_align()
-            self.run_align()
-            self.run_scipost()
+        #for recipe in self.list_recipes:
+        self.run_bias()
+        self.run_flat()
+        self.run_wave()
+        self.run_lsf()
+        self.run_twilight()
+        self.run_scibasic_all()
+        self.run_standard()
+        self.run_sky(fraction=fraction)
+        self.run_prep_align()
+        self.run_align()
+        self.run_scipost()
+
+    @print_my_function_name
+    def run_autocal_sky(self):
+        sel.run_scipost(expotype="SKY", skymethod="none", suffix="_AC", save="autocal", offset_list=False,
+                autocalib='deepfield')
 
     @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
@@ -590,7 +596,8 @@ class PipePrep(SofPipe) :
                         suffix_products.append("_{0:04d}".format(i))
                         suffix_finalnames.append("_{0}".format(value))
                         name_products.append(prod)
-                elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY']):
+
+                elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY', 'AUTOCAL']):
                     for i in range(len(list_expo)):
                         suffix_products.append("_{0:04d}".format(i+1))
                         suffix_finalnames.append("_{0:04d}".format(i+1))
