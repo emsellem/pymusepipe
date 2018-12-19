@@ -683,7 +683,7 @@ class PipePrep(SofPipe) :
         filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
         offset_list = kwargs.pop("offset_list", "True")
         autocalib = kwargs.pop("autocalib", "none")
-        rvcorr = kwarfs.pop("rvcorr", "bary")
+        rvcorr = kwargs.pop("rvcorr", "bary")
         if rvcorr != "bary":
             print_warning("Scipost will use '{0}' as barycentric "
                     "correction [Options are bary, helio, geo, none]".format(rvcorr))
