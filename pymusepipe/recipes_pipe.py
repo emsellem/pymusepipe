@@ -195,7 +195,7 @@ class PipeRecipes(object) :
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
             suffix_products=[], suffix_finalnames=[], list_expo=[1], save='cube,skymodel', filter_list='white', skymethod='model',
             pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE',
-            lambdamin=4000., lambdamax=10000., suffix="", autocalib='none'):
+            lambdamin=4000., lambdamax=10000., suffix="", autocalib='none', rvcorr='bary'):
         """Running the esorex muse_scipost recipe
         """
         self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
@@ -203,10 +203,11 @@ class PipeRecipes(object) :
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darcheck={darcheck} --skymodel_frac={model:02f} "
                 "--lambdamin={lmin} --lambdamax={lmax} --autocalib={autocalib} "
-                "{sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
+                "--rvcorr={rvcorr} {sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
                     pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
                     darcheck=darcheck, model=skymodel_frac, lmin=lambdamin,
-                    lmax=lambdamax, autocalib=autocalib, sof=sof, expotype=expotype, tpl=tpl))
+                    lmax=lambdamax, autocalib=autocalib, sof=sof, expotype=expotype, 
+                    tpl=tpl, rvcorr=rvcorr))
 
         for name_prod, suff_prod, suff_final in zip(name_products, suffix_products, suffix_finalnames) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,

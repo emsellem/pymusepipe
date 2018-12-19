@@ -652,7 +652,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
-            lambdaminmax=[4000.,10000.], suffix="", AC_suffix="_AC", **kwargs):
+            lambdaminmax=[4000.,10000.], suffix="", AC_suffix="_AC", rvcorr="bary", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
 
@@ -683,6 +683,10 @@ class PipePrep(SofPipe) :
         filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
         offset_list = kwargs.pop("offset_list", "True")
         autocalib = kwargs.pop("autocalib", "none")
+        rvcorr = kwarfs.pop("rvcorr", "bary")
+        if rvcorr != "bary":
+            print_warning("Scipost will use '{0}' as barycentric "
+                    "correction [Options are bary, helio, geo, none]".format(rvcorr))
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -734,7 +738,7 @@ class PipePrep(SofPipe) :
                     name_products, suffix_products, suffix_finalnames, 
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
                     list_expo=list_group_expo, suffix=suffix, filter_list=filter_list, 
-                    autocalib=autocalib, **kwargs)
+                    autocalib=autocalib, rvcorr=rvcorr, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, scipost_table, "reduced", 
