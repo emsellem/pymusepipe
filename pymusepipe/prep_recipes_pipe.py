@@ -652,7 +652,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
-            lambdaminmax=[4000.,10000.], suffix="", AC_suffix="_AC", rvcorr="bary", **kwargs):
+            lambdaminmax=[4000.,10000.], suffix="", AC_suffix="_AC", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
 
