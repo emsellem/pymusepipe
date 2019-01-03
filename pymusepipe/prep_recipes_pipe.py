@@ -685,7 +685,7 @@ class PipePrep(SofPipe) :
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
         if rvcorr != "bary":
-            print_warning("Scipost will use '{0}' as barycentric "
+            upipe.print_warning("Scipost will use '{0}' as barycentric "
                     "correction [Options are bary, helio, geo, none]".format(rvcorr))
 
         # Go to the data folder
