@@ -337,7 +337,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def run_twilight(self, sof_filename='twilight', tpl="ALL", update=None):
+    def run_twilight(self, sof_filename='twilight', tpl="ALL", update=None, illum=True):
         """Reducing the  files and creating the TWILIGHT CUBE.
         Will run the esorex muse_twilight command on all TWILIGHT
 
@@ -370,7 +370,8 @@ class PipePrep(SofPipe) :
             self._sofdict['SKYFLAT'] = add_listpath(self.paths.rawfiles,
                     list(gtable['filename']))
             # Finding the best tpl for BIAS, FLAT, ILLUM, TRACE, WAVE
-            self._add_tplraw_to_sofdict(mean_mjd, "ILLUM")
+            if illum:
+                self._add_tplraw_to_sofdict(mean_mjd, "ILLUM")
             self._add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 'TRACE', 'WAVE'])
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
@@ -395,7 +396,7 @@ class PipePrep(SofPipe) :
             self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl)
 
     @print_my_function_name
-    def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL"):
+    def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL", illum=True):
         """Reducing the files of a certain category and creating the PIXTABLES
         Will run the esorex muse_scibasic 
 
@@ -432,7 +433,8 @@ class PipePrep(SofPipe) :
             if self.verbose:
                 upipe.print_info("Number of expo is {Nexpo} for {expotype}".format(Nexpo=Nexpo, expotype=expotype))
             # Finding the best tpl for BIAS
-            self._add_tplraw_to_sofdict(mean_mjd, "ILLUM") 
+            if illum:
+                self._add_tplraw_to_sofdict(mean_mjd, "ILLUM") 
             self._add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 
                 'TRACE', 'WAVE', 'TWILIGHT'])
             # Writing the sof file
