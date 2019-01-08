@@ -577,5 +577,3 @@ class MusePipe(PipePrep, PipeRecipes):
 
     def _get_path_files(self, expotype) :
         return upipe.normpath(getattr(self.paths, expotype.lower()))
-
-
