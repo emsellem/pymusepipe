@@ -125,7 +125,7 @@ class PipePrep(SofPipe) :
             return group_table.groups[group_table.groups.keys['tpls'] == tpl]
         
     @print_my_function_name
-    def run_all_recipes(self, fraction=0.8):
+    def run_all_recipes(self, fraction=0.8, illum=True):
         """Running all recipes in one shot
         """
         #for recipe in self.list_recipes:
@@ -133,8 +133,8 @@ class PipePrep(SofPipe) :
         self.run_flat()
         self.run_wave()
         self.run_lsf()
-        self.run_twilight()
-        self.run_scibasic_all()
+        self.run_twilight(illum=illum)
+        self.run_scibasic_all(illum=illum)
         self.run_standard()
         self.run_sky(fraction=fraction)
         self.run_prep_align()
