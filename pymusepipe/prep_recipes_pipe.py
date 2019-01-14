@@ -581,10 +581,9 @@ class PipePrep(SofPipe) :
         window = extra_kwargs.pop("window", 10.0)
         [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=self.vsystemic, window=window)
 
+        suffix = extra_kwargs.pop("suffix", "")
         if line is not None: 
-            suffix = "_{0}".format(line)
-        else :
-            suffix = ""
+            suffix = "{0}_{1}".format(suffix, line)
 
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
