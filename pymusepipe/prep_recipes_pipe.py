@@ -686,10 +686,15 @@ class PipePrep(SofPipe) :
         offset_list = kwargs.pop("offset_list", "True")
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
-        suffix_skycontinuum = kwargs.pop("suffix_skycont", "")
+        default_suffix_skycontinuum = ""
+        suffix_skycontinuum = kwargs.pop("suffix_skycont", default_suffix_skycontinuum)
         if rvcorr != "bary":
             upipe.print_warning("Scipost will use '{0}' as barycentric "
                     "correction [Options are bary, helio, geo, none]".format(rvcorr))
+
+        if suffix_skycontinuum != default_suffix_skycontinuum:
+            upipe.print_warning("Scipost will use '{0}' as suffix for the SKY_CONTINUUM "
+                    "files".format(suffix_skycontinuum)
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
