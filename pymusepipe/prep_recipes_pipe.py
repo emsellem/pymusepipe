@@ -693,8 +693,8 @@ class PipePrep(SofPipe) :
                     "correction [Options are bary, helio, geo, none]".format(rvcorr))
 
         if suffix_skycontinuum != default_suffix_skycontinuum:
-            upipe.print_warning("Scipost will use '{0}' as suffix for the SKY_CONTINUUM "
-                    "files".format(suffix_skycontinuum)
+            upipe.print_warning("Scipost will use '{0}' as suffix "
+                    "for the SKY_CONTINUUM files".format(suffix_skycontinuum))
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
