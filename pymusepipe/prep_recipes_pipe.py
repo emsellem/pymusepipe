@@ -686,6 +686,7 @@ class PipePrep(SofPipe) :
         offset_list = kwargs.pop("offset_list", "True")
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
+        suffix_skycontinuum = kwargs.pop("suffix_skycont", "")
         if rvcorr != "bary":
             upipe.print_warning("Scipost will use '{0}' as barycentric "
                     "correction [Options are bary, helio, geo, none]".format(rvcorr))
@@ -709,7 +710,7 @@ class PipePrep(SofPipe) :
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', 
-                    "processed", perexpo=True)
+                    "processed", perexpo=True, suffix=suffix_skycontinuum)
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
             if offset_list :
                 self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
