@@ -29,12 +29,15 @@ from astropy.modeling import models, fitting
 from astropy.stats import mad_std
 from astropy.table import Table
 
+from mpdaf.obj import Image, WCS
+
+# This was the old way. No need of montage any more with mpdaf
 # Montage
-try :
-    import montage_wrapper as montage
-except ImportError :
-#    upipe.print_warning("Montage python wrapper - montage_wrapper - is required for the alignment module")
-    raise Exception("montage_wrapper is required for this module")
+# try :
+#     import montage_wrapper as montage
+# except ImportError :
+# #    upipe.print_warning("Montage python wrapper - montage_wrapper - is required for the alignment module")
+#     raise Exception("montage_wrapper is required for this module")
 
 def is_sequence(arg):
     return (not hasattr(arg, "strip") and
@@ -169,6 +172,9 @@ class AlignMusePointing(object):
         """
 
         # Some input variables for the cross-correlation
+
+# This is the old way, with montage = clumsy, slow and problematic
+#        self.use_montage = kwargs.pop("use_montage", True)
         self.verbose = kwargs.pop("verbose", True)
         self.plot = kwargs.pop("plot", True)
         self.border = border
@@ -372,7 +378,7 @@ class AlignMusePointing(object):
         self.nimages = len(self.list_muse_images)
 
     def open_hdu(self):
-        """OPen the HDU of the MUSE and reference images
+        """Open the HDU of the MUSE and reference images
         """
         self._open_ref_hdu()
         self._open_muse_nhdu()
@@ -414,7 +420,9 @@ class AlignMusePointing(object):
         # Projecting the reference image onto the MUSE field
         tmphdr = muse_hdu.header.totextfile(name_musehdr,
                                             overwrite=True)
-        proj_ref_hdu = self._project_reference_hdu(name_musehdr)
+# This was the old way with montage
+#        proj_ref_hdu = self._project_reference_hdu(muse_hdu, name_musehdr)
+        proj_ref_hdu = self._project_reference_hdu(muse_hdu)
 
         # Cleaning the images
         ima_ref = self._prepare_image(proj_ref_hdu.data)
@@ -506,11 +514,33 @@ class AlignMusePointing(object):
 
         return lperc, hperc
 
-    def _project_reference_hdu(self, name_hdr):
+    def _project_reference_hdu(self, muse_hdu=None):
         """Project the reference image onto the MUSE field
         """
-        return montage.reproject_hdu(self.reference_hdu,
-                     header=name_hdr, exact_size=True)
+#=================================================================
+# This is the old way with montage - removing it
+#         if self.use_montage:
+#             # This is the original way with montage
+#             # This sometimes involve an offset
+#             hdu_repr = montage.reproject_hdu(self.reference_hdu,
+#                      header=name_hdr, exact_size=True)
+#=================================================================
+        # The mpdaf way to project an image onto an other one
+        if muse_hdu is not None:
+            wcs_ref = WCS(hdr=self.reference_hdu.header)
+            ima_ref = Image(data=self.reference_hdu.data, wcs=wcs_ref)
+        
+            wcs_muse = WCS(hdr=muse_hdu.header)
+            ima_muse = Image(data=muse_hdu.data, wcs=wcs_muse)
+        
+            ima_ref = ima_ref.align_with_image(ima_muse, flux=True)
+            hdu_repr = ima_ref.get_data_hdu()
+        
+        else:
+            hdu_repr = None
+            print("Warning: please provide target HDU to allow reprojection")
+        
+        return hdu_repr
 
     def _add_user_arc_offset(self, extra_arcsec=[0., 0.], nima=0):
         """Add user offset in arcseconds
@@ -553,8 +583,9 @@ class AlignMusePointing(object):
         self.list_offmuse_hdu[nima] = pyfits.PrimaryHDU(self.list_muse_hdu[nima].data, header=newhdr)
 
         tmphdr = self.list_offmuse_hdu[nima].header.totextfile(self.list_name_offmusehdr[nima], overwrite=True)
-        self.list_proj_refhdu[nima] = self._project_reference_hdu(self.list_name_offmusehdr[nima])
-
+        self.list_proj_refhdu[nima] = self._project_reference_hdu(muse_hdu=self.list_offmuse_hdu[nima])
+# This was the old way with montage
+#                name_hdr=self.list_name_offmusehdr[nima])
 
     def compare(self, muse_hdu=None, ref_hdu=None, factor=1.0, 
             start_nfig=1, nlevels=7, levels=None, muse_smooth=1., 
@@ -563,6 +594,8 @@ class AlignMusePointing(object):
             normalise=True, median_filter=True, ncuts=5, showdiff=True,
             percentage=10.):
         """Plot the contours of the projected reference and MUSE image
+        It can also show the difference as an image, and cuts of the differences
+        if showcuts=True and showdiff=True (default).
         """
         # Getting the data
         if muse_hdu is None:

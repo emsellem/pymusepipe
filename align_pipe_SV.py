@@ -361,6 +361,7 @@ class AlignMusePointing(object):
             
     def _get_list_muse_images(self):
         # test if 1 or several images
+        
         if isinstance(self.name_muse_images, str):
             self.list_muse_images = [self.name_muse_images]
         elif isinstance(self.name_muse_images, list):
@@ -370,7 +371,7 @@ class AlignMusePointing(object):
                     "please check input name_muse_images")
             self.nimages = 0
             return
-
+        #print(self.list_muse_images)
         # Number of images to deal with
         self.nimages = len(self.list_muse_images)
 
@@ -526,7 +527,7 @@ class AlignMusePointing(object):
                 wcs_muse = WCS(hdr=muse_hdu.header)
                 ima_muse = Image(data=muse_hdu.data, wcs=wcs_muse)
         
-                ima_ref = ima_ref.align_with_image(ima_muse)
+                ima_ref = ima_ref.align_with_image(ima_muse, flux=True)
             
                 hdu_repr = ima_ref.get_data_hdu()
             
@@ -603,15 +604,17 @@ class AlignMusePointing(object):
         else:
             musedata = muse_hdu.data
             refdata = ref_hdu.data
-
+        
+        
         # If normalising, using the median ratio fit
         if normalise :
             polypar = get_image_norm_poly(musedata, refdata, chunk_size=15)
             if self.verbose:
                 upipe.print_info("Renormalising the MUSE data as NewMUSE = "
                         "{1:8.4f} * ({0:8.4f} + MUSE)".format(polypar.beta[0], polypar.beta[1]))
-
+            
             musedata = (polypar.beta[0] + musedata) * polypar.beta[1]
+            
             self.ima_polynorm[nima] = polypar.beta
 
         # Getting the range of relevant fluxes
