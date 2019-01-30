@@ -14,10 +14,14 @@ import os
 from os.path import join as joinpath
 import glob
 
-__version__ = '0.0.1 (15 March 2018)'
+__version__ = '0.0.2 (30 Jan 2019)'
+# v0.0.2: Added some import after moving MuseCube, MuseImage, etc
+# v0.0.1: initial
 
 from pymusepipe.graph_pipe import GraphMuse
 from pymusepipe.musepipe import MusePipe
+from pymusepipe.mpdaf_pipe import MuseCube, MuseSpectrum, MuseSetSpectra
+from pymusepipe.mpdaf_pipe import MuseImage, MuseSetImages
 
 name_final_datacube = "DATACUBE_FINAL.fits"
 PLOT = '\033[1;34;20m'

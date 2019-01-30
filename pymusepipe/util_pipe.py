@@ -133,20 +133,20 @@ def get_emissionline_wavelength(line="Ha", velocity=0., redshift=None, medium='a
     wavel = list_emission_lines[line][index_line[medium]]
     return doppler_shift(wavel, velocity)
 
-def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', window=10.0):
+def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', lambda_window=10.0):
     """Get the wavelengths of an emission line, including a correction
-    for the redshift (or velocity) and a window around that line (in Angstroems)
+    for the redshift (or velocity) and a lambda_window around that line (in Angstroems)
 
     Parameters
     ----------
     line: name of the line (string). Default is 'Ha'
     velocity: shift in velocity (km/s)
     medium: 'air' or 'vacuum'
-    window: window in Angstroem
+    lambda_window: lambda_window in Angstroem
     """
     red_wavel = get_emissionline_wavelength(line=line, velocity=velocity, redshift=redshift, medium=medium)
     # In case the line is not in the list, just return the full lambda Range
     if red_wavel < 0 :
         return full_muse_wavelength_range
     else:
-        return [red_wavel - window/2., red_wavel + window/2.]
+        return [red_wavel - lambda_window/2., red_wavel + lambda_window/2.]

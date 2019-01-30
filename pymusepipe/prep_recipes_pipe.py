@@ -140,6 +140,7 @@ class PipePrep(SofPipe) :
         self.run_prep_align()
         self.run_align()
         self.run_scipost()
+        self.run_scipost(expotype="SKY")
 
     @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
@@ -578,8 +579,8 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo("OBJECT", "processed")
 
         # Getting the band corresponding to the line
-        window = extra_kwargs.pop("window", 10.0)
-        [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=self.vsystemic, window=window)
+        lambda_window = extra_kwargs.pop("lambda_window", 10.0)
+        [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=self.vsystemic, lambda_window=lambda_window)
 
         suffix = extra_kwargs.pop("suffix", "")
         if line is not None: 
