@@ -84,8 +84,8 @@ class MuseCube(Cube):
         """
         if central_lambda == None : central_lambda = self.shape[0] // 2
         lambda_halfwindow = lambda_window // 2
-        return MuseImage(source=self[central_lambda - lambda_halfwindow: central_lambda \ 
-            + lambda_halfwindow + 1, :, :].sum(axis=0))
+        return MuseImage(source=self[central_lambda - lambda_halfwindow: 
+            central_lambda + lambda_halfwindow + 1, :, :].sum(axis=0))
 
     def get_set_spectra(self) :
         """Get a set of standard spectra from the Cube
