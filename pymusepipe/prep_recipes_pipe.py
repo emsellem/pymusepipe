@@ -934,9 +934,8 @@ class PipePrep(SofPipe) :
         name_products = []
         for prod in dic_products_scipost['cube']:
             if prod == "IMAGE_FOV":
-                for filt in filter_list:
+                for filt in filter_list.split(','):
                     name_products.append("{0}_{1}".format(prod, filt))
-
             else :
                 name_products.append(prod)
 
