@@ -629,14 +629,14 @@ class PipePrep(SofPipe) :
 
         return name_products, suffix_products, suffix_finalnames
 
-    def _select_list_expo(self, expotype, tpl, stage, list_expo=None):
+    def _select_list_expo(self, expotype, tpl, stage, list_expo=[]):
         """Select the expo numbers which exists for a certain expotype
         """
         # First selecting the files via the grouped table
         tpl_table = self.select_tpl_files(expotype=expotype, tpl=tpl, stage=stage)
 
         # Selecting the table with the right iexpo
-        if list_expo is None: 
+        if len(list_expo) == 0: 
             list_expo = tpl_table['iexpo'].data
         # First we isolate the unique values of iexpo from the table
         list_expo = np.unique(list_expo)
@@ -657,7 +657,7 @@ class PipePrep(SofPipe) :
         return found_expo, list_expo, group_list_expo, group_table
 
     @print_my_function_name
-    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
+    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=[], 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
@@ -925,7 +925,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
-            list_expo=None, stage="reduced", tpl="ALL", filter_name="Cousins_R", 
+            list_expo=[], stage="processed", tpl="ALL", filter_list="Cousins_R", 
             suffix="", **kwargs):
         """Produce a cube from all frames in the pointing
         list_expo or tpl specific arguments can still reduce the selection if needed
@@ -946,19 +946,23 @@ class PipePrep(SofPipe) :
         # Selecting only exposures to be treated
         # Producing the list of REDUCED PIXTABLES
         pixtable_name = self._get_suffix_product('OBJECT')
-        pixtable_name_thisone = self._get_suffix_product(expotype)
-        self._sofdict[pixtable_name] = []
+        pixtable_name_thisone = dic_products_scipost['individual']
         if old_naming_convention:
-           self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+           self._sofdict[pixtable_name] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
                '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name_thisone, row['iexpo'])) for row in combine_table]
         else:
-           self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+           self._sofdict[pixtable_name] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
                '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, row['tpls'], row['iexpo'])) for row in combine_table]
         self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
             suffix, tpl), new=True)
 
+        # Product names
+        dir_products = self._get_fullpath_expo(expotype, "processed")
+        name_products, suffix_products, suffix_finalnames = self._get_scipost_products('cube', 
+            list_expo, filter_list) 
         # Find the alignment - Note that tpl reflects the given selection
-        self.recipe_combine(self.current_sof, tpl, expotype, suffix=suffix, **kwargs)
+        self.recipe_combine(self.current_sof, dir_products, name_products, 
+                tpl, expotype, save='cube', suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, align_table, "reduced", 

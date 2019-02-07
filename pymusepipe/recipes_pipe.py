@@ -193,7 +193,8 @@ class PipeRecipes(object) :
                     "{0}_{1}".format(suffix_out, name_prod))))
    
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
-            suffix_products=[], suffix_finalnames=[], list_expo=[1], save='cube,skymodel', filter_list='white', skymethod='model',
+            suffix_products=[], suffix_finalnames=[], list_expo=[1], 
+            save='cube,skymodel', filter_list='white', skymethod='model',
             pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE',
             lambdamin=4000., lambdamax=10000., suffix="", autocalib='none', rvcorr='bary'):
         """Running the esorex muse_scipost recipe
@@ -210,9 +211,11 @@ class PipeRecipes(object) :
                     tpl=tpl, rvcorr=rvcorr))
 
         for name_prod, suff_prod, suff_final in zip(name_products, suffix_products, suffix_finalnames) :
-            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}_{tpl}{suff_final}{suffix}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod+suff_prod), name_imaout=joinpath(dir_products, name_prod), 
-                suff_final=suff_final, tpl=tpl, suffix=suffix))
+            self.run_oscommand("{nocache} mv {name_imain}.fits "
+                    "{name_imaout}_{tpl}{suff_final}{suffix}.fits".format(nocache=self.nocache,
+                    name_imain=self.joinprod(name_prod+suff_prod), 
+                    name_imaout=joinpath(dir_products, name_prod), 
+                    suff_final=suff_final, tpl=tpl, suffix=suffix))
    
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
@@ -227,14 +230,21 @@ class PipeRecipes(object) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(namein_prod), name_imaout=joinpath(dir_products, nameout_prod)))
 
-    def recipe_combine(self, sof, tpl, expotype, save='cube', pixfrac=0.6, 
-            format_out='Cube', filter_FOV='Cousins_R,white'):
+    def recipe_combine(self, sof, dir_products, name_products,
+            tpl, expotype, save='cube', pixfrac=0.6, 
+            format_out='Cube', filter_list='Cousins_R,white'):
         """Running the muse_exp_combine recipe
         """
         self.run_oscommand("{esorex}  --log-file=exp_combine_cube_{expotype}_{tpl}.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, save=save, 
-                   pixfrac=pixfrac, form=format_out, filt=filter_FOV, sof=sof, 
+                   pixfrac=pixfrac, form=format_out, filt=filter_list, sof=sof, 
                    tpl=tpl, expotype=expotype))
+
+        for name_prod in name_products:
+            self.run_oscommand("{nocache} mv {name_imain}.fits "
+                '{name_imaout}_{pointing}_{tpl}{suffix}.fits'.format(nocache=self.nocache,
+                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod),
+                suffix=suffix, tpl=tpl, pointing="P{0:2d}".format(self.pointing)))
 
 
