@@ -824,8 +824,8 @@ class PipePrep(SofPipe) :
             name_align = deepcopy(dic_files_products['ALIGN'])
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
-                    name_align.append('{0}_{1}_{2:04d}'.format(iter_file, mytpl, iexpo))
-            self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix=suffix, **kwargs)
+                    name_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, mytpl, iexpo))
+            self.recipe_align(self.current_sof, dir_align, name_align, mytpl, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, align_table, "reduced", 
@@ -873,10 +873,10 @@ class PipePrep(SofPipe) :
         name_align = deepcopy(dic_files_products['ALIGN'])
         for iter_file in dic_files_iexpo_products['ALIGN']:
             for row in align_table:
-                name_align.append('{0}_{1}_{2:04d}'.format(iter_file, row['tpls'], row['iexpo']))
+                name_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, row['tpls'], row['iexpo']))
 
         # Find the alignment - Note that tpl reflects the given selection
-        self.recipe_align(self.current_sof, dir_align, name_align, tpl, suffix=suffix, **kwargs)
+        self.recipe_align(self.current_sof, dir_align, name_align, tpl, **kwargs)
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, align_table, "reduced", 
