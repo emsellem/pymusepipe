@@ -949,10 +949,10 @@ class PipePrep(SofPipe) :
         pixtable_name_thisone = dic_products_scipost['individual']
         if old_naming_convention:
            self._sofdict[pixtable_name] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-               '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name_thisone, row['iexpo'])) for row in combine_table]
+               '{0}_{1:04d}.fits'.format(pixtable_name_thisone, row['iexpo'])) for row in combine_table]
         else:
            self._sofdict[pixtable_name] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-               '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, row['tpls'], row['iexpo'])) for row in combine_table]
+               '{0}_{1}_{2:04d}.fits'.format(pixtable_name_thisone, row['tpls'], row['iexpo'])) for row in combine_table]
         self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
             suffix, tpl), new=True)
 
