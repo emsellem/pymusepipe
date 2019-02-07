@@ -100,7 +100,9 @@ class PipePrep(SofPipe) :
     def _get_tpl_meanmjd(self, gtable):
         """Get tpl of the group and mean mjd of the group
         """
+        # This returns the first tpl of the group table
         tpl = gtable['tpls'][0]
+        # This returns the mean mjd, using aggregate
         mean_mjd = gtable.groups.aggregate(np.mean)['mjd'].data[0]
         return tpl, mean_mjd
 
@@ -586,11 +588,13 @@ class PipePrep(SofPipe) :
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
+        # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             if tpl != "ALL" and tpl != mytpl :
                 continue
+            # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
                     tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
                     filter_list=filter_list,
@@ -654,7 +658,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=None, 
-            lambdaminmax=[4000.,10000.], suffix="", AC_suffix="_AC", **kwargs):
+            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
 
@@ -686,6 +690,7 @@ class PipePrep(SofPipe) :
         offset_list = kwargs.pop("offset_list", "True")
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
+        AC_suffix = kwargs.pop("AC_suffix", "_AC")
         default_suffix_skycontinuum = ""
         suffix_skycontinuum = kwargs.pop("suffix_skycont", default_suffix_skycontinuum)
         if rvcorr != "bary":
@@ -778,9 +783,9 @@ class PipePrep(SofPipe) :
         return name_products, suffix_products
 
     @print_my_function_name
-    def run_align(self, sof_filename='exp_align', expotype="OBJECT", 
-            list_expo=None, stage="processed", line=None, filter_name="Cousins_R", tpl="ALL",
-            **kwargs):
+    def run_align_bygroup(self, sof_filename='exp_align', expotype="OBJECT", 
+            list_expo=None, stage="processed", line=None, 
+            filter_name="Cousins_R", tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -813,13 +818,13 @@ class PipePrep(SofPipe) :
             self._sofdict.clear()
             list_group_expo = gtable['iexpo'].data
             self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_group_expo]
+                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) for iexpo in list_group_expo]
             self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             name_align = deepcopy(dic_files_products['ALIGN'])
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
-                    name_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
+                    name_align.append('{0}_{1}_{2:04d}'.format(iter_file, mytpl, iexpo))
             self.recipe_align(self.current_sof, dir_align, name_align, mytpl, suffix=suffix, **kwargs)
 
             # Write the MASTER files Table and save it
@@ -829,9 +834,61 @@ class PipePrep(SofPipe) :
         
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
+        
+    @print_my_function_name
+    def run_align_bypointing(self, sof_filename='exp_align', expotype="OBJECT", 
+            list_expo=None, stage="processed", line=None, 
+            filter_name="Cousins_R", tpl="ALL", **kwargs):
+        """Aligning the individual exposures from a dataset
+        using the emission line region 
+        With the muse exp_align routine
+
+        Parameters
+        ----------
+        sof_filename: string (without the file extension)
+            Name of the SOF file which will contain the Bias frames
+        tpl: ALL by default or a special tpl time
+
+        """
+        # Selecting the table with the right iexpo
+        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        if not found_expo:
+            return
+        
+        # Go to the data folder
+        self.goto_folder(self.paths.data, logfile=True)
+
+        suffix = "_{0}".format(filter_name)
+        if line is not None:
+            suffix += "_{0}".format(line)
+
+        # Now creating the SOF file, first reseting it
+        self._sofdict.clear()
+        # Producing the list of IMAGES and add them to the SOF
+        self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
+            'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) for row in align_table]
+        # Write the SOF
+        self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}".format(suffix, expotype, tpl), new=True)
+        dir_align = self._get_fullpath_expo('OBJECT', "processed")
+        name_align = deepcopy(dic_files_products['ALIGN'])
+        for iter_file in dic_files_iexpo_products['ALIGN']:
+            for row in align_table:
+                name_align.append('{0}_{1}_{2:04d}'.format(iter_file, row['tpls'], row['iexpo']))
+
+        # Find the alignment - Note that tpl reflects the given selection
+        self.recipe_align(self.current_sof, dir_align, name_align, tpl, suffix=suffix, **kwargs)
+
+        # Write the MASTER files Table and save it
+        self.save_expo_table(expotype, align_table, "reduced", 
+                "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, 
+                suffix, tpl), aggregate=False, update=True)
+        
+        # Go back to original folder
+        self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def adjust_alignment(self, name_ima_reference, list_expo=None, line=None, filter_name="CousinsR"):
+    def adjust_alignment(self, name_ima_reference, list_expo=None, line=None, 
+            filter_name="Cousins_R", bygroup=False):
         """Adjust the alignment using a background image
         """
         # Selecting the table with the right iexpo
@@ -845,9 +902,59 @@ class PipePrep(SofPipe) :
         suffix = "_{0}".format(filter_name)
         if line is not None:
             suffix += "_{0}".format(line)
-        for gtable in align_table.groups:
-            mytpl, mymjd = self._get_tpl_meanmjd(gtable)
-            list_group_expo = gtable['iexpo'].data
+
+        if bygroup:
+            for gtable in align_table.groups:
+                mytpl, mymjd = self._get_tpl_meanmjd(gtable)
+                list_group_expo = gtable['iexpo'].data
+                list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
+                    'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) for iexpo in list_group_expo]
+                self.groupexpo.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
+        else:
             list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                    'IMAGE_FOV{0}_{1:04d}_{2}.fits'.format(suffix, iexpo, mytpl)) for iexpo in list_group_expo]
+                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) for row in align_table]
             self.groupexpo.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
+
+    @print_my_function_name
+    def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
+            list_expo=None, stage="reduced", tpl="ALL", filter_name="Cousins_R", 
+            suffix="", **kwargs):
+        """Produce a cube from all frames in the pointing
+        list_expo or tpl specific arguments can still reduce the selection if needed
+        """
+              # Selecting the table with the right iexpo
+        found_expo, list_expo, group_list_expo, combine_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        if not found_expo:
+            return
+        
+        # Go to the data folder
+        self.goto_folder(self.paths.data, logfile=True)
+
+        # Now creating the SOF file, first reseting it
+        self._sofdict.clear()
+        # Selecting only exposures to be treated
+        # Producing the list of REDUCED PIXTABLES
+        pixtable_name = self._get_suffix_product('OBJECT')
+        pixtable_name_thisone = self._get_suffix_product(expotype)
+        self._sofdict[pixtable_name] = []
+        if old_naming_convention:
+           self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+               '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name_thisone, row['iexpo'])) for row in combine_table]
+        else:
+           self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+               '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, row['tpls'], row['iexpo'])) for row in combine_table]
+        self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
+            suffix, tpl), new=True)
+
+        # Find the alignment - Note that tpl reflects the given selection
+        self.recipe_combine(self.current_sof, tpl, expotype, suffix=suffix, **kwargs)
+
+        # Write the MASTER files Table and save it
+        self.save_expo_table(expotype, align_table, "reduced", 
+                "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, 
+                suffix, tpl), aggregate=False, update=True)
+        
+        # Go back to original folder
+        self.goto_prevfolder(logfile=True)
+
+

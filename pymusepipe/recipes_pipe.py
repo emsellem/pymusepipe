@@ -210,9 +210,9 @@ class PipeRecipes(object) :
                     tpl=tpl, rvcorr=rvcorr))
 
         for name_prod, suff_prod, suff_final in zip(name_products, suffix_products, suffix_finalnames) :
-            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod+suff_prod), name_imaout=joinpath(dir_products, name_prod+suff_final), tpl=tpl,
-                suffix=suffix))
+            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}_{tpl}{suff_final}{suffix}.fits'.format(nocache=self.nocache,
+                name_imain=self.joinprod(name_prod+suff_prod), name_imaout=joinpath(dir_products, name_prod), 
+                suff_final=suff_final, tpl=tpl, suffix=suffix))
    
     def recipe_align(self, sof, dir_products, name_products, tpl, 
             suffix="", threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
@@ -223,15 +223,18 @@ class PipeRecipes(object) :
                     srcmin=srcmin, srcmax=srcmax, threshold=threshold, fwhm=fwhm, sof=sof, tpl=tpl))
     
         for name_prod in name_products :
-            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}{suffix}_{tpl}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod), tpl=tpl,
+            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}_{suffix}.fits'.format(nocache=self.nocache,
+                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod),
                 suffix=suffix))
 
-    def recipe_cube(self, sof, save='cube', pixfrac=0.8, format_out='Cube', filter_FOV='SDSS_g,SDSS_r,SDSS_i'):
+    def recipe_combine(self, sof, tpl, expotype, save='cube', pixfrac=0.6, 
+            format_out='Cube', filter_FOV='Cousins_R,white'):
         """Running the muse_exp_combine recipe
         """
-        self.run_oscommand("{esorex}  --log-file=exp_combine_cube.log muse_exp_combine--save={save} --pixfrac={pixfrac:0.2f} "
-        "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, save=save, 
-            pixfrac=pixfrac, form=format_out, filt=filter_FOV, sof=sof))
+        self.run_oscommand("{esorex}  --log-file=exp_combine_cube_{expotype}_{tpl}.log "
+               " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
+               "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, save=save, 
+                   pixfrac=pixfrac, form=format_out, filt=filter_FOV, sof=sof, 
+                   tpl=tpl, expotype=expotype))
 
 

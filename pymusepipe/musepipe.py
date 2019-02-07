@@ -96,6 +96,7 @@ dic_listMaster = {'DARK': 'MASTER_DARK',
 dic_listObject = {'OBJECT': 'PIXTABLE_OBJECT', 
         'SKY': 'PIXTABLE_SKY', 
         'STD': 'PIXTABLE_STD', 
+        'REDUCED': 'PIXTABLE_REDUCED'
         }
 
 listexpo_files = {
