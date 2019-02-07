@@ -927,6 +927,21 @@ class PipePrep(SofPipe) :
                 'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) for row in align_table]
             self.groupexpo.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
 
+    def _get_combine_products(self, filter_list='white,Cousins_R'):
+        """Provide a set of key output products depending on the filters
+        for combine
+        """
+        name_products = []
+        for prod in dic_products_scipost['cube']:
+            if prod == "IMAGE_FOV":
+                for filt in filter_list:
+                    name_products.append("{0}_{1}".format(prod, filt))
+
+            else :
+                name_products.append(prod)
+
+        return name_products
+
     @print_my_function_name
     def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
             list_expo=[], stage="processed", tpl="ALL", filter_list="Cousins_R", 
@@ -962,8 +977,7 @@ class PipePrep(SofPipe) :
 
         # Product names
         dir_products = self._get_fullpath_expo(expotype, "processed")
-        name_products, suffix_products, suffix_finalnames = self._get_scipost_products('cube', 
-            list_expo, filter_list) 
+        name_products = self._get_combine_products(filter_list) 
         # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, 
                 tpl, expotype, save='cube', suffix=suffix, filter_list=filter_list, **kwargs)
