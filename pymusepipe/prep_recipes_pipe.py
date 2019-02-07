@@ -873,7 +873,7 @@ class PipePrep(SofPipe) :
         self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}".format(suffix, expotype, tpl), new=True)
         dir_align = self._get_fullpath_expo('OBJECT', "processed")
         namein_align = deepcopy(dic_files_products['ALIGN'])
-        nameout_align = deepcopy(dic_files_products['ALIGN']) + "{0}_{1}".format(suffix, tpl)
+        nameout_align = [name + "{0}_{1}".format(suffix, tpl) for name in deepcopy(dic_files_products['ALIGN'])] 
         for iter_file in dic_files_iexpo_products['ALIGN']:
             for row in align_table:
                 namein_align.append('{0}_{1:04d}'.format(iter_file, row['iexpo']))
