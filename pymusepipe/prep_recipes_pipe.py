@@ -821,11 +821,13 @@ class PipePrep(SofPipe) :
                 'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) for iexpo in list_group_expo]
             self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
-            name_align = deepcopy(dic_files_products['ALIGN'])
+            namein_align = deepcopy(dic_files_products['ALIGN'])
+            nameout_align = deepcopy(dic_files_products['ALIGN']) + "{0}_{1}".format(suffix, mytpl)
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
-                    name_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, mytpl, iexpo))
-            self.recipe_align(self.current_sof, dir_align, name_align, mytpl, **kwargs)
+                    namein_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
+                    nameout_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, mytpl, iexpo))
+            self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, mytpl, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, align_table, "reduced", 
@@ -870,13 +872,15 @@ class PipePrep(SofPipe) :
         # Write the SOF
         self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}".format(suffix, expotype, tpl), new=True)
         dir_align = self._get_fullpath_expo('OBJECT', "processed")
-        name_align = deepcopy(dic_files_products['ALIGN'])
+        namein_align = deepcopy(dic_files_products['ALIGN'])
+        nameout_align = deepcopy(dic_files_products['ALIGN']) + "{0}_{1}".format(suffix, mytpl)
         for iter_file in dic_files_iexpo_products['ALIGN']:
             for row in align_table:
-                name_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, row['tpls'], row['iexpo']))
+                namein_align.append('{0}_{1:04d}'.format(iter_file, row['iexpo']))
+                nameout_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, row['tpls'], row['iexpo']))
 
         # Find the alignment - Note that tpl reflects the given selection
-        self.recipe_align(self.current_sof, dir_align, name_align, tpl, **kwargs)
+        self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, tpl, **kwargs)
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, align_table, "reduced", 

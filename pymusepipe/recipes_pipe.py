@@ -214,7 +214,7 @@ class PipeRecipes(object) :
                 name_imain=self.joinprod(name_prod+suff_prod), name_imaout=joinpath(dir_products, name_prod), 
                 suff_final=suff_final, tpl=tpl, suffix=suffix))
    
-    def recipe_align(self, sof, dir_products, name_products, tpl, 
+    def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, 
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
         """Running the muse_exp_align recipe
         """
@@ -222,9 +222,9 @@ class PipeRecipes(object) :
                 "--srcmax={srcmax} --threshold={threshold} --fwhm={fwhm} {sof}".format(esorex=self.esorex, 
                     srcmin=srcmin, srcmax=srcmax, threshold=threshold, fwhm=fwhm, sof=sof, tpl=tpl))
     
-        for name_prod in name_products :
+        for namein_prod, nameout_prod in zip(namein_products, nameout_products) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod)))
+                name_imain=self.joinprod(namein_prod), name_imaout=joinpath(dir_products, nameout_prod)))
 
     def recipe_combine(self, sof, tpl, expotype, save='cube', pixfrac=0.6, 
             format_out='Cube', filter_FOV='Cousins_R,white'):
