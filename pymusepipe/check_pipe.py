@@ -14,7 +14,8 @@ import os
 from os.path import join as joinpath
 import glob
 
-__version__ = '0.0.2 (30 Jan 2019)'
+__version__ = '0.0.3 (7 Feb 2019)'
+# v0.0.3: Debugged a bit the sequence
 # v0.0.2: Added some import after moving MuseCube, MuseImage, etc
 # v0.0.1: initial
 
@@ -46,8 +47,9 @@ class CheckPipe(MusePipe) :
         self.cube = MuseCube(filename=joinpath(self.paths.cubes, mycube))
         self.pdf = GraphMuse(pdf_name=joinpath(self.paths.figures, pdf_name))
 
+        # Input parameters useful to define a set of spectra and images
         suffix_skyspectra = kwargs.pop("suffix_skyspectra", "")
-        suffix_images = kwargs.pop("suffix_images", "")
+        suffix_images = kwargs.pop("suffix_images", None)
 
         if standard_set :
             # getting standard spectra
@@ -63,8 +65,8 @@ class CheckPipe(MusePipe) :
             # Page 3
             self.check_sky_spectra(suffix_skyspectra)
 
-            # Checking some images
-            if suffix_images != "":
+            # Checking some images only if suffix_images is provided
+            if suffix_images is not None:
                 self.check_given_images(suffix_images)
 
             # closing the pdf
@@ -109,10 +111,11 @@ class CheckPipe(MusePipe) :
         upipe.print_plot("Plotting the sky spectra")
         self.pdf.plot_page(tocheck)
 
-    def check_given_images(self, suffix="Ha") :
+    def check_given_images(self, suffix=None) :
         """Check all images with given suffix
         """
-        image_names = glob.glob(self.paths.maps + "./*suffix*.fits")
+        if suffix is None: suffix = ""
+        image_names = glob.glob(self.paths.maps + "./*{0}*.fits".format(suffix))
         tocheck = MuseSetImages(subtitle="Given Images - {0}".format(suffix))
         counter = 1
         for imaname in image_names :
