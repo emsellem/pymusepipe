@@ -218,9 +218,10 @@ class PipeRecipes(object) :
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
         """Running the muse_exp_align recipe
         """
-        self.run_oscommand("{esorex} --log-file=exp_align_{tpl}.log muse_exp_align --srcmin={srcmin} "
+        self.run_oscommand("{esorex} --log-file=exp_align_{group}_{tpl}.log muse_exp_align --srcmin={srcmin} "
                 "--srcmax={srcmax} --threshold={threshold} --fwhm={fwhm} {sof}".format(esorex=self.esorex, 
-                    srcmin=srcmin, srcmax=srcmax, threshold=threshold, fwhm=fwhm, sof=sof, tpl=tpl))
+                    srcmin=srcmin, srcmax=srcmax, threshold=threshold, fwhm=fwhm, sof=sof, tpl=tpl,
+                    group=group))
     
         for namein_prod, nameout_prod in zip(namein_products, nameout_products) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}.fits'.format(nocache=self.nocache,

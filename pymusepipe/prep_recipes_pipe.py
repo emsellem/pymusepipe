@@ -930,7 +930,10 @@ class PipePrep(SofPipe) :
         """Produce a cube from all frames in the pointing
         list_expo or tpl specific arguments can still reduce the selection if needed
         """
-              # Selecting the table with the right iexpo
+        # Backward compatibility
+        old_naming_convention = kwargs.pop("old_naming_convention", False)
+
+        # Selecting the table with the right iexpo
         found_expo, list_expo, group_list_expo, combine_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
