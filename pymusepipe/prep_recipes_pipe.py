@@ -971,5 +971,3 @@ class PipePrep(SofPipe) :
         
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
-
-
