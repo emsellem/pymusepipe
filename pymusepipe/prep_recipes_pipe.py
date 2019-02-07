@@ -960,14 +960,9 @@ class PipePrep(SofPipe) :
         dir_products = self._get_fullpath_expo(expotype, "processed")
         name_products, suffix_products, suffix_finalnames = self._get_scipost_products('cube', 
             list_expo, filter_list) 
-        # Find the alignment - Note that tpl reflects the given selection
+        # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, 
                 tpl, expotype, save='cube', suffix=suffix, filter_list=filter_list, **kwargs)
 
-        # Write the MASTER files Table and save it
-        self.save_expo_table(expotype, align_table, "reduced", 
-                "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, 
-                suffix, tpl), aggregate=False, update=True)
-        
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
