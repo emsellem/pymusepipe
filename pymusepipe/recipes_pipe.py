@@ -218,7 +218,7 @@ class PipeRecipes(object) :
                     suff_final=suff_final, tpl=tpl, suffix=suffix))
    
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
-            suffix="", threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
+            threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
         """Running the muse_exp_align recipe
         """
         self.run_oscommand("{esorex} --log-file=exp_align_{group}_{tpl}.log muse_exp_align --srcmin={srcmin} "
@@ -231,7 +231,7 @@ class PipeRecipes(object) :
                 name_imain=self.joinprod(namein_prod), name_imaout=joinpath(dir_products, nameout_prod)))
 
     def recipe_combine(self, sof, dir_products, name_products,
-            tpl, expotype, save='cube', pixfrac=0.6, 
+            tpl, expotype, save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='Cousins_R,white'):
         """Running the muse_exp_combine recipe
         """
