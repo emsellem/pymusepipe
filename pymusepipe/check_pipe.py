@@ -46,6 +46,9 @@ class CheckPipe(MusePipe) :
         self.cube = MuseCube(filename=joinpath(self.paths.cubes, mycube))
         self.pdf = GraphMuse(pdf_name=joinpath(self.paths.figures, pdf_name))
 
+        suffix_skyspectra = kwargs.pop("suffix_skyspectra", "")
+        suffix_images = kwargs.pop("suffix_images", "")
+
         if standard_set :
             # getting standard spectra
             self.cube.get_set_spectra()
@@ -55,12 +58,14 @@ class CheckPipe(MusePipe) :
             self.check_quadrants()
             # plotting the white image and Ha image
             # Page 2
-            self.check_white_Ha_image()
+            self.check_white_line_images()
             # plotting the sky spectra
             # Page 3
-            self.check_sky_spectra()
-            # Checking the Ha reconstructed images
-            self.check_Ha_images()
+            self.check_sky_spectra(suffix_skyspectra)
+
+            # Checking some images
+            if suffix_images != "":
+                self.check_given_images(suffix_images)
 
             # closing the pdf
             self.pdf.close()
@@ -80,7 +85,7 @@ class CheckPipe(MusePipe) :
         upipe.print_plot("Plotting the Master Bias and Flat")
         self.pdf.plot_page(tocheck)
 
-    def check_emissionline_image(self, line="Ha", velocity=0.) :
+    def check_white_line_images(self, line="Ha", velocity=0.) :
         """Building the White and Ha images and 
         Adding them on the page
         """
@@ -90,10 +95,10 @@ class CheckPipe(MusePipe) :
         upipe.print_plot("Plotting the White and {0} images".format(line))
         self.pdf.plot_page(tocheck)
 
-    def check_sky_spectra(self) :
+    def check_sky_spectra(self, suffix) :
         """Check all sky spectra from the exposures
         """
-        sky_spectra_names = glob.glob(self.paths.sky + "./SKY_SPECTRUM_????.fits")
+        sky_spectra_names = glob.glob(self.paths.sky + "./SKY_SPECTRUM_*{suffix}.fits".format(suffix))
         tocheck = MuseSetSpectra(subtitle="Sky Spectra")
         counter = 1
         for specname in sky_spectra_names :
@@ -104,16 +109,16 @@ class CheckPipe(MusePipe) :
         upipe.print_plot("Plotting the sky spectra")
         self.pdf.plot_page(tocheck)
 
-    def check_Ha_images(self) :
-        """Check all Ha images
+    def check_given_images(self, suffix="Ha") :
+        """Check all images with given suffix
         """
-        Ha_image_names = glob.glob(self.paths.maps + "./img_ha?.fits")
-        tocheck = MuseSetImages(subtitle="Ha Images")
+        image_names = glob.glob(self.paths.maps + "./*suffix*.fits")
+        tocheck = MuseSetImages(subtitle="Given Images - {0}".format(suffix))
         counter = 1
-        for imaname in Ha_image_names :
-            tocheck.append(MuseImage(filename=imaname, title="Ha {0:2d}".format(counter)))
+        for imaname in image_names :
+            tocheck.append(MuseImage(filename=imaname, title="Image {0:2d}".format(counter)))
             counter += 1
 
-        upipe.print_plot("Plotting the set of Ha images")
+        upipe.print_plot("Plotting the set of given images")
         self.pdf.plot_page(tocheck)
 
