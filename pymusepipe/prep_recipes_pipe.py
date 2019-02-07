@@ -127,7 +127,7 @@ class PipePrep(SofPipe) :
             return group_table.groups[group_table.groups.keys['tpls'] == tpl]
         
     @print_my_function_name
-    def run_all_recipes(self, fraction=0.8, illum=True):
+    def run_all_recipes(self, fraction=0.8, illum=True, bypointing=True):
         """Running all recipes in one shot
         """
         #for recipe in self.list_recipes:
@@ -140,9 +140,13 @@ class PipePrep(SofPipe) :
         self.run_standard()
         self.run_sky(fraction=fraction)
         self.run_prep_align()
-        self.run_align()
+        if bypointing:
+            self.run_align_bypointing()
+        else :
+            self.run_align_bygroup()
         self.run_scipost()
         self.run_scipost(expotype="SKY")
+        self.run_combine_pointing()
 
     @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
