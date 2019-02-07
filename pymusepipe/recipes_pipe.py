@@ -245,6 +245,6 @@ class PipeRecipes(object) :
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                 '{name_imaout}_{pointing}_{tpl}{suffix}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod),
-                suffix=suffix, tpl=tpl, pointing="P{0:2d}".format(self.pointing)))
+                suffix=suffix, tpl=tpl, pointing="P{0:02d}".format(self.pointing)))
 
 
