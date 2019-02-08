@@ -882,8 +882,8 @@ class PipePrep(SofPipe) :
         namein_align = deepcopy(dic_files_products['ALIGN'])
         nameout_align = [name + "{0}_{1}_{2}_{3}".format(suffix, expotype, pointing, tpl) for name in deepcopy(dic_files_products['ALIGN'])] 
         for iter_file in dic_files_iexpo_products['ALIGN']:
-            for row in align_table:
-                namein_align.append('{0}_{1:04d}'.format(iter_file, row['iexpo']))
+            for i, row in enumerate(align_table):
+                namein_align.append('{0}_{1:04d}'.format(iter_file, i+1))
                 nameout_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, row['tpls'], row['iexpo']))
 
         # Find the alignment - Note that Pointing is used and tpl reflects the given selection
