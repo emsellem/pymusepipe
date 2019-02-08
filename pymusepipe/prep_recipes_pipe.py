@@ -788,7 +788,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_align_bygroup(self, sof_filename='exp_align', expotype="OBJECT", 
-            list_expo=None, stage="processed", line=None, 
+            list_expo=[], stage="processed", line=None, 
             filter_name="Cousins_R", tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
@@ -843,7 +843,7 @@ class PipePrep(SofPipe) :
         
     @print_my_function_name
     def run_align_bypointing(self, sof_filename='exp_align', expotype="OBJECT", 
-            list_expo=None, stage="processed", line=None, 
+            list_expo=[], stage="processed", line=None, 
             filter_name="Cousins_R", tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
@@ -899,7 +899,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def adjust_alignment(self, name_ima_reference, list_expo=None, line=None, 
+    def adjust_alignment(self, name_ima_reference, list_expo=[], line=None, 
             filter_name="Cousins_R", bygroup=False):
         """Adjust the alignment using a background image
         """
