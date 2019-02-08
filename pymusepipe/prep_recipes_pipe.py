@@ -140,12 +140,10 @@ class PipePrep(SofPipe) :
         self.run_standard()
         self.run_sky(fraction=fraction)
         self.run_prep_align()
-        if bypointing:
-            self.run_align_bypointing()
-        else :
-            self.run_align_bygroup()
+        self.run_align_bypointing()
+        self.run_align_bygroup()
         self.run_scipost()
-        self.run_scipost(expotype="SKY")
+        self.run_scipost(expotype="SKY", offset_list=False)
         self.run_combine_pointing()
 
     @print_my_function_name
