@@ -766,7 +766,7 @@ class PipePrep(SofPipe) :
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_finalnames, 
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
-                    list_expo=list_group_expo, suffix=suffix, suffix_expo=suffix_expo,
+                    suffix=suffix, suffix_expo=suffix_expo,
                     filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
                     skymethod=skymethod, **kwargs)
 
