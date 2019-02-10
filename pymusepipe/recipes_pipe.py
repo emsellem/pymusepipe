@@ -212,10 +212,10 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_final in zip(name_products, suffix_products, suffix_finalnames) :
             self.run_oscommand("{nocache} mv {name_imain}.fits "
-                    "{name_imaout}{suffix}_{tpl}{suff_final}.fits".format(nocache=self.nocache,
-                    name_imain=self.joinprod(name_prod+suff_prod), 
+                    "{name_imaout}{suffix}_{tpl}{suff_prod}.fits".format(nocache=self.nocache,
+                    name_imain=self.joinprod(name_prod+suff_final), 
                     name_imaout=joinpath(dir_products, name_prod), 
-                    suff_final=suff_final, tpl=tpl, suffix=suffix))
+                    suff_prod=suff_prod, tpl=tpl, suffix=suffix))
    
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
