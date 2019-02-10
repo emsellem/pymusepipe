@@ -761,7 +761,7 @@ class PipePrep(SofPipe) :
                     name_products, suffix_products, suffix_finalnames, 
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
                     list_expo=list_group_expo, suffix=suffix, filter_list=filter_list, 
-                    autocalib=autocalib, rvcorr=rvcorr, **kwargs)
+                    autocalib=autocalib, rvcorr=rvcorr, skymethod=skymethod, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, scipost_table, "reduced", 
