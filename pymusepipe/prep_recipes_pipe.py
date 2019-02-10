@@ -978,19 +978,22 @@ class PipePrep(SofPipe) :
         # Producing the list of REDUCED PIXTABLES
         self._add_calib_to_sofdict("FILTER_LIST")
         pixtable_name = self._get_suffix_product('OBJECT')
-        self._sofdict[pixtable_name] = []
         pixtable_name_thisone = dic_products_scipost['individual']
+
         if offset_list :
-            name_offset = "{0}{1}_{2}_{3}_{4}.fits".format(dic_files_products['ALIGN'], 
+            name_offset = "{0}{1}_{2}_{3}_{4}.fits".format(dic_files_products['ALIGN'][0], 
                 suffix, expotype, pointing, tpl) 
             self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"), 
                 name_offset)]
-        if old_naming_convention:
-           self._sofdict[pixtable_name] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-               '{0}_{1:04d}.fits'.format(pixtable_name_thisone, row['iexpo'])) for row in combine_table]
-        else:
-           self._sofdict[pixtable_name] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-               '{0}_{1}_{2:04d}.fits'.format(pixtable_name_thisone, row['tpls'], row['iexpo'])) for row in combine_table]
+        self._sofdict[pixtable_name] = []
+        for prod in pixtable_name_thisone:
+            if old_naming_convention:
+               self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                   '{0}_{1:04d}.fits'.format(prod, row['iexpo'])) for row in combine_table]
+            else:
+               self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                   '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo'])) for row in
+                   combine_table]
         self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
             suffix, tpl), new=True)
 
