@@ -212,7 +212,7 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_final in zip(name_products, suffix_products, suffix_finalnames) :
             self.run_oscommand("{nocache} mv {name_imain}.fits "
-                    "{name_imaout}{suff_final}_{tpl}{suffix}.fits".format(nocache=self.nocache,
+                    "{name_imaout}{suffix}_{tpl}{suff_final}.fits".format(nocache=self.nocache,
                     name_imain=self.joinprod(name_prod+suff_prod), 
                     name_imaout=joinpath(dir_products, name_prod), 
                     suff_final=suff_final, tpl=tpl, suffix=suffix))
@@ -243,7 +243,7 @@ class PipeRecipes(object) :
 
         for name_prod in name_products:
             self.run_oscommand("{nocache} mv {name_imain}.fits "
-                '{name_imaout}_{pointing}_{tpl}{suffix}.fits'.format(nocache=self.nocache,
+                '{name_imaout}{suffix}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod),
                 suffix=suffix, tpl=tpl, pointing="P{0:02d}".format(self.pointing)))
 
