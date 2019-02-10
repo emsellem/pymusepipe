@@ -122,7 +122,7 @@ class SofPipe(object) :
         if perexpo:
             iexpo = expo_table[index]['iexpo']
             suffix += "_{0:04d}".format(iexpo)
-        self._sofdict[tag] = [joinpath(dir_calib, "{0}{1}_{2}.fits".format(tag, suffix, this_tpl))]
+        self._sofdict[tag] = [joinpath(dir_calib, "{0}_{1}{2}.fits".format(tag, this_tpl, suffix))]
 
     def _add_calib_to_sofdict(self, calibtype, reset=False):
         """Adding a calibration file for the SOF 

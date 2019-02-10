@@ -176,7 +176,7 @@ class PipeRecipes(object) :
                 sof=sof, fraction=fraction, tpl=tpl))
 
         for name_prod in name_sky:
-            self.run_oscommand('{nocache} mv {name_prodin}.fits {name_prodout}_{iexpo:04d}_{tpl}.fits'.format(nocache=self.nocache,
+            self.run_oscommand('{nocache} mv {name_prodin}.fits {name_prodout}_{tpl}_{iexpo:04d}.fits'.format(nocache=self.nocache,
                 name_prodin=self.joinprod(name_prod), name_prodout=joinpath(dir_sky, name_prod), iexpo=iexpo, tpl=tpl))
 
     def recipe_scibasic(self, sof, tpl, expotype, dir_products=None, name_products=[], suffix=""):
@@ -193,7 +193,7 @@ class PipeRecipes(object) :
                     "{0}_{1}".format(suffix_out, name_prod))))
    
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
-            suffix_products=[], suffix_finalnames=[], list_expo=[1], 
+            suffix_products=[], suffix_finalnames=[], suffix_expo="",
             save='cube,skymodel', filter_list='white', skymethod='model',
             pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE',
             lambdamin=4000., lambdamax=10000., suffix="", autocalib='none', rvcorr='bary'):
@@ -212,10 +212,11 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_final in zip(name_products, suffix_products, suffix_finalnames) :
             self.run_oscommand("{nocache} mv {name_imain}.fits "
-                    "{name_imaout}{suffix}_{tpl}{suff_prod}.fits".format(nocache=self.nocache,
-                    name_imain=self.joinprod(name_prod+suff_final), 
+                    "{name_imaout}{suffix}{suff_final}_{tpl}{suffix_expo}.fits".format(nocache=self.nocache,
+                    name_imain=self.joinprod(name_prod+suff_prod), 
                     name_imaout=joinpath(dir_products, name_prod), 
-                    suff_prod=suff_prod, tpl=tpl, suffix=suffix))
+                    suff_final=suff_final, tpl=tpl, suffix=suffix,
+                    suffix_expo=suffix_expo))
    
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):

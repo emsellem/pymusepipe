@@ -542,8 +542,8 @@ class PipePrep(SofPipe) :
             self._add_skycalib_to_sofdict("STD_TELLURIC", mymjd, 'STD')
             self._add_tplmaster_to_sofdict(mymjd, 'LSF')
             self._sofdict['PIXTABLE_SKY'] = [joinpath(self._get_fullpath_expo("SKY", "processed"),
-                'PIXTABLE_SKY_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo,j+1)) for j in range(24)]
-            self.write_sof(sof_filename=sof_filename + "{0:02d}".format(iexpo) + "_" + mytpl, new=True)
+                'PIXTABLE_SKY_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo, j+1)) for j in range(24)]
+            self.write_sof(sof_filename="{0}_{1}_{2:02d}".format(sof_filename, mytpl, iexpo), new=True)
             dir_sky = self._get_fullpath_expo('SKY', "processed")
             name_sky = deepcopy(dic_files_products['SKY'])
             self.recipe_sky(self.current_sof, dir_sky, name_sky, mytpl, iexpo, fraction)
@@ -614,7 +614,7 @@ class PipePrep(SofPipe) :
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 if prod == "IMAGE_FOV":
-                    for i, value in enumerate(filter_list.split(','), 1):
+                    for i, value in enumerate(filter_list.split(','), start=1):
                         suffix_products.append("_{0:04d}".format(i))
                         suffix_finalnames.append("_{0}".format(value))
                         name_products.append(prod)
@@ -679,8 +679,14 @@ class PipePrep(SofPipe) :
         if not found_expo:
             return
 
+        # Add the number of the exposure if single
+        # This is used to make sure we have individual IMAGES and CUBES
         if len(list_expo) == 1: 
-            suffix += "_{0:04d}".format(list_expo[0])
+            suffix_expo = "_{0:04d}".format(list_expo[0])
+        else :
+            # In case there are several images, the merged one should
+            # not have any number associated to it
+            suffix_expo = ""
         
         # Lambda min and max?
         [lambdamin, lambdamax] = lambdaminmax
@@ -760,13 +766,14 @@ class PipePrep(SofPipe) :
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_finalnames, 
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
-                    list_expo=list_group_expo, suffix=suffix, filter_list=filter_list, 
-                    autocalib=autocalib, rvcorr=rvcorr, skymethod=skymethod, **kwargs)
+                    list_expo=list_group_expo, suffix=suffix, suffix_expo=suffix_expo,
+                    filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
+                    skymethod=skymethod, **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, scipost_table, "reduced", 
                     "IMAGES_FOV_{0}{1}_{2}_list_table.fits".format(expotype, 
-                        suffix, tpl), aggregate=False, update=True)
+                        suffix_expo, tpl), aggregate=False, update=True)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
