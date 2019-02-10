@@ -965,12 +965,26 @@ class PipePrep(SofPipe) :
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
 
+        # Setting the default option of offset_list
+        offset_list = kwargs.pop("offset_list", "True")
+        # Setting the default alignment filter
+        filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
+        # Use the pointing as a suffix for the names
+        pointing = "P{0:02d}".format(self.pointing)
+
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
         # Selecting only exposures to be treated
         # Producing the list of REDUCED PIXTABLES
+        self._add_calib_to_sofdict("FILTER_LIST")
         pixtable_name = self._get_suffix_product('OBJECT')
+        self._sofdict[pixtable_name] = []
         pixtable_name_thisone = dic_products_scipost['individual']
+        if offset_list :
+            name_offset = "{0}{1}_{2}_{3}_{4}.fits".format(dic_files_products['ALIGN'], 
+                suffix, expotype, pointing, tpl) 
+            self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"), 
+                name_offset)]
         if old_naming_convention:
            self._sofdict[pixtable_name] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
                '{0}_{1:04d}.fits'.format(pixtable_name_thisone, row['iexpo'])) for row in combine_table]
@@ -983,6 +997,7 @@ class PipePrep(SofPipe) :
         # Product names
         dir_products = self._get_fullpath_expo(expotype, "processed")
         name_products = self._get_combine_products(filter_list) 
+
         # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, 
                 tpl, expotype, save='cube', suffix=suffix, filter_list=filter_list, **kwargs)
