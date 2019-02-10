@@ -193,7 +193,7 @@ class PipeRecipes(object) :
                     "{0}_{1}".format(suffix_out, name_prod))))
    
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
-            suffix_products=[], suffix_finalnames=[], suffix_expo="",
+            suffix_products=[], suffix_prefinalnames=[], suffix_postfinalnames=[], 
             save='cube,skymodel', filter_list='white', skymethod='model',
             pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE',
             lambdamin=4000., lambdamax=10000., suffix="", autocalib='none', rvcorr='bary'):
@@ -210,13 +210,14 @@ class PipeRecipes(object) :
                     lmax=lambdamax, autocalib=autocalib, sof=sof, expotype=expotype, 
                     tpl=tpl, rvcorr=rvcorr))
 
-        for name_prod, suff_prod, suff_final in zip(name_products, suffix_products, suffix_finalnames) :
+        for name_prod, suff_prod, suff_pre, suff_post in zip(name_products, suffix_products, 
+                suffix_prefinalnames, suffix_postfinalnames) :
             self.run_oscommand("{nocache} mv {name_imain}.fits "
-                    "{name_imaout}{suffix}{suff_final}_{tpl}{suffix_expo}.fits".format(nocache=self.nocache,
+                    "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(nocache=self.nocache,
                     name_imain=self.joinprod(name_prod+suff_prod), 
                     name_imaout=joinpath(dir_products, name_prod), 
-                    suff_final=suff_final, tpl=tpl, suffix=suffix,
-                    suffix_expo=suffix_expo))
+                    suff_pre=suff_pre, suff_post=suff_post, 
+                    tpl=tpl, suffix=suffix))
    
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):

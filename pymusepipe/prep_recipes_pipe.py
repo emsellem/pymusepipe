@@ -609,27 +609,34 @@ class PipePrep(SofPipe) :
         """
         name_products = []
         suffix_products = []
-        suffix_finalnames = []
+        suffix_prefinalnames = []
+        suffix_postfinalnames = []
         list_options = save.split(',')
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 if prod == "IMAGE_FOV":
                     for i, value in enumerate(filter_list.split(','), start=1):
                         suffix_products.append("_{0:04d}".format(i))
-                        suffix_finalnames.append("_{0}".format(value))
+                        suffix_prefinalnames.append("_{0}".format(value))
+                        if len(list_expo) == 1 :
+                            suffix_postfinalnames.append("_{0:04d}".format(list_expo[0]))
+                        else :
+                            suffix_postfinalnames.append("")
                         name_products.append(prod)
 
                 elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY', 'AUTOCAL']):
                     for i in range(len(list_expo)):
                         suffix_products.append("_{0:04d}".format(i+1))
-                        suffix_finalnames.append("_{0:04d}".format(i+1))
+                        suffix_prefinalnames.append("")
+                        suffix_postfinalnames.append("_{0:04d}".format(i+1))
                         name_products.append(prod)
                 else :
                     name_products.append(prod)
                     suffix_products.append("")
-                    suffix_finalnames.append("")
+                    suffix_postfinalnames.append("")
+                    suffix_prefinalnames.append("")
 
-        return name_products, suffix_products, suffix_finalnames
+        return name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames
 
     def _select_list_expo(self, expotype, tpl, stage, list_expo=[]):
         """Select the expo numbers which exists for a certain expotype
@@ -679,15 +686,6 @@ class PipePrep(SofPipe) :
         if not found_expo:
             return
 
-        # Add the number of the exposure if single
-        # This is used to make sure we have individual IMAGES and CUBES
-        if len(list_expo) == 1: 
-            suffix_expo = "_{0:04d}".format(list_expo[0])
-        else :
-            # In case there are several images, the merged one should
-            # not have any number associated to it
-            suffix_expo = ""
-        
         # Lambda min and max?
         [lambdamin, lambdamax] = lambdaminmax
         # Skymethod
@@ -761,19 +759,21 @@ class PipePrep(SofPipe) :
                 suffix, tpl), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            name_products, suffix_products, suffix_finalnames = self._get_scipost_products(save, 
-                    list_group_expo, filter_list) 
+            name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames = \
+                self._get_scipost_products(save, list_group_expo, filter_list) 
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
-                    name_products, suffix_products, suffix_finalnames, 
+                    name_products, suffix_products, suffix_prefinalnames, 
+                    suffix_postfinalnames, suffix=suffix,
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
-                    suffix=suffix, suffix_expo=suffix_expo,
                     filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
                     skymethod=skymethod, **kwargs)
 
             # Write the MASTER files Table and save it
+            if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])
+            else: suffix_expo = ""
             self.save_expo_table(expotype, scipost_table, "reduced", 
-                    "IMAGES_FOV_{0}{1}_{2}_list_table.fits".format(expotype, 
-                        suffix_expo, tpl), aggregate=False, update=True)
+                    "IMAGES_FOV_{0}_{1}{2}_list_table.fits".format(expotype, 
+                        suffix_expo, tpl, suffix_expo), aggregate=False, update=True)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
