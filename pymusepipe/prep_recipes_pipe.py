@@ -37,7 +37,7 @@ dic_files_products = {
         'STD': ['DATACUBE_STD', 'STD_FLUXES', 
             'STD_RESPONSE', 'STD_TELLURIC'],
         'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
-        'SKY': ['SKY_MASK', 'IMAGE_FOV', 'SKY_LINES', 'SKY_SPECTRUM', 
+        'SKY': ['SKY_MASK', 'SKY_IMAGE', 'SKY_LINES', 'SKY_SPECTRUM', 
             'SKY_CONTINUUM'],
         'ALIGN': ['OFFSET_LIST']
         }
