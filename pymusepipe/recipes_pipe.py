@@ -249,7 +249,7 @@ class PipeRecipes(object) :
                 '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(name_prod+suff_prod), 
                 name_imaout=joinpath(dir_products, name_prod),
-                suffix_pre=suffix_pre, suffix=suffix, 
+                suff_pre=suff_pre, suffix=suffix, 
                 tpl=tpl, pointing="P{0:02d}".format(self.pointing)))
 
 
