@@ -232,7 +232,7 @@ class PipeRecipes(object) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(namein_prod), name_imaout=joinpath(dir_products, nameout_prod)))
 
-    def recipe_combine(self, sof, dir_products, name_prod, tpl, expotype,
+    def recipe_combine(self, sof, dir_products, name_products, tpl, expotype,
             suffix_products=[""], suffix_prefinalnames=[""], 
             save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='Cousins_R,white'):
@@ -244,7 +244,7 @@ class PipeRecipes(object) :
                    pixfrac=pixfrac, form=format_out, filt=filter_list, sof=sof, 
                    tpl=tpl, expotype=expotype))
 
-        for suff_prod, suff_pre in zip(suffix_products, suffix_prefinalnames):
+        for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, suffix_prefinalnames):
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                 '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(name_prod+suff_prod), 
