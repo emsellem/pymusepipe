@@ -988,8 +988,8 @@ class PipePrep(SofPipe) :
         pixtable_name_thisone = dic_products_scipost['individual']
 
         if offset_list :
-            name_offset = "{0}{1}_{2}_{3}_{4}.fits".format(dic_files_products['ALIGN'][0], 
-                suffix, expotype, pointing, tpl) 
+            name_offset = "{0}{1}_{2}_{3}_{4}_{5}.fits".format(dic_files_products['ALIGN'][0], 
+                suffix, filter_for_alignment, expotype, pointing, tpl) 
             self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"), 
                 name_offset)]
         self._sofdict[pixtable_name] = []
