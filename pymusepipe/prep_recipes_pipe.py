@@ -1012,12 +1012,12 @@ class PipePrep(SofPipe) :
 
         # Product names
         dir_products = self._get_fullpath_expo(expotype, "processed")
-        name_products, suff_products, suff_prefinalnames = self._get_combine_products(filter_list) 
+        name_products, suffix_products, suffix_prefinalnames = self._get_combine_products(filter_list) 
 
         # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, 
-                tpl, expotype, suff_products=suff_products,
-                suff_prefinalnames=suff_prefinalnames,
+                tpl, expotype, suffix_products=suffix_products,
+                suffix_prefinalnames=suffix_prefinalnames,
                 save='cube', suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
