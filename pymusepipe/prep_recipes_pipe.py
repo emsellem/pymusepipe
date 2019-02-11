@@ -945,14 +945,20 @@ class PipePrep(SofPipe) :
         for combine
         """
         name_products = []
+        suffix_products = []
+        suffix_prefinalnames = []
         for prod in dic_products_scipost['cube']:
             if prod == "IMAGE_FOV":
-                for filt in filter_list.split(','):
-                    name_products.append("{0}_{1}".format(prod, filt))
+                for i, value in enumerate(filter_list.split(','), start=1):
+                    suffix_products.append("_{0:04d}".format(i))
+                    suffix_prefinalnames.append("_{0}".format(value))
+                    name_products.append(prod)
             else :
+                suffix_products.append("")
+                suffix_prefinalnames.append("")
                 name_products.append(prod)
 
-        return name_products
+        return name_products, suffix_products, suffix_prefinalnames
 
     @print_my_function_name
     def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
@@ -1006,11 +1012,13 @@ class PipePrep(SofPipe) :
 
         # Product names
         dir_products = self._get_fullpath_expo(expotype, "processed")
-        name_products = self._get_combine_products(filter_list) 
+        name_products, suff_products, suff_prefinalnames = self._get_combine_products(filter_list) 
 
         # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, 
-                tpl, expotype, save='cube', suffix=suffix, filter_list=filter_list, **kwargs)
+                tpl, expotype, suff_products=suff_products,
+                suff_prefinalnames=suff_prefinalnames,
+                save='cube', suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)

@@ -192,8 +192,8 @@ class PipeRecipes(object) :
                 prod=self.joinprod("{0}_{1}".format(suffix, name_prod)), newprod=joinpath(dir_products, 
                     "{0}_{1}".format(suffix_out, name_prod))))
    
-    def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[], 
-            suffix_products=[], suffix_prefinalnames=[], suffix_postfinalnames=[], 
+    def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[""], 
+            suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
             save='cube,skymodel', filter_list='white', skymethod='model',
             pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE',
             lambdamin=4000., lambdamax=10000., suffix="", autocalib='none', rvcorr='bary'):
@@ -232,8 +232,9 @@ class PipeRecipes(object) :
             self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(namein_prod), name_imaout=joinpath(dir_products, nameout_prod)))
 
-    def recipe_combine(self, sof, dir_products, name_products,
-            tpl, expotype, save='cube', pixfrac=0.6, suffix="", 
+    def recipe_combine(self, sof, dir_products, name_prod, tpl, expotype,
+            suffix_products=[""], suffix_prefinalnames=[""], 
+            save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='Cousins_R,white'):
         """Running the muse_exp_combine recipe
         """
@@ -243,10 +244,12 @@ class PipeRecipes(object) :
                    pixfrac=pixfrac, form=format_out, filt=filter_list, sof=sof, 
                    tpl=tpl, expotype=expotype))
 
-        for name_prod in name_products:
+        for suff_prod, suff_pre in zip(suffix_products, suffix_prefinalnames):
             self.run_oscommand("{nocache} mv {name_imain}.fits "
-                '{name_imaout}{suffix}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod), name_imaout=joinpath(dir_products, name_prod),
-                suffix=suffix, tpl=tpl, pointing="P{0:02d}".format(self.pointing)))
+                '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
+                name_imain=self.joinprod(name_prod+suff_prod), 
+                name_imaout=joinpath(dir_products, name_prod),
+                suffix_pre=suffix_pre, suffix=suffix, 
+                tpl=tpl, pointing="P{0:02d}".format(self.pointing)))
 
 
