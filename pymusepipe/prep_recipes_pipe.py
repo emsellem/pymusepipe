@@ -984,7 +984,7 @@ class PipePrep(SofPipe) :
         # Selecting only exposures to be treated
         # Producing the list of REDUCED PIXTABLES
         self._add_calib_to_sofdict("FILTER_LIST")
-        pixtable_name = self._get_suffix_product('OBJECT')
+        pixtable_name = self._get_suffix_product('REDUCED')
         pixtable_name_thisone = dic_products_scipost['individual']
 
         if offset_list :
