@@ -245,7 +245,6 @@ class AlignMusePointing(object):
             upipe.print_warning("0 MUSE images detected as input")
             return
         self.list_offmuse_hdu = [None] * self.nimages
-
         self.list_proj_refhdu = [None] * self.nimages
 
         self.cross_off_pixel = np.zeros((self.nimages, 2), dtype=np.float32)
@@ -438,26 +437,20 @@ class AlignMusePointing(object):
             upipe.print_error("Save is aborted")
             return
 
-        fits_table=Table()
         # Check if RA_OFFSET is there
         if 'RA_OFFSET' in fits_table.columns:
             # if yes, then check if the ORIG column is there
             if 'RA_OFFSET_ORIG' not in fits_table.columns:
                 fits_table['RA_OFFSET_ORIG'] = fits_table['RA_OFFSET']
                 fits_table['DEC_OFFSET_ORIG'] = fits_table['DEC_OFFSET']
-            # if not, just continue
-            # as it means the ORIG columns were already done
 
         # Saving the final values
-        #print(self.total_off_arcsec)
         fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600.
         fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
         fits_table['RA_CROSS_OFFSET'] = self.cross_off_arcsec[:,0] / 3600.
         fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:,1] / 3600.
-#---->>>>>>   ******************************************************************
         fits_table['FLUX_SCALE']= self.ima_normfactor
         fits_table['DATE_OBS']=self.ima_dateobs
-#---->>>>>>   ******************************************************************
 
         # Writing it up
         if exist_table and not overwrite:
@@ -713,8 +706,6 @@ class AlignMusePointing(object):
 
         tmphdr = self.list_offmuse_hdu[nima].header.totextfile(self.list_name_offmusehdr[nima], overwrite=True)
         self.list_proj_refhdu[nima] = self._project_reference_hdu(muse_hdu=self.list_offmuse_hdu[nima])
-# This was the old way with montage
-#                name_hdr=self.list_name_offmusehdr[nima])
 
     def compare(self, muse_hdu=None, ref_hdu=None, factor=1.0,
             start_nfig=1, nlevels=7, levels=None, muse_smooth=1.,
