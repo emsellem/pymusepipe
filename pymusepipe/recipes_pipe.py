@@ -43,9 +43,13 @@ class PipeRecipes(object) :
         self.first_cpu = first_cpu
         self.ncpu = ncpu
 
-        self.likwid = likwid
+        if likwid is None:
+            self.likwid = ""
+            self.list_cpu = ""
+        else :
+            self.likwid = likwid
+            self._set_cpu(first_cpu, ncpu, list_cpu)
         self.nifu = nifu
-        self._set_cpu(first_cpu, ncpu, list_cpu)
         self._domerge = domerge
 
         self.nochecksum = nochecksum
