@@ -28,6 +28,7 @@ from astropy.io import fits as pyfits
 from astropy.modeling import models, fitting
 from astropy.stats import mad_std
 from astropy.table import Table
+from astropy import units as u
 
 import mpdaf
 from mpdaf.obj import Image, Cube, WCS
@@ -38,6 +39,10 @@ def is_sequence(arg):
             hasattr(arg, "__iter__"))
 
 import pymusepipe.util_pipe as upipe
+
+# ================== Default units ======================== #
+default_reference_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
+default_muse_unit = u.microJansky
 
 # ================== Useful function ====================== #
 def open_new_wcs_figure(nfig, mywcs=None):
@@ -101,6 +106,41 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.]):
     mydata = RealData(x.ravel(), y.ravel(), sx=sx.ravel(), sy=sy.ravel())
     myodr = ODR(mydata, linear, beta0=beta0)
     return myodr.run()
+
+
+def get_conversion_factor(input_unit, output_unit, equivalence=u.spectral_density(6483.58 * u.AA)):
+    """ Conversion of units from an input one
+    to an output one
+    """
+
+    # First testing if the quantities are Quantity
+    # If not, transform them 
+    if not isinstance(input_unit, astropy.units.quantity.Quantity):
+        if not isinstance(input_unit, (astropy.units.core.Unit, astropy.units.core.CompositeUnit)):
+            upipe.print_warning("Input provided unit could not be converted")
+            upipe.print_warning("Using 1.0 as a conversion factor")
+            return 1.0
+        else :
+            input_unit = input_unit * 1.0
+    if not isinstance(output_unit, astropy.units.quantity.Quantity):
+        if not isinstance(output_unit, (astropy.units.core.Unit, astropy.units.core.CompositeUnit)):
+            upipe.print_warning("Output provided unit could not be converted")
+            upipe.print_warning("Using 1.0 as a conversion factor")
+            return 1.0
+        else:
+            output_unit = output_unit * 1.0
+
+    if not input_unit.unit.is_equivalent(output_unit):
+        # if not equivalent we try a spectral density equivalence
+        if not input_unit.unit.is_equivalent(output_unit, equivalencies=equivalence):
+            upipe.print_warning("Provided units for reference and MUSE images are not equivalent")
+            upipe.print_warning("A conversion factor of 1.0 will thus be used")
+            return 1.0
+        else :
+            return input_unit.unit.to(output_unit, equivalencies=equivalence)  \
+                * input_unit.value 
+    else :
+        return input_unit.unit.to(output_unit) * input_unit.value
 
 def arcsec_to_pixel(hdu, xy_arcsec=[0., 0.]):
     """Transform from arcsec to pixel for the muse image
@@ -212,6 +252,15 @@ class AlignMusePointing(object):
         self.use_polynorm = kwargs.pop("use_polynorm", True)
         self.filter = kwargs.pop("filter", "WFI_ESO844")
 
+        # Getting the unit conversions
+        self.convert_units = kwargs.pop("convert_units", True)
+        if self.convert_units :
+            self.ref_unit = kwargs.pop("ref_unit", default_reference_unit)
+            self.muse_unit = kwargs.pop("muse_unit", default_muse_unit)
+            self.conversion_factor = get_conversion_factor(self.ref_unit, self.muse_unit)
+        else :
+            self.conversion_factor = 1.0
+
         self._get_list_muse_images(**kwargs)
         if self.nimages == 0:
             upipe.print_warning("0 MUSE images detected as input")
@@ -263,7 +312,7 @@ class AlignMusePointing(object):
         print("Image # : InitFluxScale   LinearFit   NormFactor")
         for nima in self.nimages:
             print("Image {0:02d}:  {1:8.2f}   {1:8.2f}     {2:8.2f}".format(self.init_flux_scale[nima],
-                self.ima_normfactor[nima], self.ima_polypar[nima].beta[1])
+                self.ima_normfactor[nima], self.ima_polypar[nima].beta[1]))
 
     def show_linearfit_values(self):
         """Print some information about the normalisation factors
@@ -272,7 +321,7 @@ class AlignMusePointing(object):
         print("Image # : BackGround      Slope")
         for nima in self.nimages:
             print("Image {0:02d}:  {1:8.2f}   {2:8.2f}".format(self.ima_polypar[nima].beta[0], 
-                self.ima_polypar[nima].beta[1])
+                self.ima_polypar[nima].beta[1]))
 
     def init_guess_offset(self, firstguess="crosscorr", name_offset_table="OFFSET_LIST.fits"):
         """Initialise first guess, either from cross-correlation (default)
@@ -416,9 +465,9 @@ class AlignMusePointing(object):
             self.compare(nima=nima, **kwargs)
 
     def _get_list_muse_images(self):
-        "Extract the name of the muse images
+        """Extract the name of the muse images
         and build the list
-        "
+        """
         from pathlib import Path
 
         if self.name_muse_images is None:
@@ -485,7 +534,7 @@ class AlignMusePointing(object):
 
         # Cleaning the images
         ima_ref = prepare_image(proj_ref_hdu.data, self.border, 
-                self.dynamic_range, self.median_window)
+                self.dynamic_range, self.median_window) * self.conversion_factor
         ima_muse = prepare_image(muse_hdu.data, self.border, 
                 self.dynamic_range, self.median_window)
 
@@ -561,7 +610,7 @@ class AlignMusePointing(object):
         # The mpdaf way to project an image onto an other one
         if muse_hdu is not None:
             wcs_ref = WCS(hdr=self.reference_hdu.header)
-            ima_ref = Image(data=self.reference_hdu.data, wcs=wcs_ref)
+            ima_ref = Image(data=self.reference_hdu.data * self.conversion_factor, wcs=wcs_ref)
 
             wcs_muse = WCS(hdr=muse_hdu.header)
             ima_muse = Image(data=muse_hdu.data, wcs=wcs_muse)
@@ -633,10 +682,11 @@ class AlignMusePointing(object):
         """
         if median_filter:
             musedata = filtermed_image(self.list_offmuse_hdu[nima].data, self.border)
-            refdata = filtermed_image(self.list_proj_refhdu[nima].data, self.border)
+            refdata = filtermed_image(self.list_proj_refhdu[nima].data * self.conversion_factor, 
+                    self.border)
         else:
             musedata = self.list_offmuse_hdu[nima].data
-            refdata = self.list_proj_refhdu[nima].data
+            refdata = self.list_proj_refhdu[nima].data * self.conversion_factor
 
         self.ima_polypar[nima] = get_image_norm_poly(musedata, refdata, chunk_size=15)
         if self.use_polynorm:
