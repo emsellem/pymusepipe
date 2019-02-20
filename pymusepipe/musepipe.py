@@ -234,8 +234,8 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Setting other default attributes
         if outlog is None : 
-            outlog = "log_{timestamp}".format(timestamp = upipe.create_time_name())
-            upipe.print_info("The Log folder will be {log}".format(outlog))
+            outlog = "log_{timestamp}".format(timestamp=upipe.create_time_name())
+            upipe.print_info("The Log folder will be {log}".format(log=outlog))
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
 

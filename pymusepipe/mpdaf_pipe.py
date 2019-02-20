@@ -93,9 +93,9 @@ class MuseCube(Cube):
         self.spec_fullgalaxy = MuseSpectrum(source=self.sum(axis=(1,2)), title="Full galaxy Spectrum")
         self.spec_4quad = self.get_quadrant_spectra_from_cube()
         self.spec_central_aper = MuseSetSpectra(
-               self.get_spectrum_from_cube(lambda_window=0, title="Central aperture"), 
-               self.get_spectrum_from_cube(lambda_window=20, title="Central Aperture, w=20"), 
-               self.get_spectrum_from_cube(lambda_window=40, title="Central Aperture, w=40"),
+               self.get_spectrum_from_cube(pixel_window=0, title="Central aperture"), 
+               self.get_spectrum_from_cube(pixel_window=20, title="Central Aperture, w=20"), 
+               self.get_spectrum_from_cube(pixel_window=40, title="Central Aperture, w=40"),
                subtitle="central_spectra")
 
     def get_quadrant_spectra_from_cube(self, pixel_window=0) :

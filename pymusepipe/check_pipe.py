@@ -14,7 +14,8 @@ import os
 from os.path import join as joinpath
 import glob
 
-__version__ = '0.0.3 (7 Feb 2019)'
+__version__ = '0.0.4 (21 Feb 2019)'
+# v0.0.4: Debugged a bit more with the new MusePipe structure
 # v0.0.3: Debugged a bit the sequence
 # v0.0.2: Added some import after moving MuseCube, MuseImage, etc
 # v0.0.1: initial
@@ -22,7 +23,7 @@ __version__ = '0.0.3 (7 Feb 2019)'
 from pymusepipe.graph_pipe import GraphMuse
 from pymusepipe.musepipe import MusePipe
 from pymusepipe.mpdaf_pipe import MuseCube, MuseSpectrum, MuseSetSpectra
-from pymusepipe.mpdaf_pipe import MuseImage, MuseSetImages
+from pymusepipe.mpdaf_pipe import MuseImage, MuseSetImages, get_sky_spectrum
 
 name_final_datacube = "DATACUBE_FINAL.fits"
 PLOT = '\033[1;34;20m'
@@ -44,7 +45,7 @@ class CheckPipe(MusePipe) :
         else :
             MusePipe.__init__(self, **kwargs)
 
-        self.cube = MuseCube(filename=joinpath(self.paths.cubes, mycube))
+        self.cube = MuseCube(filename=joinpath(self.paths.object, mycube))
         self.pdf = GraphMuse(pdf_name=joinpath(self.paths.figures, pdf_name))
 
         # Input parameters useful to define a set of spectra and images
@@ -100,7 +101,7 @@ class CheckPipe(MusePipe) :
     def check_sky_spectra(self, suffix) :
         """Check all sky spectra from the exposures
         """
-        sky_spectra_names = glob.glob(self.paths.sky + "./SKY_SPECTRUM_*{suffix}.fits".format(suffix))
+        sky_spectra_names = glob.glob(self.paths.sky + "./SKY_SPECTRUM_*{suffix}.fits".format(suffix=suffix))
         tocheck = MuseSetSpectra(subtitle="Sky Spectra")
         counter = 1
         for specname in sky_spectra_names :
