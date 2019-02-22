@@ -115,15 +115,15 @@ def get_conversion_factor(input_unit, output_unit, equivalence=u.spectral_densit
 
     # First testing if the quantities are Quantity
     # If not, transform them 
-    if not isinstance(input_unit, astropy.units.quantity.Quantity):
-        if not isinstance(input_unit, (astropy.units.core.Unit, astropy.units.core.CompositeUnit)):
+    if not isinstance(input_unit, u.quantity.Quantity):
+        if not isinstance(input_unit, (u.core.Unit, u.core.CompositeUnit)):
             upipe.print_warning("Input provided unit could not be converted")
             upipe.print_warning("Using 1.0 as a conversion factor")
             return 1.0
         else :
             input_unit = input_unit * 1.0
-    if not isinstance(output_unit, astropy.units.quantity.Quantity):
-        if not isinstance(output_unit, (astropy.units.core.Unit, astropy.units.core.CompositeUnit)):
+    if not isinstance(output_unit, u.quantity.Quantity):
+        if not isinstance(output_unit, (u.core.Unit, u.core.CompositeUnit)):
             upipe.print_warning("Output provided unit could not be converted")
             upipe.print_warning("Using 1.0 as a conversion factor")
             return 1.0
@@ -471,9 +471,9 @@ class AlignMusePointing(object):
         from pathlib import Path
 
         if self.name_muse_images is None:
-            set_of_paths = glob.glob("{0}DATACUBE_FINAL*{1}*".format(folder_muse_images,
-                filter))
-            self.name_muse_images = [Path(muse_path).name for muse_path in set_of_paths]
+            set_of_paths = glob.glob("{0}DATACUBE_FINAL*{1}*".format(self.folder_muse_images,
+                self.filter))
+            self.list_muse_images = [Path(muse_path).name for muse_path in set_of_paths]
         # test if 1 or several images
         elif isinstance(self.name_muse_images, str):
             self.list_muse_images = [self.name_muse_images]
@@ -499,10 +499,10 @@ class AlignMusePointing(object):
         """
         self.list_name_musehdr = ["{0}{1:02d}.hdr".format(self.name_musehdr, i+1) for i in range(self.nimages)]
         self.list_name_offmusehdr = ["{0}{1:02d}.hdr".format(self.name_offmusehdr, i+1) for i in range(self.nimages)]
-        list_hdulist_muse = [pyfits.open(self.folder_name_muse + self.list_muse_images[i]) for i in range(self.nimages)]
-        self.list_muse_hdu = [hdu[self.hdu_ext[1]] for hdu in self.list_muse_hdu]
-        self.list_wcs_muse = [wcs.WCS(hdu.header) for hdu in self.list_muse_hdu]
-        self.ima_datobs = [hdu[0].header['DATE-OBS'] for hdu in self.list_muse_hdu]
+        self.list_hdulist_muse = [pyfits.open(self.folder_muse_images + self.list_muse_images[i]) for i in range(self.nimages)]
+        self.list_muse_hdu = [hdu[self.hdu_ext[1]] for hdu in self.list_hdulist_muse]
+        self.list_wcs_muse = [wcs.WCS(hdu[0].header) for hdu in self.list_hdulist_muse]
+        self.ima_datobs = [hdu[0].header['DATE-OBS'] for hdu in self.list_hdulist_muse]
 
     def _open_ref_hdu(self):
         """Open the reference image hdu
