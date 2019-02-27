@@ -834,6 +834,14 @@ class PipePrep(SofPipe) :
             # Now starting with the standard recipe
             self._sofdict.clear()
             list_group_expo = gtable['iexpo'].data
+
+            # Skip this group if only 1 or fewer exposures 
+            # exp_align needs at least 2
+            if len(list_group_expo) <= 1:
+                if self.verbose:
+                    upipe.print_warning("Group = {0}".format(mytpl))
+                    upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this group")
+                continue
             self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                 'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) for iexpo in list_group_expo]
             self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
@@ -873,6 +881,12 @@ class PipePrep(SofPipe) :
         found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
+        # Stop the process if only 1 or fewer exposures are retrieved
+        if len(align_table) <= 1:
+            if self.verbose:
+                upipe.print_warning("Pointing = {0}".format(self.pointing))
+                upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this Pointing")
+            return
         
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -889,6 +903,7 @@ class PipePrep(SofPipe) :
         # Producing the list of IMAGES and add them to the SOF
         self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
             'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) for row in align_table]
+
         # Write the SOF
         self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}_{3}".format(suffix, expotype, pointing, tpl), new=True)
         dir_align = self._get_fullpath_expo('OBJECT', "processed")
@@ -974,7 +989,14 @@ class PipePrep(SofPipe) :
         found_expo, list_expo, group_list_expo, combine_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
-        
+
+        # Abort if only one exposure is available
+        # exp_combine needs a minimum of 2
+        if len(combine_table) <= 1:
+            if self.verbose:
+                upipe.print_warning("The combined pointing has only one exposure: process aborted")
+            return
+
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
 
