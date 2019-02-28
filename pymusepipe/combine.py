@@ -11,6 +11,7 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Importing modules
 import numpy as np
 import os
+from os.path import join as joinpath
 
 try :
     import astropy as apy
@@ -18,22 +19,35 @@ try :
 except ImportError :
     raise Exception("astropy is required for this module")
 
-__version__ = '0.0.1 (21 November 2017)'
+from astropy.utils.exceptions import AstropyWarning
+import warnings
 
-dic_folders_name = {
+# Importing pymusepipe modules
+from pymusepipe.recipes_pipe import PipeRecipes
+from pymusepipe.prep_recipes_pipe import PipePrep
+from pymusepipe.init_musepipe import InitMuseParameters
+import pymusepipe.util_pipe as upipe
+from pymusepipe import musepipe 
+
+__version__ = '0.0.2 (28 Feb 2019)'
+# 0.0.2 28 Feb, 2019: trying to make it work
+# 0.0.1 21 Nov, 2017 : just setting up the scene
+
+dic_combined_folders = {
         # Sof files
-        "sof": "Sof",
+        "sof": "Sof/",
         # Combined products
-        "combined": "Combined",
+        "cubes": "Cubes/",
          # esores log files
         "esorex_log" : "Esorex_log/",
         # Data Products - first writing
         "pipe_products": "Pipe_products/"
         }
 
-class muse_combine(object) :
+class muse_combine(PipePrep, PipeRecipes) :
     def __init__(self, galaxyname=None, list_pointings=[1], rc_filename=None, 
-            cal_filename=None, outlog=None, logfile="MusePipeCombine.log", reset_log=False,
+            cal_filename=None, combined_folder_name="Combined",
+            outlog=None, logfile="MusePipeCombine.log", reset_log=False,
             verbose=True, **kwargs):
         """Initialisation of class muse_expo
 
@@ -62,13 +76,14 @@ class muse_combine(object) :
 
         # Setting the default attibutes #####################
         self.galaxyname = galaxyname
-        self.list_pointing = list_pointings
+        self.list_pointings = list_pointings
+        self.combined_folder_name = combined_folder_name
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
         if outlog is None : 
             outlog = "log_{timestamp}".format(timestamp = upipe.create_time_name())
-            upipe.print_info("The Log folder will be {log}".format(outlog))
+            upipe.print_info("The Log folder will be {0}".format(outlog))
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
 
@@ -78,76 +93,81 @@ class muse_combine(object) :
         PipeRecipes.__init__(self, **kwargs)
 
         # =========================================================== #
-        # Create full path folder 
+        # Setting up the folders and names for the data reduction
+        # Can be initialised by either an rc_file, 
+        # or a default rc_file or harcoded defaults.
+        self.my_params = InitMuseParameters(rc_filename=rc_filename, 
+                            cal_filename=cal_filename)
+        # Setting up the relative path for the data, using Galaxy Name + Pointing
+        self.my_params.data = "{0}/{1}/".format(self.galaxyname, self.combined_folder_name)
+
+        self.my_params.init_default_param(dic_combined_folders)
+        self._dic_combined_folders = dic_combined_folders
+
         self.set_fullpath_names()
+        # Making the output folders in a safe mode
+        if self.verbose:
+            upipe.print_info("Creating directory structure")
 
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
 
-        # Go to the combined Folder:w
-        self.goto_folder(self.paths.combined)
+        # First create the data Combined folder
+        upipe.safely_create_folder(self.paths.data, verbose=verbose)
 
-        # ==============================================
-        # Creating the extra pipeline folder structure
-        upipe.safely_create_folder(self.paths.combined, verbose=verbose)
-        upipe.safely_create_folder(self.paths.combined, verbose=verbose)
+        # Go to the Combined Folder
+        self.goto_folder(self.paths.data)
 
-        # ==============================================
-        # Creating the folder structure itself if needed
-        for folder in self.my_params._dic_folders.keys() :
-            upipe.safely_create_folder(self.my_params._dic_folders[folder], verbose=verbose)
-
-        # ==============================================
-        # Init the Master exposure flag dictionary
-        self.Master = {}
-        for mastertype in dic_listMaster.keys() :
-            upipe.safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=self.verbose)
-            self.Master[mastertype] = False
-
-        # Init the Object folder
-        for objecttype in dic_listObject.keys() :
-            upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=self.verbose)
-
-        self._dic_listMasterObject = {**dic_listMaster, **dic_listObject}
-        # ==============================================
+        # =========================================================== #
+        # Now create full path folder 
+        for folder in self._dic_combined_folders.keys() :
+            upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
 
         # Going back to initial working directory
         self.goto_prevfolder()
 
-        # ===========================================================
-        # Now creating the raw table, and attribute containing the
-        # astropy dataset probing the rawfiles folder
-        # When creating the table, if the table already exists
-        # it will read the old one, except if an overwrite_astropy_table
-        # is set to True.
-        self.init_raw_table()
-        self.read_all_astro_tables()
-        # ===========================================================
-
+    def goto_prevfolder(self, logfile=False) :
+        """Go back to previous folder
+        """
+        upipe.print_info("Going back to the original folder {0}".format(self.paths._prev_folder))
+        self.goto_folder(self.paths._prev_folder, logfile=logfile, verbose=False)
+            
+    def goto_folder(self, newpath, logfile=False, verbose=True) :
+        """Changing directory and keeping memory of the old working one
+        """
+        try: 
+            prev_folder = os.getcwd()
+            newpath = os.path.normpath(newpath)
+            os.chdir(newpath)
+            if verbose :
+                upipe.print_info("Going to folder {0}".format(newpath))
+            if logfile :
+                upipe.append_file(joinpath(self.paths.data, self.logfile), "cd {0}\n".format(newpath))
+            self.paths._prev_folder = prev_folder 
+        except OSError:
+            if not os.path.isdir(newpath):
+                raise
+    
     def set_fullpath_names(self) :
         """Create full path names to be used
         """
         # initialisation of the full paths 
         self.paths = musepipe.PipeObject("All Paths useful for the pipeline")
         self.paths.root = self.my_params.root
+        self.paths.data = joinpath(self.paths.root, self.my_params.data)
 
-        for key in dic_folders_name
-        self.paths.combined = joinpath(self.paths.root, self.outfolder_name)
-        self.paths.sof = joinpath(self.paths.root, "Sof")
+        for name in list(self._dic_combined_folders.keys()):
+            setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
 
         # Creating the filenames for Master files
-        for pointing in list_pointings:
+        for pointing in self.list_pointings:
             name_pointing = "P{0:02d}".format(np.int(pointing))
             # Adding the path of the folder
             setattr(self.paths, name_pointing,
-                    joinpath(self.paths.combined, name_pointing))
+                    joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.galaxyname, pointing)))
 
-    def method1(self) :
-        """Method 1
-        """
-        pass
-
-    def run_combine(self, sof_filename='exp_combine', expotype="REDUCED", tpl="ALL", stage="reduced", list_pointing=None, 
+    def run_combine(self, sof_filename='exp_combine', expotype="REDUCED", 
+            tpl="ALL", stage="reduced", list_pointing=None, 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """MUSE Exp_combine treatment of the reduced pixtables
         Will run the esorex muse_exp_combine routine
