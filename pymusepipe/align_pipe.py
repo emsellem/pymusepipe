@@ -23,12 +23,13 @@ from scipy.signal import correlate
 from scipy.odr import ODR, Model, RealData
 
 # Astropy
-import astropy.wcs as wcs
+import astropy.wcs as awcs
 from astropy.io import fits as pyfits
 from astropy.modeling import models, fitting
 from astropy.stats import mad_std
 from astropy.table import Table
 from astropy import units as u
+from astropy.convolution import Gaussian2DKernel, convolve
 
 import mpdaf
 from mpdaf.obj import Image, Cube, WCS
@@ -43,6 +44,11 @@ import pymusepipe.util_pipe as upipe
 # ================== Default units ======================== #
 default_reference_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
 default_muse_unit = u.microJansky
+
+default_mjd_table = "MJD_OBS"
+default_mjd_image = "MJD-OBS"
+default_date_table = "DATE_OBS"
+default_date_image = "DATE-OBS"
 
 # ================== Useful function ====================== #
 def open_new_wcs_figure(nfig, mywcs=None):
@@ -65,7 +71,7 @@ def chunk_stats(list_data, chunk_size=15):
     nchunk_x = np.int(list_data[0].shape[0] // chunk_size - 1)
     nchunk_y = np.int(list_data[0].shape[1] // chunk_size - 1)
     # Check that all datasets have the same size
-    med_data = np.zeros((ndatasets, nchunk_x * nchunk_y), dtype=np.float32)
+    med_data = np.zeros((ndatasets, nchunk_x * nchunk_y), dtype=np.float64)
     std_data = np.zeros_like(med_data)
 
     if not all([d.size for d in list_data]):
@@ -93,7 +99,8 @@ def get_image_norm_poly(data1, data2, chunk_size=15):
     pos = (med[0] > 0.) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > 0.)
     guess_slope = np.median(med[1][pos] / med[0][pos])
 
-    result = regress_odr(x=med[0][pos], y=med[1][pos], sx=std[0][pos], sy=std[1][pos], beta0=[0., guess_slope])
+    result = regress_odr(x=med[0][pos], y=med[1][pos], sx=std[0][pos], 
+                         sy=std[1][pos], beta0=[0., guess_slope])
     result.med = med
     result.std = std
     result.selection = pos
@@ -107,8 +114,8 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.]):
     myodr = ODR(mydata, linear, beta0=beta0)
     return myodr.run()
 
-
-def get_conversion_factor(input_unit, output_unit, equivalence=u.spectral_density(6483.58 * u.AA)):
+def get_conversion_factor(input_unit, output_unit, 
+                          equivalence=u.spectral_density(6483.58 * u.AA)):
     """ Conversion of units from an input one
     to an output one
     """
@@ -146,7 +153,7 @@ def arcsec_to_pixel(hdu, xy_arcsec=[0., 0.]):
     """Transform from arcsec to pixel for the muse image
     """
     # Matrix
-    input_wcs = wcs.WCS(hdu.header)
+    input_wcs = awcs.WCS(hdu.header)
     scale_matrix = np.linalg.inv(input_wcs.pixel_scale_matrix * 3600.)
 
     # Transformation in Pixels
@@ -159,7 +166,7 @@ def pixel_to_arcsec(hdu, xy_pixel=[0.,0.]):
     """ Transform pixel to arcsec for the muse image
     """
     # Matrix
-    input_wcs = wcs.WCS(hdu.header)
+    input_wcs = awcs.WCS(hdu.header)
 
     # Transformation in arcsecond
     dels = np.array(xy_pixel)
@@ -167,17 +174,29 @@ def pixel_to_arcsec(hdu, xy_pixel=[0.,0.]):
     yarc = np.sum(dels * input_wcs.pixel_scale_matrix[1, :] * 3600.)
     return xarc, yarc
 
-def filtermed_image(data, border=50, filter_size=2):
+def crop_data(data, border=10):
+    if data.ndim != 2:
+        print_warning("Input data to crop is not 2, returning the original data")
+        return data
+    if (data.shape[0] > 2 * border) & (data.shape[1] > 2 * border):
+        return data[border:-border, border:-border]
+    else:
+        print_warning("Data is not being cropped, as shape is {0} "
+             " while border is {1}".format(data.shape, border))
+        return data
+
+def filtermed_image(data, border=10, filter_size=2):
     """Process image by removing the borders
     and filtering it
     """
     # Omit the border pixels
-    data = data[border:-border, border:-border]
+    if border > 0:
+        data = data[border:-border, border:-border]
     meddata = nd.filters.median_filter(data, filter_size)
 
     return meddata
 
-def prepare_image(data, border=50, dynamic_range=10, median_window=10):
+def prepare_image(data, border=10, dynamic_range=10, median_window=10):
     """Process image by squeezing the range, removing the borders
     and filtering it
     """
@@ -185,15 +204,16 @@ def prepare_image(data, border=50, dynamic_range=10, median_window=10):
     data = np.arctan(data / np.nanmedian(data) / dynamic_range)
 
     # Omit the border pixels
-    data -= filtermed_image(data, border, median_window)
+    data -= filtermed_image(data, 0, median_window)
+    cdata = crop_data(data, border)
 
     # Removing the zeros
-    data[data < 0] = 0.
+    cdata[cdata < 0] = 0.
 
     # Clean up the NaNs
-    data = np.nan_to_num(data)
+    cdata = np.nan_to_num(cdata)
 
-    return data
+    return cdata
 
 #################################################################
 # ================== END Useful function ====================== #
@@ -204,12 +224,13 @@ class AlignMusePointing(object):
     """Class to align MUSE images onto a reference image
     """
     def __init__(self, name_reference,
+                 folder_reference="",
                  folder_muse_images="",
                  name_muse_images=None,
                  median_window=10,
                  subim_window=10,
                  dynamic_range=10,
-                 border=50, hdu_ext=[0,1],
+                 border=10, hdu_ext=[0,1],
                  **kwargs):
         """Initialise the AlignMuseImages class
         Keywords
@@ -244,13 +265,25 @@ class AlignMusePointing(object):
         self.median_window = median_window
         self.dynamic_range = dynamic_range
         self.name_reference = name_reference
+        self.folder_reference = folder_reference
+        # Check if folder reference exists
+        if not os.path.isdir(self.folder_reference):
+            print_error("Provided folder_reference is not an existing folder")
+            return
+
         self.name_muse_images = name_muse_images
         self.folder_muse_images = folder_muse_images
+        # Check if folder muse images exists
+        if not os.path.isdir(self.folder_muse_images):
+            print_error("Provided folder_muse_images is not an existing folder")
+            return
+
         self.name_musehdr = kwargs.pop("name_musehdr", "muse")
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
         self.name_refhdr = kwargs.pop("name_refhdr", "reference.hdr")
         self.use_polynorm = kwargs.pop("use_polynorm", True)
-        self.filter = kwargs.pop("filter", "WFI_ESO844")
+        self.suffix_images = kwargs.pop("suffix_muse_images", "IMAGE_FOV")
+        self.name_filter = kwargs.pop("name_filter", "WFI_ESO844")
 
         # Getting the unit conversions
         self.convert_units = kwargs.pop("convert_units", True)
@@ -261,6 +294,11 @@ class AlignMusePointing(object):
         else :
             self.conversion_factor = 1.0
 
+        # Initialise the parameters for the first guess
+        self.firstguess = kwargs.pop("firstguess", "crosscorr")
+        self.name_offset_table = kwargs.pop("name_offset_table", None)
+
+        # Get the MUSE images
         self._get_list_muse_images(**kwargs)
         if self.nimages == 0:
             upipe.print_warning("0 MUSE images detected as input")
@@ -270,20 +308,23 @@ class AlignMusePointing(object):
         self.list_proj_refhdu = [None] * self.nimages
         self.list_wcs_proj_refhdu = [None] * self.nimages
 
-        self.cross_off_pixel = np.zeros((self.nimages, 2), dtype=np.float32)
+        # Initialise the needed arrays for the offsets
+        self.cross_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
         self.extra_off_pixel = np.zeros_like(self.cross_off_pixel)
-        self.init_off_pixel = np.zeros_like(self.cross_off_pixel)
         self.total_off_pixel = np.zeros_like(self.cross_off_pixel)
         self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
-        self.init_off_arcsec = np.zeros_like(self.cross_off_pixel)
         self.total_off_arcsec = np.zeros_like(self.cross_off_pixel)
+        self._reset_init_guess_values()
 
         # Cross normalisation for the images
         # This contains the parameters of the linear fit
         self.ima_polypar = [None] * self.nimages
         # Normalisation factor to be saved or used
-        self.ima_normfactor = np.zeros((self.nimages), dtype=np.float32)
+        self.ima_norm_factors = np.zeros((self.nimages), dtype=np.float64)
+        # Default lists for date and mjd of the MUSE images
+        self.ima_dateobs = [None] * self.nimages
+        self.ima_mjdobs = [None] * self.nimages
 
         # Which extension to be used for the ref and muse images
         self.hdu_ext = hdu_ext
@@ -295,14 +336,13 @@ class AlignMusePointing(object):
         self.find_ncross_peak()
 
         # Initialise the offset
-        firstguess = kwargs.pop("firstguess", "crosscorr")
-        self.init_guess_offset(firstguess, **kwargs)
+        self.init_guess_offset(self.firstguess, **kwargs)
 
         self.total_off_arcsec = self.init_off_arcsec + self.extra_off_arcsec
         self.total_off_pixel = self.init_off_pixel + self.extra_off_pixel
 
         # Now doing the shifts and projections with the guess/input values
-        for nima in self.nimages:
+        for nima in range(self.nimages):
             self.shift(nima)
 
     def show_norm_factors(self):
@@ -312,7 +352,7 @@ class AlignMusePointing(object):
         print("Image # : InitFluxScale   LinearFit   NormFactor")
         for nima in self.nimages:
             print("Image {0:02d}:  {1:8.2f}   {1:8.2f}     {2:8.2f}".format(self.init_flux_scale[nima],
-                self.ima_normfactor[nima], self.ima_polypar[nima].beta[1]))
+                self.ima_norm_factors[nima], self.ima_polypar[nima].beta[1]))
 
     def show_linearfit_values(self):
         """Print some information about the normalisation factors
@@ -323,11 +363,12 @@ class AlignMusePointing(object):
             print("Image {0:02d}:  {1:8.2f}   {2:8.2f}".format(self.ima_polypar[nima].beta[0], 
                 self.ima_polypar[nima].beta[1]))
 
-    def init_guess_offset(self, firstguess="crosscorr", name_offset_table="OFFSET_LIST.fits"):
+    def init_guess_offset(self, firstguess="crosscorr"):
         """Initialise first guess, either from cross-correlation (default)
         or from an Offset FITS Table
         """
         # Implement the guess
+        self.firstguess = firstguess
         if firstguess not in ["crosscorr", "fits"]:
             firstguess = "crosscorr"
             upipe.print_warning("Keyword 'firstguess' not recognised")
@@ -337,20 +378,46 @@ class AlignMusePointing(object):
             self.init_off_arcsec = self.cross_off_arcsec
             self.init_off_pixel = self.cross_off_pixel
         elif firstguess == "fits":
-            self.name_offset_table = name_offset_table
-            exist_table, self.offset_table = self.open_offset_table(self.name_offset_table)
-            if exist_table is not True:
+            exist_table, self.offset_table = self.open_offset_table(self.folder_muse_images \
+                    + self.name_offset_table)
+            if exist_table is not True :
                 upipe.print_warning("Fits initialisation table not found, "
                     "setting init value to 0")
-                self.init_off_pixel *= 0.
-                self.init_off_arcsec *= 0.
-            else:
-                self.init_off_arcsec = np.vstack((self.offset_table['RA_OFFSET'],
-                    self.offset_table['DEC_OFFSET'])).T * 3600.
-                for nima in range(self.nimages):
-                    self.init_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
-                            self.init_off_arcsec[nima])
-                self.init_flux_scale = self.offset_table['FLUX_SCALE']
+                self._reset_init_guess_values()
+                return
+
+            # First get the right indices for the table by comparing MJD_OBS
+            if default_mjd_table not in self.offset_table.columns:
+                upipe.print_warning("Input table does not contain MJD_OBS column")
+                self._reset_init_guess_values()
+                return
+
+            self.table_mjdobs = self.offset_table[default_mjd_table]
+            # Now finding the right match with the Images
+            # Warning, needs > numpy 1.15.0
+            values, ind_ima, ind_table = np.intersect1d(self.ima_mjdobs, self.table_mjdobs,
+                    return_indices=True, assume_unique=True)
+            nonan_flux_scale_table = np.where(np.isnan(self.offset_table['FLUX_SCALE']), 
+                    1., self.offset_table['FLUX_SCALE'])
+            for nima, mjd in enumerate(self.ima_mjdobs):
+                if mjd in values:
+                    ind = np.nonzero(values == mjd)[0][0]
+                    self.init_off_arcsec[nima] = [self.offset_table['RA_OFFSET'][ind] * 3600.,
+                        self.offset_table['DEC_OFFSET'][ind] * 3600.]
+                    self.init_flux_scale[nima] = nonan_flux_scale_table[ind]
+                else :
+                    self.init_flux_scale[nima] = 1.0
+                    self.init_off_arcsec[nima] = [0., 0.]
+
+                self.init_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
+                        self.init_off_arcsec[nima])
+
+    def _reset_init_guess_values(self):
+        self.table_mjdobs = [None] * self.nimages
+        self.init_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
+        self.init_off_arcsec = np.zeros((self.nimages, 2), dtype=np.float64)
+        self.init_flux_scale = np.zeros(self.nimages, dtype=np.int)
+        self.muse_rotangles = np.zeros(self.nimages, dtype=np.float64)
 
     def open_offset_table(self, name_table=None):
         """Read offset table from fits file
@@ -361,8 +428,8 @@ class AlignMusePointing(object):
                 return None, Table()
 
         if not os.path.isfile(name_table):
-            upipe.print_warning("FITS Table does not exist yet"
-                "({0})".format(name_table))
+            upipe.print_warning("FITS Table ({0}) does not "
+                " exist yet".format(name_table))
             return False, Table()
 
         return True, Table.read(name_table)
@@ -380,10 +447,10 @@ class AlignMusePointing(object):
 
         upipe.print_info("Offset recorded in OFFSET_LIST Table")
         upipe.print_info("Total in ARCSEC")
-        for i in self.nimages:
+        for nima in range(self.nimages):
             upipe.print_info("Image {0}: "
-                "{1:8.4f} {1:8.4f}".format(fits_table['RA_OFFSET']*3600,
-                    fits_table['DEC_OFFSET']*3600.))
+                "{1:8.4f} {1:8.4f}".format(fits_table['RA_OFFSET'][nima]*3600,
+                    fits_table['DEC_OFFSET'][nima]*3600.))
 
     def print_offset(self):
         """Print out the offset
@@ -405,7 +472,10 @@ class AlignMusePointing(object):
         """Save the Offsets into a fits Table
         """
         if name_output_table is None: 
-            name_output_table = self.name_offset_table
+            if self.name_offset_table is None:
+                name_output_table = "DUMMY_OFFSET_TABLE.fits"
+            else :
+                name_output_table = self.name_offset_table
         self.suffix = suffix
         self.name_output_table = name_output_table.replace(".fits", 
                 "{0}.fits".format(self.suffix))
@@ -428,8 +498,9 @@ class AlignMusePointing(object):
         fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
         fits_table['RA_CROSS_OFFSET'] = self.cross_off_arcsec[:,0] / 3600.
         fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:,1] / 3600.
-        fits_table['FLUX_SCALE']= self.ima_normfactor
+        fits_table['FLUX_SCALE']= self.ima_norm_factors
         fits_table['DATE_OBS'] = self.ima_dateobs
+        fits_table['MJD_OBS'] = self.ima_mjdobs
 
         # Writing it up
         if exist_table and not overwrite:
@@ -457,6 +528,8 @@ class AlignMusePointing(object):
         else:
             extra_arcsec = kwargs.pop("extra_arcsec", [0., 0.])
 
+        self.muse_rotangles[nima] = kwargs.pop("rotation", 0.0)
+
         # Add the offset from user
         self.shift_arcsecond(extra_arcsec, nima)
 
@@ -471,8 +544,8 @@ class AlignMusePointing(object):
         from pathlib import Path
 
         if self.name_muse_images is None:
-            set_of_paths = glob.glob("{0}DATACUBE_FINAL*{1}*".format(self.folder_muse_images,
-                self.filter))
+            set_of_paths = glob.glob("{0}{1}*{2}*".format(self.folder_muse_images,
+                self.suffix_images, self.name_filter))
             self.list_muse_images = [Path(muse_path).name for muse_path in set_of_paths]
         # test if 1 or several images
         elif isinstance(self.name_muse_images, str):
@@ -482,8 +555,10 @@ class AlignMusePointing(object):
         else:
             upipe.print_warning("Name of images is not a string or a list, "
                     "please check input name_muse_images")
-            self.nimages = 0
-            return
+            self.list_muse_images = []
+
+        # Sort alphabetically
+        self.list_muse_images.sort()
 
         # Number of images to deal with
         self.nimages = len(self.list_muse_images)
@@ -501,14 +576,28 @@ class AlignMusePointing(object):
         self.list_name_offmusehdr = ["{0}{1:02d}.hdr".format(self.name_offmusehdr, i+1) for i in range(self.nimages)]
         self.list_hdulist_muse = [pyfits.open(self.folder_muse_images + self.list_muse_images[i]) for i in range(self.nimages)]
         self.list_muse_hdu = [hdu[self.hdu_ext[1]] for hdu in self.list_hdulist_muse]
-        self.list_wcs_muse = [wcs.WCS(hdu[0].header) for hdu in self.list_hdulist_muse]
-        self.ima_datobs = [hdu[0].header['DATE-OBS'] for hdu in self.list_hdulist_muse]
+        # CHANGE to mpdaf WCS
+        self.list_wcs_muse = [WCS(hdu[0].header) for hdu in self.list_hdulist_muse]
+        # Getting the orientation angles
+        self.list_orig_rotangles = [musewcs.get_rot() for musewcs in self.list_wcs_muse]
+
+        # Filling in the MJD and DATE OBS keywords for the MUSE images
+        # If not there, will be filled with "None"
+        for nima, hdu in enumerate(self.list_hdulist_muse):
+            if default_date_image not in hdu[0].header:
+                self.ima_dateobs[nima] = None
+            else :
+                self.ima_dateobs[nima] = hdu[0].header[default_date_image]
+            if default_mjd_image not in hdu[0].header:
+                self.ima_mjdobs[nima] = None
+            else :
+                self.ima_mjdobs[nima] = hdu[0].header[default_mjd_image]
 
     def _open_ref_hdu(self):
         """Open the reference image hdu
         """
         # Open the images
-        hdulist_reference = pyfits.open(self.name_reference)
+        hdulist_reference = pyfits.open(self.folder_reference + self.name_reference)
         self.reference_hdu = hdulist_reference[self.hdu_ext[0]]
 
     def find_ncross_peak(self):
@@ -516,11 +605,11 @@ class AlignMusePointing(object):
         """
         for nima in range(self.nimages):
             self.cross_off_pixel[nima] = self.find_cross_peak(self.list_muse_hdu[nima],
-                    self.list_name_musehdr[nima])
+                    self.list_name_musehdr[nima], rotation=self.muse_rotangles[nima])
             self.cross_off_arcsec[nima] = pixel_to_arcsec(self.list_muse_hdu[nima],
                     self.cross_off_pixel[nima])
 
-    def find_cross_peak(self, muse_hdu, name_musehdr):
+    def find_cross_peak(self, muse_hdu, name_musehdr, rotation=0.0):
         """Aligns the MUSE HDU to a reference HDU
         Returns
         -------
@@ -530,7 +619,7 @@ class AlignMusePointing(object):
         # Projecting the reference image onto the MUSE field
         tmphdr = muse_hdu.header.totextfile(name_musehdr,
                                             overwrite=True)
-        proj_ref_hdu = self._project_reference_hdu(muse_hdu)
+        proj_ref_hdu = self._project_reference_hdu(muse_hdu, rotation=rotation)
 
         # Cleaning the images
         ima_ref = prepare_image(proj_ref_hdu.data, self.border, 
@@ -587,7 +676,7 @@ class AlignMusePointing(object):
         """Process image and return it
         """
         # Omit the border pixels
-        data = data[self.border:-self.border, self.border:-self.border]
+        data = crop_data(data, self.border)
 
         # Clean up the NaNs
         data = np.nan_to_num(data)
@@ -596,7 +685,7 @@ class AlignMusePointing(object):
 
         return lperc, hperc
 
-    def _project_reference_hdu(self, muse_hdu=None):
+    def _project_reference_hdu(self, muse_hdu=None, rotation=0.0):
         """Project the reference image onto the MUSE field
         """
 #=================================================================
@@ -613,6 +702,8 @@ class AlignMusePointing(object):
             ima_ref = Image(data=self.reference_hdu.data * self.conversion_factor, wcs=wcs_ref)
 
             wcs_muse = WCS(hdr=muse_hdu.header)
+            if rotation != 0.:
+                wcs_muse.rotate(-rotation)
             ima_muse = Image(data=muse_hdu.data, wcs=wcs_muse)
 
             ima_ref = ima_ref.align_with_image(ima_muse, flux=True)
@@ -667,14 +758,16 @@ class AlignMusePointing(object):
         # Adding the WCS
         self.list_offmuse_hdu[nima] = pyfits.PrimaryHDU(self.list_muse_hdu[nima].data, 
                 header=newhdr)
-        self.list_wcs_offmuse_hdu[nima] = wcs.WCS(self.list_offmuse_hdu[nima].header)
+        self.list_wcs_offmuse_hdu[nima] = WCS(self.list_offmuse_hdu[nima].header)
 
         tmphdr = self.list_offmuse_hdu[nima].header.totextfile(self.list_name_offmusehdr[nima], 
                 overwrite=True)
         # Adding to the list of projected reference images
         # Adding the WCS
-        self.list_proj_refhdu[nima] = self._project_reference_hdu(muse_hdu=self.list_offmuse_hdu[nima])
-        self.list_wcs_proj_refhdu[nima] = wcs.WCS(self.list_proj_refhdu[nima].header)
+        self.list_proj_refhdu[nima] = self._project_reference_hdu(muse_hdu=self.list_offmuse_hdu[nima], 
+                rotation=self.muse_rotangles[nima])
+        # CHANGE to mpdaf WCS
+        self.list_wcs_proj_refhdu[nima] = WCS(self.list_proj_refhdu[nima].header)
         musedata, refdata = self.get_image_normfactor(nima)
 
     def get_image_normfactor(self, nima=0, median_filter=True):
@@ -688,23 +781,25 @@ class AlignMusePointing(object):
             musedata = self.list_offmuse_hdu[nima].data
             refdata = self.list_proj_refhdu[nima].data * self.conversion_factor
 
+        # Getting the result of the normalisation
         self.ima_polypar[nima] = get_image_norm_poly(musedata, refdata, chunk_size=15)
         if self.use_polynorm:
-            self.ima_norm_factors[nima] = self.ima_polypar[nima]
+            self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
         return musedata, refdata
 
-    def compare(self, start_nfig=1, nlevels=7, levels=None, muse_smooth=1.,
-            ref_smooth=1., samecontour=True, nima=0,
+    def compare(self, start_nfig=1, nlevels=7, levels=None, muse_convolve=0.,
+            ref_convolve=0., samecontour=True, nima=0,
             showcontours=True, showcuts=True, 
             shownormalise=True, showdiff=True,
             normalise=True, median_filter=True, 
-            ncuts=5, percentage=10.):
+            ncuts=5, percentage=10.,
+            rotation=0.0):
         """Plot the contours of the projected reference and MUSE image
         It can also show the difference as an image, and cuts of the differences
         if showcuts=True and showdiff=True (default).
         """
         # Getting the data
-        musedata, refdata = self.get_image_normfactor(self, nima=nima, 
+        musedata, refdata = self.get_image_normfactor(nima=nima, 
                 median_filter=median_filter)
 
         # If normalising, using the median ratio fit
@@ -714,7 +809,7 @@ class AlignMusePointing(object):
         if normalise :
             if self.verbose:
                 upipe.print_info("Renormalising the MUSE data as NewMUSE = "
-                        "{1:8.4f} * ({0:8.4f} + MUSE)".format(polypar.beta[0], polypar.beta[1]))
+                        "{0:8.4e} * ({1:8.4e} + MUSE)".format(polypar.beta[1], polypar.beta[0]))
 
             musedata = (polypar.beta[0] + musedata) * polypar.beta[1]
 
@@ -723,19 +818,30 @@ class AlignMusePointing(object):
         lowlevel_ref, highlevel_ref = self._get_flux_range(refdata)
         if self.verbose:
             print("Low / High level MUSE flux: "
-                    "{0:8.4f} {1:8.4f}".format(lowlevel_muse, highlevel_muse))
+                    "{0:8.4e} {1:8.4e}".format(lowlevel_muse, highlevel_muse))
             print("Low / High level REF  flux: "
-                    "{0:8.4f} {1:8.4f}".format(lowlevel_ref, highlevel_ref))
+                    "{0:8.4e} {1:8.4e}".format(lowlevel_ref, highlevel_ref))
 
         # Smoothing out the result in case it is needed
-        if muse_smooth > 0 :
-           musedata = nd.filters.gaussian_filter(musedata, muse_smooth)
-        if ref_smooth > 0 :
-           refdata = nd.filters.gaussian_filter(refdata, ref_smooth)
+        if muse_convolve > 0 :
+            kernel = Gaussian2DKernel(x_stddev=muse_convolve)
+            musedata = convolve(musedata, kernel)
+        if ref_convolve > 0 :
+            kernel = Gaussian2DKernel(x_stddev=ref_convolve)
+            refdata = convolve(refdata, kernel)
 
         # Get the WCS
         musewcs = self.list_wcs_offmuse_hdu[nima]
         refwcs = self.list_wcs_proj_refhdu[nima]
+        # WCS for plotting using astropy
+        plotwcs = awcs.WCS(self.list_offmuse_hdu[nima].header)
+
+        # Apply rotation in degrees
+        # Apply it to the rerence image not to couple it with the offset
+        if rotation != 0:
+            if self.verbose:
+                upipe.print_warning("Apply a rotation of {0} degrees".format(rotation))
+            refwcs.rotate(rotation)
 
         # Preparing the figure
         current_fig = start_nfig
@@ -749,13 +855,14 @@ class AlignMusePointing(object):
             ax.plot(x, y, '.')
             ax.set_xlabel("MuseData")
             ax.set_ylabel("RefData")
-            ax.plot(x, my_linear_model(polypar.beta, x), 'k', x, 'r')
+            ax.plot(x, my_linear_model(polypar.beta, x), 'k')
+            # ax.plot([np.min(x), np.max(x)], [np.min(x), np.max(x)], 'r')
 
             self.list_figures.append(current_fig)
             current_fig += 1
             
         if showcontours:
-            fig, ax = open_new_wcs_figure(current_fig, musewcs)
+            fig, ax = open_new_wcs_figure(current_fig, plotwcs)
             if levels is not None:
                 mylevels = levels
                 samecontour = True
@@ -800,7 +907,7 @@ class AlignMusePointing(object):
             current_fig += 1
 
         if showdiff:
-            fig, ax = open_new_wcs_figure(current_fig, musewcs)
+            fig, ax = open_new_wcs_figure(current_fig, plotwcs)
             ratio = 100. * (refdata - musedata) / (musedata + 1.e-12)
             im = ax.imshow(ratio, vmin=-percentage, vmax=percentage)
             cbar = fig.colorbar(im)
