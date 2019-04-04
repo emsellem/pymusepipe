@@ -1183,7 +1183,7 @@ class AlignMusePointing(object):
 
             self.list_figures.append(current_fig)
             current_fig += 1
-            np.seterr(divide = 'warning') 
+            np.seterr(divide = 'warn') 
 
         if showcuts:
             fig, ax = open_new_wcs_figure(current_fig)
