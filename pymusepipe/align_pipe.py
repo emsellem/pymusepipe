@@ -1034,7 +1034,8 @@ class AlignMusePointing(object):
         # Getting the normalisation factors again
         musedata, refdata = self.get_image_normfactor(nima)
 
-    def get_image_normfactor(self, nima=0, median_filter=True):
+    def get_image_normfactor(self, nima=0, median_filter=True, 
+            convolve_muse=0., convolve_reference=0.):
         """Get the normalisation factor for image nima
          
         Keywords
@@ -1056,6 +1057,14 @@ class AlignMusePointing(object):
             musedata = copy.copy(self.list_offmuse_hdu[nima].data)
             refdata = self.list_proj_refhdu[nima].data * self.conversion_factor
 
+        # Smoothing out the result in case it is needed
+        if convolve_muse > 0 :
+            kernel = Gaussian2DKernel(x_stddev=convolve_muse)
+            musedata = convolve(musedata, kernel)
+        if convolve_reference > 0 :
+            kernel = Gaussian2DKernel(x_stddev=convolve_reference)
+            refdata = convolve(refdata, kernel)
+
         # Getting the result of the normalisation
         self.ima_polypar[nima] = get_image_norm_poly(musedata, 
                         refdata, chunk_size=self.chunk_size)
@@ -1063,8 +1072,8 @@ class AlignMusePointing(object):
             self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
         return musedata, refdata
 
-    def compare(self, start_nfig=1, nlevels=7, levels=None, muse_convolve=0.,
-            ref_convolve=0., samecontour=True, nima=0,
+    def compare(self, start_nfig=1, nlevels=7, levels=None, convolve_muse=0.,
+            convolve_reference=0., samecontour=True, nima=0,
             showcontours=True, showcuts=True, 
             shownormalise=True, showdiff=True,
             normalise=True, median_filter=True, 
@@ -1081,7 +1090,9 @@ class AlignMusePointing(object):
         """
         # Getting the data
         musedata, refdata = self.get_image_normfactor(nima=nima, 
-                median_filter=median_filter)
+                median_filter=median_filter, 
+                convolve_muse=convolve_muse,
+                convolve_reference=convolve_reference)
 
         # If normalising, using the median ratio fit
         if normalise or shownormalise :
@@ -1104,14 +1115,6 @@ class AlignMusePointing(object):
                     "{0:8.4e} {1:8.4e}".format(lowlevel_muse, highlevel_muse))
             print("Low / High level REF  flux: "
                     "{0:8.4e} {1:8.4e}".format(lowlevel_ref, highlevel_ref))
-
-        # Smoothing out the result in case it is needed
-        if muse_convolve > 0 :
-            kernel = Gaussian2DKernel(x_stddev=muse_convolve)
-            musedata = convolve(musedata, kernel)
-        if ref_convolve > 0 :
-            kernel = Gaussian2DKernel(x_stddev=ref_convolve)
-            refdata = convolve(refdata, kernel)
 
         # Get the WCS from mpdaf to allow rotation if needed
         refwcs = self.list_wcs_proj_refhdu[nima]
@@ -1147,6 +1150,7 @@ class AlignMusePointing(object):
             current_fig += 1
             
         if showcontours:
+            np.seterr(divide = 'ignore') 
             fig, ax = open_new_wcs_figure(current_fig, plotwcs)
             if levels is not None:
                 mylevels = levels
@@ -1162,18 +1166,14 @@ class AlignMusePointing(object):
                     origin='lower', linestyles='solid')
             # Second contours - Ref
             if samecontour:
-                np.seterr(divide = 'ignore') 
                 crefset = ax.contour(np.log10(refdata), 
                                      levels=cmuseset.levels, 
                                      colors='r', origin='lower', 
                                      alpha=0.5, linestyles='solid')
-                np.seterr(divide = 'ignore') 
             else :
-                np.seterr(divide = 'ignore') 
                 crefset = ax.contour(np.log10(refdata), levels=levels_ref,
                         colors='r', origin='lower', alpha=0.5,
                         linestyles='solid')
-                np.seterr(divide = 'ignore') 
             ax.set_aspect('equal')
             h1,_ = cmuseset.legend_elements()
             h2,_ = crefset.legend_elements()
@@ -1183,6 +1183,7 @@ class AlignMusePointing(object):
 
             self.list_figures.append(current_fig)
             current_fig += 1
+            np.seterr(divide = 'warning') 
 
         if showcuts:
             fig, ax = open_new_wcs_figure(current_fig)
