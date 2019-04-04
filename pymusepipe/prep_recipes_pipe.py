@@ -1006,6 +1006,8 @@ class PipePrep(SofPipe) :
         filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
         # Use the pointing as a suffix for the names
         pointing = "P{0:02d}".format(self.pointing)
+        # Save option
+        save = kwargs.pop("save", "cube,combined")
 
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
@@ -1040,7 +1042,7 @@ class PipePrep(SofPipe) :
         self.recipe_combine(self.current_sof, dir_products, name_products, 
                 tpl, expotype, suffix_products=suffix_products,
                 suffix_prefinalnames=suffix_prefinalnames,
-                save='cube', suffix=suffix, filter_list=filter_list, **kwargs)
+                save=save, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
