@@ -1000,8 +1000,6 @@ class PipePrep(SofPipe) :
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
 
-        # Setting the default option of offset_list
-        offset_list = kwargs.pop("offset_list", "True")
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
         # Use the pointing as a suffix for the names
@@ -1017,11 +1015,22 @@ class PipePrep(SofPipe) :
         pixtable_name = self._get_suffix_product('REDUCED')
         pixtable_name_thisone = dic_products_scipost['individual']
 
+        # Setting the default option of offset_list
+        # And looking for that table, adding it to the sof file
+        offset_list = kwargs.pop("offset_list", "True")
         if offset_list :
-            name_offset = "{0}{1}_{2}_{3}_{4}_{5}.fits".format(dic_files_products['ALIGN'][0], 
-                suffix, filter_for_alignment, expotype, pointing, tpl) 
-            self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"), 
-                name_offset)]
+            offset_list_tablename = kwargs.pop("offset_list_tablename", None)
+            if offset_list_tablename is None:
+                offset_list_tablename = "{0}{1}_{2}_{3}_{4}_{5}.fits".format(
+                        dic_files_products['ALIGN'][0], suffix, filter_for_alignment, 
+                        expotype, pointing, tpl) 
+            if not os.path.isfile(offset_list_tablename):
+                upipe.print_error("OFFSET_LIST table {0} not found".format(
+                        offset_list_tablename))
+                return
+
+            self._sofdict['OFFSET_LIST'] = [offset_list_tablename]
+
         self._sofdict[pixtable_name] = []
         for prod in pixtable_name_thisone:
             if old_naming_convention:
