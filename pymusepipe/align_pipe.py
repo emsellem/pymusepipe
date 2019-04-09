@@ -663,21 +663,28 @@ class AlignMusePointing(object):
             return
 
         # Check if RA_OFFSET is there
-        if 'RA_OFFSET' in fits_table.columns:
-            # if yes, then check if the ORIG column is there
+        exist_ra_offset =  ('RA_OFFSET' in fits_table.columns)
+
+        # First save the DATA and MJD references
+        fits_table['DATE_OBS'] = self.ima_dateobs
+        fits_table['MJD_OBS'] = self.ima_mjdobs
+
+        # Saving the final values
+        fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600.
+        fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
+        fits_table['FLUX_SCALE'] = self.ima_norm_factors
+
+        # Deal with RA_OFFSET_ORIG if needed
+        if exist_ra_offset:
+            # if RA_OFFSET exists, then check if the ORIG column is there
             if 'RA_OFFSET_ORIG' not in fits_table.columns:
                 fits_table['RA_OFFSET_ORIG'] = fits_table['RA_OFFSET']
                 fits_table['DEC_OFFSET_ORIG'] = fits_table['DEC_OFFSET']
                 fits_table['FLUX_SCALE_ORIG'] = fits_table['FLUX_SCALE']
 
-        # Saving the final values
-        fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600.
-        fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
+        # Finally add the cross-correlation offsets
         fits_table['RA_CROSS_OFFSET'] = self.cross_off_arcsec[:,0] / 3600.
         fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:,1] / 3600.
-        fits_table['FLUX_SCALE']= self.ima_norm_factors
-        fits_table['DATE_OBS'] = self.ima_dateobs
-        fits_table['MJD_OBS'] = self.ima_mjdobs
 
         # Writing it up
         if exist_table and not overwrite:
