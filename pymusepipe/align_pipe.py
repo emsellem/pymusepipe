@@ -281,7 +281,7 @@ def filtermed_image(data, border=10, filter_size=2):
 
     return meddata
 
-def prepare_image(data, border=10, dynamic_range=10, median_window=10):
+def prepare_image(data, border=10, dynamic_range=10, median_window=10, minflux=0.0):
     """Process image by squeezing the range, removing the borders
     and filtering it.
      
@@ -299,7 +299,7 @@ def prepare_image(data, border=10, dynamic_range=10, median_window=10):
     cdata = crop_data(data, border)
 
     # Removing the zeros
-    cdata[cdata < 0] = 0.
+    cdata[cdata < minflux] = 0.
 
     # Clean up the NaNs
     cdata = np.nan_to_num(cdata)
@@ -402,6 +402,7 @@ class AlignMusePointing(object):
         # Initialise the parameters for the first guess
         self.firstguess = kwargs.pop("firstguess", "crosscorr")
         self.name_offset_table = kwargs.pop("name_offset_table", None)
+        self.minflux_crosscorr = kwargs.pop("minflux_crosscorr", 0.)
 
         # Get the MUSE images
         self._get_list_muse_images(**kwargs)
@@ -861,47 +862,67 @@ class AlignMusePointing(object):
 
         return 1
 
-    def find_ncross_peak(self):
+    def find_ncross_peak(self, list_nima=None, minflux=None):
         """Run the cross correlation peaks on all MUSE images
+        Derive the self.cross_off_pixel/arcsec parameters
          
         Keywords
         --------
+        list_nima: list of indices for images to process
+                Should be a list. Default is None
+                and all images are processed
+
+        minflux: minimum flux to be used in the cross-correlation
+                Flux below that value will be set to 0.
+                Default is 0.
         
-        Returns
-        -------
         """
-        for nima in range(self.nimages):
+        if list_nima is None:
+            list_nima = range(self.nimages)
+
+        for nima in list_nima:
             self.cross_off_pixel[nima] = self.find_cross_peak(
                     self.list_muse_hdu[nima],
                     self.list_name_musehdr[nima], 
-                    rotation=self.muse_rotangles[nima])
+                    rotation=self.muse_rotangles[nima], 
+                    minflux=minflux)
             self.cross_off_arcsec[nima] = pixel_to_arcsec(
                     self.list_muse_hdu[nima],
                     self.cross_off_pixel[nima])
 
-    def find_cross_peak(self, muse_hdu, name_musehdr, rotation=0.0):
+    def find_cross_peak(self, muse_hdu, name_musehdr, rotation=0.0, minflux=None):
         """Aligns the MUSE HDU to a reference HDU
          
         Keywords
         --------
+        muse_hdu: MUSE hdu file
+        name_musehdr: name of the muse hdr to save
+        rotation: Angle in degrees (0). 
+        minflux: minimum flux to be used in the cross-correlation
+                Flux below that value will be set to 0.
+                Default is 0.
         
         Returns
         -------
-        Returns
-        -------
-        new_hdu : fits.PrimaryHDU
-            HDU with header astrometry updated
+        xpix_cross
+        ypix_cross: x and y pixel coordinates of the cross-correlation peak
         """
         # Projecting the reference image onto the MUSE field
         tmphdr = muse_hdu.header.totextfile(name_musehdr, overwrite=True)
         proj_ref_hdu = self._project_reference_hdu(muse_hdu, rotation=rotation)
 
         # Cleaning the images
+        if minflux is None:
+            minflux = self.minflux_crosscorr
+
+        minflux_ref = minflux / self.conversion_factor
         ima_ref = prepare_image(proj_ref_hdu.data, self.border, 
                                 self.dynamic_range,
-                                self.median_window) * self.conversion_factor
+                                self.median_window,
+                                minflux=minflux_ref) * self.conversion_factor
         ima_muse = prepare_image(muse_hdu.data, self.border, 
-                self.dynamic_range, self.median_window)
+                self.dynamic_range, self.median_window,
+                minflux=minflux)
 
         # Cross-correlate the images
         ccor = correlate(ima_ref, ima_muse, mode='full', method='auto')
@@ -933,8 +954,8 @@ class AlignMusePointing(object):
                         subim)
 
         # Update Astrometry
-        xpix_cross = params.x_mean - ccor.shape[1]//2
-        ypix_cross = params.y_mean - ccor.shape[0]//2
+        xpix_cross = ccor.shape[1]//2 - params.x_mean
+        ypix_cross = ccor.shape[0]//2 - params.y_mean
 
         return xpix_cross, ypix_cross
 
@@ -955,7 +976,7 @@ class AlignMusePointing(object):
         else:
             upipe.print_error("There are not yet any new hdu to save")
 
-    def _get_flux_range(self, data, low=10, high=90):
+    def _get_flux_range(self, data, low=10, high=99):
         """Process image and return it
          
         Keywords
@@ -969,8 +990,8 @@ class AlignMusePointing(object):
 
         # Clean up the NaNs
         data = np.nan_to_num(data)
-        lperc = np.percentile(data[data > 0.], 10)
-        hperc = np.percentile(data[data > 0.], 90)
+        lperc = np.percentile(data[data > 0.], low)
+        hperc = np.percentile(data[data > 0.], high)
 
         return lperc, hperc
 
