@@ -123,7 +123,8 @@ def my_linear_model(B, x):
     """
     return B[1] * (x + B[0])
 
-def get_image_norm_poly(data1, data2, chunk_size=15):
+def get_image_norm_poly(data1, data2, chunk_size=15, 
+        threshold1=0., threshold2=0):
     """Find the normalisation factor between two datasets
     Including the background and slope
      
@@ -134,7 +135,7 @@ def get_image_norm_poly(data1, data2, chunk_size=15):
     -------
     """
     med, std = chunk_stats([data1, data2], chunk_size=chunk_size)
-    pos = (med[0] > 0.) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > 0.)
+    pos = (med[0] > threshold1) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > threshold2)
     guess_slope = np.nanmedian(med[1][pos] / med[0][pos])
 
     result = regress_odr(x=med[0][pos], y=med[1][pos], sx=std[0][pos], 
@@ -317,11 +318,13 @@ class AlignMusePointing(object):
                  folder_reference="",
                  folder_muse_images="",
                  name_muse_images=None,
+                 sel_indices_images=None,
                  median_window=10,
                  subim_window=10,
                  dynamic_range=10,
                  border=10, hdu_ext=[0,1],
                  chunk_size=15,
+                 threshold_muse=0.,
                  **kwargs):
         """Initialise the AlignMuseImages class.
         
@@ -371,6 +374,7 @@ class AlignMusePointing(object):
             return
 
         self.name_muse_images = name_muse_images
+        self.sel_indices_images = sel_indices_images
         self.folder_muse_images = folder_muse_images
         # Check if folder muse images exists
         if not os.path.isdir(self.folder_muse_images):
@@ -401,8 +405,10 @@ class AlignMusePointing(object):
 
         # Get the MUSE images
         self._get_list_muse_images(**kwargs)
+        upipe.print_info("{0} MUSE images detected as input".format(
+                            self.nimages))
         if self.nimages == 0:
-            upipe.print_warning("0 MUSE images detected as input")
+            upipe.print_error("No MUSE images detected. Aborted")
             return
         self.list_offmuse_hdu = [None] * self.nimages
         self.list_wcs_offmuse_hdu = [None] * self.nimages
@@ -423,6 +429,7 @@ class AlignMusePointing(object):
         self.ima_polypar = [None] * self.nimages
         # Normalisation factor to be saved or used
         self.ima_norm_factors = np.zeros((self.nimages), dtype=np.float64)
+        self.threshold_muse = np.zeros_like(self.ima_norm_factors) + threshold_muse
         # Default lists for date and mjd of the MUSE images
         self.ima_dateobs = [None] * self.nimages
         self.ima_mjdobs = [None] * self.nimages
@@ -431,7 +438,10 @@ class AlignMusePointing(object):
         self.hdu_ext = hdu_ext
 
         # Open the Ref and MUSE image
-        self.open_hdu()
+        status_open = self.open_hdu()
+        if not status_open:
+            upipe.print_error("Problem in opening frames, please check your input")
+            return
 
         # find the cross correlation peaks for each image
         self.find_ncross_peak()
@@ -458,7 +468,7 @@ class AlignMusePointing(object):
         """
         print("Normalisation factors")
         print("Image # : InitFluxScale   LinearFit   NormFactor")
-        for nima in self.nimages:
+        for nima in range(self.nimages):
             print("Image {0:02d}:  {1:8.2f}   {1:8.2f}     {2:8.2f}".format(
                     self.init_flux_scale[nima], 
                     self.ima_norm_factors[nima], 
@@ -705,6 +715,7 @@ class AlignMusePointing(object):
             extra_arcsec = kwargs.pop("extra_arcsec", [0., 0.])
 
         self.muse_rotangles[nima] = kwargs.pop("rotation", 0.0)
+        self.threshold_muse[nima] = kwargs.pop("threshold_muse", 0.0)
 
         # Add the offset from user
         self.shift_arcsecond(extra_arcsec, nima)
@@ -731,6 +742,20 @@ class AlignMusePointing(object):
                     self.suffix_images, self.name_filter))
             self.list_muse_images = [Path(muse_path).name 
                                      for muse_path in set_of_paths]
+            # Sort alphabetically
+            self.list_muse_images.sort()
+            # Subselection if sel_indices_images is given
+            if self.sel_indices_images is not None:
+                if not all([i in np.arange(len(self.list_muse_images)) 
+                        for i in self.sel_indices_images]): 
+                    upipe.print_warning("Selection list - sel_indices_images "
+                                        "- does not match image list")
+                    upipe.print_warning("Ignoring that input sel_indices_images")
+                else :
+                    newlist = [self.list_muse_images[nima] 
+                            for nima in self.sel_indices_images]
+                    self.list_muse_images = newlist
+
         # test if 1 or several images
         elif isinstance(self.name_muse_images, str):
             self.list_muse_images = [self.name_muse_images]
@@ -741,8 +766,6 @@ class AlignMusePointing(object):
                     "please check input name_muse_images")
             self.list_muse_images = []
 
-        # Sort alphabetically
-        self.list_muse_images.sort()
 
         # Number of images to deal with
         self.nimages = len(self.list_muse_images)
@@ -756,8 +779,17 @@ class AlignMusePointing(object):
         Returns
         -------
         """
-        self._open_ref_hdu()
-        self._open_muse_nhdu()
+        status_ref = self._open_ref_hdu()
+        if not status_ref:
+            upipe.print_error("Problem in opening Reference frame, please check input")
+            return 0
+
+        status_muse = self._open_muse_nhdu()
+        if not status_muse:
+            upipe.print_error("Problem in opening MUSE frame, please check input")
+            return 0
+
+        return 1
 
     def _open_muse_nhdu(self):
         """Open the MUSE images hdu
@@ -796,6 +828,11 @@ class AlignMusePointing(object):
             else :
                 self.ima_mjdobs[nima] = hdu[0].header[default_mjd_image]
 
+            if self.list_muse_hdu[nima].data is None:
+                return 0
+
+        return 1
+
     def _open_ref_hdu(self):
         """Open the reference image hdu
          
@@ -809,6 +846,13 @@ class AlignMusePointing(object):
         hdulist_reference = pyfits.open(self.folder_reference 
                                         + self.name_reference)
         self.reference_hdu = hdulist_reference[self.hdu_ext[0]]
+        if self.reference_hdu.data is None:
+            upipe.print_error("No data found in extension of reference frame")
+            upipe.print_error("Check your input, "
+                    "or change the extention number in input hdu_ext[0]")
+            return 0
+
+        return 1
 
     def find_ncross_peak(self):
         """Run the cross correlation peaks on all MUSE images
@@ -1002,14 +1046,16 @@ class AlignMusePointing(object):
 
         # Shift the HDU in X and Y
         if self.verbose:
-            print("Shifting CRPIX1 by {0:8.4f} pixels "
-                  "/ {1:8.4f} arcsec".format(self.total_off_pixel[nima][0],
-                self.total_off_arcsec[nima][0]))
+            print("Image {0:03d} - Shifting CRPIX1 by {1:8.4f} pixels "
+                  "/ {1:8.4f} arcsec".format(nima, 
+                      self.total_off_pixel[nima][0], 
+                      self.total_off_arcsec[nima][0]))
         newhdr['CRPIX1'] = newhdr['CRPIX1'] + self.total_off_pixel[nima][0]
         if self.verbose:
-            print("Shifting CRPIX2 by {0:8.4f} pixels "
-                  "/ {1:8.4f} arcsec".format(self.total_off_pixel[nima][1],
-                self.total_off_arcsec[nima][1]))
+            print("Image {0:03d} - Shifting CRPIX2 by {1:8.4f} pixels "
+                  "/ {1:8.4f} arcsec".format(nima, 
+                      self.total_off_pixel[nima][1], 
+                      self.total_off_arcsec[nima][1]))
         newhdr['CRPIX2'] = newhdr['CRPIX2'] + self.total_off_pixel[nima][1]
 
         # Creating a new Primary HDU with the input data, and the new Header
@@ -1035,7 +1081,8 @@ class AlignMusePointing(object):
         musedata, refdata = self.get_image_normfactor(nima)
 
     def get_image_normfactor(self, nima=0, median_filter=True, 
-            convolve_muse=0., convolve_reference=0.):
+            convolve_muse=0., convolve_reference=0.,
+            threshold_muse=None):
         """Get the normalisation factor for image nima
          
         Keywords
@@ -1066,8 +1113,12 @@ class AlignMusePointing(object):
             refdata = convolve(refdata, kernel)
 
         # Getting the result of the normalisation
+        if threshold_muse is not None:
+            self.threshold_muse[nima] = threshold_muse
+
         self.ima_polypar[nima] = get_image_norm_poly(musedata, 
-                        refdata, chunk_size=self.chunk_size)
+                        refdata, chunk_size=self.chunk_size,
+                        threshold1=self.threshold_muse[nima])
         if self.use_polynorm:
             self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
         return musedata, refdata
@@ -1078,7 +1129,8 @@ class AlignMusePointing(object):
             shownormalise=True, showdiff=True,
             normalise=True, median_filter=True, 
             ncuts=5, percentage=10.,
-            rotation=0.0):
+            rotation=0.0,
+            threshold_muse=None):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
          
@@ -1092,7 +1144,8 @@ class AlignMusePointing(object):
         musedata, refdata = self.get_image_normfactor(nima=nima, 
                 median_filter=median_filter, 
                 convolve_muse=convolve_muse,
-                convolve_reference=convolve_reference)
+                convolve_reference=convolve_reference,
+                threshold_muse=threshold_muse)
 
         # If normalising, using the median ratio fit
         if normalise or shownormalise :
