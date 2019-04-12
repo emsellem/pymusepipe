@@ -299,7 +299,8 @@ def prepare_image(data, border=10, dynamic_range=10, median_window=10, minflux=0
     cdata = crop_data(data, border)
 
     # Removing the zeros
-    cdata[cdata < minflux] = 0.
+    with np.errstate(invalid='ignore'):
+        cdata[cdata < minflux] = 0.
 
     # Clean up the NaNs
     cdata = np.nan_to_num(cdata)
@@ -1248,7 +1249,7 @@ class AlignMusePointing(object):
             current_fig += 1
             
         if showcontours:
-            np.seterr(divide = 'ignore') 
+            np.seterr(divide = 'ignore', invalid='ignore') 
             fig, ax = open_new_wcs_figure(current_fig, plotwcs)
             if levels is not None:
                 mylevels = levels
@@ -1281,7 +1282,7 @@ class AlignMusePointing(object):
 
             self.list_figures.append(current_fig)
             current_fig += 1
-            np.seterr(divide = 'warn') 
+            np.seterr(divide = 'warn', invalid='warn') 
 
         if showcuts:
             fig, ax = open_new_wcs_figure(current_fig)
