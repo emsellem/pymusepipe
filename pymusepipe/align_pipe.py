@@ -367,6 +367,10 @@ class AlignMusePointing(object):
         self.dynamic_range = dynamic_range
         self.name_reference = name_reference
         self.folder_reference = folder_reference
+
+        # Debug option
+        self.debug = kwargs.pop("debug", False)
+
         # Check if folder reference exists
         if not os.path.isdir(self.folder_reference):
             upipe.print_error("Provided folder_reference is "
@@ -512,8 +516,8 @@ class AlignMusePointing(object):
                                 "a first guess of the alignment")
 
         if firstguess == "crosscorr":
-            self.init_off_arcsec = self.cross_off_arcsec
-            self.init_off_pixel = self.cross_off_pixel
+            self.init_off_arcsec = self.cross_off_arcsec * 1.0
+            self.init_off_pixel = self.cross_off_pixel * 1.0
         elif firstguess == "fits":
             exist_table, self.offset_table = self.open_offset_table(
                     self.folder_muse_images + self.name_offset_table)
@@ -954,6 +958,7 @@ class AlignMusePointing(object):
                         subim)
 
         # Update Astrometry
+        # Beware, the sign was changed here and is now ok
         xpix_cross = ccor.shape[1]//2 - params.x_mean
         ypix_cross = ccor.shape[0]//2 - params.y_mean
 
@@ -1075,13 +1080,13 @@ class AlignMusePointing(object):
         # Shift the HDU in X and Y
         if self.verbose:
             print("Image {0:03d} - Shifting CRPIX1 by {1:8.4f} pixels "
-                  "/ {1:8.4f} arcsec".format(nima, 
+                  "/ {2:8.4f} arcsec".format(nima, 
                       self.total_off_pixel[nima][0], 
                       self.total_off_arcsec[nima][0]))
         newhdr['CRPIX1'] = newhdr['CRPIX1'] + self.total_off_pixel[nima][0]
         if self.verbose:
             print("Image {0:03d} - Shifting CRPIX2 by {1:8.4f} pixels "
-                  "/ {1:8.4f} arcsec".format(nima, 
+                  "/ {2:8.4f} arcsec".format(nima, 
                       self.total_off_pixel[nima][1], 
                       self.total_off_arcsec[nima][1]))
         newhdr['CRPIX2'] = newhdr['CRPIX2'] + self.total_off_pixel[nima][1]
@@ -1197,6 +1202,11 @@ class AlignMusePointing(object):
             print("Low / High level REF  flux: "
                     "{0:8.4e} {1:8.4e}".format(lowlevel_ref, highlevel_ref))
 
+        # Save the frames if in debug mode
+        if self.debug:
+            self._temp_refdata = refdata
+            self._temp_musedata = musedata
+
         # Get the WCS from mpdaf to allow rotation if needed
         refwcs = self.list_wcs_proj_refhdu[nima]
 
@@ -1287,5 +1297,3 @@ class AlignMusePointing(object):
             cbar = fig.colorbar(im)
             self.list_figures.append(current_fig)
             current_fig += 1
-
-
