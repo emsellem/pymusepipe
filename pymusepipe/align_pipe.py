@@ -927,9 +927,16 @@ class AlignMusePointing(object):
         ima_muse = prepare_image(muse_hdu.data, self.border, 
                 self.dynamic_range, self.median_window,
                 minflux=minflux)
+        if self.debug:
+            self._temp_input_origmuse_cc = muse_hdu.data * 1.0
+            self._temp_input_origref_cc = proj_ref_hdu.data * 1.0
 
         # Cross-correlate the images
         ccor = correlate(ima_ref, ima_muse, mode='full', method='auto')
+        if self.debug:
+            self._temp_ima_muse_tocc = ima_muse * 1.0
+            self._temp_ima_ref_tocc = ima_ref * 1.0
+            self._temp_cc = ccor * 1.0
 
         # Find peak of cross-correlation
         maxy, maxx = np.unravel_index(np.argmax(ccor),
@@ -1013,7 +1020,7 @@ class AlignMusePointing(object):
         if muse_hdu is not None:
             wcs_ref = WCS(hdr=self.reference_hdu.header)
             ima_ref = Image(
-                    data=np.nan_to_num(self.reference_hdu.data) * self.conversion_factor, 
+                    data=self.reference_hdu.data * self.conversion_factor, 
                     wcs=wcs_ref)
 
             wcs_muse = WCS(hdr=muse_hdu.header)
