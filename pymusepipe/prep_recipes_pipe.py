@@ -116,8 +116,10 @@ class PipePrep(SofPipe) :
         MUSE_subtable = self._get_table_expo(expotype, stage)
         if len(MUSE_subtable) == 0:
             if self.verbose :
-                upipe.print_warning("Empty file table of type {0}".format(expotype))
-                upipe.print_warning("Returning an empty Table from the tpl -astropy- selection")
+                upipe.print_warning("Empty file table of type {0}".format(expotype),
+                        pipe=self)
+                upipe.print_warning("Returning an empty Table from the tpl -astropy- selection",
+                        pipe=self)
             return MUSE_subtable
 
         group_table = MUSE_subtable.group_by('tpls')
@@ -162,7 +164,8 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='BIAS', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No BIAS recovered from the astropy Table - Aborting")
+                upipe.print_warning("No BIAS recovered from the astropy Table - Aborting",
+                        pipe=self)
                 return
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -207,7 +210,8 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='FLAT', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No FLAT recovered from the astropy Table - Aborting")
+                upipe.print_warning("No FLAT recovered from the astropy Table - Aborting",
+                        pipe=self)
                 return
 
         # Go to the data folder
@@ -259,7 +263,8 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No WAVE recovered from the astropy file Table - Aborting")
+                upipe.print_warning("No WAVE recovered from the astropy file Table - Aborting", 
+                        pipe=self)
                 return
 
         # Go to the data folder
@@ -308,7 +313,8 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No WAVE recovered from the astropy file Table - Aborting")
+                upipe.print_warning("No WAVE recovered from the astropy file Table - Aborting", 
+                        pipe=self)
                 return
 
         # Go to the data folder
@@ -357,7 +363,8 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='TWILIGHT', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No TWILIGHT recovered from the astropy file Table - Aborting")
+                upipe.print_warning("No TWILIGHT recovered from the astropy file Table - Aborting", 
+                        pipe=self)
                 return
 
         # Go to the data folder
@@ -416,7 +423,8 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype=expotype, tpl=tpl, stage="raw")
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No {0} recovered from the astropy file Table - Aborting".format(expotype))
+                upipe.print_warning("No {0} recovered from the astropy file Table - Aborting".format(expotype), 
+                        pipe=self)
                 return
 
         # Go to the data folder
@@ -477,7 +485,8 @@ class PipePrep(SofPipe) :
         std_table = self.select_tpl_files("STD", tpl=tpl, stage="processed")
         if len(std_table) == 0:
             if self.verbose :
-                upipe.print_warning("No processed STD recovered from the astropy file Table - Aborting")
+                upipe.print_warning("No processed STD recovered from the astropy file Table - Aborting",
+                        pipe=self)
                 return
 
         # Go to the data folder
@@ -521,7 +530,8 @@ class PipePrep(SofPipe) :
         sky_table = self._get_table_expo("SKY", "processed")
         if len(sky_table) == 0:
             if self.verbose :
-                upipe.print_warning("No SKY recovered from the astropy file Table - Aborting")
+                upipe.print_warning("No SKY recovered from the astropy file Table - Aborting",
+                        pipe=self)
                 return
 
         # Go to the data folder
@@ -661,7 +671,7 @@ class PipePrep(SofPipe) :
             found_expo = False
             if self.verbose :
                 upipe.print_warning("No {0} recovered from the {1} astropy file "
-                    "Table - Aborting".format(expotype, stage))
+                    "Table - Aborting".format(expotype, stage), pipe=self)
 
         return found_expo, list_expo, group_list_expo, group_table
 
@@ -707,12 +717,14 @@ class PipePrep(SofPipe) :
         suffix_skycontinuum = kwargs.pop("suffix_skycont", default_suffix_skycontinuum)
         if rvcorr != "bary":
             upipe.print_warning("Scipost will use '{0}' as barycentric "
-                    "correction [Options are bary, helio, geo, none]".format(rvcorr))
+                    "correction [Options are bary, helio, geo, none]".format(rvcorr), 
+                    pipe=self)
 
         if skymethod != "none" :
             if suffix_skycontinuum != default_suffix_skycontinuum:
                 upipe.print_warning("Scipost will use '{0}' as suffix "
-                        "for the SKY_CONTINUUM files".format(suffix_skycontinuum))
+                        "for the SKY_CONTINUUM files".format(suffix_skycontinuum),
+                        pipe=self)
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -839,8 +851,10 @@ class PipePrep(SofPipe) :
             # exp_align needs at least 2
             if len(list_group_expo) <= 1:
                 if self.verbose:
-                    upipe.print_warning("Group = {0}".format(mytpl))
-                    upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this group")
+                    upipe.print_warning("Group = {0}".format(mytpl),
+                            pipe=self)
+                    upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this group",
+                            pipe=self)
                 continue
             self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                 'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) for iexpo in list_group_expo]
@@ -884,8 +898,10 @@ class PipePrep(SofPipe) :
         # Stop the process if only 1 or fewer exposures are retrieved
         if len(align_table) <= 1:
             if self.verbose:
-                upipe.print_warning("Pointing = {0}".format(self.pointing))
-                upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this Pointing")
+                upipe.print_warning("Pointing = {0}".format(self.pointing),
+                        pipe=self)
+                upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this Pointing",
+                        pipe=self)
             return
         
         # Go to the data folder
@@ -935,7 +951,8 @@ class PipePrep(SofPipe) :
         found_expo, list_expo, group_list_expo, align_table = self._select_list_expo("OBJECT", "ALL", "processed", list_expo) 
         if not found_expo:
             if self.verbose:
-                upipe.print_warning("No exposure recovered for the fine alignment")
+                upipe.print_warning("No exposure recovered for the fine alignment",
+                        pipe=self)
             return
             
         self.groupexpo = []
@@ -994,7 +1011,8 @@ class PipePrep(SofPipe) :
         # exp_combine needs a minimum of 2
         if len(combine_table) <= 1:
             if self.verbose:
-                upipe.print_warning("The combined pointing has only one exposure: process aborted")
+                upipe.print_warning("The combined pointing has only one exposure: process aborted",
+                        pipe=self)
             return
 
         # Go to the data folder
@@ -1026,7 +1044,7 @@ class PipePrep(SofPipe) :
                         expotype, pointing, tpl) 
             if not os.path.isfile(offset_list_tablename):
                 upipe.print_error("OFFSET_LIST table {0} not found".format(
-                        offset_list_tablename))
+                        offset_list_tablename), pipe=self)
                 return
 
             self._sofdict['OFFSET_LIST'] = [offset_list_tablename]

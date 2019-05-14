@@ -30,17 +30,48 @@ INFO = '\033[1;32;20m'
 ERROR = '\033[91m'
 ENDC = '\033[0m'
 BOLD = "\033[1m"
+
+def write_in_pipelogfile(mypipe, text):
+    """Writing in log file of the pipeline
+    """
+    fout = open(mypipe.logfile, 'a')
+    first_text = "# At : " + upipe.formatted_time()
+    if mypipe.fakemode : 
+        first_text += " FAKEMODE\n"
+    else :
+        first_text += "\n"
+    fout.write(first_text)
+    fout.write(text + "\n")
+    fout.close()
+
 def print_endline(text, **kwargs) :
     print(INFO + text + ENDC, **kwargs)
 
 def print_warning(text, **kwargs) :
-    print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
+    toprint = WARNING + "# MusePipeWarning " + ENDC + text, **kwargs
+    if 'pipe' in kwargs:
+        mypipe = kwargs.pop("pipe", None)
+        try:
+            write_in_pipelogfile(mypipe, toprint)
+        except:
+            pass
+
+    print(toprint)
 
 def print_info(text, **kwargs) :
     print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
 def print_error(text, **kwargs) :
-    print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
+    toprint = ERROR + "# MusePipeError " + ENDC + text, **kwargs
+    if 'pipe' in kwargs:
+        mypipe = kwargs.pop("pipe", None)
+        try:
+            write_in_pipelogfile(mypipe, toprint)
+        except:
+            pass
+
+    print(toprint)
+
 #-----------  END PRINTING FUNCTIONS -----------------------
 
 def lower_allbutfirst_letter(mystring):

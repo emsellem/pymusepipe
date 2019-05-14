@@ -398,10 +398,12 @@ class MusePipe(PipePrep, PipeRecipes):
         # Read the astropy table
         name_table = self._get_fitstablename_expo(expotype, stage)
         if not os.path.isfile(name_table):
-            upipe.print_warning("Astropy table {0} does not exist - setting up an empty one".format(name_table))
+            upipe.print_warning("Astropy table {0} does not exist - setting up an "
+                                " empty one".format(name_table), pipe=self)
             return Table([[],[],[]], names=['tpls','mjd', 'tplnexp'])
         else :
-            if self.verbose : upipe.print_info("Reading Astropy fits Table {0}".format(name_table))
+            if self.verbose : upipe.print_info("Reading Astropy fits Table {0}".format(
+                name_table))
             return Table.read(name_table, format="fits")
         
     def init_raw_table(self, reset=False):
@@ -422,12 +424,16 @@ class MusePipe(PipePrep, PipeRecipes):
         overwrite = True
         if os.path.isfile(name_table) :
             if self._overwrite_astropy_table :
-                upipe.print_warning("The raw-files table will be overwritten")
+                upipe.print_warning("The raw-files table will be overwritten", 
+                        pipe=self)
             else :
-                upipe.print_warning("The raw files table already exists")
+                upipe.print_warning("The raw files table already exists", 
+                        pipe=self)
                 upipe.print_warning("If you wish to overwrite it, "
-                      " please turn on the 'overwrite_astropy_table' option to 'True'")
-                upipe.print_warning("In the meantime, the existing table will be read and used")
+                      " please turn on the 'overwrite_astropy_table' option to 'True'", 
+                      pipe=self)
+                upipe.print_warning("In the meantime, the existing table will be read and used", 
+                        pipe=self)
                 self.Tables.Rawfiles = self.read_astropy_table('RAWFILES', "raw")
                 overwrite = False
 
@@ -504,21 +510,25 @@ class MusePipe(PipePrep, PipeRecipes):
             # Check if we update
             if self._update_astropy_table:
                 # Reading the existing table
-                upipe.print_warning("Reading the existing Astropy table {0}".format(fits_tablename))
+                upipe.print_warning("Reading the existing Astropy table {0}".format(fits_tablename), 
+                        pipe=self)
                 existing_table = Table.read(full_tablename, format="fits")
                 # first try to see if they are compatible by using vstack
                 try: 
                     stack_temptable = vstack([existing_table, table_to_save], join_type='exact')
-                    upipe.print_warning("Updating the existing Astropy table {0}".format(fits_tablename))
+                    upipe.print_warning("Updating the existing Astropy table {0}".format(fits_tablename), 
+                            pipe=self)
                     table_to_save = apy.table.unique(stack_temptable, keep='first')
                 except TableMergeError:
-                    upipe.print_warning("Astropy Table cannot be joined to the existing one")
+                    upipe.print_warning("Astropy Table cannot be joined to the existing one", 
+                            pipe=self)
                     return
 
             # Check if we want to overwrite or add the line in
             elif not self._overwrite_astropy_table:
                 upipe.print_warning("Astropy Table {0} already exists, "
-                    " use overwrite_astropy_table to overwrite it".format(fits_tablename))
+                    " use overwrite_astropy_table to overwrite it".format(fits_tablename), 
+                    pipe=self)
                 return
 
         table_to_save.write(full_tablename, format="fits", overwrite=True)

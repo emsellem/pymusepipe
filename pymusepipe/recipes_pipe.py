@@ -86,6 +86,19 @@ class PipeRecipes(object) :
         if self.verbose:
             upipe.print_info("LIST_CPU: {0}".format(self.list_cpu))
 
+    def write_logfile(self, text):
+        """Writing in log file
+        """
+        fout = open(self.logfile, 'a')
+        first_text = "# At : " + upipe.formatted_time()
+        if self.fakemode : 
+            first_text += " FAKEMODE\n"
+        else :
+            first_text += "\n"
+        fout.write(first_text)
+        fout.write(text + "\n")
+        fout.close()
+
     def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
         Fake mode will just spit out the command but not actually do it.
@@ -94,15 +107,7 @@ class PipeRecipes(object) :
             print(command)
     
         if log :
-            fout = open(self.logfile, 'a')
-            text = "# At : " + upipe.formatted_time()
-            if self.fakemode : 
-                text += " FAKEMODE\n"
-            else :
-                text += "\n"
-            fout.write(text)
-            fout.write(command + "\n")
-            fout.close()
+            self.write_logfile(command)
 
         if not self.fakemode :
             os.system(command)
