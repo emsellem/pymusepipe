@@ -1140,7 +1140,7 @@ class AlignMusePointing(object):
                                        self.border)
             refdata = filtermed_image(
 #                    self.list_proj_refhdu[nima].data * self.conversion_factor, 
-                    self.list_proj_refhdu[nima].data
+                    self.list_proj_refhdu[nima].data,
                     self.border)
         # Otherwise just copy the data
         else:
