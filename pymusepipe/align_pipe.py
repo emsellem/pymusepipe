@@ -160,7 +160,7 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.]):
     return myodr.run()
 
 def get_conversion_factor(input_unit, output_unit, 
-                          equivalence=u.spectral_density(6483.58 * u.AA)):
+                          equivalencies=u.spectral_density(6483.58 * u.AA)):
     """ Conversion of units from an input one
     to an output one
      
@@ -191,14 +191,14 @@ def get_conversion_factor(input_unit, output_unit,
     if not input_unit.unit.is_equivalent(output_unit):
         # if not equivalent we try a spectral density equivalence
         if not input_unit.unit.is_equivalent(output_unit, 
-                                             equivalencies=equivalence):
+                                             equivalencies=equivalencies):
             upipe.print_warning("Provided units for reference "
                                 "and MUSE images are not equivalent")
             upipe.print_warning("A conversion factor of 1.0 will thus be used")
             return 1.0
         else :
             return input_unit.unit.to(
-                    output_unit, equivalencies=equivalence) * input_unit.value 
+                    output_unit, equivalencies=equivalencies) * input_unit.value 
     else :
         return input_unit.unit.to(output_unit) * input_unit.value
 
@@ -473,9 +473,9 @@ class AlignMusePointing(object):
         
         """
         print("Normalisation factors")
-        print("Image # : InitFluxScale   LinearFit   NormFactor")
+        print("Image # : InitFluxScale     LinearFit     NormFactor")
         for nima in range(self.nimages):
-            print("Image {0:02d}:  {1:8.2f}   {1:8.2f}     {2:8.2f}".format(
+            print("Image {0:02d}:  {1:10.6e}   {1:10.6e}     {2:10.6e}".format(
                     self.init_flux_scale[nima], 
                     self.ima_norm_factors[nima], 
                     self.ima_polypar[nima].beta[1]))
@@ -492,9 +492,9 @@ class AlignMusePointing(object):
         
         """
         print("Normalisation factors")
-        print("Image # : BackGround      Slope")
+        print("Image # : BackGround        Slope")
         for nima in self.nimages:
-            print("Image {0:02d}:  {1:8.2f}   {2:8.2f}".format(
+            print("Image {0:02d}:  {1:10.6e}   {2:10.6e}".format(
                     self.ima_polypar[nima].beta[0], 
                     self.ima_polypar[nima].beta[1]))
 
@@ -584,7 +584,7 @@ class AlignMusePointing(object):
         -------
         """
         if name_table is None:
-            if not hasattr(self, name_table):
+            if not hasattr(self, "name_table"):
                 upipe.print_error("No FITS table name provided, "
                                   "Aborting Open")
                 return None, Table()
@@ -1018,6 +1018,7 @@ class AlignMusePointing(object):
         -------
         """
         # The mpdaf way to project an image onto an other one
+        # WARNING: the reference image will be converted in flux
         if muse_hdu is not None:
             wcs_ref = WCS(hdr=self.reference_hdu.header)
             ima_ref = Image(
@@ -1138,12 +1139,14 @@ class AlignMusePointing(object):
             musedata = filtermed_image(self.list_offmuse_hdu[nima].data, 
                                        self.border)
             refdata = filtermed_image(
-                    self.list_proj_refhdu[nima].data * self.conversion_factor, 
+#                    self.list_proj_refhdu[nima].data * self.conversion_factor, 
+                    self.list_proj_refhdu[nima].data
                     self.border)
         # Otherwise just copy the data
         else:
             musedata = copy.copy(self.list_offmuse_hdu[nima].data)
-            refdata = self.list_proj_refhdu[nima].data * self.conversion_factor
+#            refdata = self.list_proj_refhdu[nima].data * self.conversion_factor
+            refdata = self.list_proj_refhdu[nima].data
 
         # Smoothing out the result in case it is needed
         if convolve_muse > 0 :
