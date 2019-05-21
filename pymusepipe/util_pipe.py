@@ -21,6 +21,9 @@ from astropy import constants as const
 from pymusepipe.emission_lines import list_emission_lines
 from pymusepipe.emission_lines import full_muse_wavelength_range
 
+import collections
+from collections import OrderedDict
+
 ############    PRINTING FUNCTIONS #########################
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
@@ -36,7 +39,7 @@ def write_in_pipelogfile(mypipe, text):
     """
     fout = open(mypipe.logfile, 'a')
     first_text = "# At : " + upipe.formatted_time()
-    if mypipe.fakemode : 
+    if mypipe.fakemode: 
         first_text += " FAKEMODE\n"
     else :
         first_text += "\n"
@@ -44,11 +47,11 @@ def write_in_pipelogfile(mypipe, text):
     fout.write(text + "\n")
     fout.close()
 
-def print_endline(text, **kwargs) :
+def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)
 
 def print_warning(text, **kwargs) :
-    toprint = WARNING + "# MusePipeWarning " + ENDC + text, **kwargs
+    toprint = WARNING + "# MusePipeWarning " + ENDC + text
     if 'pipe' in kwargs:
         mypipe = kwargs.pop("pipe", None)
         try:
@@ -56,13 +59,13 @@ def print_warning(text, **kwargs) :
         except:
             pass
 
-    print(toprint)
+    print(toprint, **kwargs)
 
 def print_info(text, **kwargs) :
     print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
 def print_error(text, **kwargs) :
-    toprint = ERROR + "# MusePipeError " + ENDC + text, **kwargs
+    toprint = ERROR + "# MusePipeError " + ENDC + text
     if 'pipe' in kwargs:
         mypipe = kwargs.pop("pipe", None)
         try:
@@ -70,7 +73,7 @@ def print_error(text, **kwargs) :
         except:
             pass
 
-    print(toprint)
+    print(toprint, **kwargs)
 
 #-----------  END PRINTING FUNCTIONS -----------------------
 
@@ -78,6 +81,33 @@ def lower_allbutfirst_letter(mystring):
     """Lowercase all letters except the first one
     """
     return mystring[0].upper() + mystring[1:].lower()
+
+class TimeStampDict(OrderedDict):
+    """Class which builds a time stamp driven
+    dictionary of objects
+    """
+    def __init__(self, description="", myobject=None):
+        """Initialise an empty dictionary
+        with a given name
+        """
+        OrderedDict.__init__(self)
+        self.description = description
+        self.create_new_timestamp(myobject)
+
+    def create_new_timestamp(self, myobject=None):
+        """Create a new item in dictionary
+        using a time stamp
+        """
+        if myobject is not None:
+            self.present_tstamp = create_time_name()
+            self[self.present_tstamp] = myobject
+        else:
+            self.present_stamp = None
+
+    def delete_timestamp(self, tstamp=None):
+        """Delete a key in the dictionary
+        """
+        outkey = self.pop(tstamp)
 
 def create_time_name() :
     """Create a time-link name for file saving purposes

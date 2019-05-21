@@ -83,8 +83,6 @@ dic_folders = {
         # values provide the folder and whether or not this should be attempted to create
             # Master Calibration files
             "master" : "Master/",
-            # Reduced files
-            "reduced" : "Reduced/",
             # Object files
             "object" : "Object/",
             # Sky files

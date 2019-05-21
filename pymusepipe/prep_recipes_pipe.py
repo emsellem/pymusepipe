@@ -785,7 +785,7 @@ class PipePrep(SofPipe) :
             else: suffix_expo = ""
             self.save_expo_table(expotype, scipost_table, "reduced", 
                     "IMAGES_FOV_{0}_{1}{2}_list_table.fits".format(expotype, 
-                        suffix_expo, tpl, suffix_expo), aggregate=False, update=True)
+                        suffix_expo, tpl), aggregate=False, update=True)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
@@ -943,34 +943,84 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(logfile=True)
 
     @print_my_function_name
-    def adjust_alignment(self, name_ima_reference, list_expo=[], line=None, 
+    def save_fine_alignment(self, name_offset_table=None):
+        """ Save the fine pointing alignment
+        """
+        if name_offset_table is None:
+            name_offset_table = "XX"
+
+        # Use the save from the alignment module
+        tstamp = self.dic_alignments.present_tstamp
+        self.dic_alignments[tstamp].save(name_offset_table)
+
+    @print_my_function_name
+    def run_fine_alignment(self, name_ima_reference=None, nexpo=1, list_expo=[], line=None, 
+            filter_name="Cousins_R", bygroup=False, reset=False):
+        """Run the alignment on this pointing using or not a reference image
+        """
+        # If not yet initialised, build the dictionary
+        if not hasattr(self, "dic_alignments"):
+            # Create an empty dictionary with a None timestamp
+            self.dic_alignments = upipe.TimeStampDict()
+            # Reset to True to initialise the structure
+            reset = True
+
+        # If reset, check if list is not empty
+        # If not empty, create new time stamp and proceed with initialisation
+        if reset:
+            # Create a new set of alignments
+            self.get_align_group(name_ima_reference=name_ima_reference, 
+                    list_expo=list_expo, line=line, filter_name=filter_name, 
+                    bygroup=bygroup)
+            # if dictionary is empty, it creates the first timestamp
+            self.dic_alignments.create_new_timestamp(self.align_group)
+
+        # Run the alignment
+        tstamp = self.dic_alignments.present_tstamp
+        self.dic_alignments[tstamp].run(nexpo)
+        
+    @print_my_function_name
+    def get_align_group(self, name_ima_reference=None, list_expo=[], line=None, 
             filter_name="Cousins_R", bygroup=False):
-        """Adjust the alignment using a background image
+        """Extract the needed information for a set of exposures to be aligned
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo("OBJECT", "ALL", "processed", list_expo) 
+        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo("OBJECT", 
+                "ALL", "processed", list_expo) 
         if not found_expo:
             if self.verbose:
                 upipe.print_warning("No exposure recovered for the fine alignment",
                         pipe=self)
             return
             
-        self.groupexpo = []
+        # Initialise the list of Groups to be aligned
+        self.align_group = []
         suffix = "_{0}".format(filter_name)
         if line is not None:
             suffix += "_{0}".format(line)
 
+        # Option to do a per group alignment
         if bygroup:
             for gtable in align_table.groups:
                 mytpl, mymjd = self._get_tpl_meanmjd(gtable)
                 list_group_expo = gtable['iexpo'].data
                 list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                    'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) for iexpo in list_group_expo]
-                self.groupexpo.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
+                    'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) 
+                    for iexpo in list_group_expo]
+                self.align_group.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
+        # If not by group
         else:
             list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) for row in align_table]
-            self.groupexpo.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
+                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) 
+                for row in align_table]
+            # Giving a reference image name, doing the alignment w.r.t. to that specific image
+            if name_ima_reference is None:
+                upipe.print_warning("Using the first MUSE exposure as a reference")
+                self.align_group.append(AlignMusePointing(list_names_muse[0], 
+                    list_names_muse[1:], flag="mytpl"))
+            else:
+                self.align_group.append(AlignMusePointing(name_ima_reference, 
+                    list_names_muse, flag="mytpl"))
 
     def _get_combine_products(self, filter_list='white,Cousins_R'):
         """Provide a set of key output products depending on the filters
@@ -1036,33 +1086,34 @@ class PipePrep(SofPipe) :
         # Setting the default option of offset_list
         # And looking for that table, adding it to the sof file
         offset_list = kwargs.pop("offset_list", "True")
+        folder_expo = self._get_fullpath_expo(expotype, stage)
         if offset_list :
             offset_list_tablename = kwargs.pop("offset_list_tablename", None)
             if offset_list_tablename is None:
                 offset_list_tablename = "{0}{1}_{2}_{3}_{4}_{5}.fits".format(
                         dic_files_products['ALIGN'][0], suffix, filter_for_alignment, 
-                        expotype, pointing, tpl) 
-            if not os.path.isfile(offset_list_tablename):
-                upipe.print_error("OFFSET_LIST table {0} not found".format(
-                        offset_list_tablename), pipe=self)
+                        expotype, pointing, tpl)
+            if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
+                upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
+                        offset_list_tablename, folder_expo), pipe=self)
                 return
 
-            self._sofdict['OFFSET_LIST'] = [offset_list_tablename]
+            self._sofdict['OFFSET_LIST'] = [joinpath(folder_expo, offset_list_tablename)]
 
         self._sofdict[pixtable_name] = []
         for prod in pixtable_name_thisone:
             if old_naming_convention:
-               self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+               self._sofdict[pixtable_name] += [joinpath(folder_expo,
                    '{0}_{1:04d}.fits'.format(prod, row['iexpo'])) for row in combine_table]
             else:
-               self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+               self._sofdict[pixtable_name] += [joinpath(folder_expo,
                    '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo'])) for row in
                    combine_table]
         self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
             suffix, tpl), new=True)
 
         # Product names
-        dir_products = self._get_fullpath_expo(expotype, "processed")
+        dir_products = self._get_fullpath_expo(expotype, stage)
         name_products, suffix_products, suffix_prefinalnames = self._get_combine_products(filter_list) 
 
         # Combine the exposures 

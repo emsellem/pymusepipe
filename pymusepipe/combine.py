@@ -41,7 +41,16 @@ dic_combined_folders = {
          # esores log files
         "esorex_log" : "Esorex_log/",
         # Data Products - first writing
-        "pipe_products": "Pipe_products/"
+        "pipe_products": "Pipe_products/",
+        # Alignment for various pointings
+        "pointings": "Pointings/"
+        }
+
+dic_WFI_filter = {
+        # Narrow band filter 
+        "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
+        # Broad band filter
+        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt"
         }
 
 class muse_combine(PipePrep, PipeRecipes) :
@@ -86,6 +95,12 @@ class muse_combine(PipePrep, PipeRecipes) :
             upipe.print_info("The Log folder will be {0}".format(outlog))
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
+
+        # Initialise the filter
+        filter_name = kwargs.pop("reference_filter_name", "Cousin_R")
+        filter_loc = kwargs.pop("reference_filter_file", None)
+        self.init_reference_filter(filter_name, filter_loc)
+        self.create_reference_images()
 
         # End of parameter settings #########################
 
@@ -165,6 +180,44 @@ class muse_combine(PipePrep, PipeRecipes) :
             # Adding the path of the folder
             setattr(self.paths, name_pointing,
                     joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.galaxyname, pointing)))
+
+    def init_reference_filter(self, reference_filter_name, reference_filter_file=None):
+        """Initialise the reference filter
+        """
+        # Setting the reference filter
+        self.filter = reference_filter_name
+        if self.filter not in XXX:
+            print_info("Reading private reference filter {0}".format(self.filter))
+            if self.filter in dic_WFI_filter.keys():
+                self.filter_file = dic_WFI_filter[self.filter]
+            else:
+                if self_filter_file is None:
+                    upipe.print_error("Reference filter is not set")
+                    return
+                else:
+                    self.filter_file = reference_filter_file
+            # Now reading the filter data
+            path_filter = joinpath(self.paths.root, self.filter_file)
+            self.filter_wave, self.filter_sensitivity = np.loadtxt(path_filter, unpack=True)
+
+    def create_reference_images(self, reference_filter_name=None, reference_filter_file=None):
+        """Create all reference images using a dedicated filter (if not by
+        default in the mpdaf set)
+        """
+        import mpdaf
+        from mpdaf.obj import Cube
+
+        if reference_filter_name is not None:
+            self.init_reference_filter(reference_filter_name, reference_filter_file)
+
+        # Now loop on pointings
+        for pointing in self.list_pointings:
+            # Reading the filter sensitivity
+            # DEFINE THE POINTING + CUBE FOLDER
+            # GET THE CUBE NAME
+            data = Cube(self.XXXX +cube_name+".fits", ext=1)
+            refimage = data.bandpass_image(self.filter_wave, self.filter_sensitivity)
+            refimage.write(self.my_params.pointings +cube_name+'_'+filter+'.fits',)
 
     def run_combine(self, sof_filename='exp_combine', expotype="REDUCED", 
             tpl="ALL", stage="reduced", list_pointing=None, 
