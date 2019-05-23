@@ -201,6 +201,14 @@ class PipeRecipes(object) :
                 prod=self.joinprod("{0}_{1}".format(suffix, name_prod)), newprod=joinpath(dir_products, 
                     "{0}_{1}".format(suffix_out, name_prod))))
    
+    # Name of the output combined files are described by several key arguments
+    # Summary = {name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits
+    # Where:
+    #       name_imaout = folder of products + generic name of product (e.g., PIXTABLE_REDUCED)
+    #       suffix = User defined flag (suffix)
+    #       suff_pre = filter name if IMAGE_FOV, otherwise ""
+    #       tpl = tpls of the exposure
+    #       suff_post = number of expo if relevant (2 integer)
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[""], 
             suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
             save='cube,skymodel', filter_list='white', skymethod='model',

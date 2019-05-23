@@ -387,12 +387,20 @@ class AlignMusePointing(object):
                         "not an existing folder")
             return
 
+        # Creating the Header-Align folder
+        header_folder_name = kwargs.pop("header_folder_name", "AlignHeaders")
+        self.header_folder_name = joinpath(self.folder_muse_images, header_folder_name)
+        upipe.safely_create_folder(self.header_folder_name, verbose=self.verbose)
+
+        # Getting the names
         self.name_musehdr = kwargs.pop("name_musehdr", "muse")
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
         self.name_refhdr = kwargs.pop("name_refhdr", "reference.hdr")
-        self.use_polynorm = kwargs.pop("use_polynorm", True)
         self.suffix_images = kwargs.pop("suffix_muse_images", "IMAGE_FOV")
         self.name_filter = kwargs.pop("name_filter", "WFI_ESO844")
+
+        # Use polynorm or not
+        self.use_polynorm = kwargs.pop("use_polynorm", True)
 
         # Getting the unit conversions
         self.convert_units = kwargs.pop("convert_units", True)
@@ -548,7 +556,8 @@ class AlignMusePointing(object):
                 if mjd in values:
                     ind = np.nonzero(values == mjd)[0][0]
                     self.init_off_arcsec[nima] = [
-                            self.offset_table['RA_OFFSET'][ind] * 3600.,
+                            self.offset_table['RA_OFFSET'][ind] * 3600. \
+                                    * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                             self.offset_table['DEC_OFFSET'][ind] * 3600.]
                     self.init_flux_scale[nima] = nonan_flux_scale_table[ind]
                 else :
@@ -618,8 +627,9 @@ class AlignMusePointing(object):
         upipe.print_info("Offset recorded in OFFSET_LIST Table")
         upipe.print_info("Total in ARCSEC")
         for nima in range(self.nimages):
-            upipe.print_info("Image {0}: {1:8.4f} {1:8.4f}".format(
-                    fits_table['RA_OFFSET'][nima]*3600,
+            upipe.print_info("Image {0}: {1:8.4f} {2:8.4f}".format(
+                    fits_table['RA_OFFSET'][nima]*3600 \
+                            * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                     fits_table['DEC_OFFSET'][nima]*3600.))
 
     def print_offset(self):
@@ -676,7 +686,8 @@ class AlignMusePointing(object):
         fits_table['MJD_OBS'] = self.ima_mjdobs
 
         # Saving the final values
-        fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600.
+        fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600. \
+                / np.cos(np.deg2rad(self.list_dec_muse))
         fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
         fits_table['FLUX_SCALE'] = self.ima_norm_factors
 
@@ -689,7 +700,8 @@ class AlignMusePointing(object):
                 fits_table['FLUX_SCALE_ORIG'] = fits_table['FLUX_SCALE']
 
         # Finally add the cross-correlation offsets
-        fits_table['RA_CROSS_OFFSET'] = self.cross_off_arcsec[:,0] / 3600.
+        fits_table['RA_CROSS_OFFSET'] = self.cross_off_arcsec[:,0] / 3600.  \
+                / np.cos(np.deg2rad(self.list_dec_muse))
         fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:,1] / 3600.
 
         # Writing it up
@@ -823,8 +835,10 @@ class AlignMusePointing(object):
         self.list_muse_hdu = [hdu[self.hdu_ext[1]] 
                               for hdu in self.list_hdulist_muse]
         # CHANGE to mpdaf WCS
-        self.list_wcs_muse = [WCS(hdu[0].header) 
+        self.list_wcs_muse = [WCS(hdu[1].header) 
                               for hdu in self.list_hdulist_muse]
+        self.list_dec_muse = np.array([muse_wcs.get_crval2()
+                              for muse_wcs in self.list_wcs_muse])
         # Getting the orientation angles
         self.list_orig_rotangles = [musewcs.get_rot() 
                                     for musewcs in self.list_wcs_muse]
@@ -1109,7 +1123,8 @@ class AlignMusePointing(object):
 
         # Writing this up in an ascii file for record purposes
         tmphdr = self.list_offmuse_hdu[nima].header.totextfile(
-                self.list_name_offmusehdr[nima], overwrite=True)
+                self.header_folder_name + self.list_name_offmusehdr[nima], 
+                overwrite=True)
 
         # Reprojecting the Reference image onto the new MUSE frame
         self.list_proj_refhdu[nima] = self._project_reference_hdu(
@@ -1139,13 +1154,11 @@ class AlignMusePointing(object):
             musedata = filtermed_image(self.list_offmuse_hdu[nima].data, 
                                        self.border)
             refdata = filtermed_image(
-#                    self.list_proj_refhdu[nima].data * self.conversion_factor, 
                     self.list_proj_refhdu[nima].data,
                     self.border)
         # Otherwise just copy the data
         else:
             musedata = copy.copy(self.list_offmuse_hdu[nima].data)
-#            refdata = self.list_proj_refhdu[nima].data * self.conversion_factor
             refdata = self.list_proj_refhdu[nima].data
 
         # Smoothing out the result in case it is needed
@@ -1167,12 +1180,12 @@ class AlignMusePointing(object):
             self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
         return musedata, refdata
 
-    def compare(self, start_nfig=1, nlevels=7, levels=None, convolve_muse=0.,
+    def compare(self, start_nfig=1, nlevels=10, levels=None, convolve_muse=0.,
             convolve_reference=0., samecontour=True, nima=0,
             showcontours=True, showcuts=True, 
             shownormalise=True, showdiff=True,
             normalise=True, median_filter=True, 
-            ncuts=5, percentage=10.,
+            ncuts=5, percentage=5.,
             rotation=0.0,
             threshold_muse=None):
         """Compare the projected reference and MUSE image

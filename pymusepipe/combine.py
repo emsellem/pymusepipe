@@ -12,6 +12,7 @@ __contact__   = " <eric.emsellem@eso.org>"
 import numpy as np
 import os
 from os.path import join as joinpath
+import glob
 
 try :
     import astropy as apy
@@ -28,6 +29,8 @@ from pymusepipe.prep_recipes_pipe import PipePrep
 from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe 
+# Default keywords for MJD and DATE
+from pymusepipe.align_pipe import default_mjd_table, default_date_table
 
 __version__ = '0.0.2 (28 Feb 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
@@ -54,8 +57,11 @@ dic_WFI_filter = {
         }
 
 class muse_combine(PipePrep, PipeRecipes) :
-    def __init__(self, galaxyname=None, list_pointings=[1], rc_filename=None, 
-            cal_filename=None, combined_folder_name="Combined",
+    def __init__(self, galaxyname=None, list_pointings=[1], 
+            dic_exposures_in_pointing=None,
+            rc_filename=None, cal_filename=None, 
+            combined_folder_name="Combined", suffix="",
+            offset_table=None,
             outlog=None, logfile="MusePipeCombine.log", reset_log=False,
             verbose=True, **kwargs):
         """Initialisation of class muse_expo
@@ -85,7 +91,10 @@ class muse_combine(PipePrep, PipeRecipes) :
 
         # Setting the default attibutes #####################
         self.galaxyname = galaxyname
-        self.list_pointings = list_pointings
+        self._check_pointings(list_pointings, dic_exposures_in_pointing)
+        if offset_table is not None:
+            self._check_offset_table(offset_table)
+
         self.combined_folder_name = combined_folder_name
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
@@ -95,11 +104,12 @@ class muse_combine(PipePrep, PipeRecipes) :
             upipe.print_info("The Log folder will be {0}".format(outlog))
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
+        self.suffix = suffix
 
         # Initialise the filter
-        filter_name = kwargs.pop("reference_filter_name", "Cousin_R")
-        filter_loc = kwargs.pop("reference_filter_file", None)
-        self.init_reference_filter(filter_name, filter_loc)
+        filter_name = kwargs.pop("reference_filter_name", "Cousins_R")
+        filter_file = kwargs.pop("reference_filter_file", None)
+        self.init_reference_filter(filter_name, filter_file)
         self.create_reference_images()
 
         # End of parameter settings #########################
@@ -141,6 +151,82 @@ class muse_combine(PipePrep, PipeRecipes) :
         # Going back to initial working directory
         self.goto_prevfolder()
 
+    def _check_pointings(self, list_pointings, dic_exposures_in_pointings=None):
+        """Check if pointings and dictionary are compatible
+        """
+        self.list_pointings = list_pointings
+        self.dic_exposures_in_pointings = dic_exposures_in_pointings
+
+        # Getting the pieces of the names to be used for pixtabs
+        pixtable_suffix = dic_products_scipost['individual']
+
+        if self.dic_exponum_in_pointing is None:
+
+        # Initialise the dictionary of pixtabs to be found in each pointing
+        self.dic_pixtabs_in_pointings = {}
+        # Loop on Pointings
+        for pointing in self.list_pointings:
+            # get the path
+            path_pointing = getattr(self.paths, dic_name_pointings[pointing])
+            # List existing pixtabs, using the given suffix
+            list_pixtabs = glob.glob(path_pointing + self.my_params.object + 
+                    "{0}{1}*fits".format(pixtable_suffix, self.suffix))
+
+            # if no selection on exposure names are given
+            # Select all existing pixtabs
+            if self.dic_exponum_in_pointing is None:
+                select_list_pixtabs = list_pixtabs
+            # Otherwise use the ones which are given via their expo numbers
+            else:
+                try:
+                    # this is the list of exposures to consider
+                    list_expo = self.dic_exposures_in_pointings[pointing]
+                    # We loop on that list
+                    for expo in list_expo:
+                        # Check whether this exists in the our cube list
+                        for cube_name in list_pixtabs:
+                            if expo in cube_name:
+                                # We select the cube
+                                select_list_pixtabs.append(cube_name)
+                                # And remove it from the list
+                                list_pixtabs.remove(cube_name)
+                                # We break out of the cube for loop
+                                break
+                except:
+                    select_list_pixtabs = []
+
+            self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs
+
+    def _check_offset_table(self, offset_table=None):
+        """Checking if DATE-OBS and MJD-OBS are in the OFFSET Table
+        """
+        if offset_table is None:
+            upipe.print_error("No Offset table given")
+            return
+        else:
+            self.offset_table = offset_table
+        # getting the MJD and DATE from the OFFSET table
+        self.table_mjdobs = self.offset_table[default_mjd_table]
+        self.table_dateobs = self.offset_table[default_date_table]
+
+        # Checking existence of each pixel_table in the offset table
+        for pointing in self.list_pointings:
+            pixtab_to_exclude.append = []
+            for pixtab_name in self.dic_pixtabs_in_pointings[pointing]:
+                pixtab_header = pyfits.getheader(pixtab_name)
+                mjd_obs = pixtab_header['MJD-OBS']
+                date_obs = pixtab_header['DATE-OBS']
+                # First check MJD
+                index = np.argwhere(self.table_mjdobs == mjd_obs)
+                # Then check DATE
+                if (index.size == 0) or (self.table_dateobs[index] != date_obs):
+                    upipe.warning("PIXELTABLE {0} not found in OFFSET table: "
+                            "please Check MJD-OBS and DATE-OBS".format(pixtab_name))
+                    pixtab_to_exclude.append(pixtab_name)
+                # Exclude the one which have not been found
+                for pixtab in pixtab_to_exclude:
+                    self.dic_pixtabs_in_pointings[pointing].remove(pixtab)
+
     def goto_prevfolder(self, logfile=False) :
         """Go back to previous folder
         """
@@ -175,8 +261,10 @@ class muse_combine(PipePrep, PipeRecipes) :
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
 
         # Creating the filenames for Master files
+        self.dic_name_pointings = {}
         for pointing in self.list_pointings:
             name_pointing = "P{0:02d}".format(np.int(pointing))
+            self.dic_name_pointings[pointing] = name_pointing
             # Adding the path of the folder
             setattr(self.paths, name_pointing,
                     joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.galaxyname, pointing)))
@@ -184,12 +272,26 @@ class muse_combine(PipePrep, PipeRecipes) :
     def init_reference_filter(self, reference_filter_name, reference_filter_file=None):
         """Initialise the reference filter
         """
+        # Setting the names of reference filters provided by the MUSE files
+        with pyfits.open(self.XXX) as hdu1:
+            self.list_name_filters = []
+            for hdu in hdu1[1:]:
+                self.list_name_filters.append(hdu.name)
+
         # Setting the reference filter
-        self.filter = reference_filter_name
-        if self.filter not in XXX:
-            print_info("Reading private reference filter {0}".format(self.filter))
-            if self.filter in dic_WFI_filter.keys():
-                self.filter_file = dic_WFI_filter[self.filter]
+        self.filter_name = reference_filter_name
+
+        # Testing if in the MUSE list
+        if self.filter_name in self.list_name_filters:
+            upipe.print_info("Using MUSE reference filter {0}".format(self.filter_name))
+            self.private_filter = False
+
+        # If not in the list, use the private filter file
+        else:
+            upipe.print_info("Reading private reference filter {0}".format(self.filter_name))
+            self.private_filter = True
+            if self.filter_name in dic_WFI_filter.keys():
+                self.filter_file = dic_WFI_filter[self.filter_name]
             else:
                 if self_filter_file is None:
                     upipe.print_error("Reference filter is not set")
@@ -212,12 +314,17 @@ class muse_combine(PipePrep, PipeRecipes) :
 
         # Now loop on pointings
         for pointing in self.list_pointings:
-            # Reading the filter sensitivity
-            # DEFINE THE POINTING + CUBE FOLDER
-            # GET THE CUBE NAME
-            data = Cube(self.XXXX +cube_name+".fits", ext=1)
-            refimage = data.bandpass_image(self.filter_wave, self.filter_sensitivity)
-            refimage.write(self.my_params.pointings +cube_name+'_'+filter+'.fits',)
+            # Get the cube
+            path_cube = getattr(self.paths, self.dic_name_pointings[pointing])
+            mycube = Cube(path_cube + cube_name + ".fits", ext=1)
+
+            # Using either sensitivity or built-in mpdaf filter module (get_band_image)
+            if self.private_filter:
+                refimage = mycube.bandpass_image(self.filter_wave, self.filter_sensitivity)
+            else:
+                refimage = mycube.get_band_image(self.filter_name)
+            # Writing the image
+            refimage.write(self.my_params.pointings +cube_name+'_'+ self.filter_name +'.fits',)
 
     def run_combine(self, sof_filename='exp_combine', expotype="REDUCED", 
             tpl="ALL", stage="reduced", list_pointing=None, 
