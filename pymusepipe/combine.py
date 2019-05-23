@@ -160,8 +160,6 @@ class muse_combine(PipePrep, PipeRecipes) :
         # Getting the pieces of the names to be used for pixtabs
         pixtable_suffix = dic_products_scipost['individual']
 
-        if self.dic_exponum_in_pointing is None:
-
         # Initialise the dictionary of pixtabs to be found in each pointing
         self.dic_pixtabs_in_pointings = {}
         # Loop on Pointings
