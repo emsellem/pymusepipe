@@ -99,6 +99,10 @@ dic_folders = {
             "figures" : "Figures/",
             }
 
+# This dictionary shows the folders to be created within the TARGET name
+dic_folders_target = {
+        "alignment" : "Alignment/"
+        }
 
 ############################################################
 # Main class InitMuseParameters
@@ -118,6 +122,7 @@ class InitMuseParameters(object) :
         # attributing the dictionaries
         self._dic_folders = dic_folders
         self._dic_input_folders = dic_input_folders
+        self._dic_folders_target = dic_folders_target
 
         if rc_filename is None :
             if not os.path.isfile(default_rc_filename):

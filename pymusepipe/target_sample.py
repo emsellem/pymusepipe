@@ -41,17 +41,17 @@ class MusepipeSample(object) :
         self.targets = MUSEPIPE_sample.keys()
 
 class MusepipeTarget(object) :
-    def __init__(self, galaxyname=None, list_pointings=[1]) :
-        if galaxyname not in MUSEPIPE_sample.keys() :
-            upipe.print_error("ERROR: no Galaxy named {gal} in the defined sample".format(gal=galaxyname))
+    def __init__(self, targetname=None, list_pointings=[1]) :
+        if targetname not in MUSEPIPE_sample.keys() :
+            upipe.print_error("ERROR: no Galaxy named {gal} in the defined sample".format(gal=targetname))
             return
 
         # Galaxy name
-        upipe.print_info("Initialising Target {name}".format(name=galaxyname))
-        self.targetname = galaxyname
+        upipe.print_info("Initialising Target {name}".format(name=targetname))
+        self.targetname = targetname
 
         # Info of the pointings and extracting the observing run for each pointing
-        self.info_pointings = MUSEPIPE_sample[galaxyname]
+        self.info_pointings = MUSEPIPE_sample[targetname]
         if any([_ not in self.info_pointings.keys() for _ in list_pointings]) :
             upipe.print_error("ERROR: no pointing {0} for the Galaxy".format(list_pointings))
             return
@@ -86,16 +86,16 @@ class MusepipeTarget(object) :
             calfile = self._get_calfile_name(self.suffix_calfile, pointing)
             rcfile = self._get_rcfile_name(self.suffix_rcfile, pointing)
             
-            python_command = ("mypipe = musepipe.MusePipe(galaxyname={0}, "
+            python_command = ("mypipe = musepipe.MusePipe(targetname={0}, "
                     "pointing={1}, rc_filename={2}, cal_filename={3}, "
                     "outlog=None, logfile={4}, fakemode={5}, "
-                    "nocache=False)".format(galaxyname, pointing, rcfile, calfile, 
+                    "nocache=False)".format(targetname, pointing, rcfile, calfile, 
                             logfile, fakemode))
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
             upipe.print_info(python_command)
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
             self.history.append(python_command)
-            mypipe = MusePipe(galaxyname=galaxyname, pointing=pointing, 
+            mypipe = MusePipe(targetname=targetname, pointing=pointing, 
                     rc_filename=rcfile, cal_filename=calfile, outlog=None, 
                     logfile=logfile, fakemode=fakemode, nocache=False)
 

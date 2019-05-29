@@ -76,6 +76,13 @@ __version__ = '0.2.0 (22 May 2018)'
 # NOTE: most of the parameters have now been migrated to
 # init_musepipe.py for consistency.
 
+dic_WFI_filter = {
+        # Narrow band filter 
+        "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
+        # Broad band filter
+        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt"
+        }
+
 listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
         'ILLUM': 'FLAT,LAMP,ILLUM', 'TWILIGHT': 'FLAT,SKY', 
         'WAVE': 'WAVE', 'STD': 'STD', 'AST': 'AST',
@@ -173,12 +180,12 @@ def lower_rep(text) :
 class MusePipe(PipePrep, PipeRecipes):
     """Main Class to define and run the MUSE pipeline, given a certain galaxy name
     
-    musep = MusePipe(galaxyname='NGC1087', rc_filename="", cal_filename="", 
+    musep = MusePipe(targetname='NGC1087', rc_filename="", cal_filename="", 
                       outlog"NGC1087_log1.log", objects=[''])
     musep.run()
     """
 
-    def __init__(self, galaxyname=None, pointing=0, objectlist=[], rc_filename=None, 
+    def __init__(self, targetname=None, pointing=0, objectlist=[], rc_filename=None, 
             cal_filename=None, outlog=None, logfile="MusePipe.log", reset_log=False,
             verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
             strong_checkmode=False, **kwargs):
@@ -186,7 +193,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         Input
         -----
-        galaxyname: string (e.g., 'NGC1208'). default is None. 
+        targetname: string (e.g., 'NGC1208'). default is None. 
         objectlist= list of objects (string=filenames) to process. Default is empty
 
         rc_filename: filename to initialise folders
@@ -228,7 +235,7 @@ class MusePipe(PipePrep, PipeRecipes):
 #        super(MusePipe, self).__init__(**kwargs)
 
         # Setting the default attibutes #####################
-        self.galaxyname = galaxyname
+        self.targetname = targetname
         self.pointing = pointing
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
@@ -264,7 +271,7 @@ class MusePipe(PipePrep, PipeRecipes):
                             cal_filename=cal_filename)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
-        self.my_params.data = "{0}/P{1:02d}/".format(self.galaxyname, self.pointing)
+        self.my_params.data = "{0}/P{1:02d}/".format(self.targetname, self.pointing)
 
         # Create full path folder 
         self.set_fullpath_names()
@@ -300,8 +307,14 @@ class MusePipe(PipePrep, PipeRecipes):
             upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=self.verbose)
 
         self._dic_listMasterObject = {**dic_listMaster, **dic_listObject}
-        # ==============================================
 
+        # ==============================================
+        # Creating the folders in the TARGET root folder 
+        # e.g, for the alignment images
+        for name in list(self.my_params._dic_folders_target.keys()):
+            upipe.safely_create_folder(getattr(self.paths, name), verbose=verbose)
+
+        # ==============================================
         # Going back to initial working directory
         self.goto_prevfolder()
 
@@ -350,6 +363,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self.paths = PipeObject("All Paths useful for the pipeline")
         self.paths.root = self.my_params.root
         self.paths.data = joinpath(self.paths.root, self.my_params.data)
+        self.paths.target = joinpath(self.paths.root, self.targetname)
 
         for name in list(self.my_params._dic_folders.keys()) + list(self.my_params._dic_input_folders.keys()):
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
@@ -362,6 +376,10 @@ class MusePipe(PipePrep, PipeRecipes):
                     joinpath(self.paths.data, self._get_path_expo(expotype, "master")))
 
         self._dic_paths = {"master": self.paths.Master, "processed": self.paths}
+
+        # Creating the folders needed in the TARGET root folder, e.g., for alignments
+        for name in list(self.my_params._dic_folders_target.keys()):
+            setattr(self.paths, name, joinpath(self.paths.target, self._dic_folders_target[name])
 
     def _reset_tables(self) :
         """Reseting the astropy Tables for expotypes

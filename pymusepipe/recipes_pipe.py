@@ -19,6 +19,7 @@ from os.path import join as joinpath
 
 # pymusepipe modules
 from pymusepipe import util_pipe as upipe
+from mpdaf_pipe import MuseCube
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"
@@ -202,7 +203,9 @@ class PipeRecipes(object) :
                     "{0}_{1}".format(suffix_out, name_prod))))
    
     # Name of the output combined files are described by several key arguments
-    # Summary = {name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits
+    # Summary 
+    # namein  = name_products + suffix_products
+    # nameout = dir_prod+name_prod+{suffix}{suff_pre}_{tpl}{suff_post}.fits
     # Where:
     #       name_imaout = folder of products + generic name of product (e.g., PIXTABLE_REDUCED)
     #       suffix = User defined flag (suffix)
@@ -211,9 +214,10 @@ class PipeRecipes(object) :
     #       suff_post = number of expo if relevant (2 integer)
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[""], 
             suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
-            save='cube,skymodel', filter_list='white', skymethod='model',
-            pixfrac=0.8, darcheck='none', skymodel_frac=0.05, astrometry='TRUE',
-            lambdamin=4000., lambdamax=10000., suffix="", autocalib='none', rvcorr='bary'):
+            save='cube,skymodel', filter_list='white', filter_for_alignment='Cousins_R',
+            skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, 
+            astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="", 
+            autocalib='none', rvcorr='bary'):
         """Running the esorex muse_scipost recipe
         """
         self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
@@ -227,8 +231,30 @@ class PipeRecipes(object) :
                     lmax=lambdamax, autocalib=autocalib, sof=sof, expotype=expotype, 
                     tpl=tpl, rvcorr=rvcorr))
 
+        # Creating the images for the alignment, outside of scipost
+        # The filter can be a private one
+
         for name_prod, suff_prod, suff_pre, suff_post in zip(name_products, suffix_products, 
                 suffix_prefinalnames, suffix_postfinalnames) :
+            # Create extra filter image if requested
+            if 'CUBE' in name_prod:
+                cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
+                mycube = MuseCube(cube_name)
+                myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
+                        filter_folder=self.paths.root)
+                name_imageout = "{name_imaout}{suffix}{myfilter}_{tpl}{suff_post}.fits".format(
+                    name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
+                    myfilter=filter_for_alignment, suff_post=suff_post, 
+                    tpl=tpl, suffix=suffix))
+                myimage.write(name_imageout)
+
+                # Copying it in the Alignment folder
+                name_imageout_align = "{name_imaout}_{pointing:02d}{suffix}{myfilter}_{tpl}{suff_post}.fits".format(
+                    name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
+                    myfilter=filter_for_alignment, suff_post=suff_post, 
+                    tpl=tpl, suffix=suffix, pointing=self.pointing))
+                myimage.write(name_imageout_align)
+
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                     "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(nocache=self.nocache,
                     name_imain=self.joinprod(name_prod+suff_prod), 

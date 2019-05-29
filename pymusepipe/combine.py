@@ -50,15 +50,8 @@ dic_combined_folders = {
         "pointings": "Pointings/"
         }
 
-dic_WFI_filter = {
-        # Narrow band filter 
-        "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
-        # Broad band filter
-        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt"
-        }
-
-class muse_combine(PipePrep, PipeRecipes) :
-    def __init__(self, galaxyname=None, list_pointings=[1], 
+class MusePointings(PipePrep, PipeRecipes) :
+    def __init__(self, targetname=None, list_pointings=[1], 
             dic_exposures_in_pointing=None,
             rc_filename=None, cal_filename=None, 
             combined_folder_name="Combined", suffix="",
@@ -69,7 +62,7 @@ class muse_combine(PipePrep, PipeRecipes) :
 
         Input
         -----
-        galaxyname: string (e.g., 'NGC1208'). default is None. 
+        targetname: string (e.g., 'NGC1208'). default is None. 
 
         rc_filename: filename to initialise folders
         cal_filename: filename to initiale FIXED calibration MUSE files
@@ -91,10 +84,7 @@ class muse_combine(PipePrep, PipeRecipes) :
            warnings.simplefilter('ignore', category=AstropyWarning)
 
         # Setting the default attibutes #####################
-        self.galaxyname = galaxyname
-        self._check_pointings(list_pointings, dic_exposures_in_pointing)
-        if offset_table is not None:
-            self._check_offset_table(offset_table)
+        self.targetname = targetname
 
         self.combined_folder_name = combined_folder_name
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
@@ -106,6 +96,11 @@ class muse_combine(PipePrep, PipeRecipes) :
         self.outlog = outlog
         self.logfile = joinpath(self.outlog, logfile)
         self.suffix = suffix
+
+        # Checking input cubes
+        self._check_pointings(list_pointings, dic_exposures_in_pointing)
+        if offset_table is not None:
+            self._check_offset_table(offset_table)
 
         # Initialise the filter
         filter_name = kwargs.pop("reference_filter_name", "Cousins_R")
@@ -125,7 +120,7 @@ class muse_combine(PipePrep, PipeRecipes) :
         self.my_params = InitMuseParameters(rc_filename=rc_filename, 
                             cal_filename=cal_filename)
         # Setting up the relative path for the data, using Galaxy Name + Pointing
-        self.my_params.data = "{0}/{1}/".format(self.galaxyname, self.combined_folder_name)
+        self.my_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
 
         self.my_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
@@ -266,64 +261,7 @@ class muse_combine(PipePrep, PipeRecipes) :
             self.dic_name_pointings[pointing] = name_pointing
             # Adding the path of the folder
             setattr(self.paths, name_pointing,
-                    joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.galaxyname, pointing)))
-
-    def init_reference_filter(self, reference_filter_name, reference_filter_file=None):
-        """Initialise the reference filter
-        """
-        # Setting the names of reference filters provided by the MUSE files
-        with pyfits.open(self.XXX) as hdu1:
-            self.list_name_filters = []
-            for hdu in hdu1[1:]:
-                self.list_name_filters.append(hdu.name)
-
-        # Setting the reference filter
-        self.filter_name = reference_filter_name
-
-        # Testing if in the MUSE list
-        if self.filter_name in self.list_name_filters:
-            upipe.print_info("Using MUSE reference filter {0}".format(self.filter_name))
-            self.private_filter = False
-
-        # If not in the list, use the private filter file
-        else:
-            upipe.print_info("Reading private reference filter {0}".format(self.filter_name))
-            self.private_filter = True
-            if self.filter_name in dic_WFI_filter.keys():
-                self.filter_file = dic_WFI_filter[self.filter_name]
-            else:
-                if self_filter_file is None:
-                    upipe.print_error("Reference filter is not set")
-                    return
-                else:
-                    self.filter_file = reference_filter_file
-            # Now reading the filter data
-            path_filter = joinpath(self.paths.root, self.filter_file)
-            self.filter_wave, self.filter_sensitivity = np.loadtxt(path_filter, unpack=True)
-
-    def create_reference_images(self, reference_filter_name=None, reference_filter_file=None):
-        """Create all reference images using a dedicated filter (if not by
-        default in the mpdaf set)
-        """
-        import mpdaf
-        from mpdaf.obj import Cube
-
-        if reference_filter_name is not None:
-            self.init_reference_filter(reference_filter_name, reference_filter_file)
-
-        # Now loop on pointings
-        for pointing in self.list_pointings:
-            # Get the cube
-            path_cube = getattr(self.paths, self.dic_name_pointings[pointing])
-            mycube = Cube(path_cube + cube_name + ".fits", ext=1)
-
-            # Using either sensitivity or built-in mpdaf filter module (get_band_image)
-            if self.private_filter:
-                refimage = mycube.bandpass_image(self.filter_wave, self.filter_sensitivity)
-            else:
-                refimage = mycube.get_band_image(self.filter_name)
-            # Writing the image
-            refimage.write(self.my_params.pointings +cube_name+'_'+ self.filter_name +'.fits',)
+                    joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.targetname, pointing)))
 
     def run_combine(self, sof_filename='exp_combine', expotype="REDUCED", 
             tpl="ALL", stage="reduced", list_pointing=None, 

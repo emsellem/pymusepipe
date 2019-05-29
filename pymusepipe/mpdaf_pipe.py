@@ -32,18 +32,10 @@ from astropy.io import fits as pyfits
 from astropy import units as units
 
 from pymusepipe import util_pipe as upipe
+from pymusepipe.musepipe import dic_WFI_filter
 
 __version__ = '0.0.1 (15 March 2018)'
 
-############################################################
-#                      BEGIN
-# The following parameters can be adjusted for the need of
-# the specific pipeline to be used
-############################################################
-
-############################################################
-#                      END
-############################################################
 
 #########################################################################
 # Main class
@@ -132,6 +124,31 @@ class MuseCube(Cube):
         
         return MuseImage(self.select_lambda(lmin, lmax).sum(axis=0), 
                 title="{0} map".format(line))
+
+    def get_filter_image(self, filter_name=None, own_filter_file=None, filter_folder=""):
+        """Get an image given by a filter. If the filter belongs to
+        the filter list, then use that, otherwise use the given file
+        """
+        try:
+            upipe.print_info("Reading MUSE filter {0}".format(filter_name))
+            refimage = self.get_band_image(filter_name)
+        except ValueError:
+            # initialise the filter file
+            upipe.print_info("Reading private reference filter {0}".format(filter_name))
+            if filter_name in dic_WFI_filter.keys():
+                filter_file = dic_WFI_filter[filter_name]
+            else:
+                if own_filter_file is None:
+                    upipe.print_error("Private filter file is not set")
+                    return
+                else:
+                    filter_file = own_filter_file
+            # Now reading the filter data
+            path_filter = joinpath(filter_folder, filter_file)
+            filter_wave, filter_sensitivity = np.loadtxt(path_filter, unpack=True)
+            refimage = self.bandpass_image(filter_wave, filter_sensitivity)
+
+        return refimage
 
 def get_sky_spectrum(filename) :
     """Read sky spectrum from MUSE data reduction
