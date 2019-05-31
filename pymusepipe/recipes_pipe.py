@@ -245,7 +245,7 @@ class PipeRecipes(object) :
                 name_imageout = "{name_imaout}{suffix}{myfilter}_{tpl}{suff_post}.fits".format(
                     name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
                     myfilter=filter_for_alignment, suff_post=suff_post, 
-                    tpl=tpl, suffix=suffix))
+                    tpl=tpl, suffix=suffix)
                 myimage.write(name_imageout)
 
                 # Copying it in the Alignment folder
