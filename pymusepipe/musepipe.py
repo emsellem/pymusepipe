@@ -374,7 +374,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Creating the folders needed in the TARGET root folder, e.g., for alignments
         for name in list(self.my_params._dic_folders_target.keys()):
-            setattr(self.paths, name, joinpath(self.paths.target, self._dic_folders_target[name]))
+            setattr(self.paths, name, joinpath(self.paths.target, self.my_params._dic_folders_target[name]))
 
     def _reset_tables(self) :
         """Reseting the astropy Tables for expotypes
