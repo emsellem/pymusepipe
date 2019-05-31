@@ -32,7 +32,6 @@ from astropy.io import fits as pyfits
 from astropy import units as units
 
 from pymusepipe import util_pipe as upipe
-from pymusepipe.init_musepipe import dic_extra_filters
 
 # Versioning
 __version__ = '0.1.0 (31 May 2019)'
@@ -125,7 +124,8 @@ class MuseCube(Cube):
         return MuseImage(self.select_lambda(lmin, lmax).sum(axis=0), 
                 title="{0} map".format(line))
 
-    def get_filter_image(self, filter_name=None, own_filter_file=None, filter_folder=""):
+    def get_filter_image(self, filter_name=None, own_filter_file=None, filter_folder="",
+            dic_extra_filters=None):
         """Get an image given by a filter. If the filter belongs to
         the filter list, then use that, otherwise use the given file
         """
@@ -135,6 +135,9 @@ class MuseCube(Cube):
         except ValueError:
             # initialise the filter file
             upipe.print_info("Reading private reference filter {0}".format(filter_name))
+            if dic_extra_filters is None:
+                upipe,print_error("No extra filter directory given for private filter "
+                        "[get_filter_image/mpdaf_pipe]")
             if filter_name in dic_extra_filters.keys():
                 filter_file = dic_extra_filters[filter_name]
             else:

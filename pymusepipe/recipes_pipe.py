@@ -241,7 +241,7 @@ class PipeRecipes(object) :
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
                 mycube = MuseCube(cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
-                        filter_folder=self.paths.root)
+                        filter_folder=self.paths.root, dic_extra_filters=self.dic_extra_filters)
                 name_imageout = "{name_imaout}{suffix}{myfilter}_{tpl}{suff_post}.fits".format(
                     name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
                     myfilter=filter_for_alignment, suff_post=suff_post, 
