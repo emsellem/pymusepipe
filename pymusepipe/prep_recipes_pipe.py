@@ -149,6 +149,26 @@ class PipePrep(SofPipe) :
         self.run_combine_pointing()
 
     @print_my_function_name
+    def run_all_phangs_recipes(self, fraction=0.8, illum=True, bypointing=True):
+        """Running all recipes in one shot
+        """
+        #for recipe in self.list_recipes:
+        self.run_bias()
+        self.run_flat()
+        self.run_wave()
+        self.run_lsf()
+        self.run_twilight(illum=illum)
+        self.run_scibasic_all(illum=illum)
+        self.run_standard()
+        self.run_sky(fraction=fraction)
+        self.run_prep_align()
+        self.run_align_bypointing()
+        self.run_align_bygroup()
+        self.run_scipost()
+        self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
+        self.run_combine_pointing()
+
+    @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
         """Reducing the Bias files and creating a Master Bias
         Will run the esorex muse_bias command on all Biases
@@ -585,7 +605,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line=None, filter_list='Cousins_R', ref_filter_list=[], **extra_kwargs):
+            line=None, filter_list='white', **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -600,6 +620,9 @@ class PipePrep(SofPipe) :
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
+        # Filter for alignment if set up
+        filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
@@ -609,12 +632,11 @@ class PipePrep(SofPipe) :
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
                     tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
-                    filter_list=filter_list,
+                    filter_list=filter_list, filter_for_alignment=filter_for_alignment,
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=False, **extra_kwargs)
 
-    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list='white',
-            filter_for_alignment='Cousins_R'):
+    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list='white'):
         """Provide a set of key output products depending on the save mode
         for scipost
         """
@@ -710,7 +732,7 @@ class PipePrep(SofPipe) :
             save = kwargs.pop("save", "cube,individual")
         # Filters
         filter_list = kwargs.pop("filter_list", "white")
-        filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         offset_list = kwargs.pop("offset_list", "True")
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
@@ -774,7 +796,7 @@ class PipePrep(SofPipe) :
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames = \
-                self._get_scipost_products(save, list_group_expo, filter_list, filter_for_alignment) 
+                self._get_scipost_products(save, list_group_expo, filter_list)
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_prefinalnames, 
                     suffix_postfinalnames, suffix=suffix,
@@ -1072,7 +1094,7 @@ class PipePrep(SofPipe) :
         self.goto_folder(self.paths.data, logfile=True)
 
         # Setting the default alignment filter
-        filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         # Use the pointing as a suffix for the names
         pointing = "P{0:02d}".format(self.pointing)
         # Save option

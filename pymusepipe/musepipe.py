@@ -233,6 +233,8 @@ class MusePipe(PipePrep, PipeRecipes):
         self._time_astro_table = kwargs.pop("time_astro_table", True)
 
 #        super(MusePipe, self).__init__(**kwargs)
+        # Filter for alignment
+        self.filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
 
         # Setting the default attibutes #####################
         self.targetname = targetname
