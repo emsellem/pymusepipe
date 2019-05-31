@@ -262,11 +262,11 @@ class MusePipe(PipePrep, PipeRecipes):
         # Setting up the folders and names for the data reduction
         # Can be initialised by either an rc_file, 
         # or a default rc_file or harcoded defaults.
-        self.my_params = InitMuseParameters(rc_filename=rc_filename, 
+        self.pipe_params = InitMuseParameters(rc_filename=rc_filename, 
                             cal_filename=cal_filename)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
-        self.my_params.data = "{0}/P{1:02d}/".format(self.targetname, self.pointing)
+        self.pipe_params.data = "{0}/P{1:02d}/".format(self.targetname, self.pointing)
 
         # Create full path folder 
         self.set_fullpath_names()
@@ -282,13 +282,13 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # ==============================================
         # Creating the extra pipeline folder structure
-        for folder in self.my_params._dic_input_folders.keys() :
-            upipe.safely_create_folder(self.my_params._dic_input_folders[folder], verbose=verbose)
+        for folder in self.pipe_params._dic_input_folders.keys() :
+            upipe.safely_create_folder(self.pipe_params._dic_input_folders[folder], verbose=verbose)
 
         # ==============================================
         # Creating the folder structure itself if needed
-        for folder in self.my_params._dic_folders.keys() :
-            upipe.safely_create_folder(self.my_params._dic_folders[folder], verbose=verbose)
+        for folder in self.pipe_params._dic_folders.keys() :
+            upipe.safely_create_folder(self.pipe_params._dic_folders[folder], verbose=verbose)
 
         # ==============================================
         # Init the Master exposure flag dictionary
@@ -306,7 +306,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # ==============================================
         # Creating the folders in the TARGET root folder 
         # e.g, for the alignment images
-        for name in list(self.my_params._dic_folders_target.keys()):
+        for name in list(self.pipe_params._dic_folders_target.keys()):
             upipe.safely_create_folder(getattr(self.paths, name), verbose=verbose)
 
         # ==============================================
@@ -356,12 +356,12 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         # initialisation of the full paths 
         self.paths = PipeObject("All Paths useful for the pipeline")
-        self.paths.root = self.my_params.root
-        self.paths.data = joinpath(self.paths.root, self.my_params.data)
+        self.paths.root = self.pipe_params.root
+        self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
         self.paths.target = joinpath(self.paths.root, self.targetname)
 
-        for name in list(self.my_params._dic_folders.keys()) + list(self.my_params._dic_input_folders.keys()):
-            setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
+        for name in list(self.pipe_params._dic_folders.keys()) + list(self.pipe_params._dic_input_folders.keys()):
+            setattr(self.paths, name, joinpath(self.paths.data, getattr(self.pipe_params, name)))
 
         # Creating the filenames for Master files
         self.paths.Master = PipeObject("All Paths for Master files useful for the pipeline")
@@ -373,8 +373,8 @@ class MusePipe(PipePrep, PipeRecipes):
         self._dic_paths = {"master": self.paths.Master, "processed": self.paths}
 
         # Creating the folders needed in the TARGET root folder, e.g., for alignments
-        for name in list(self.my_params._dic_folders_target.keys()):
-            setattr(self.paths, name, joinpath(self.paths.target, self.my_params._dic_folders_target[name]))
+        for name in list(self.pipe_params._dic_folders_target.keys()):
+            setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
 
     def _reset_tables(self) :
         """Reseting the astropy Tables for expotypes
@@ -593,7 +593,7 @@ class MusePipe(PipePrep, PipeRecipes):
     def _get_path_expo(self, expotype, stage="master"):
         masterfolder = upipe.lower_allbutfirst_letter(expotype)
         if stage.lower() == "master":
-            masterfolder = joinpath(self.my_params.master, masterfolder)
+            masterfolder = joinpath(self.pipe_params.master, masterfolder)
         return masterfolder
 
     def _get_fullpath_expo(self, expotype, stage="master"):

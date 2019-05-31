@@ -128,14 +128,14 @@ class SofPipe(object) :
         """Adding a calibration file for the SOF 
         """
         if reset: self._sofdict.clear()
-        calibfile = getattr(self.my_params, calibtype.lower())
-        self._sofdict[calibtype] = [joinpath(self.my_params.musecalib, calibfile)]
+        calibfile = getattr(self.pipe_params, calibtype.lower())
+        self._sofdict[calibtype] = [joinpath(self.pipe_params.musecalib, calibfile)]
 
     def _add_geometry_to_sofdict(self, tpls):
         """Extract the geometry table and add it to the dictionary
         for the SOF file
         """
-        calfolder = self.my_params.musecalib
+        calfolder = self.pipe_params.musecalib
         if self._time_geo_table :
             listkeys = list(musepipe.dic_geo_table.keys())
             listkeys.append(musepipe.future_date)
@@ -143,7 +143,7 @@ class SofPipe(object) :
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
                     geofile = musepipe.dic_geo_table[listkeys[ikey]]
         else:
-            geofile = self.my_params.geo_table
+            geofile = self.pipe_params.geo_table
 
         self._sofdict['GEOMETRY_TABLE']=["{folder}{geo}".format(folder=calfolder, geo=geofile)]
 
@@ -151,7 +151,7 @@ class SofPipe(object) :
         """Extract the astrometry table and add it to the dictionary
         for the SOF file
         """
-        calfolder = self.my_params.musecalib
+        calfolder = self.pipe_params.musecalib
         if self._time_geo_table :
             listkeys = list(musepipe.dic_astro_wcs.keys())
             listkeys.append(musepipe.future_date)
@@ -159,7 +159,7 @@ class SofPipe(object) :
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
                     astrofile = musepipe.dic_astro_wcs[listkeys[ikey]]
         else :
-            astrofile = self.my_params.astro_table
+            astrofile = self.pipe_params.astro_table
 
         self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]
 

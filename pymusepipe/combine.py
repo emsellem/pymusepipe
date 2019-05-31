@@ -117,12 +117,12 @@ class MusePointings(PipePrep, PipeRecipes) :
         # Setting up the folders and names for the data reduction
         # Can be initialised by either an rc_file, 
         # or a default rc_file or harcoded defaults.
-        self.my_params = InitMuseParameters(rc_filename=rc_filename, 
+        self.pipe_params = InitMuseParameters(rc_filename=rc_filename, 
                             cal_filename=cal_filename)
         # Setting up the relative path for the data, using Galaxy Name + Pointing
-        self.my_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
+        self.pipe_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
 
-        self.my_params.init_default_param(dic_combined_folders)
+        self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
 
         self.set_fullpath_names()
@@ -163,7 +163,7 @@ class MusePointings(PipePrep, PipeRecipes) :
             # get the path
             path_pointing = getattr(self.paths, dic_name_pointings[pointing])
             # List existing pixtabs, using the given suffix
-            list_pixtabs = glob.glob(path_pointing + self.my_params.object + 
+            list_pixtabs = glob.glob(path_pointing + self.pipe_params.object + 
                     "{0}{1}*fits".format(pixtable_suffix, self.suffix))
 
             # if no selection on exposure names are given
@@ -248,11 +248,11 @@ class MusePointings(PipePrep, PipeRecipes) :
         """
         # initialisation of the full paths 
         self.paths = musepipe.PipeObject("All Paths useful for the pipeline")
-        self.paths.root = self.my_params.root
-        self.paths.data = joinpath(self.paths.root, self.my_params.data)
+        self.paths.root = self.pipe_params.root
+        self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
 
         for name in list(self._dic_combined_folders.keys()):
-            setattr(self.paths, name, joinpath(self.paths.data, getattr(self.my_params, name)))
+            setattr(self.paths, name, joinpath(self.paths.data, getattr(self.pipe_params, name)))
 
         # Creating the filenames for Master files
         self.dic_name_pointings = {}
