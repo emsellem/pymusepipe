@@ -28,6 +28,13 @@ dic_user_folders = {
             "root" : "/mnt/fhgfs/PHANGS/MUSE/LP_131117/",
             }
 
+dic_extra_filters = {
+        # Narrow band filter 
+        "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
+        # Broad band filter
+        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt"
+        }
+
 # Default hard-coded fits files - Calibration Tables
 # This should be replaced by an ascii file reading at some point
 dic_calib_tables = {

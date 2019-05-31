@@ -32,10 +32,10 @@ from astropy.io import fits as pyfits
 from astropy import units as units
 
 from pymusepipe import util_pipe as upipe
-from pymusepipe.musepipe import dic_WFI_filter
+from pymusepipe.init_musepipe import dic_extra_filters
 
-__version__ = '0.0.1 (15 March 2018)'
-
+# Versioning
+__version__ = '0.1.0 (31 May 2019)'
 
 #########################################################################
 # Main class
@@ -135,8 +135,8 @@ class MuseCube(Cube):
         except ValueError:
             # initialise the filter file
             upipe.print_info("Reading private reference filter {0}".format(filter_name))
-            if filter_name in dic_WFI_filter.keys():
-                filter_file = dic_WFI_filter[filter_name]
+            if filter_name in dic_extra_filters.keys():
+                filter_file = dic_extra_filters[filter_name]
             else:
                 if own_filter_file is None:
                     upipe.print_error("Private filter file is not set")

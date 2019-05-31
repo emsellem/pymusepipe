@@ -59,7 +59,7 @@ from pymusepipe.prep_recipes_pipe import PipePrep
 import pymusepipe.util_pipe as upipe
 
 # Likwid command
-likwid = "likwid-pin -c N:"
+# likwid = "likwid-pin -c N:"
 
 # Included an astropy table
 __version__ = '0.2.0 (22 May 2018)'
@@ -75,13 +75,6 @@ __version__ = '0.2.0 (22 May 2018)'
 
 # NOTE: most of the parameters have now been migrated to
 # init_musepipe.py for consistency.
-
-dic_WFI_filter = {
-        # Narrow band filter 
-        "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
-        # Broad band filter
-        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt"
-        }
 
 listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
         'ILLUM': 'FLAT,LAMP,ILLUM', 'TWILIGHT': 'FLAT,SKY', 
