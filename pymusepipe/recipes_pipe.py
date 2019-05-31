@@ -19,7 +19,7 @@ from os.path import join as joinpath
 
 # pymusepipe modules
 from pymusepipe import util_pipe as upipe
-from mpdaf_pipe import MuseCube
+from pymusepipe.mpdaf_pipe import MuseCube
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"
