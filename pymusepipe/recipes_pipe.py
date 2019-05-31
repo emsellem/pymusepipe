@@ -239,7 +239,7 @@ class PipeRecipes(object) :
             # Create extra filter image if requested
             if 'CUBE' in name_prod:
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
-                mycube = MuseCube(cube_name)
+                mycube = MuseCube(filename=cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
                         filter_folder=self.paths.root, dic_extra_filters=self.dic_extra_filters)
                 name_imageout = "{name_imaout}{suffix}{myfilter}_{tpl}{suff_post}.fits".format(
