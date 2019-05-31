@@ -252,7 +252,7 @@ class PipeRecipes(object) :
                 name_imageout_align = "{name_imaout}_{pointing:02d}{suffix}{myfilter}_{tpl}{suff_post}.fits".format(
                     name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
                     myfilter=filter_for_alignment, suff_post=suff_post, 
-                    tpl=tpl, suffix=suffix, pointing=self.pointing))
+                    tpl=tpl, suffix=suffix, pointing=self.pointing)
                 myimage.write(name_imageout_align)
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
