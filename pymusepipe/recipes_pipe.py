@@ -216,7 +216,7 @@ class PipeRecipes(object) :
             suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
             save='cube,skymodel', filter_list='white', filter_for_alignment='Cousins_R',
             skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, 
-            astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="", 
+            astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="", suffix_expo="", 
             autocalib='none', rvcorr='bary'):
         """Running the esorex muse_scipost recipe
         """
@@ -225,8 +225,8 @@ class PipeRecipes(object) :
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
                 "--darcheck={darcheck} --skymodel_frac={model:02f} "
                 "--lambdamin={lmin} --lambdamax={lmax} --autocalib={autocalib} "
-                "--rvcorr={rvcorr} {sof}".format(esorex=self.esorex, astro=astrometry, save=save, 
-                    pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
+                "--rvcorr={rvcorr} {sof}".format(esorex=self.esorex, astro=astrometry, 
+                    save=save, pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
                     darcheck=darcheck, model=skymodel_frac, lmin=lambdamin,
                     lmax=lambdamax, autocalib=autocalib, sof=sof, expotype=expotype, 
                     tpl=tpl, rvcorr=rvcorr))
@@ -241,23 +241,27 @@ class PipeRecipes(object) :
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
                 mycube = MuseCube(filename=cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
-                        filter_folder=self.paths.root, dic_extra_filters=self.pipe_params._dic_extra_filters)
-                name_imageout = "{name_imaout}{suffix}{myfilter}_{tpl}{suff_post}.fits".format(
+                        filter_folder=self.paths.root, 
+                        dic_extra_filters=self.pipe_params._dic_extra_filters)
+                name_imageout = "{name_imaout}_{suffix}{myfilter}_{tpl}"
+                    "{suff_post}{suffix_expo}.fits".format(
                     name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
                     myfilter=filter_for_alignment, suff_post=suff_post, 
-                    tpl=tpl, suffix=suffix)
+                    tpl=tpl, suffix=suffix, suffix_expo=suffix_expo)
                 myimage.write(name_imageout)
 
                 # Copying it in the Alignment folder
-                name_imageout_align = "{name_imaout}_P{pointing:02d}_{suffix}{myfilter}_{tpl}{suff_post}.fits".format(
+                name_imageout_align = "{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
+                    "_{tpl}{suff_post}{suffix_expo}.fits".format(
                     name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
                     myfilter=filter_for_alignment, suff_post=suff_post, 
-                    tpl=tpl, suffix=suffix, pointing=self.pointing)
+                    tpl=tpl, suffix=suffix, suffix_expo=suffix_expo,
+                    pointing=self.pointing)
                 myimage.write(name_imageout_align)
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
-                    "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(nocache=self.nocache,
-                    name_imain=self.joinprod(name_prod+suff_prod), 
+                    "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(
+                    nocache=self.nocache, name_imain=self.joinprod(name_prod+suff_prod), 
                     name_imaout=joinpath(dir_products, name_prod), 
                     suff_pre=suff_pre, suff_post=suff_post, 
                     tpl=tpl, suffix=suffix))

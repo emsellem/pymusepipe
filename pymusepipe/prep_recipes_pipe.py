@@ -793,21 +793,21 @@ class PipePrep(SofPipe) :
                        '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
                 suffix, tpl), new=True)
+            if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])
+            else: suffix_expo = ""
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames = \
                 self._get_scipost_products(save, list_group_expo, filter_list)
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_prefinalnames, 
-                    suffix_postfinalnames, suffix=suffix,
+                    suffix_postfinalnames, suffix=suffix, suffix_expo=suffix_expo,
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
                     filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
                     skymethod=skymethod, filter_for_alignment=filter_for_alignment,
                     **kwargs)
 
             # Write the MASTER files Table and save it
-            if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])
-            else: suffix_expo = ""
             self.save_expo_table(expotype, scipost_table, "reduced", 
                     "IMAGES_FOV_{0}_{1}{2}_list_table.fits".format(expotype, 
                         suffix_expo, tpl), aggregate=False, update=True)
