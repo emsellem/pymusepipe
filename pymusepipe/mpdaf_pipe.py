@@ -137,7 +137,7 @@ class MuseCube(Cube):
             upipe.print_info("Reading private reference filter {0}".format(filter_name))
             if dic_extra_filters is None:
                 upipe,print_error("No extra filter directory given for private filter "
-                        "[get_filter_image/mpdaf_pipe]")
+                        "[get_filter_image in mpdaf_pipe]")
             if filter_name in dic_extra_filters.keys():
                 filter_file = dic_extra_filters[filter_name]
             else:
