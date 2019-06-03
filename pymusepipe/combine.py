@@ -224,7 +224,7 @@ class MusePointings(PipePrep, PipeRecipes) :
             return
 
         # Opening the offset table
-        offset_table = Table.read(self.offset_table_name)
+        offset_table = Table.read(full_offset_table_name)
 
         # getting the MJD and DATE from the OFFSET table
         self.table_mjdobs = offset_table[default_mjd_table]
