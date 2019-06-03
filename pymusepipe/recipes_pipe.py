@@ -216,7 +216,7 @@ class PipeRecipes(object) :
             suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
             save='cube,skymodel', filter_list='white', filter_for_alignment='Cousins_R',
             skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, 
-            astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="", suffix_expo="", 
+            astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="",
             autocalib='none', rvcorr='bary'):
         """Running the esorex muse_scipost recipe
         """
@@ -244,20 +244,19 @@ class PipeRecipes(object) :
                         filter_folder=self.paths.root, 
                         dic_extra_filters=self.pipe_params._dic_extra_filters)
                 name_imageout = ("{name_imaout}_{suffix}{myfilter}_{tpl}"
-                                 "{suff_post}{suffix_expo}.fits".format(
+                                 "{suff_post}.fits".format(
                                  name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
                                  myfilter=filter_for_alignment, suff_post=suff_post, 
-                                 tpl=tpl, suffix=suffix, suffix_expo=suffix_expo))
+                                 tpl=tpl, suffix=suffix))
                 myimage.write(name_imageout)
 
                 # Copying it in the Alignment folder
                 if self._save_alignment_images:
                     name_imageout_align = ("{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
-                                          "_{tpl}{suff_post}{suffix_expo}.fits".format(
+                                          "_{tpl}{suff_post}.fits".format(
                                           name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
                                           myfilter=filter_for_alignment, suff_post=suff_post, 
-                                          tpl=tpl, suffix=suffix, suffix_expo=suffix_expo,
-                                          pointing=self.pointing))
+                                          tpl=tpl, suffix=suffix, pointing=self.pointing))
                     myimage.write(name_imageout_align)
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
