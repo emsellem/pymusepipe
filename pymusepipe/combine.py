@@ -188,7 +188,7 @@ class MusePointings(PipePrep, PipeRecipes) :
                 except:
                     select_list_pixtabs = []
 
-            self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs
+            self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs.sort()
 
     def _check_offset_table(self, offset_table=None):
         """Checking if DATE-OBS and MJD-OBS are in the OFFSET Table
