@@ -276,68 +276,68 @@ class MusePointings(PipePrep, PipeRecipes) :
         tpl: ALL by default or a special tpl time
         list_expo: list of integers providing the exposure numbers
         """
-        # Selecting the table with the right iexpo
-        found_expo, list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
-        if not found_expo:
-            return
-
-        if len(list_expo) == 1: 
-            suffix += "_{0:04d}".format(list_expo[0])
-        
         # Lambda min and max?
         [lambdamin, lambdamax] = lambdaminmax
         # Save options
-        save = kwargs.pop("save", "cube,skymodel,individual")
+        save = kwargs.pop("save", "cube,combined")
         # Filters
-        filter_list = kwargs.pop("filter_list", "white,Cousins_R")
+        filter_list = kwargs.pop("filter_list", "white")
         filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
         offset_list = kwargs.pop("offset_list", "True")
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
 
-        # Create the dictionary for scipost
-        # Selecting either one or all of the exposures
-        for gtable in scipost_table.groups:
-            # extract the tpl (string) and mean mjd (float) 
-            tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
-            # Now starting with the standard recipe
-            self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
-            self._add_calib_to_sofdict("SKY_LINES")
-            self._add_calib_to_sofdict("FILTER_LIST")
-            self._add_astrometry_to_sofdict(tpl)
-            self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
-            self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
-            self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', "processed")
-            self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
-            if offset_list :
-                self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                        '{0}_{1}_{2}.fits'.format(dic_files_products['ALIGN'][0], 
-                            filter_for_alignment, tpl))]
+        # Abort if only one exposure is available
+        # exp_combine needs a minimum of 2
+        if len(combine_table) <= 1:
+            if self.verbose:
+                upipe.print_warning("The combined pointing has only one exposure: process aborted",
+                        pipe=self)
+            return
 
-            # Selecting only exposures to be treated
-            pixtable_name = self._get_suffix_product(expotype)
-            self._sofdict[pixtable_name] = []
-            for iexpo in list_expo:
-                self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                    '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name, iexpo, j+1)) for j in range(24)]
-            self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
-                suffix, tpl), new=True)
-            # products
-            dir_products = self._get_fullpath_expo(expotype, "processed")
-            name_products, suffix_products, suffix_finalnames = self._get_scipost_products(save, 
-                    list_expo, filter_list) 
-            self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
-                    name_products, suffix_products, suffix_finalnames, 
-                    lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
-                    list_expo=list_expo, suffix=suffix, filter_list=filter_list, **kwargs)
+        # Go to the data folder
+        self.goto_folder(self.paths.data, logfile=True)
 
-            # Write the MASTER files Table and save it
-            self.save_expo_table(expotype, scipost_table, "reduced", 
-                    "IMAGES_FOV_{0}{1}_{2}_list_table.fits".format(expotype, 
-                        suffix, tpl), aggregate=False)
+        # Now creating the SOF file, first reseting it
+        self._sofdict.clear()
+        # Selecting only exposures to be treated
+        # Producing the list of REDUCED PIXTABLES
+        self._add_calib_to_sofdict("FILTER_LIST")
+        pixtable_name = self._get_suffix_product('REDUCED')
+        pixtable_name_thisone = dic_products_scipost['individual']
+
+        # Setting the default option of offset_list
+        if offset_list :
+            offset_list_tablename = kwargs.pop("offset_list_tablename", None)
+            if offset_list_tablename is None:
+                offset_list_tablename = "{0}{1}_{2}_{3}_{4}.fits".format(
+                        dic_files_products['ALIGN'][0], suffix, filter_for_alignment, 
+                        expotype, tpl)
+            if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
+                upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
+                        offset_list_tablename, folder_expo), pipe=self)
+                return
+
+            self._sofdict['OFFSET_LIST'] = [joinpath(folder_expo, offset_list_tablename)]
+
+        self._sofdict[pixtable_name] = []
+        for prod in pixtable_name_thisone:
+           self._sofdict[pixtable_name] += [joinpath(folder_expo,
+               '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo'])) for row in
+               combine_table]
+        self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
+            suffix, tpl), new=True)
+
+        # Product names
+        dir_products = self._get_fullpath_expo(expotype, stage)
+        name_products, suffix_products, suffix_prefinalnames = self._get_combine_products(filter_list) 
+
+        # Combine the exposures 
+        self.recipe_combine(self.current_sof, dir_products, name_products, 
+                tpl, expotype, suffix_products=suffix_products,
+                suffix_prefinalnames=suffix_prefinalnames,
+                save=save, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)
-
-
