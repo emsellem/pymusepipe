@@ -109,12 +109,14 @@ class MusePointings(PipePrep, PipeRecipes) :
         # or a default rc_file or harcoded defaults.
         self.pipe_params = InitMuseParameters(rc_filename=rc_filename, 
                             cal_filename=cal_filename)
+
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
 
         self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
 
+        # Setting all the useful paths
         self.set_fullpath_names()
 
         # Checking input cubes
@@ -156,7 +158,7 @@ class MusePointings(PipePrep, PipeRecipes) :
         # Loop on Pointings
         for pointing in self.list_pointings:
             # get the path
-            path_pointing = getattr(self.paths, dic_name_pointings[pointing])
+            path_pointing = getattr(self.paths, self.dic_name_pointings[pointing])
             # List existing pixtabs, using the given suffix
             list_pixtabs = glob.glob(path_pointing + self.pipe_params.object + 
                     "{0}{1}*fits".format(pixtable_suffix, self.suffix))
