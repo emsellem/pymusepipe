@@ -255,8 +255,11 @@ class MusePointings(PipePrep, PipeRecipes) :
 
         # printing result
         upipe.print_info("Offset Table checked")
-        upipe.print_info("# Exposures not found in Offset Table: {0}".format(
-            nexcluded_pixtab))
+        if nexclude_pixtab == 0:
+            upipe.print_info("All PixTables were found in Offset Table")
+        else:
+            upipe.print_warning("#{0} PixTables not found in Offset Table".format(
+                nexcluded_pixtab))
 
     def goto_prevfolder(self, logfile=False) :
         """Go back to previous folder
