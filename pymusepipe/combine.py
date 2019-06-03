@@ -277,6 +277,7 @@ class MusePointings(PipePrep, PipeRecipes) :
         self.paths = musepipe.PipeObject("All Paths useful for the pipeline")
         self.paths.root = self.pipe_params.root
         self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
+        self.paths.target = joinpath(self.paths.root, self.targetname)
 
         for name in list(self._dic_combined_folders.keys()):
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.pipe_params, name)))
@@ -289,6 +290,10 @@ class MusePointings(PipePrep, PipeRecipes) :
             # Adding the path of the folder
             setattr(self.paths, name_pointing,
                     joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.targetname, pointing)))
+
+        # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
+        for name in list(self.pipe_params._dic_folders_target.keys()):
+            setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
 
     def run_combine(self, sof_filename='exp_combine', expotype="REDUCED", 
             tpl="ALL", stage="reduced", list_pointing=None, 
