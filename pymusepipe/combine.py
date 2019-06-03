@@ -148,6 +148,7 @@ class MusePointings(PipePrep, PipeRecipes) :
     def _check_pointings(self, dic_exposures_in_pointings=None):
         """Check if pointings and dictionary are compatible
         """
+        # Dictionary of exposures to select per pointing
         self.dic_exposures_in_pointings = dic_exposures_in_pointings
 
         # Getting the pieces of the names to be used for pixtabs
@@ -165,8 +166,9 @@ class MusePointings(PipePrep, PipeRecipes) :
 
             # if no selection on exposure names are given
             # Select all existing pixtabs
-            if self.dic_exponum_in_pointing is None:
+            if self.dic_exposures_in_pointings is None:
                 select_list_pixtabs = list_pixtabs
+
             # Otherwise use the ones which are given via their expo numbers
             else:
                 try:
