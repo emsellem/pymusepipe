@@ -97,12 +97,6 @@ class MusePointings(PipePrep, PipeRecipes) :
         self.logfile = joinpath(self.outlog, logfile)
         self.suffix = suffix
 
-        # Initialise the filter
-        filter_name = kwargs.pop("reference_filter_name", "Cousins_R")
-        filter_file = kwargs.pop("reference_filter_file", None)
-        self.init_reference_filter(filter_name, filter_file)
-        self.create_reference_images()
-
         # End of parameter settings #########################
 
         # Init of the subclasses
