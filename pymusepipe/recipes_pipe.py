@@ -251,13 +251,14 @@ class PipeRecipes(object) :
                 myimage.write(name_imageout)
 
                 # Copying it in the Alignment folder
-                name_imageout_align = "{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
-                    "_{tpl}{suff_post}{suffix_expo}.fits".format(
-                    name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
-                    myfilter=filter_for_alignment, suff_post=suff_post, 
-                    tpl=tpl, suffix=suffix, suffix_expo=suffix_expo,
-                    pointing=self.pointing)
-                myimage.write(name_imageout_align)
+                if self._save_alignment_images:
+                    name_imageout_align = "{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
+                        "_{tpl}{suff_post}{suffix_expo}.fits".format(
+                        name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
+                        myfilter=filter_for_alignment, suff_post=suff_post, 
+                        tpl=tpl, suffix=suffix, suffix_expo=suffix_expo,
+                        pointing=self.pointing)
+                    myimage.write(name_imageout_align)
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                     "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(

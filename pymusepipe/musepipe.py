@@ -178,7 +178,7 @@ class MusePipe(PipePrep, PipeRecipes):
     musep.run()
     """
 
-    def __init__(self, targetname=None, pointing=0, objectlist=[], rc_filename=None, 
+    def __init__(self, targetname=None, pointing=0, rc_filename=None, 
             cal_filename=None, outlog=None, logfile="MusePipe.log", reset_log=False,
             verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
             strong_checkmode=False, **kwargs):
@@ -187,7 +187,6 @@ class MusePipe(PipePrep, PipeRecipes):
         Input
         -----
         targetname: string (e.g., 'NGC1208'). default is None. 
-        objectlist= list of objects (string=filenames) to process. Default is empty
 
         rc_filename: filename to initialise folders
         cal_filename: filename to initiale FIXED calibration MUSE files
@@ -225,6 +224,9 @@ class MusePipe(PipePrep, PipeRecipes):
         self._time_geo_table = kwargs.pop("time_geo_table", True)
         self._time_astro_table = kwargs.pop("time_astro_table", True)
 
+        # Set alignment saving option
+        self._save_alignment_images = kwargs.pop("save_alignment_images", True)
+
 #        super(MusePipe, self).__init__(**kwargs)
         # Filter for alignment
         self.filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
@@ -248,9 +250,6 @@ class MusePipe(PipePrep, PipeRecipes):
         self.checkmode = checkmode
         # Checking if mode is correct also for BIAS & DARK
         self.strong_checkmode = strong_checkmode
-
-        # Set of objects to reduced
-        self.objectlist = objectlist
 
         # End of parameter settings #########################
 

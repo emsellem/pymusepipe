@@ -37,6 +37,8 @@ BOLD = "\033[1m"
 def write_in_pipelogfile(mypipe, text):
     """Writing in log file of the pipeline
     """
+    if mypipe is None:
+        return
     fout = open(mypipe.logfile, 'a')
     first_text = "# At : " + upipe.formatted_time()
     if mypipe.fakemode: 
