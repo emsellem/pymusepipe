@@ -97,11 +97,6 @@ class MusePointings(PipePrep, PipeRecipes) :
         self.logfile = joinpath(self.outlog, logfile)
         self.suffix = suffix
 
-        # Checking input cubes
-        self._check_pointings(list_pointings, dic_exposures_in_pointing)
-        if offset_table is not None:
-            self._check_offset_table(offset_table)
-
         # Initialise the filter
         filter_name = kwargs.pop("reference_filter_name", "Cousins_R")
         filter_file = kwargs.pop("reference_filter_file", None)
@@ -126,6 +121,12 @@ class MusePointings(PipePrep, PipeRecipes) :
         self._dic_combined_folders = dic_combined_folders
 
         self.set_fullpath_names()
+
+        # Checking input cubes
+        self._check_pointings(list_pointings, dic_exposures_in_pointing)
+        if offset_table is not None:
+            self._check_offset_table(offset_table)
+
         # Making the output folders in a safe mode
         if self.verbose:
             upipe.print_info("Creating directory structure")
