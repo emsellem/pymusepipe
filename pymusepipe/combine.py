@@ -85,6 +85,7 @@ class MusePointings(PipePrep, PipeRecipes) :
 
         # Setting the default attibutes #####################
         self.targetname = targetname
+        self.list_pointings = list_pointings
 
         self.combined_folder_name = combined_folder_name
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
@@ -117,7 +118,7 @@ class MusePointings(PipePrep, PipeRecipes) :
         self.set_fullpath_names()
 
         # Checking input cubes
-        self._check_pointings(list_pointings, dic_exposures_in_pointing)
+        self._check_pointings(dic_exposures_in_pointing)
         if offset_table is not None:
             self._check_offset_table(offset_table)
 
@@ -142,10 +143,9 @@ class MusePointings(PipePrep, PipeRecipes) :
         # Going back to initial working directory
         self.goto_prevfolder()
 
-    def _check_pointings(self, list_pointings, dic_exposures_in_pointings=None):
+    def _check_pointings(self, dic_exposures_in_pointings=None):
         """Check if pointings and dictionary are compatible
         """
-        self.list_pointings = list_pointings
         self.dic_exposures_in_pointings = dic_exposures_in_pointings
 
         # Getting the pieces of the names to be used for pixtabs
