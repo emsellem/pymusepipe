@@ -21,6 +21,11 @@ except ImportError :
     raise Exception("astropy is required for this module")
 
 from astropy.utils.exceptions import AstropyWarning
+try :
+    from astropy.table import Table
+except ImportError :
+    raise Exception("astropy.table.Table is required for this module")
+
 import warnings
 
 # Importing pymusepipe modules
@@ -55,7 +60,7 @@ class MusePointings(PipePrep, PipeRecipes) :
             dic_exposures_in_pointing=None,
             rc_filename=None, cal_filename=None, 
             combined_folder_name="Combined", suffix="",
-            offset_table=None,
+            offset_table_name=None,
             outlog=None, logfile="MusePipeCombine.log", reset_log=False,
             verbose=True, **kwargs):
         """Initialisation of class muse_expo
@@ -103,7 +108,7 @@ class MusePointings(PipePrep, PipeRecipes) :
         # Init of the subclasses
         PipeRecipes.__init__(self, **kwargs)
 
-        # =========================================================== #
+        # ---------------------------------------------------------
         # Setting up the folders and names for the data reduction
         # Can be initialised by either an rc_file, 
         # or a default rc_file or harcoded defaults.
@@ -118,11 +123,17 @@ class MusePointings(PipePrep, PipeRecipes) :
 
         # Setting all the useful paths
         self.set_fullpath_names()
+        # END Set up params =======================================
 
-        # Checking input cubes
+        # ---------------------------------------------------------
+        # Checking input pointings and pixtables
         self._check_pointings(dic_exposures_in_pointing)
-        if offset_table is not None:
-            self._check_offset_table(offset_table)
+
+        # Checking input offset table and corresponding pixtables
+        folder_offset_table = kwargs.pop("folder_offset_table", None)
+        if offset_table_name is not None:
+            self._check_offset_table(offset_table_name, folder_offset_table)
+        # END CHECK UP ============================================
 
         # Making the output folders in a safe mode
         if self.verbose:
@@ -191,17 +202,33 @@ class MusePointings(PipePrep, PipeRecipes) :
             select_list_pixtabs.sort()
             self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs
 
-    def _check_offset_table(self, offset_table=None):
+    def _check_offset_table(self, offset_table_name=None, folder_offset_table=None):
         """Checking if DATE-OBS and MJD-OBS are in the OFFSET Table
         """
-        if offset_table is None:
+        self.offset_table_name = offset_table_name
+        if self.offset_table_name is None:
             upipe.print_error("No Offset table given")
             return
+        
+        # Using the given folder name, alignment one by default
+        if folder_offset_table is None:
+            self.folder_offset_table = self.paths.alignment
         else:
-            self.offset_table = offset_table
+            self.folder_offset_table = folder_offset_table
+
+        full_offset_table_name = joinpath(self.folder_offset_table,
+                                    self.offset_table_name)
+        if not os.path.isfile(full_offset_table_name):
+            upipe.print_error("Offset table [{0}] not found".format(
+                full_offset_table_name))
+            return
+
+        # Opening the offset table
+        offset_table = Table.read(self.offset_table_name)
+
         # getting the MJD and DATE from the OFFSET table
-        self.table_mjdobs = self.offset_table[default_mjd_table]
-        self.table_dateobs = self.offset_table[default_date_table]
+        self.table_mjdobs = offset_table[default_mjd_table]
+        self.table_dateobs = offset_table[default_date_table]
 
         # Checking existence of each pixel_table in the offset table
         for pointing in self.list_pointings:
