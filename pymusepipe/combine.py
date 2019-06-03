@@ -152,7 +152,7 @@ class MusePointings(PipePrep, PipeRecipes) :
         self.dic_exposures_in_pointings = dic_exposures_in_pointings
 
         # Getting the pieces of the names to be used for pixtabs
-        pixtable_suffix = dic_products_scipost['individual']
+        pixtable_suffix = dic_products_scipost['individual'][0]
 
         # Initialise the dictionary of pixtabs to be found in each pointing
         self.dic_pixtabs_in_pointings = {}
