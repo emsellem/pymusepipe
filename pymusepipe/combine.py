@@ -232,7 +232,7 @@ class MusePointings(PipePrep, PipeRecipes) :
 
         # Checking existence of each pixel_table in the offset table
         for pointing in self.list_pointings:
-            pixtab_to_exclude.append = []
+            pixtab_to_exclude = []
             for pixtab_name in self.dic_pixtabs_in_pointings[pointing]:
                 pixtab_header = pyfits.getheader(pixtab_name)
                 mjd_obs = pixtab_header['MJD-OBS']
@@ -245,8 +245,8 @@ class MusePointings(PipePrep, PipeRecipes) :
                             "please Check MJD-OBS and DATE-OBS".format(pixtab_name))
                     pixtab_to_exclude.append(pixtab_name)
                 # Exclude the one which have not been found
-                for pixtab in pixtab_to_exclude:
-                    self.dic_pixtabs_in_pointings[pointing].remove(pixtab)
+            for pixtab in pixtab_to_exclude:
+                self.dic_pixtabs_in_pointings[pointing].remove(pixtab)
 
     def goto_prevfolder(self, logfile=False) :
         """Go back to previous folder
