@@ -231,6 +231,7 @@ class MusePointings(PipePrep, PipeRecipes) :
         self.table_dateobs = offset_table[default_date_table]
 
         # Checking existence of each pixel_table in the offset table
+        nexcluded_pixtab = 0
         for pointing in self.list_pointings:
             pixtab_to_exclude = []
             for pixtab_name in self.dic_pixtabs_in_pointings[pointing]:
@@ -245,8 +246,16 @@ class MusePointings(PipePrep, PipeRecipes) :
                             "please Check MJD-OBS and DATE-OBS".format(pixtab_name))
                     pixtab_to_exclude.append(pixtab_name)
                 # Exclude the one which have not been found
+            nexcluded_pixtab += len(pixtab_to_exclude)
             for pixtab in pixtab_to_exclude:
                 self.dic_pixtabs_in_pointings[pointing].remove(pixtab)
+                if self.verbose:
+                    upipe.print_warning("PIXTABLE [not found in OffsetTable]: "
+                                        "{0}".format(pixtab))
+
+        # printing result
+        upipe.print_info("Offset Table checked")
+        upipe.print_info("Exposures not found in Offset Table: ", nexcluded_pixtab)
 
     def goto_prevfolder(self, logfile=False) :
         """Go back to previous folder
