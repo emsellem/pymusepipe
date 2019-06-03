@@ -243,21 +243,21 @@ class PipeRecipes(object) :
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
                         filter_folder=self.paths.root, 
                         dic_extra_filters=self.pipe_params._dic_extra_filters)
-                name_imageout = "{name_imaout}_{suffix}{myfilter}_{tpl}"
-                    "{suff_post}{suffix_expo}.fits".format(
-                    name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
-                    myfilter=filter_for_alignment, suff_post=suff_post, 
-                    tpl=tpl, suffix=suffix, suffix_expo=suffix_expo)
+                name_imageout = ("{name_imaout}_{suffix}{myfilter}_{tpl}"
+                                 "{suff_post}{suffix_expo}.fits".format(
+                                 name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
+                                 myfilter=filter_for_alignment, suff_post=suff_post, 
+                                 tpl=tpl, suffix=suffix, suffix_expo=suffix_expo))
                 myimage.write(name_imageout)
 
                 # Copying it in the Alignment folder
                 if self._save_alignment_images:
-                    name_imageout_align = "{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
-                        "_{tpl}{suff_post}{suffix_expo}.fits".format(
-                        name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
-                        myfilter=filter_for_alignment, suff_post=suff_post, 
-                        tpl=tpl, suffix=suffix, suffix_expo=suffix_expo,
-                        pointing=self.pointing)
+                    name_imageout_align = ("{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
+                                          "_{tpl}{suff_post}{suffix_expo}.fits".format(
+                                          name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
+                                          myfilter=filter_for_alignment, suff_post=suff_post, 
+                                          tpl=tpl, suffix=suffix, suffix_expo=suffix_expo,
+                                          pointing=self.pointing))
                     myimage.write(name_imageout_align)
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
@@ -271,14 +271,17 @@ class PipeRecipes(object) :
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
         """Running the muse_exp_align recipe
         """
-        self.run_oscommand("{esorex} --log-file=exp_align_{group}_{tpl}.log muse_exp_align --srcmin={srcmin} "
-                "--srcmax={srcmax} --threshold={threshold} --fwhm={fwhm} {sof}".format(esorex=self.esorex, 
-                    srcmin=srcmin, srcmax=srcmax, threshold=threshold, fwhm=fwhm, sof=sof, tpl=tpl,
+        self.run_oscommand("{esorex} --log-file=exp_align_{group}_{tpl}.log "
+                "muse_exp_align --srcmin={srcmin} --srcmax={srcmax} "
+                "--threshold={threshold} --fwhm={fwhm} {sof}".format(
+                    esorex=self.esorex, srcmin=srcmin, srcmax=srcmax, 
+                    threshold=threshold, fwhm=fwhm, sof=sof, tpl=tpl,
                     group=group))
     
         for namein_prod, nameout_prod in zip(namein_products, nameout_products) :
-            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(namein_prod), name_imaout=joinpath(dir_products, nameout_prod)))
+            self.run_oscommand('{nocache} mv {name_imain}.fits {name_imaout}.fits'.format(
+                nocache=self.nocache, name_imain=self.joinprod(namein_prod), 
+                name_imaout=joinpath(dir_products, nameout_prod)))
 
     def recipe_combine(self, sof, dir_products, name_products, tpl, expotype,
             suffix_products=[""], suffix_prefinalnames=[""], 
@@ -292,7 +295,8 @@ class PipeRecipes(object) :
                    pixfrac=pixfrac, form=format_out, filt=filter_list, sof=sof, 
                    tpl=tpl, expotype=expotype))
 
-        for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, suffix_prefinalnames):
+        for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
+                suffix_prefinalnames):
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                 '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(name_prod+suff_prod), 
