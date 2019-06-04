@@ -124,9 +124,15 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.set_fullpath_names()
         self.paths.logfile = joinpath(self.paths.log, logfile)
 
+        # and Recording the folder where we start
+        self.paths.orig = os.getcwd()
+
         # END Set up params =======================================
 
         # ---------------------------------------------------------
+        # Go to the Combined Folder
+        self.goto_folder(self.paths.data)
+
         # Checking input pointings and pixtables
         self._check_pointings(dic_exposures_in_pointing)
 
@@ -139,14 +145,8 @@ class MusePointings(SofPipe, PipeRecipes) :
         if self.verbose:
             upipe.print_info("Creating directory structure")
 
-        # and Recording the folder where we start
-        self.paths.orig = os.getcwd()
-
         # First create the data Combined folder
         upipe.safely_create_folder(self.paths.data, verbose=verbose)
-
-        # Go to the Combined Folder
-        self.goto_folder(self.paths.data)
 
         # =========================================================== #
         # Now create full path folder 
@@ -351,9 +351,6 @@ class MusePointings(SofPipe, PipeRecipes) :
                                     "have one exposure: process aborted", 
                                     pipe=self)
             return
-
-        # Go to the data folder
-        self.goto_folder(self.paths.data, addtolog=True)
 
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
