@@ -374,7 +374,8 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Product names
         dir_products = upipe.normpath(self.paths.combined)
-        name_products, suffix_products, suffix_prefinalnames = musepipe._get_combine_products(filter_list) 
+        name_products, suffix_products, suffix_prefinalnames = \
+                prep_recipes_pipe._get_combine_products(filter_list) 
 
         # Combine the exposures 
         self.recipe_combine_pointings(self.current_sof, dir_products, name_products, 
