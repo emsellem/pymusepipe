@@ -369,7 +369,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         pixtable_name = musepipe.dic_listObject['REDUCED']
         self._sofdict[pixtable_name] = []
         for pointing in self.list_pointings:
-            self._sofdict[pixtable_name] += [self.dic_pixtabs_in_pointings[pointing]]
+            self._sofdict[pixtable_name] += self.dic_pixtabs_in_pointings[pointing]
 
         self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename, self.targetname, suffix), new=True)
 
