@@ -340,7 +340,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         # exp_combine needs a minimum of 2
         nexpo_tocombine = sum(len(self.dic_pixtabs_in_pointings[pointing]) 
                               for pointing in self.list_pointings)
-        if len(nexpo_tocombine) <= 1:
+        if nexpo_tocombine <= 1:
             if self.verbose:
                 upipe.print_warning("All considered pointings only "
                                     "have one exposure: process aborted", 
