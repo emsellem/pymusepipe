@@ -50,7 +50,7 @@ dic_combined_folders = {
          # esores log files
         "esorex_log" : "Esorex_log/",
         # Data Products - first writing
-        "pipe_products": "Pipe_products/"
+        "pipe_products": "Pipe_products/",
         # Log
         "log": "Log/"
         }
