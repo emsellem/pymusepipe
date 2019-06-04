@@ -154,7 +154,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
 
         # Going back to initial working directory
-        self.goto_prevfolder()
+        self.goto_origfolder()
 
     def _check_pointings(self, dic_exposures_in_pointings=None):
         """Check if pointings and dictionary are compatible
@@ -264,10 +264,16 @@ class MusePointings(SofPipe, PipeRecipes) :
             upipe.print_warning("#{0} PixTables not found in Offset Table".format(
                                  nexcluded_pixtab))
 
+    def goto_origfolder(self, addtolog=False) :
+        """Go back to original folder
+        """
+        upipe.print_info("Going back to the original folder {0}".format(self.paths.orig))
+        self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
+            
     def goto_prevfolder(self, addtolog=False) :
         """Go back to previous folder
         """
-        upipe.print_info("Going back to the original folder {0}".format(self.paths._prev_folder))
+        upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder))
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
             
     def goto_folder(self, newpath, addtolog=False, verbose=True) :

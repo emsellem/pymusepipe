@@ -306,7 +306,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # ==============================================
         # Going back to initial working directory
-        self.goto_prevfolder()
+        self.goto_origfolder()
 
         # ===========================================================
         # Now creating the raw table, and attribute containing the
@@ -324,10 +324,16 @@ class MusePipe(PipePrep, PipeRecipes):
         if overwrite is not None: self._overwrite_astropy_table = overwrite
         if update is not None: self._update_astropy_table = update
 
+    def goto_origfolder(self, addtolog=False) :
+        """Go back to original folder
+        """
+        upipe.print_info("Going back to the original folder {0}".format(self.paths.orig))
+        self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
+            
     def goto_prevfolder(self, addtolog=False) :
         """Go back to previous folder
         """
-        upipe.print_info("Going back to the original folder {0}".format(self.paths._prev_folder))
+        upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder))
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
             
     def goto_folder(self, newpath, addtolog=False, verbose=True) :
