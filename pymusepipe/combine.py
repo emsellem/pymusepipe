@@ -46,13 +46,11 @@ dic_combined_folders = {
         # Sof files
         "sof": "Sof/",
         # Combined products
-        "cubes": "Cubes/",
+        "combined": "Combined/",
          # esores log files
         "esorex_log" : "Esorex_log/",
         # Data Products - first writing
         "pipe_products": "Pipe_products/",
-        # Alignment for various pointings
-        "pointings": "Pointings/"
         }
 
 class MusePointings(PipePrep, PipeRecipes) :
@@ -232,6 +230,7 @@ class MusePointings(PipePrep, PipeRecipes) :
 
         # Checking existence of each pixel_table in the offset table
         nexcluded_pixtab = 0
+        nincluded_pixtab = 0
         for pointing in self.list_pointings:
             pixtab_to_exclude = []
             for pixtab_name in self.dic_pixtabs_in_pointings[pointing]:
@@ -245,6 +244,7 @@ class MusePointings(PipePrep, PipeRecipes) :
                     upipe.warning("PIXELTABLE {0} not found in OFFSET table: "
                             "please Check MJD-OBS and DATE-OBS".format(pixtab_name))
                     pixtab_to_exclude.append(pixtab_name)
+                nincluded_pixtab += 1
                 # Exclude the one which have not been found
             nexcluded_pixtab += len(pixtab_to_exclude)
             for pixtab in pixtab_to_exclude:
@@ -254,12 +254,13 @@ class MusePointings(PipePrep, PipeRecipes) :
                                         "{0}".format(pixtab))
 
         # printing result
-        upipe.print_info("Offset Table checked")
+        upipe.print_info("Offset Table checked: #{0} PixTables included".format(
+                          nincluded_pixtab)
         if nexcluded_pixtab == 0:
             upipe.print_info("All PixTables were found in Offset Table")
         else:
             upipe.print_warning("#{0} PixTables not found in Offset Table".format(
-                nexcluded_pixtab))
+                                 nexcluded_pixtab))
 
     def goto_prevfolder(self, logfile=False) :
         """Go back to previous folder
@@ -292,6 +293,8 @@ class MusePointings(PipePrep, PipeRecipes) :
         self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
         self.paths.target = joinpath(self.paths.root, self.targetname)
 
+        self._dic_paths = {"combined": self.paths}
+
         for name in list(self._dic_combined_folders.keys()):
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.pipe_params, name)))
 
@@ -308,9 +311,8 @@ class MusePointings(PipePrep, PipeRecipes) :
         for name in list(self.pipe_params._dic_folders_target.keys()):
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
 
-    def run_combine(self, sof_filename='exp_combine', expotype="REDUCED", 
-            tpl="ALL", stage="reduced", list_pointing=None, 
-            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
+    def run_combine(self, sof_filename='pointings_combine', expotype="REDUCED", 
+            list_pointing=None, lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """MUSE Exp_combine treatment of the reduced pixtables
         Will run the esorex muse_exp_combine routine
 
@@ -335,10 +337,13 @@ class MusePointings(PipePrep, PipeRecipes) :
 
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2
-        if len(combine_table) <= 1:
+        nexpo_tocombine = sum(len(self.dic_pixtab_in_pointings[pointing]) 
+                              for pointing in self.list_pointings)
+        if len(nexpo_tocombine) <= 1:
             if self.verbose:
-                upipe.print_warning("The combined pointing has only one exposure: process aborted",
-                        pipe=self)
+                upipe.print_warning("All considered pointings only "
+                                    "have one exposure: process aborted", 
+                                    pipe=self)
             return
 
         # Go to the data folder
@@ -349,16 +354,13 @@ class MusePointings(PipePrep, PipeRecipes) :
         # Selecting only exposures to be treated
         # Producing the list of REDUCED PIXTABLES
         self._add_calib_to_sofdict("FILTER_LIST")
-        pixtable_name = self._get_suffix_product('REDUCED')
-        pixtable_name_thisone = dic_products_scipost['individual']
 
         # Setting the default option of offset_list
         if offset_list :
             offset_list_tablename = kwargs.pop("offset_list_tablename", None)
             if offset_list_tablename is None:
                 offset_list_tablename = "{0}{1}_{2}_{3}_{4}.fits".format(
-                        dic_files_products['ALIGN'][0], suffix, filter_for_alignment, 
-                        expotype, tpl)
+                        dic_files_products['ALIGN'][0], suffix, filter_for_alignment)
             if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
                 upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
                         offset_list_tablename, folder_expo), pipe=self)
@@ -366,23 +368,24 @@ class MusePointings(PipePrep, PipeRecipes) :
 
             self._sofdict['OFFSET_LIST'] = [joinpath(folder_expo, offset_list_tablename)]
 
+
+        pixtable_name = self._get_suffix_product('REDUCED')
         self._sofdict[pixtable_name] = []
-        for prod in pixtable_name_thisone:
-           self._sofdict[pixtable_name] += [joinpath(folder_expo,
-               '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo'])) for row in
-               combine_table]
-        self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
-            suffix, tpl), new=True)
+        for pointing in self.list_pointings:
+            self._sofdict[pixtable_name] += [self.dic_pixtab_in_pointings[pointing]]
+
+        self.write_sof(sof_filename="{0}_{1}".format(sof_filename, suffix), new=True)
 
         # Product names
-        dir_products = self._get_fullpath_expo(expotype, stage)
+        dir_products = upipe.normpath(self.paths.combined)
         name_products, suffix_products, suffix_prefinalnames = self._get_combine_products(filter_list) 
 
         # Combine the exposures 
-        self.recipe_combine(self.current_sof, dir_products, name_products, 
-                tpl, expotype, suffix_products=suffix_products,
+        self.recipe_combine_pointings(self.current_sof, dir_products, name_products, 
+                suffix_products=suffix_products,
                 suffix_prefinalnames=suffix_prefinalnames,
-                save=save, suffix=suffix, filter_list=filter_list, **kwargs)
+                save=save, suffix=suffix, filter_list=filter_list, 
+                filter_for_alignment=filter_for_alignment, **kwargs)
 
         # Go back to original folder
         self.goto_prevfolder(logfile=True)

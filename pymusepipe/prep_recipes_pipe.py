@@ -614,14 +614,17 @@ class PipePrep(SofPipe) :
 
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
-        [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=self.vsystemic, lambda_window=lambda_window)
+        [lmin, lmax] = upipe.get_emissionline_band(line=line, 
+                                                   velocity=self.vsystemic, 
+                                                   lambda_window=lambda_window)
 
         suffix = extra_kwargs.pop("suffix", "")
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
         # Filter for alignment if set up
-        filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_for_alignment = extra_kwargs.pop("filter_for_alignment", 
+                                                self.filter_for_alignment)
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):

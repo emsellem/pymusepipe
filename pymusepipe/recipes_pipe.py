@@ -285,8 +285,9 @@ class PipeRecipes(object) :
     def recipe_combine(self, sof, dir_products, name_products, tpl, expotype,
             suffix_products=[""], suffix_prefinalnames=[""], 
             save='cube', pixfrac=0.6, suffix="", 
-            format_out='Cube', filter_list='Cousins_R,white'):
-        """Running the muse_exp_combine recipe
+            format_out='Cube', filter_list='white',
+            filter_for_alignment="Cousins_R"):
+        """Running the muse_exp_combine recipe for one single pointing
         """
         self.run_oscommand("{esorex}  --log-file=exp_combine_cube_{expotype}_{tpl}.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
@@ -296,6 +297,19 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):
+            if 'CUBE' in name_prod:
+                cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
+                mycube = MuseCube(filename=cube_name)
+                myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
+                        filter_folder=self.paths.root, 
+                        dic_extra_filters=self.pipe_params._dic_extra_filters)
+                name_imageout = ("{name_imaout}_{suffix}{myfilter}_{pointing}_{tpl}"
+                                 ".fits".format(
+                                 name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
+                                 myfilter=filter_for_alignment, 
+                                 pointing="P{0:02d}".format(self.pointing),
+                                 tpl=tpl, suffix=suffix))
+                myimage.write(name_imageout)
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                 '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(name_prod+suff_prod), 
@@ -303,4 +317,36 @@ class PipeRecipes(object) :
                 suff_pre=suff_pre, suffix=suffix, 
                 tpl=tpl, pointing="P{0:02d}".format(self.pointing)))
 
+    def recipe_combine_pointings(self, sof, dir_products, name_products,
+            suffix_products=[""], suffix_prefinalnames=[""], 
+            save='cube', pixfrac=0.6, suffix="", 
+            format_out='Cube', filter_list='white', 
+            filter_for_alignment="Cousins_R"):
+        """Running the muse_exp_combine recipe for pointings
+        """
+        self.run_oscommand("{esorex}  --log-file=exp_combine_pointings.log "
+               " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
+               "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, 
+                   save=save, pixfrac=pixfrac, form=format_out, 
+                   filt=filter_list, sof=sof))
+
+        for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
+                suffix_prefinalnames):
+             # Create extra filter image if requested
+            if 'CUBE' in name_prod:
+                cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
+                mycube = MuseCube(filename=cube_name)
+                myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
+                        filter_folder=self.paths.root, 
+                        dic_extra_filters=self.pipe_params._dic_extra_filters)
+                name_imageout = ("{name_imaout}_{suffix}{myfilter}.fits".format(
+                                 name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
+                                 myfilter=filter_for_alignment, suffix=suffix))
+                myimage.write(name_imageout)
+
+           self.run_oscommand("{nocache} mv {name_imain}.fits "
+                '{name_imaout}{suffix}{suff_pre}.fits'.format(nocache=self.nocache,
+                name_imain=self.joinprod(name_prod+suff_prod), 
+                name_imaout=joinpath(dir_products, name_prod),
+                suff_pre=suff_pre, suffix=suffix))
 
