@@ -365,7 +365,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             self._sofdict['OFFSET_LIST'] = [joinpath(self.folder_offset_table, 
                                                      self.offset_table_name)]
 
-        pixtable_name = musepipe.dic_listObject('REDUCED')
+        pixtable_name = musepipe.dic_listObject['REDUCED']
         self._sofdict[pixtable_name] = []
         for pointing in self.list_pointings:
             self._sofdict[pixtable_name] += [self.dic_pixtabs_in_pointings[pointing]]
