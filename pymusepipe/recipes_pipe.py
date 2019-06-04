@@ -233,7 +233,7 @@ class PipeRecipes(object) :
         for name_prod, suff_prod, suff_pre, suff_post in zip(name_products, suffix_products, 
                 suffix_prefinalnames, suffix_postfinalnames) :
             # Create extra filter image if requested
-            if 'CUBE' in name_prod:
+            if 'CUBE' in name_prod and not self.fakemode:
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
                 mycube = MuseCube(filename=cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
@@ -293,7 +293,7 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):
-            if 'CUBE' in name_prod:
+            if 'CUBE' in name_prod and not self.fakemode:
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
                 mycube = MuseCube(filename=cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
@@ -306,6 +306,7 @@ class PipeRecipes(object) :
                                  pointing="P{0:02d}".format(self.pointing),
                                  tpl=tpl, suffix=suffix))
                 myimage.write(name_imageout)
+
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                 '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
                 name_imain=self.joinprod(name_prod+suff_prod), 
@@ -329,7 +330,7 @@ class PipeRecipes(object) :
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):
              # Create extra filter image if requested
-            if 'CUBE' in name_prod:
+            if 'CUBE' in name_prod and not self.fakemode:
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
                 mycube = MuseCube(filename=cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
