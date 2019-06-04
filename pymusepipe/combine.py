@@ -106,6 +106,7 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Init of the subclasses
         PipeRecipes.__init__(self, **kwargs)
+        SofPipe.__init__(self)
 
         # ---------------------------------------------------------
         # Setting up the folders and names for the data reduction
