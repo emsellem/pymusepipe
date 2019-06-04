@@ -130,9 +130,8 @@ class MusePointings(SofPipe, PipeRecipes) :
         self._check_pointings(dic_exposures_in_pointing)
 
         # Checking input offset table and corresponding pixtables
-        folder_offset_table = kwargs.pop("folder_offset_table", None)
-        if offset_table_name is not None:
-            self._check_offset_table(offset_table_name, folder_offset_table)
+        folder_offset_table = kwargs.pop("folder_offset_table", self.paths.alignment)
+        self._check_offset_table(offset_table_name, folder_offset_table)
         # END CHECK UP ============================================
 
         # Making the output folders in a safe mode
@@ -207,7 +206,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         """
         self.offset_table_name = offset_table_name
         if self.offset_table_name is None:
-            upipe.print_error("No Offset table given")
+            upipe.print_warning("No Offset table given")
             return
         
         # Using the given folder name, alignment one by default
@@ -332,7 +331,11 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Filters
         filter_list = kwargs.pop("filter_list", "white")
         filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
-        offset_list = kwargs.pop("offset_list", "True")
+
+        if "offset_table_name" in kwargs:
+            offset_table_name = kwargs.pop("offset_table_name", None)
+            folder_offset_table = kwargs.pop("offset_table_name", self.folder_offset_table)
+            self._check_offset_table(offset_table_name, folder_offset_table)
 
         # Go to the data folder
         self.goto_folder(self.paths.data, logfile=True)
@@ -358,18 +361,9 @@ class MusePointings(SofPipe, PipeRecipes) :
         self._add_calib_to_sofdict("FILTER_LIST")
 
         # Setting the default option of offset_list
-        if offset_list :
-            offset_list_tablename = kwargs.pop("offset_list_tablename", None)
-            if offset_list_tablename is None:
-                offset_list_tablename = "{0}{1}_{2}.fits".format(
-                        dic_files_products['ALIGN'][0], suffix, filter_for_alignment)
-            if not os.path.isfile(joinpath(self.paths.alignment, offset_list_tablename)):
-                upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
-                        offset_list_tablename, self.paths.alignment), pipe=self)
-                return
-
-            self._sofdict['OFFSET_LIST'] = [joinpath(self.paths.alignment, 
-                                                     offset_list_tablename)]
+        if self.offset_table_name is not None:
+            self._sofdict['OFFSET_LIST'] = [joinpath(self.folder_offset_table, 
+                                                     self.offset_table_name)]
 
         pixtable_name = self._get_suffix_product('REDUCED')
         self._sofdict[pixtable_name] = []
