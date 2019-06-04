@@ -173,9 +173,6 @@ def lower_rep(text) :
 class MusePipe(PipePrep, PipeRecipes):
     """Main Class to define and run the MUSE pipeline, given a certain galaxy name
     
-    musep = MusePipe(targetname='NGC1087', rc_filename="", cal_filename="", 
-                      outlog"NGC1087_log1.log", objects=[''])
-    musep.run()
     """
 
     def __init__(self, targetname=None, pointing=0, rc_filename=None, 
@@ -190,7 +187,6 @@ class MusePipe(PipePrep, PipeRecipes):
 
         rc_filename: filename to initialise folders
         cal_filename: filename to initiale FIXED calibration MUSE files
-        outlog: string, output directory for the log files
         verbose: boolean. Give more information as output (default is True)
         musemode: string (default is WFM_N) String to define the mode to be considered
         checkmode: boolean (default is True) Check the mode or not when reducing

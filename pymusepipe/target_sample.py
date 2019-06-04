@@ -88,7 +88,7 @@ class MusepipeTarget(object) :
             
             python_command = ("mypipe = musepipe.MusePipe(targetname={0}, "
                     "pointing={1}, rc_filename={2}, cal_filename={3}, "
-                    "outlog=None, logfile={4}, fakemode={5}, "
+                    "logfile={4}, fakemode={5}, "
                     "nocache=False)".format(targetname, pointing, rcfile, calfile, 
                             logfile, fakemode))
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
@@ -96,7 +96,7 @@ class MusepipeTarget(object) :
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
             self.history.append(python_command)
             mypipe = MusePipe(targetname=targetname, pointing=pointing, 
-                    rc_filename=rcfile, cal_filename=calfile, outlog=None, 
+                    rc_filename=rcfile, cal_filename=calfile, 
                     logfile=logfile, fakemode=fakemode, nocache=False)
 
             self.pipelines.append(mypipe)

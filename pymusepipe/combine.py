@@ -71,7 +71,6 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         rc_filename: filename to initialise folders
         cal_filename: filename to initiale FIXED calibration MUSE files
-        outlog: string, output directory for the log files
         verbose: boolean. Give more information as output (default is True)
         vsystemic: float (default is 0), indicating the systemic velocity of the galaxy [in km/s]
 
