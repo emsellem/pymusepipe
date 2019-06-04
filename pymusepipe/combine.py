@@ -30,7 +30,8 @@ import warnings
 
 # Importing pymusepipe modules
 from pymusepipe.recipes_pipe import PipeRecipes
-from pymusepipe.prep_recipes_pipe import PipePrep
+#from pymusepipe.prep_recipes_pipe import PipePrep
+from pymusepipe.create_sof import SofPipe
 from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe 
@@ -53,7 +54,7 @@ dic_combined_folders = {
         "pipe_products": "Pipe_products/",
         }
 
-class MusePointings(PipePrep, PipeRecipes) :
+class MusePointings(SofPipe, PipeRecipes) :
     def __init__(self, targetname=None, list_pointings=[1], 
             dic_exposures_in_pointing=None,
             rc_filename=None, cal_filename=None, 
@@ -337,7 +338,7 @@ class MusePointings(PipePrep, PipeRecipes) :
 
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2
-        nexpo_tocombine = sum(len(self.dic_pixtab_in_pointings[pointing]) 
+        nexpo_tocombine = sum(len(self.dic_pixtabs_in_pointings[pointing]) 
                               for pointing in self.list_pointings)
         if len(nexpo_tocombine) <= 1:
             if self.verbose:
@@ -372,7 +373,7 @@ class MusePointings(PipePrep, PipeRecipes) :
         pixtable_name = self._get_suffix_product('REDUCED')
         self._sofdict[pixtable_name] = []
         for pointing in self.list_pointings:
-            self._sofdict[pixtable_name] += [self.dic_pixtab_in_pointings[pointing]]
+            self._sofdict[pixtable_name] += [self.dic_pixtabs_in_pointings[pointing]]
 
         self.write_sof(sof_filename="{0}_{1}".format(sof_filename, suffix), new=True)
 
