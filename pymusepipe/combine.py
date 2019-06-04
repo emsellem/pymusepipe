@@ -371,7 +371,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         for pointing in self.list_pointings:
             self._sofdict[pixtable_name] += [self.dic_pixtabs_in_pointings[pointing]]
 
-        self.write_sof(sof_filename="{0}_{1}".format(sof_filename, suffix), new=True)
+        self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename, self.targetname, suffix), new=True)
 
         # Product names
         dir_products = upipe.normpath(self.paths.combined)
