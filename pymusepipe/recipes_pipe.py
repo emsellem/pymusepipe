@@ -282,14 +282,16 @@ class PipeRecipes(object) :
             suffix_products=[""], suffix_prefinalnames=[""], 
             save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white',
-            filter_for_alignment="Cousins_R"):
+            filter_for_alignment="Cousins_R", lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for one single pointing
         """
         self.run_oscommand("{esorex}  --log-file=exp_combine_cube_{expotype}_{tpl}.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
-               "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, save=save, 
+               "--format={form} --filter={filt} "
+               "--lambdamin={lmin} --lambdamax={lmax} {sof}".format(
+                   esorex=self.esorex, save=save, 
                    pixfrac=pixfrac, form=format_out, filt=filter_list, sof=sof, 
-                   tpl=tpl, expotype=expotype))
+                   tpl=tpl, expotype=expotype, lmin=lambdamin, lmax=lambdamax))
 
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):
@@ -318,14 +320,18 @@ class PipeRecipes(object) :
             suffix_products=[""], suffix_prefinalnames=[""], 
             save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white', 
+            lambdamin=4000., lambdamax=10000.,
             filter_for_alignment="Cousins_R"):
         """Running the muse_exp_combine recipe for pointings
         """
         self.run_oscommand("{esorex}  --log-file=exp_combine_pointings.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
-               "--format={form} --filter={filt} {sof}".format(esorex=self.esorex, 
+               "--format={form} --filter={filt} "
+               "--lambdamin={lmin} --lambdamax={lmax} "
+               "{sof}".format(esorex=self.esorex, 
                    save=save, pixfrac=pixfrac, form=format_out, 
-                   filt=filter_list, sof=sof))
+                   filt=filter_list, sof=sof, 
+                   lmin=lambdamin, lmax=lambdamax))
 
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):

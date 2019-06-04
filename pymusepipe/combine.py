@@ -386,6 +386,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                 suffix_products=suffix_products,
                 suffix_prefinalnames=suffix_prefinalnames,
                 save=save, suffix=suffix, filter_list=filter_list, 
+                lambdamin=lambdamin, lambdamax=lambdamax,
                 filter_for_alignment=filter_for_alignment, **kwargs)
 
         # Go back to original folder

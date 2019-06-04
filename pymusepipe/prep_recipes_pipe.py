@@ -1076,7 +1076,7 @@ class PipePrep(SofPipe) :
     @print_my_function_name
     def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
             list_expo=[], stage="processed", tpl="ALL", filter_list="Cousins_R", 
-            suffix="", **kwargs):
+            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Produce a cube from all frames in the pointing
         list_expo or tpl specific arguments can still reduce the selection if needed
         """
@@ -1087,6 +1087,9 @@ class PipePrep(SofPipe) :
         found_expo, list_expo, group_list_expo, combine_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
+
+        # Lambda min and max?
+        [lambdamin, lambdamax] = lambdaminmax
 
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2
@@ -1151,6 +1154,7 @@ class PipePrep(SofPipe) :
         self.recipe_combine(self.current_sof, dir_products, name_products, 
                 tpl, expotype, suffix_products=suffix_products,
                 suffix_prefinalnames=suffix_prefinalnames,
+                lambdamin=lambdamin, lambdamax=lambdamax,
                 save=save, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
