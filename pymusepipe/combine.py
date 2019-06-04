@@ -255,7 +255,7 @@ class MusePointings(PipePrep, PipeRecipes) :
 
         # printing result
         upipe.print_info("Offset Table checked: #{0} PixTables included".format(
-                          nincluded_pixtab)
+                          nincluded_pixtab))
         if nexcluded_pixtab == 0:
             upipe.print_info("All PixTables were found in Offset Table")
         else:
