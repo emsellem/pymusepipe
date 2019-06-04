@@ -363,13 +363,13 @@ class MusePointings(SofPipe, PipeRecipes) :
             if offset_list_tablename is None:
                 offset_list_tablename = "{0}{1}_{2}.fits".format(
                         dic_files_products['ALIGN'][0], suffix, filter_for_alignment)
-            if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
+            if not os.path.isfile(joinpath(self.paths.alignment, offset_list_tablename)):
                 upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
-                        offset_list_tablename, folder_expo), pipe=self)
+                        offset_list_tablename, self.paths.alignment), pipe=self)
                 return
 
-            self._sofdict['OFFSET_LIST'] = [joinpath(folder_expo, offset_list_tablename)]
-
+            self._sofdict['OFFSET_LIST'] = [joinpath(self.paths.alignment, 
+                                                     offset_list_tablename)]
 
         pixtable_name = self._get_suffix_product('REDUCED')
         self._sofdict[pixtable_name] = []
