@@ -30,14 +30,14 @@ import warnings
 
 # Importing pymusepipe modules
 from pymusepipe.recipes_pipe import PipeRecipes
-#from pymusepipe.prep_recipes_pipe import PipePrep
 from pymusepipe.create_sof import SofPipe
 from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe 
+
 # Default keywords for MJD and DATE
 from pymusepipe.align_pipe import default_mjd_table, default_date_table
-from pymusepipe.prep_recipes_pipe import dic_products_scipost
+from pymusepipe.prep_recipes_pipe import dic_products_scipost, dic_files_products
 
 __version__ = '0.0.2 (28 Feb 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
