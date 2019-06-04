@@ -33,11 +33,10 @@ from pymusepipe.recipes_pipe import PipeRecipes
 from pymusepipe.create_sof import SofPipe
 from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
-from pymusepipe import musepipe 
+from pymusepipe import musepipe, prep_recipes_pipe 
 
 # Default keywords for MJD and DATE
 from pymusepipe.align_pipe import default_mjd_table, default_date_table
-from pymusepipe.prep_recipes_pipe import dic_products_scipost, dic_files_products
 
 __version__ = '0.0.2 (28 Feb 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
@@ -162,7 +161,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.dic_exposures_in_pointings = dic_exposures_in_pointings
 
         # Getting the pieces of the names to be used for pixtabs
-        pixtable_suffix = dic_products_scipost['individual'][0]
+        pixtable_suffix = prep_recipes_pipe.dic_products_scipost['individual'][0]
 
         # Initialise the dictionary of pixtabs to be found in each pointing
         self.dic_pixtabs_in_pointings = {}
