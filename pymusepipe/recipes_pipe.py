@@ -344,9 +344,10 @@ class PipeRecipes(object) :
                                  myfilter=filter_for_alignment, suffix=suffix))
                 myimage.write(name_imageout)
 
-           self.run_oscommand("{nocache} mv {name_imain}.fits "
-                '{name_imaout}{suffix}{suff_pre}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod+suff_prod), 
-                name_imaout=joinpath(dir_products, name_prod),
-                suff_pre=suff_pre, suffix=suffix))
+            self.run_oscommand("{nocache} mv {name_imain}.fits "
+                              "{name_imaout}{suffix}{suff_pre}.fits".format(
+                                  nocache=self.nocache, 
+                                  name_imain=self.joinprod(name_prod+suff_prod), 
+                                  name_imaout=joinpath(dir_products, name_prod),
+                                  suff_pre=suff_pre, suffix=suffix))
 
