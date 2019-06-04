@@ -84,6 +84,27 @@ def print_my_function_name(f):
         return f(*myargs, **mykwargs)
     return wrapped
 
+def _get_combine_products(filter_list='white,Cousins_R'):
+    """Provide a set of key output products depending on the filters
+    for combine
+    """
+    name_products = []
+    suffix_products = []
+    suffix_prefinalnames = []
+    for prod in dic_products_scipost['cube']:
+        if prod == "IMAGE_FOV":
+            for i, value in enumerate(filter_list.split(','), start=1):
+                suffix_products.append("_{0:04d}".format(i))
+                suffix_prefinalnames.append("_{0}".format(value))
+                name_products.append(prod)
+        else :
+            suffix_products.append("")
+            suffix_prefinalnames.append("")
+            name_products.append(prod)
+
+    return name_products, suffix_products, suffix_prefinalnames
+
+
 ###################################################################
 # Class for preparing the launch of recipes
 ###################################################################
@@ -1052,26 +1073,6 @@ class PipePrep(SofPipe) :
                 self.align_group.append(AlignMusePointing(name_ima_reference, 
                     list_names_muse, flag="mytpl"))
 
-    def _get_combine_products(self, filter_list='white,Cousins_R'):
-        """Provide a set of key output products depending on the filters
-        for combine
-        """
-        name_products = []
-        suffix_products = []
-        suffix_prefinalnames = []
-        for prod in dic_products_scipost['cube']:
-            if prod == "IMAGE_FOV":
-                for i, value in enumerate(filter_list.split(','), start=1):
-                    suffix_products.append("_{0:04d}".format(i))
-                    suffix_prefinalnames.append("_{0}".format(value))
-                    name_products.append(prod)
-            else :
-                suffix_products.append("")
-                suffix_prefinalnames.append("")
-                name_products.append(prod)
-
-        return name_products, suffix_products, suffix_prefinalnames
-
     @print_my_function_name
     def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
             list_expo=[], stage="processed", tpl="ALL", filter_list="Cousins_R", 
@@ -1144,7 +1145,7 @@ class PipePrep(SofPipe) :
 
         # Product names
         dir_products = self._get_fullpath_expo(expotype, stage)
-        name_products, suffix_products, suffix_prefinalnames = self._get_combine_products(filter_list) 
+        name_products, suffix_products, suffix_prefinalnames = _get_combine_products(filter_list) 
 
         # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, 
