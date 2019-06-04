@@ -179,7 +179,7 @@ class MusePipe(PipePrep, PipeRecipes):
     """
 
     def __init__(self, targetname=None, pointing=0, rc_filename=None, 
-            cal_filename=None, outlog=None, logfile="MusePipe.log", reset_log=False,
+            cal_filename=None, logfile="MusePipe.log", reset_log=False,
             verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
             strong_checkmode=False, **kwargs):
         """Initialise the file parameters to be used during the run
@@ -237,11 +237,10 @@ class MusePipe(PipePrep, PipeRecipes):
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
-        if outlog is None : 
-            outlog = "log_{timestamp}".format(timestamp=upipe.create_time_name())
-            upipe.print_info("The Log folder will be {log}".format(log=outlog))
-        self.outlog = outlog
-        self.logfile = joinpath(self.outlog, logfile)
+        if logfile is None : 
+            logfile = "log_{timestamp}.txt".format(timestamp=upipe.create_time_name())
+            upipe.print_info("The Log file will be {log}".format(log=logfile))
+        self.logfile = logfile
 
         # Further reduction options =====================================
         # Mode of the observations
@@ -269,6 +268,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Create full path folder 
         self.set_fullpath_names()
+        self.paths.logfile = joinpath(self.paths.log, logfile)
 
         # Go to the data directory
         # and Recording the folder where we start
@@ -328,13 +328,13 @@ class MusePipe(PipePrep, PipeRecipes):
         if overwrite is not None: self._overwrite_astropy_table = overwrite
         if update is not None: self._update_astropy_table = update
 
-    def goto_prevfolder(self, logfile=False) :
+    def goto_prevfolder(self, addtolog=False) :
         """Go back to previous folder
         """
         upipe.print_info("Going back to the original folder {0}".format(self.paths._prev_folder))
-        self.goto_folder(self.paths._prev_folder, logfile=logfile, verbose=False)
+        self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
             
-    def goto_folder(self, newpath, logfile=False, verbose=True) :
+    def goto_folder(self, newpath, addtolog=False, verbose=True) :
         """Changing directory and keeping memory of the old working one
         """
         try: 
@@ -343,8 +343,8 @@ class MusePipe(PipePrep, PipeRecipes):
             os.chdir(newpath)
             if verbose :
                 upipe.print_info("Going to folder {0}".format(newpath))
-            if logfile :
-                upipe.append_file(joinpath(self.paths.data, self.logfile), "cd {0}\n".format(newpath))
+            if addtolog :
+                upipe.append_file(self.paths.logfile, "cd {0}\n".format(newpath))
             self.paths._prev_folder = prev_folder 
         except OSError:
             if not os.path.isdir(newpath):

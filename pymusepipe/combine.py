@@ -50,7 +50,9 @@ dic_combined_folders = {
          # esores log files
         "esorex_log" : "Esorex_log/",
         # Data Products - first writing
-        "pipe_products": "Pipe_products/",
+        "pipe_products": "Pipe_products/"
+        # Log
+        "log": "Log/"
         }
 
 class MusePointings(SofPipe, PipeRecipes) :
@@ -59,7 +61,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             rc_filename=None, cal_filename=None, 
             combined_folder_name="Combined", suffix="",
             offset_table_name=None,
-            outlog=None, logfile="MusePipeCombine.log", reset_log=False,
+            logfile="MusePipeCombine.log", reset_log=False,
             verbose=True, **kwargs):
         """Initialisation of class muse_expo
 
@@ -94,11 +96,10 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
-        if outlog is None : 
-            outlog = "log_{timestamp}".format(timestamp = upipe.create_time_name())
-            upipe.print_info("The Log folder will be {0}".format(outlog))
-        self.outlog = outlog
-        self.logfile = joinpath(self.outlog, logfile)
+        if logfile is None : 
+            logfile = "log_{timestamp}.txt".format(timestamp = upipe.create_time_name())
+            upipe.print_info("The Log file will be {0}".format(logfile))
+        self.logfile = logfile
         self.suffix = suffix
 
         # End of parameter settings #########################
@@ -122,6 +123,8 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Setting all the useful paths
         self.set_fullpath_names()
+        self.paths.logfile = joinpath(self.paths.log, logfile)
+
         # END Set up params =======================================
 
         # ---------------------------------------------------------
@@ -262,13 +265,13 @@ class MusePointings(SofPipe, PipeRecipes) :
             upipe.print_warning("#{0} PixTables not found in Offset Table".format(
                                  nexcluded_pixtab))
 
-    def goto_prevfolder(self, logfile=False) :
+    def goto_prevfolder(self, addtolog=False) :
         """Go back to previous folder
         """
         upipe.print_info("Going back to the original folder {0}".format(self.paths._prev_folder))
-        self.goto_folder(self.paths._prev_folder, logfile=logfile, verbose=False)
+        self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
             
-    def goto_folder(self, newpath, logfile=False, verbose=True) :
+    def goto_folder(self, newpath, addtolog=False, verbose=True) :
         """Changing directory and keeping memory of the old working one
         """
         try: 
@@ -277,8 +280,8 @@ class MusePointings(SofPipe, PipeRecipes) :
             os.chdir(newpath)
             if verbose :
                 upipe.print_info("Going to folder {0}".format(newpath))
-            if logfile :
-                upipe.append_file(joinpath(self.paths.data, self.logfile), "cd {0}\n".format(newpath))
+            if addtolog :
+                upipe.append_file(self.paths.logfile, "cd {0}\n".format(newpath))
             self.paths._prev_folder = prev_folder 
         except OSError:
             if not os.path.isdir(newpath):
@@ -337,7 +340,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             self._check_offset_table(offset_table_name, folder_offset_table)
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2
@@ -351,7 +354,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
@@ -384,4 +387,4 @@ class MusePointings(SofPipe, PipeRecipes) :
                 filter_for_alignment=filter_for_alignment, **kwargs)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)

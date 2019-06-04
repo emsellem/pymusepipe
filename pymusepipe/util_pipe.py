@@ -34,32 +34,16 @@ ERROR = '\033[91m'
 ENDC = '\033[0m'
 BOLD = "\033[1m"
 
-def write_in_pipelogfile(mypipe, text):
-    """Writing in log file of the pipeline
-    """
-    if mypipe is None:
-        return
-    fout = open(mypipe.logfile, 'a')
-    first_text = "# At : " + upipe.formatted_time()
-    if mypipe.fakemode: 
-        first_text += " FAKEMODE\n"
-    else :
-        first_text += "\n"
-    fout.write(first_text)
-    fout.write(text + "\n")
-    fout.close()
-
 def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)
 
 def print_warning(text, **kwargs) :
     toprint = WARNING + "# MusePipeWarning " + ENDC + text
-    if 'pipe' in kwargs:
-        mypipe = kwargs.pop("pipe", None)
-        try:
-            write_in_pipelogfile(mypipe, toprint)
-        except:
-            pass
+    mypipe = kwargs.pop("pipe", None)
+    try:
+        mypipe.write_logfile(toprint)
+    except:
+        pass
 
     print(toprint, **kwargs)
 
@@ -68,12 +52,11 @@ def print_info(text, **kwargs) :
 
 def print_error(text, **kwargs) :
     toprint = ERROR + "# MusePipeError " + ENDC + text
-    if 'pipe' in kwargs:
-        mypipe = kwargs.pop("pipe", None)
-        try:
-            write_in_pipelogfile(mypipe, toprint)
-        except:
-            pass
+    mypipe = kwargs.pop("pipe", None)
+    try:
+        mypipe.write_logfile(toprint)
+    except:
+        pass
 
     print(toprint, **kwargs)
 

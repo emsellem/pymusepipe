@@ -209,7 +209,7 @@ class PipePrep(SofPipe) :
                         pipe=self)
                 return
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for the BIASES including
         # the list of files to be processed for one MASTER BIAS
@@ -233,7 +233,7 @@ class PipePrep(SofPipe) :
         self.save_expo_table('BIAS', tpl_gtable, "master", update=update)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_flat(self, sof_filename='flat', tpl="ALL", update=None):
@@ -256,7 +256,7 @@ class PipePrep(SofPipe) :
                 return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for the FLATs including
         # the list of files to be processed for one MASTER Flat
@@ -286,7 +286,7 @@ class PipePrep(SofPipe) :
         self.save_expo_table('TRACE', tpl_gtable, "master", update=update)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_wave(self, sof_filename='wave', tpl="ALL", update=None):
@@ -309,7 +309,7 @@ class PipePrep(SofPipe) :
                 return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for the FLATs including
         # the list of files to be processed for one WAVECAL
@@ -336,7 +336,7 @@ class PipePrep(SofPipe) :
         self.save_expo_table('WAVE', tpl_gtable, "master", update=update)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_lsf(self, sof_filename='lsf', tpl="ALL", update=None):
@@ -359,7 +359,7 @@ class PipePrep(SofPipe) :
                 return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
@@ -386,7 +386,7 @@ class PipePrep(SofPipe) :
         self.save_expo_table('LSF', tpl_gtable, "master", update=update)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_twilight(self, sof_filename='twilight', tpl="ALL", update=None, illum=True):
@@ -409,7 +409,7 @@ class PipePrep(SofPipe) :
                 return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
@@ -437,7 +437,7 @@ class PipePrep(SofPipe) :
         self.save_expo_table('TWILIGHT', tpl_gtable, "master", update=update)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_scibasic_all(self, list_object=['OBJECT', 'SKY', 'STD'], tpl="ALL", illum=True):
@@ -469,7 +469,7 @@ class PipePrep(SofPipe) :
                 return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
@@ -508,7 +508,7 @@ class PipePrep(SofPipe) :
             self.save_expo_table(expotype, gtable, "processed", aggregate=False, update=True)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_standard(self, sof_filename='standard', tpl="ALL", update=None):
@@ -531,7 +531,7 @@ class PipePrep(SofPipe) :
                 return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for the STD Sof
         for i in range(len(std_table)):
@@ -553,7 +553,7 @@ class PipePrep(SofPipe) :
         self.save_expo_table("STD", std_table, "master", aggregate=False, update=update)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_sky(self, sof_filename='sky', tpl="ALL", fraction=0.8, update=None):
@@ -576,7 +576,7 @@ class PipePrep(SofPipe) :
                 return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
@@ -603,7 +603,7 @@ class PipePrep(SofPipe) :
         self.save_expo_table("SKY", sky_table, "processed", aggregate=False, update=update)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_autocal_sky(self, sof_filename='scipost', expotype="SKY", 
@@ -777,7 +777,7 @@ class PipePrep(SofPipe) :
                         pipe=self)
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Create the dictionary for scipost
         # Selecting either one or all of the exposures
@@ -839,7 +839,7 @@ class PipePrep(SofPipe) :
                         suffix_expo, tpl), aggregate=False, update=True)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     def _get_align_products(self, list_expo=[], filter_list='white,Cousins_R'):
         """Provide a set of key output products for exp_align
@@ -883,7 +883,7 @@ class PipePrep(SofPipe) :
             return
         
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         suffix = "_{0}".format(filter_name)
         if line is not None:
@@ -925,7 +925,7 @@ class PipePrep(SofPipe) :
                         suffix, mytpl), aggregate=False, update=True)
         
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
         
     @print_my_function_name
     def run_align_bypointing(self, sof_filename='exp_align', expotype="OBJECT", 
@@ -956,7 +956,7 @@ class PipePrep(SofPipe) :
             return
         
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         suffix = "_{0}".format(filter_name)
         if line is not None:
@@ -991,7 +991,7 @@ class PipePrep(SofPipe) :
                 suffix, tpl), aggregate=False, update=True)
         
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def save_fine_alignment(self, name_offset_table=None):
@@ -1097,7 +1097,7 @@ class PipePrep(SofPipe) :
             return
 
         # Go to the data folder
-        self.goto_folder(self.paths.data, logfile=True)
+        self.goto_folder(self.paths.data, addtolog=True)
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
@@ -1154,4 +1154,4 @@ class PipePrep(SofPipe) :
                 save=save, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
-        self.goto_prevfolder(logfile=True)
+        self.goto_prevfolder(addtolog=True)

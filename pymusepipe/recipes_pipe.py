@@ -90,15 +90,11 @@ class PipeRecipes(object) :
     def write_logfile(self, text):
         """Writing in log file
         """
-        fout = open(self.logfile, 'a')
-        first_text = "# At : " + upipe.formatted_time()
-        if self.fakemode : 
-            first_text += " FAKEMODE\n"
-        else :
-            first_text += "\n"
-        fout.write(first_text)
-        fout.write(text + "\n")
-        fout.close()
+        fulltext = "# At : {0}{1}\n{2}\n".format(
+                upipe.formatted_time(),
+                " FAKEMODE" if self.fakemode else "",
+                text) 
+        upipe.append_file(self.paths.logfile, fulltext)
 
     def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
