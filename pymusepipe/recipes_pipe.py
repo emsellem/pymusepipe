@@ -336,7 +336,7 @@ class PipeRecipes(object) :
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
                         filter_folder=self.paths.root, 
                         dic_extra_filters=self.pipe_params._dic_extra_filters)
-                name_imageout = ("{name_imaout}_{suffix}{myfilter}.fits".format(
+                name_imageout = ("{name_imaout}_{myfilter}{suffix}.fits".format(
                                  name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
                                  myfilter=filter_for_alignment, suffix=suffix))
                 myimage.write(name_imageout)
