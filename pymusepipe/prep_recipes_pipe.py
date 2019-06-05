@@ -920,7 +920,8 @@ class PipePrep(SofPipe) :
                                           for iexpo in list_group_expo]
             self._sofdict['IMAGE_FOV'] = list_images
             create_offset_table(list_images, table_folder=self.paths.pipe_products, 
-                                table_name="{0}.fits".format(dic_files_products['ALIGN'][0])
+                                table_name="{0}.fits".format(dic_files_products['ALIGN'][0]))
+            upipe.print_info("Creating empty OFFSET_LIST.fits using images list")
             self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             namein_align = deepcopy(dic_files_products['ALIGN'])
@@ -986,8 +987,9 @@ class PipePrep(SofPipe) :
         list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
             'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) for row in align_table]
         self._sofdict['IMAGE_FOV'] = list_images
+        upipe.print_info("Creating empty OFFSET_LIST.fits using images list")
         create_offset_table(list_images, table_folder=self.paths.pipe_products, 
-                            table_name="{0}.fits".format(dic_files_products['ALIGN'][0])
+                            table_name="{0}.fits".format(dic_files_products['ALIGN'][0]))
 
         # Write the SOF
         self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}_{3}".format(
