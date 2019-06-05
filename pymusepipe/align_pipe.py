@@ -10,6 +10,8 @@ __contact__   = " <eric.emsellem@eso.org>"
 
 # Import general modules
 import os
+from os.path import join as joinpath
+
 import glob
 import copy
 
@@ -27,7 +29,7 @@ import astropy.wcs as awcs
 from astropy.io import fits as pyfits
 from astropy.modeling import models, fitting
 from astropy.stats import mad_std
-from astropy.table import Table
+from astropy.table import Table, Column
 from astropy import units as u
 from astropy.convolution import Gaussian2DKernel, convolve
 
@@ -49,12 +51,61 @@ default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
 default_reference_unit = u.microJansky
 
 # Define useful keywords for fits table and images
-default_mjd_table = "MJD_OBS"
-default_mjd_image = "MJD-OBS"
-default_date_table = "DATE_OBS"
-default_date_image = "DATE-OBS"
+mjd_names = {'table': "MJD_OBS", 'image': "MJD-OBS"}
+date_names = {'table': "DATE_OBS", 'image': "DATE-OBS"}
+
+default_offset_table = {'date': [date_names['table'], 'S23', ""],
+                        'mjd' : [mjd_names['table'], 'f8', 0.0],
+                        'ora':["RA_OFFSET", 'f8', 0.0],
+                        'odec':["DEC_OFFSET", 'f8', 0.0],
+                        'scale':["FLUX_SCALE", 'f8', 1.0]}
 
 # ================== Useful function ====================== #
+def create_offset_table(images=[], table_folder="", 
+        table_name="dummy_offset_table.fits",
+        overwrite=False):
+    """Create an offet list table from a set of images
+    """
+
+    # Check if table exists and see if overwrite is set up
+    table_fullname = joinpath(table_folder, table_name)
+    if not overwrite and os.path.isfile(table_fullname):
+        upipe.print_warning("[create_offset_table] Table {0} "
+                            "already exists".format(table_fullname))
+        upipe.print_warning("Use overwrite=True if you wish to proceed")
+        return 
+
+    nimages = len(images)
+    if nimages == 0:
+        upipe.print_warning("No images provided for create_offset_table")
+        return
+
+    # Gather the values of DATE and MJD from the images
+    date, mjd = [], []
+    for ima in images:
+        if not os.path.isfile(ima):
+            upipe.print_warning("[create_offset] Image {0} does not exists".format(ima))
+            continue
+
+        head = pyfits.getheader(ima)
+        date.append(head[date_names['image']])
+        mjd.append(head[mjd_names['image']])
+
+    nlines = len(date)
+
+    # Create and fill the table
+    offset_table = Table()
+    for col in default_offset_table.keys():
+        [name, form, default] = default_offset_table[col]
+        offset_table[name] = Column([default for i in range(nlines)], 
+                                    dtype=form)
+
+    offset_table[date_names['table']] = date
+    offset_table[mjd_names['table']] = mjd
+
+    # Write the table
+    offset_table.write(table_fullname, overwrite=overwrite)
+
 def open_new_wcs_figure(nfig, mywcs=None):
     """Open a new figure with wcs projection.
     
@@ -537,13 +588,13 @@ class AlignMusePointing(object):
                 return
 
             # First get the right indices for the table by comparing MJD_OBS
-            if default_mjd_table not in self.offset_table.columns:
+            if mjd_names['table'] not in self.offset_table.columns:
                 upipe.print_warning("Input table does not "
                                     "contain MJD_OBS column")
                 self._reset_init_guess_values()
                 return
 
-            self.table_mjdobs = self.offset_table[default_mjd_table]
+            self.table_mjdobs = self.offset_table[mjd_names['table']]
             # Now finding the right match with the Images
             # Warning, needs > numpy 1.15.0
             values, ind_ima, ind_table = np.intersect1d(
@@ -846,14 +897,14 @@ class AlignMusePointing(object):
         # Filling in the MJD and DATE OBS keywords for the MUSE images
         # If not there, will be filled with "None"
         for nima, hdu in enumerate(self.list_hdulist_muse):
-            if default_date_image not in hdu[0].header:
+            if date_names['image'] not in hdu[0].header:
                 self.ima_dateobs[nima] = None
             else :
-                self.ima_dateobs[nima] = hdu[0].header[default_date_image]
-            if default_mjd_image not in hdu[0].header:
+                self.ima_dateobs[nima] = hdu[0].header[date_names['image']]
+            if mjd_names['image'] not in hdu[0].header:
                 self.ima_mjdobs[nima] = None
             else :
-                self.ima_mjdobs[nima] = hdu[0].header[default_mjd_image]
+                self.ima_mjdobs[nima] = hdu[0].header[mjd_names['image']]
 
             if self.list_muse_hdu[nima].data is None:
                 return 0

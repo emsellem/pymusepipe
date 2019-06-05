@@ -21,7 +21,14 @@ import numpy as np
 # pymusepipe modules
 from pymusepipe import util_pipe as upipe
 from pymusepipe.create_sof import SofPipe
+from pymusepipe.align_pipe import create_offset_table
 from pymusepipe import musepipe
+
+try :
+    import astropy as apy
+    from astropy.io import fits as pyfits
+except ImportError :
+    raise Exception("astropy is required for this module")
 
 # =======================================================
 # List of recipes
@@ -53,6 +60,7 @@ dic_products_scipost = {
         'raman': ['RAMAN_IMAGES'],
         'autocal': ['AUTOCAL_FACTORS']
         }
+
 # =======================================================
 # Few useful functions
 # =======================================================
@@ -907,12 +915,17 @@ class PipePrep(SofPipe) :
                     upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this group",
                             pipe=self)
                 continue
-            self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) for iexpo in list_group_expo]
+            list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
+                                          'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) 
+                                          for iexpo in list_group_expo]
+            self._sofdict['IMAGE_FOV'] = list_images
+            create_offset_table(list_images, table_folder=self.paths.pipe_products, 
+                                table_name="{0}.fits".format(dic_files_products['ALIGN'][0])
             self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             namein_align = deepcopy(dic_files_products['ALIGN'])
-            nameout_align = [name + "{0}_{1}".format(suffix, mytpl) for name in deepcopy(dic_files_products['ALIGN'])] 
+            nameout_align = [name + "{0}_{1}".format(suffix, mytpl) 
+                             for name in deepcopy(dic_files_products['ALIGN'])] 
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
                     namein_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
@@ -943,7 +956,8 @@ class PipePrep(SofPipe) :
 
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(
+                                      expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
         # Stop the process if only 1 or fewer exposures are retrieved
@@ -951,7 +965,8 @@ class PipePrep(SofPipe) :
             if self.verbose:
                 upipe.print_warning("Pointing = {0}".format(self.pointing),
                         pipe=self)
-                upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this Pointing",
+                upipe.print_warning("No derived OFFSET LIST as only "
+                                    "1 exposure retrieved in this Pointing",
                         pipe=self)
             return
         
@@ -968,14 +983,19 @@ class PipePrep(SofPipe) :
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
         # Producing the list of IMAGES and add them to the SOF
-        self._sofdict['IMAGE_FOV'] = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
+        list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
             'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) for row in align_table]
+        self._sofdict['IMAGE_FOV'] = list_images
+        create_offset_table(list_images, table_folder=self.paths.pipe_products, 
+                            table_name="{0}.fits".format(dic_files_products['ALIGN'][0])
 
         # Write the SOF
-        self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}_{3}".format(suffix, expotype, pointing, tpl), new=True)
+        self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}_{3}".format(
+                       suffix, expotype, pointing, tpl), new=True)
         dir_align = self._get_fullpath_expo('OBJECT', "processed")
         namein_align = deepcopy(dic_files_products['ALIGN'])
-        nameout_align = [name + "{0}_{1}_{2}_{3}".format(suffix, expotype, pointing, tpl) for name in deepcopy(dic_files_products['ALIGN'])] 
+        nameout_align = [name + "{0}_{1}_{2}_{3}".format(suffix, expotype, pointing, tpl) 
+                         for name in deepcopy(dic_files_products['ALIGN'])] 
         for iter_file in dic_files_iexpo_products['ALIGN']:
             for i, row in enumerate(align_table):
                 namein_align.append('{0}_{1:04d}'.format(iter_file, i+1))

@@ -36,7 +36,7 @@ import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe 
 
 # Default keywords for MJD and DATE
-from pymusepipe.align_pipe import default_mjd_table, default_date_table
+from pymusepipe.align_pipe import mjd_names, date_names
 
 __version__ = '0.0.2 (28 Feb 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
@@ -227,8 +227,8 @@ class MusePointings(SofPipe, PipeRecipes) :
         offset_table = Table.read(full_offset_table_name)
 
         # getting the MJD and DATE from the OFFSET table
-        self.table_mjdobs = offset_table[default_mjd_table]
-        self.table_dateobs = offset_table[default_date_table]
+        self.table_mjdobs = offset_table[mjd_names['table']]
+        self.table_dateobs = offset_table[date_names['table']]
 
         # Checking existence of each pixel_table in the offset table
         nexcluded_pixtab = 0
