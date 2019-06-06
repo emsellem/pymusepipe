@@ -135,14 +135,15 @@ class SofPipe(object) :
         """Extract the geometry table and add it to the dictionary
         for the SOF file
         """
-        calfolder = self.pipe_params.musecalib
-        if self._time_geo_table :
+        if self._time_astrometry :
+            calfolder = self.pipe_params.musecalib_time
             listkeys = list(musepipe.dic_geo_table.keys())
             listkeys.append(musepipe.future_date)
             for ikey in range(len(listkeys) - 1):
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
                     geofile = musepipe.dic_geo_table[listkeys[ikey]]
         else:
+            calfolder = self.pipe_params.musecalib
             geofile = self.pipe_params.geo_table
 
         self._sofdict['GEOMETRY_TABLE']=["{folder}{geo}".format(folder=calfolder, geo=geofile)]
@@ -151,14 +152,15 @@ class SofPipe(object) :
         """Extract the astrometry table and add it to the dictionary
         for the SOF file
         """
-        calfolder = self.pipe_params.musecalib
-        if self._time_geo_table :
+        if self._time_astrometry :
+            calfolder = self.pipe_params.musecalib_time
             listkeys = list(musepipe.dic_astro_wcs.keys())
             listkeys.append(musepipe.future_date)
             for ikey in range(len(listkeys) - 1):
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
                     astrofile = musepipe.dic_astro_wcs[listkeys[ikey]]
         else :
+            calfolder = self.pipe_params.musecalib
             astrofile = self.pipe_params.astro_table
 
         self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]

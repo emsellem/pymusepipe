@@ -115,27 +115,83 @@ exclude_list_checkmode = ['BIAS', 'DARK']
 esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
         
 dic_geo_table = {
-        '1900-01-01': "geometry_table_wfm.fits",
-        '2000-01-01': "geometry_table_wfm.fits",
-        '2014-12-01': "geometry_table_wfm.fits",
-        '2015-04-16': "geometry_table_wfm.fits",
-        '2015-09-08': "geometry_table_wfm.fits",
+  '2014-02-09': "geometry_table_wfm_comm1.fits",
+  '2014-04-28': "geometry_table_wfm_comm2a.fits",
+  '2014-07-31': "geometry_table_wfm_comm2b.fits",
+  '2014-10-23': "geometry_table_wfm_gto02.fits",
+  '2014-11-21': "geometry_table_wfm_gto03.fits",
+  '2014-12-01': "geometry_table_wfm_2014dec.fits",
+  '2015-04-15': "geometry_table_wfm_gto05.fits",
+  '2015-05-10': "geometry_table_wfm_gto06.fits",
+  '2015-08-24': "geometry_table_wfm_gto07.fits",
+  '2015-09-08': "geometry_table_wfm_gto08.fits",
+  '2015-10-11': "geometry_table_wfm_gto09.fits",
+  '2015-11-07': "geometry_table_wfm_gto10.fits",
+  '2016-02-02': "geometry_table_wfm_gto11.fits",
+  '2016-03-10': "geometry_table_wfm_gto12.fits",
+  '2016-04-03': "geometry_table_wfm_gto13.fits",
+  '2016-09-02': "geometry_table_wfm_gto15.fits",
+  '2017-01-30': "geometry_table_wfm_gto16.fits",
+  '2017-04-24': "geometry_table_wfm_gto17.fits",
+  '2017-09-24': "geometry_table_wfm_gto19.fits",
+  '2017-10-20': "geometry_table_wfm_gto20.fits",
+  '2017-11-17': "geometry_table_wfm_gto21.fits",
+  '2018-02-13': "geometry_table_wfm_gto22.fits",
+  '2018-03-15': "geometry_table_wfm_gto23.fits",
+  '2018-04-14': "geometry_table_wfm_gto24.fits",
+  '2018-05-12': "geometry_table_wfm_gto25.fits",
+  '2018-08-14': "geometry_table_wfm_gto26.fits",
+  '2018-09-11': "geometry_table_wfm_gto27.fits",
+  '2018-10-14': "geometry_table_wfm_gto28.fits",
+  '2018-11-14': "geometry_table_wfm_gto29.fits",
+  '2019-01-09': "geometry_table_wfm_gto31.fits",
+  '2019-03-05': "geometry_table_wfm_gto32.fits",
+  '2019-04-01': "geometry_table_wfm_gto33.fits",
+  '2019-05-04': "geometry_table_wfm_gto34.fits"
         }
 
-dic_astro_table = {
-        '1900-01-01': "astrometry_table_wfm.fits",
-        '2000-01-01': "astrometry_table_wfm.fits",
-        '2014-12-01': "astrometry_table_wfm.fits",
-        '2015-04-16': "astrometry_table_wfm.fits",
-        '2015-09-08': "astrometry_table_wfm.fits",
-        }
+# dic_astro_table = {
+#         '1900-01-01': "astrometry_table_wfm.fits",
+#         '2000-01-01': "astrometry_table_wfm.fits",
+#         '2014-12-01': "astrometry_table_wfm.fits",
+#         '2015-04-16': "astrometry_table_wfm.fits",
+#         '2015-09-08': "astrometry_table_wfm.fits",
+#         }
 
 dic_astro_wcs = {
-        '1900-01-01': "astrometry_wcs_wfm.fits",
-        '2000-01-01': "astrometry_wcs_wfm.fits",
-        '2014-12-01': "astrometry_wcs_wfm.fits",
-        '2015-04-16': "astrometry_wcs_wfm.fits",
-        '2015-09-08': "astrometry_wcs_wfm.fits",
+  '2014-02-09': "astrometry_wcs_wfm_comm1.fits",
+  '2014-04-28': "astrometry_wcs_wfm_comm2a.fits",
+  '2014-07-31': "astrometry_wcs_wfm_comm2b.fits",
+  '2014-10-23': "astrometry_wcs_wfm_gto02.fits",
+  '2014-11-21': "astrometry_wcs_wfm_gto03.fits",
+  '2014-12-01': "astrometry_wcs_wfm_2014dec.fits",
+  '2015-04-15': "astrometry_wcs_wfm_gto05.fits",
+  '2015-05-10': "astrometry_wcs_wfm_gto06.fits",
+  '2015-08-24': "astrometry_wcs_wfm_gto07.fits",
+  '2015-09-08': "astrometry_wcs_wfm_gto08.fits",
+  '2015-10-11': "astrometry_wcs_wfm_gto09.fits",
+  '2015-11-07': "astrometry_wcs_wfm_gto10.fits",
+  '2016-02-02': "astrometry_wcs_wfm_gto11.fits",
+  '2016-03-10': "astrometry_wcs_wfm_gto12.fits",
+  '2016-04-03': "astrometry_wcs_wfm_gto13.fits",
+  '2016-09-02': "astrometry_wcs_wfm_gto15.fits",
+  '2017-01-30': "astrometry_wcs_wfm_gto16.fits",
+  '2017-04-24': "astrometry_wcs_wfm_gto17.fits",
+  '2017-09-24': "astrometry_wcs_wfm_gto19.fits",
+  '2017-10-20': "astrometry_wcs_wfm_gto20.fits",
+  '2017-11-17': "astrometry_wcs_wfm_gto21.fits",
+  '2018-02-13': "astrometry_wcs_wfm_gto22.fits",
+  '2018-03-15': "astrometry_wcs_wfm_gto23.fits",
+  '2018-04-14': "astrometry_wcs_wfm_gto24.fits",
+  '2018-05-12': "astrometry_wcs_wfm_gto25.fits",
+  '2018-08-14': "astrometry_wcs_wfm_gto26.fits",
+  '2018-09-11': "astrometry_wcs_wfm_gto27.fits",
+  '2018-10-14': "astrometry_wcs_wfm_gto28.fits",
+  '2018-11-14': "astrometry_wcs_wfm_gto29.fits",
+  '2019-01-09': "astrometry_wcs_wfm_gto31.fits",
+  '2019-03-05': "astrometry_wcs_wfm_gto32.fits",
+  '2019-04-01': "astrometry_wcs_wfm_gto33.fits",
+  '2019-05-04': "astrometry_wcs_wfm_gto34.fits"
         }
 
 future_date = '2099-01-01'
@@ -199,8 +255,7 @@ class MusePipe(PipePrep, PipeRecipes):
         overwrite_astropy_table: boolean (default is False). Overwrite the astropy table even when
             it exists.
         warnings: strong  ('ignore'by default. If set to ignore, will ignore the Astropy Warnings.
-        time_geo_table: boolean (default is True). Use the time dependent geo_table
-        time_astro_table: boolean (default is True). Use the time dependent astro_table
+        time_astrometry: boolean (default is True). Use the time dependent geo_table and astrometry_wcs
 
         """
         # Verbose option
@@ -217,8 +272,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self._update_astropy_table = kwargs.pop("update_astropy_table", False)
 
         # Use time dependent geo_table
-        self._time_geo_table = kwargs.pop("time_geo_table", True)
-        self._time_astro_table = kwargs.pop("time_astro_table", True)
+        self._time_astrometry = kwargs.pop("time_astrometry", True)
 
         # Set alignment saving option
         self._save_alignment_images = kwargs.pop("save_alignment_images", True)
