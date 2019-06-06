@@ -114,6 +114,7 @@ exclude_list_checkmode = ['BIAS', 'DARK']
 
 esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
         
+# Time varying calibrations for the astrometry
 dic_geo_table = {
   '2014-02-09': "geometry_table_wfm_comm1.fits",
   '2014-04-28': "geometry_table_wfm_comm2a.fits",
