@@ -25,7 +25,7 @@ dic_user_folders = {
             # Muse calibration files (common to all)
             "musecalib": "/home/mcelroy/reflex/install/calib/muse-2.2/cal/'",
             # Time varying calibrations
-            "musecalib_time": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/LP_131117/astrocal/"
+            "musecalib_time": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/LP_131117/astrocal/",
             # Calibration files (specific to OBs)
             "root" : "/mnt/fhgfs/PHANGS/MUSE/LP_131117/",
             }
