@@ -1033,7 +1033,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_fine_alignment(self, name_ima_reference=None, nexpo=1, list_expo=[], line=None, 
-            filter_name="Cousins_R", bygroup=False, reset=False):
+            bygroup=False, reset=False):
         """Run the alignment on this pointing using or not a reference image
         """
         # If not yet initialised, build the dictionary
@@ -1043,13 +1043,16 @@ class PipePrep(SofPipe) :
             # Reset to True to initialise the structure
             reset = True
 
+        # Setting the default alignment filter
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+
         # If reset, check if list is not empty
         # If not empty, create new time stamp and proceed with initialisation
         if reset:
             # Create a new set of alignments
             self.get_align_group(name_ima_reference=name_ima_reference, 
-                    list_expo=list_expo, line=line, filter_name=filter_name, 
-                    bygroup=bygroup)
+                    list_expo=list_expo, line=line, 
+                    filter_for_alignment=filter_for_alignment, bygroup=bygroup)
             # if dictionary is empty, it creates the first timestamp
             self.dic_alignments.create_new_timestamp(self.align_group)
 
@@ -1059,7 +1062,7 @@ class PipePrep(SofPipe) :
         
     @print_my_function_name
     def get_align_group(self, name_ima_reference=None, list_expo=[], line=None, 
-            filter_name="Cousins_R", bygroup=False):
+            bygroup=False):
         """Extract the needed information for a set of exposures to be aligned
         """
         # Selecting the table with the right iexpo
@@ -1073,7 +1076,9 @@ class PipePrep(SofPipe) :
             
         # Initialise the list of Groups to be aligned
         self.align_group = []
-        suffix = "_{0}".format(filter_name)
+        # Setting the default alignment filter
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        suffix = "_{0}".format(filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
