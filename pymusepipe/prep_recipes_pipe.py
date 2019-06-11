@@ -873,7 +873,7 @@ class PipePrep(SofPipe) :
     @print_my_function_name
     def run_align_bygroup(self, sof_filename='exp_align', expotype="OBJECT", 
             list_expo=[], stage="processed", line=None, 
-            filter_name="Cousins_R", tpl="ALL", **kwargs):
+            filter_for_alignment="Cousins_R", tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -886,14 +886,17 @@ class PipePrep(SofPipe) :
 
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(
+                expotype, tpl, stage, list_expo) 
         if not found_expo:
             return
         
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
 
-        suffix = "_{0}".format(filter_name)
+        # Setting the default alignment filter
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        suffix = "_{0}".format(filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
@@ -944,7 +947,7 @@ class PipePrep(SofPipe) :
     @print_my_function_name
     def run_align_bypointing(self, sof_filename='exp_align', expotype="OBJECT", 
             list_expo=[], stage="processed", line=None, 
-            filter_name="Cousins_R", tpl="ALL", **kwargs):
+            filter_for_alignment="Cousins_R", tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -974,7 +977,9 @@ class PipePrep(SofPipe) :
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
 
-        suffix = "_{0}".format(filter_name)
+        # Setting the default alignment filter
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        suffix = "_{0}".format(filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
@@ -1097,7 +1102,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
-            list_expo=[], stage="processed", tpl="ALL", filter_list="Cousins_R", 
+            list_expo=[], stage="processed", tpl="ALL", filter_list="white", 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Produce a cube from all frames in the pointing
         list_expo or tpl specific arguments can still reduce the selection if needed
