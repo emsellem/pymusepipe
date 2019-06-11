@@ -92,7 +92,7 @@ def print_my_function_name(f):
         return f(*myargs, **mykwargs)
     return wrapped
 
-def _get_combine_products(filter_list='white,Cousins_R'):
+def _get_combine_products(filter_list='white'):
     """Provide a set of key output products depending on the filters
     for combine
     """
@@ -849,26 +849,26 @@ class PipePrep(SofPipe) :
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    def _get_align_products(self, list_expo=[], filter_list='white,Cousins_R'):
-        """Provide a set of key output products for exp_align
-        """
-        name_products = []
-        suffix_products = []
-        list_options = save.split(',')
-        for option in list_options:
-            for prod in dic_products_scipost[option]:
-                if prod == "IMAGE_FOV":
-                    for i in range(len(filter_list.split(','))):
-                        suffix_products.append("_{0:04d}".format(i+1))
-                        name_products.append(prod)
-                elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY']):
-                    for i in range(len(list_expo)):
-                        suffix_products.append("_{0:04d}".format(i+1))
-                        name_products.append(prod)
-                else :
-                    name_products.append(prod)
-                    suffix_products.append("")
-        return name_products, suffix_products
+#    def _get_align_products(self, list_expo=[], filter_list='white'):
+#        """Provide a set of key output products for exp_align
+#        """
+#        name_products = []
+#        suffix_products = []
+#        list_options = save.split(',')
+#        for option in list_options:
+#            for prod in dic_products_scipost[option]:
+#                if prod == "IMAGE_FOV":
+#                    for i in range(len(filter_list.split(','))):
+#                        suffix_products.append("_{0:04d}".format(i+1))
+#                        name_products.append(prod)
+#                elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY']):
+#                    for i in range(len(list_expo)):
+#                        suffix_products.append("_{0:04d}".format(i+1))
+#                        name_products.append(prod)
+#                else :
+#                    name_products.append(prod)
+#                    suffix_products.append("")
+#        return name_products, suffix_products
 
     @print_my_function_name
     def run_align_bygroup(self, sof_filename='exp_align', expotype="OBJECT", 
@@ -1187,6 +1187,7 @@ class PipePrep(SofPipe) :
                 tpl, expotype, suffix_products=suffix_products,
                 suffix_prefinalnames=suffix_prefinalnames,
                 lambdamin=lambdamin, lambdamax=lambdamax,
+                filter_for_alignment=filter_for_alignment,
                 save=save, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
