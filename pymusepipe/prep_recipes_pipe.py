@@ -873,7 +873,7 @@ class PipePrep(SofPipe) :
     @print_my_function_name
     def run_align_bygroup(self, sof_filename='exp_align', expotype="OBJECT", 
             list_expo=[], stage="processed", line=None, 
-            filter_for_alignment="Cousins_R", tpl="ALL", **kwargs):
+            tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -947,7 +947,7 @@ class PipePrep(SofPipe) :
     @print_my_function_name
     def run_align_bypointing(self, sof_filename='exp_align', expotype="OBJECT", 
             list_expo=[], stage="processed", line=None, 
-            filter_for_alignment="Cousins_R", tpl="ALL", **kwargs):
+            tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
