@@ -157,8 +157,8 @@ class MuseCube(Cube):
             add_mpdaf_method_keywords(refimage.primary_header, 
                     "cube.bandpass_image", ['name'], 
                     [filter_name], ['filter name used'])
-            # Only selecting the primary + data HDU (removing DQ, STAT)
-            data_refimage = pyfits.HDUList([refimage[0], refimage[1]])
+        # Only selecting the primary + data HDU (removing DQ, STAT)
+        data_refimage = pyfits.HDUList([refimage[0], refimage[1]])
         return data_refimage
 
 def get_sky_spectrum(filename) :
