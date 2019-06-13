@@ -234,6 +234,8 @@ class PipeRecipes(object) :
                 suffix_prefinalnames, suffix_postfinalnames) :
             # Create extra filter image if requested
             if 'CUBE' in name_prod and not self.fakemode:
+                upipe.print_info("Deriving filter alignment image "
+                                 "[filter: {0}]".format(filter_for_alignment))
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
                 mycube = MuseCube(filename=cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
@@ -244,10 +246,16 @@ class PipeRecipes(object) :
                                  name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
                                  myfilter=filter_for_alignment, suff_post=suff_post, 
                                  tpl=tpl, suffix=suffix))
+                upipe.print_info("Adding filter alignment image [filter: {0}] "
+                                 "to Object folder".format(filter_for_alignment))
                 myimage.write(name_imageout)
 
                 # Copying it in the Alignment folder
                 if self._save_alignment_images:
+                    upipe.print_info("Adding filter alignment image [filter: {0}] "
+                                     "to Alignment folder {1}".format(
+                                         filter_for_alignment,
+                                         self.paths.alignment))
                     name_imageout_align = ("{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
                                           "_{tpl}{suff_post}.fits".format(
                                           name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
