@@ -26,6 +26,7 @@ except ImportError :
 
 from mpdaf.obj import Cube, Image
 from mpdaf.obj import Spectrum, WaveCoord
+from mpdaf.tools import add_mpdaf_method_keywords
 
 # Astropy
 from astropy.io import fits as pyfits
@@ -149,7 +150,13 @@ class MuseCube(Cube):
             # Now reading the filter data
             path_filter = joinpath(filter_folder, filter_file)
             filter_wave, filter_sensitivity = np.loadtxt(path_filter, unpack=True)
-            refimage = self.bandpass_image(filter_wave, filter_sensitivity)
+            refimage = self.bandpass_image(filter_wave, filter_sensitivity, 
+                                           interpolation='linear')
+            key = 'HIERARCH ESO DRS MUSE FILTER NAME'
+            refimage.primary_header[key] = (name, 'filter name used')
+            add_mpdaf_method_keywords(refimage.primary_header, 
+                    "cube.bandpass_image", ['name'], 
+                    [name], ['filter name used'])
 
         return refimage
 
