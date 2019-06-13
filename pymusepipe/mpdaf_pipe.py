@@ -153,10 +153,10 @@ class MuseCube(Cube):
             refimage = self.bandpass_image(filter_wave, filter_sensitivity, 
                                            interpolation='linear')
             key = 'HIERARCH ESO DRS MUSE FILTER NAME'
-            refimage.primary_header[key] = (name, 'filter name used')
+            refimage.primary_header[key] = (filter_name, 'filter name used')
             add_mpdaf_method_keywords(refimage.primary_header, 
                     "cube.bandpass_image", ['name'], 
-                    [name], ['filter name used'])
+                    [filter_name], ['filter name used'])
 
         return refimage
 
