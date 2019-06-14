@@ -248,7 +248,7 @@ class PipeRecipes(object) :
                                  tpl=tpl, suffix=suffix))
                 upipe.print_info("Adding filter alignment image [filter: {0}] "
                                  "to Object folder".format(filter_for_alignment))
-                myimage.writeto(name_imageout)
+                myimage.write(name_imageout, savemask='nan')
 
                 # Copying it in the Alignment folder
                 if self._save_alignment_images:
@@ -261,7 +261,7 @@ class PipeRecipes(object) :
                                           name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
                                           myfilter=filter_for_alignment, suff_post=suff_post, 
                                           tpl=tpl, suffix=suffix, pointing=self.pointing))
-                    myimage.writeto(name_imageout_align)
+                    myimage.write(name_imageout_align, savemask='nan')
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                     "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(
@@ -315,7 +315,7 @@ class PipeRecipes(object) :
                                  myfilter=filter_for_alignment, 
                                  pointing="P{0:02d}".format(self.pointing),
                                  tpl=tpl, suffix=suffix))
-                myimage.writeto(name_imageout)
+                myimage.write(name_imageout, savemask='nan')
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                 '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
@@ -353,7 +353,7 @@ class PipeRecipes(object) :
                 name_imageout = ("{name_imaout}_{myfilter}{suffix}.fits".format(
                                  name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
                                  myfilter=filter_for_alignment, suffix=suffix))
-                myimage.writeto(name_imageout)
+                myimage.write(name_imageout, savemask='nan')
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                               "{name_imaout}{suffix}{suff_pre}.fits".format(
