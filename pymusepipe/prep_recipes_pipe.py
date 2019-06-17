@@ -764,6 +764,7 @@ class PipePrep(SofPipe) :
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
         offset_list = kwargs.pop("offset_list", "True")
+
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
         AC_suffix = kwargs.pop("AC_suffix", "_AC")
