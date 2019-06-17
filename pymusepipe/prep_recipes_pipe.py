@@ -651,11 +651,6 @@ class PipePrep(SofPipe) :
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
-        # Filter for alignment if set up
-        filter_for_alignment = extra_kwargs.pop("filter_for_alignment", 
-                                                self.filter_for_alignment)
-        filter_list = extra_kwargs.pop("filter_list", self.filter_list)
-
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
@@ -665,7 +660,6 @@ class PipePrep(SofPipe) :
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
                     tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
-                    filter_list=filter_list, filter_for_alignment=filter_for_alignment,
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=False, **extra_kwargs)
 
