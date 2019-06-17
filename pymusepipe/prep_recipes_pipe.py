@@ -663,7 +663,7 @@ class PipePrep(SofPipe) :
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=False, **extra_kwargs)
 
-    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], **extra_kwargs):
+    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list=None):
         """Provide a set of key output products depending on the save mode
         for scipost
         """
@@ -672,7 +672,7 @@ class PipePrep(SofPipe) :
         suffix_prefinalnames = []
         suffix_postfinalnames = []
         list_options = save.split(',')
-        filter_list = extra_kwargs.pop("filter_list", self.filter_list)
+        if filter_list is None: filter_list = self.filter_list
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 name_products.append(prod)
@@ -826,8 +826,7 @@ class PipePrep(SofPipe) :
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames = \
-                self._get_scipost_products(save=save, list_expo=list_group_expo, 
-                        filter_list=filter_list)
+                self._get_scipost_products(save, list_group_expo, filter_list)
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_prefinalnames, 
                     suffix_postfinalnames, suffix=suffix, 
