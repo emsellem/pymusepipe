@@ -893,7 +893,6 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        filter_list = kwargs.pop("filter_list", self.filter_list)
         suffix = "_{0}".format(filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
@@ -977,7 +976,6 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        filter_list = kwargs.pop("filter_list", self.filter_list)
         suffix = "_{0}".format(filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
@@ -1044,7 +1042,6 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        filter_list = kwargs.pop("filter_list", self.filter_list)
 
         # If reset, check if list is not empty
         # If not empty, create new time stamp and proceed with initialisation
