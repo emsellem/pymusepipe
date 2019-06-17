@@ -233,7 +233,8 @@ class PipeRecipes(object) :
         for name_prod, suff_prod, suff_pre, suff_post in zip(name_products, suffix_products, 
                 suffix_prefinalnames, suffix_postfinalnames) :
             # Create extra filter image if requested
-            if 'CUBE' in name_prod and not self.fakemode:
+            if 'CUBE' in name_prod and not self.fakemode \
+                    and not filter_for_alignment in filter_list:
                 upipe.print_info("Deriving filter alignment image "
                                  "[filter: {0}]".format(filter_for_alignment))
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
@@ -250,26 +251,43 @@ class PipeRecipes(object) :
                                  "to Object folder".format(filter_for_alignment))
                 myimage.write(name_imageout, savemask='nan')
 
-                # Copying it in the Alignment folder
-                if self._save_alignment_images:
-                    upipe.print_info("Adding filter alignment image [filter: {0}] "
-                                     "to Alignment folder {1}".format(
-                                         filter_for_alignment,
-                                         self.paths.alignment))
+                # Save the alignment image in the right folder
+                if self._save_alignment_image:
                     name_imageout_align = ("{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
                                           "_{tpl}{suff_post}.fits".format(
                                           name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
                                           myfilter=filter_for_alignment, suff_post=suff_post, 
                                           tpl=tpl, suffix=suffix, pointing=self.pointing))
+                    upipe.print_info("Adding filter alignment image [filter: {0}] "
+                                     "to Alignment folder {1}".format(
+                                         filter_for_alignment,
+                                         self.paths.alignment))
                     myimage.write(name_imageout_align, savemask='nan')
 
-            self.run_oscommand("{nocache} mv {name_imain}.fits "
-                    "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(
-                    nocache=self.nocache, name_imain=self.joinprod(name_prod+suff_prod), 
-                    name_imaout=joinpath(dir_products, name_prod), 
-                    suff_pre=suff_pre, suff_post=suff_post, 
-                    tpl=tpl, suffix=suffix))
-   
+            # In any case move the file from Pipe_products to the right folder
+            fitsname_out = "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(
+                            name_imaout=joinpath(dir_products, name_prod), 
+                            suff_pre=suff_pre, suff_post=suff_post, 
+                            tpl=tpl, suffix=suffix)
+
+            self.run_oscommand("{nocache} mv {name_imain}.fits {fitsname}".format(
+                               nocache=self.nocache, 
+                               name_imain=self.joinprod(name_prod+suff_prod), 
+                               fitsname = fitname_out))
+
+            # Now if in need of an alignment image and it is the filter image
+            # Copying it in the Alignment folder or write it 
+            if self._save_alignment_image and filter_for_alignment in fitsname_out:
+                name_imageout_align = ("{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
+                                      "_{tpl}{suff_post}.fits".format(
+                                      name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
+                                      myfilter=filter_for_alignment, suff_post=suff_post, 
+                                      tpl=tpl, suffix=suffix, pointing=self.pointing))
+                if filter_for_alignment in filter_list :
+                    self.run_oscommand("{nocache} cp {fitsname} {nameima_out}".format(
+                                       nocache=self.nocache, fitsname=fitname_out,
+                                       nameima_out=name_imageout_align))
+
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
         """Running the muse_exp_align recipe
@@ -303,7 +321,8 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):
-            if 'CUBE' in name_prod and not self.fakemode:
+            if 'CUBE' in name_prod and not self.fakemode \
+                    and not filter_for_alignment in filter_list:
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
                 mycube = MuseCube(filename=cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
@@ -344,7 +363,8 @@ class PipeRecipes(object) :
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):
              # Create extra filter image if requested
-            if 'CUBE' in name_prod and not self.fakemode:
+            if 'CUBE' in name_prod and not self.fakemode \
+                    and not filter_for_alignment in filter_list:
                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
                 mycube = MuseCube(filename=cube_name)
                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
