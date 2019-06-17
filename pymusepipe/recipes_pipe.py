@@ -273,7 +273,7 @@ class PipeRecipes(object) :
             self.run_oscommand("{nocache} mv {name_imain}.fits {fitsname}".format(
                                nocache=self.nocache, 
                                name_imain=self.joinprod(name_prod+suff_prod), 
-                               fitsname = fitname_out))
+                               fitsname=fitsname_out))
 
             # Now if in need of an alignment image and it is the filter image
             # Copying it in the Alignment folder or write it 
@@ -285,7 +285,7 @@ class PipeRecipes(object) :
                                       tpl=tpl, suffix=suffix, pointing=self.pointing))
                 if filter_for_alignment in filter_list :
                     self.run_oscommand("{nocache} cp {fitsname} {nameima_out}".format(
-                                       nocache=self.nocache, fitsname=fitname_out,
+                                       nocache=self.nocache, fitsname=fitsname_out,
                                        nameima_out=name_imageout_align))
 
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
