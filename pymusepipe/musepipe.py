@@ -282,6 +282,7 @@ class MusePipe(PipePrep, PipeRecipes):
 #        super(MusePipe, self).__init__(**kwargs)
         # Filter for alignment
         self.filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
+        self.filter_list = kwargs.pop("filter_list", "white")
 
         # Setting the default attibutes #####################
         self.targetname = targetname

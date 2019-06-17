@@ -634,7 +634,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line=None, filter_list='white', **extra_kwargs):
+            line=None, **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -654,6 +654,7 @@ class PipePrep(SofPipe) :
         # Filter for alignment if set up
         filter_for_alignment = extra_kwargs.pop("filter_for_alignment", 
                                                 self.filter_for_alignment)
+        filter_list = extra_kwargs.pop("filter_list", self.filter_list)
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
@@ -668,7 +669,7 @@ class PipePrep(SofPipe) :
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=False, **extra_kwargs)
 
-    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list='white'):
+    def _get_scipost_products(self, save='cube,skymodel', list_expo=[]):
         """Provide a set of key output products depending on the save mode
         for scipost
         """
@@ -681,7 +682,7 @@ class PipePrep(SofPipe) :
             for prod in dic_products_scipost[option]:
                 name_products.append(prod)
                 if prod == "IMAGE_FOV":
-                    for i, value in enumerate(filter_list.split(','), 
+                    for i, value in enumerate(self.filter_list.split(','), 
                             start=1):
                         suffix_products.append("_{0:04d}".format(i))
                         suffix_prefinalnames.append("_{0}".format(value))
@@ -765,8 +766,8 @@ class PipePrep(SofPipe) :
             # If skymethod is none, no need to save the skymodel...
             save = kwargs.pop("save", "cube,individual")
         # Filters
-        filter_list = kwargs.pop("filter_list", "white")
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_list = kwargs.pop("filter_list", self.filter_list)
         offset_list = kwargs.pop("offset_list", "True")
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
@@ -896,6 +897,7 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_list = kwargs.pop("filter_list", self.filter_list)
         suffix = "_{0}".format(filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
@@ -979,6 +981,7 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_list = kwargs.pop("filter_list", self.filter_list)
         suffix = "_{0}".format(filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
@@ -1045,6 +1048,7 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_list = kwargs.pop("filter_list", self.filter_list)
 
         # If reset, check if list is not empty
         # If not empty, create new time stamp and proceed with initialisation
@@ -1107,7 +1111,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
-            list_expo=[], stage="processed", tpl="ALL", filter_list="white", 
+            list_expo=[], stage="processed", tpl="ALL", 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Produce a cube from all frames in the pointing
         list_expo or tpl specific arguments can still reduce the selection if needed
@@ -1136,6 +1140,7 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_list = kwargs.pop("filter_list", self.filter_list)
         # Use the pointing as a suffix for the names
         pointing = "P{0:02d}".format(self.pointing)
         # Save option
