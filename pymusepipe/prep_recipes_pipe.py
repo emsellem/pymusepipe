@@ -669,7 +669,7 @@ class PipePrep(SofPipe) :
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=False, **extra_kwargs)
 
-    def _get_scipost_products(self, save='cube,skymodel', list_expo=[]):
+    def _get_scipost_products(self, save='cube,skymodel', list_expo=[], **kwargs):
         """Provide a set of key output products depending on the save mode
         for scipost
         """
@@ -678,11 +678,12 @@ class PipePrep(SofPipe) :
         suffix_prefinalnames = []
         suffix_postfinalnames = []
         list_options = save.split(',')
+        filter_list = kwargs.pop("filter_list", self.filter_list)
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 name_products.append(prod)
                 if prod == "IMAGE_FOV":
-                    for i, value in enumerate(self.filter_list.split(','), 
+                    for i, value in enumerate(filter_list.split(','), 
                             start=1):
                         suffix_products.append("_{0:04d}".format(i))
                         suffix_prefinalnames.append("_{0}".format(value))
