@@ -832,7 +832,8 @@ class PipePrep(SofPipe) :
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames = \
-                self._get_scipost_products(save, list_group_expo, filter_list=filter_list)
+                self._get_scipost_products(save=save, list_expo=list_group_expo, 
+                        filter_list=filter_list)
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_prefinalnames, 
                     suffix_postfinalnames, suffix=suffix, 
