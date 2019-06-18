@@ -171,8 +171,10 @@ class PipePrep(SofPipe) :
         self.run_standard()
         self.run_sky(fraction=fraction)
         self.run_prep_align()
-        self.run_align_bypointing()
-        self.run_align_bygroup()
+        if bypointing:
+            self.run_align_bypointing()
+        else:
+            self.run_align_bygroup()
         self.run_scipost()
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
         self.run_combine_pointing()
@@ -191,8 +193,10 @@ class PipePrep(SofPipe) :
         self.run_standard()
         self.run_sky(fraction=fraction)
         self.run_prep_align()
-        self.run_align_bypointing()
-        self.run_align_bygroup()
+        if bypointing:
+            self.run_align_bypointing()
+        else:
+            self.run_align_bygroup()
         self.run_scipost()
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
         self.run_combine_pointing()
