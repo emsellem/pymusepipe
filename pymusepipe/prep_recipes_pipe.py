@@ -661,7 +661,8 @@ class PipePrep(SofPipe) :
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
                     tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
                     lambdaminmax=[lmin, lmax], save='cube', 
-                    offset_list=False, **extra_kwargs)
+                    offset_list=False, filter_list=filter_for_alignment,
+                    **extra_kwargs)
 
     def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list=None):
         """Provide a set of key output products depending on the save mode
@@ -673,6 +674,9 @@ class PipePrep(SofPipe) :
         suffix_postfinalnames = []
         list_options = save.split(',')
         if filter_list is None: filter_list = self.filter_list
+        if self.verbose:
+            upipe.print_info("Filter list is {0}".format(filter_list))
+            upipe.print_info("Filter for alignment is {0}".format(filter_for_alignment))
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 name_products.append(prod)
