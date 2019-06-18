@@ -644,7 +644,7 @@ class PipePrep(SofPipe) :
         # Filter used for the alignment
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         if self.verbose:
-            upipe.print_info("Filter for alignment is {0}".format(filter_for_alignment)
+            upipe.print_info("Filter for alignment is {0}".format(filter_for_alignment))
 
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
