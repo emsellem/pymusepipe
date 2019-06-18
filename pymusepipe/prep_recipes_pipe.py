@@ -642,7 +642,7 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo("OBJECT", "processed")
 
         # Filter used for the alignment
-        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         if self.verbose:
             upipe.print_info("Filter for alignment is {0}".format(filter_for_alignment))
 
