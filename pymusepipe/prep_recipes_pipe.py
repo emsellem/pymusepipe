@@ -643,6 +643,8 @@ class PipePrep(SofPipe) :
 
         # Filter used for the alignment
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        if self.verbose:
+            upipe.print_info("Filter for alignment is {0}".format(filter_for_alignment)
 
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
@@ -679,7 +681,6 @@ class PipePrep(SofPipe) :
         if filter_list is None: filter_list = self.filter_list
         if self.verbose:
             upipe.print_info("Filter list is {0}".format(filter_list))
-            upipe.print_info("Filter for alignment is {0}".format(filter_for_alignment))
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 name_products.append(prod)
