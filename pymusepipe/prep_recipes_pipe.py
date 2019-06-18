@@ -708,6 +708,14 @@ class PipePrep(SofPipe) :
                     suffix_products.append("")
                     suffix_prefinalnames.append("")
 
+        if self.debug:
+            upipe.print_info("Products for scipost: \n"
+                    "Name_products: [{0}] \n"
+                    "suffix_products: [{1}] \n"
+                    "suffix_pre: [{2}] \n"
+                    "suffix_post: [{3}]".format(
+                        name_products, suffix_products,
+                        suffix_prefinalnames, suffix_postfinalnames))
         return name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames
 
     def _select_list_expo(self, expotype, tpl, stage, list_expo=[]):
