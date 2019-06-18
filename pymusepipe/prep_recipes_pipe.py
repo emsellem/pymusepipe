@@ -641,6 +641,9 @@ class PipePrep(SofPipe) :
         # First selecting the files via the grouped table
         object_table = self._get_table_expo("OBJECT", "processed")
 
+        # Filter used for the alignment
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
         [lmin, lmax] = upipe.get_emissionline_band(line=line, 
