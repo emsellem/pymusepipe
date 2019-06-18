@@ -262,6 +262,7 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         # Verbose option
         self.verbose = verbose
+        self._debug = kwargs.pop("debug", False)
 
         # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')

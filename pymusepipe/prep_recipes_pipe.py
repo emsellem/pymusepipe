@@ -708,7 +708,7 @@ class PipePrep(SofPipe) :
                     suffix_products.append("")
                     suffix_prefinalnames.append("")
 
-        if self.debug:
+        if self._debug:
             upipe.print_info("Products for scipost: \n"
                     "Name_products: [{0}] \n"
                     "suffix_products: [{1}] \n"
