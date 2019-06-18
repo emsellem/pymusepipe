@@ -683,10 +683,10 @@ class PipePrep(SofPipe) :
             upipe.print_info("Filter list is {0}".format(filter_list))
         for option in list_options:
             for prod in dic_products_scipost[option]:
-                name_products.append(prod)
                 if prod == "IMAGE_FOV":
                     for i, value in enumerate(filter_list.split(','), 
                             start=1):
+                        name_products.append(prod)
                         suffix_products.append("_{0:04d}".format(i))
                         suffix_prefinalnames.append("_{0}".format(value))
                         if len(list_expo) == 1 :
@@ -696,6 +696,7 @@ class PipePrep(SofPipe) :
 
                 elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY', 'AUTOCAL']):
                     for i in range(len(list_expo)):
+                        name_products.append(prod)
                         suffix_products.append("_{0:04d}".format(i+1))
                         suffix_prefinalnames.append("")
                         suffix_postfinalnames.append("_{0:04d}".format(i+1))
@@ -705,6 +706,7 @@ class PipePrep(SofPipe) :
                             suffix_postfinalnames.append("_{0:04d}".format(list_expo[0]))
                         else :
                             suffix_postfinalnames.append("")
+                    name_products.append(prod)
                     suffix_products.append("")
                     suffix_prefinalnames.append("")
 
