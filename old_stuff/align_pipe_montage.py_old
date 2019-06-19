@@ -29,15 +29,6 @@ from astropy.modeling import models, fitting
 from astropy.stats import mad_std
 from astropy.table import Table
 
-from mpdaf.obj import Image, WCS
-
-# Montage
-try :
-    import montage_wrapper as montage
-except ImportError :
-#    upipe.print_warning("Montage python wrapper - montage_wrapper - is required for the alignment module")
-    raise Exception("montage_wrapper is required for this module")
-
 def is_sequence(arg):
     return (not hasattr(arg, "strip") and
             hasattr(arg, "__getitem__") or
@@ -171,7 +162,6 @@ class AlignMusePointing(object):
         """
 
         # Some input variables for the cross-correlation
-        self.use_montage = kwargs.pop("use_montage", True)
         self.verbose = kwargs.pop("verbose", True)
         self.plot = kwargs.pop("plot", True)
         self.border = border
@@ -361,7 +351,6 @@ class AlignMusePointing(object):
             
     def _get_list_muse_images(self):
         # test if 1 or several images
-        
         if isinstance(self.name_muse_images, str):
             self.list_muse_images = [self.name_muse_images]
         elif isinstance(self.name_muse_images, list):
@@ -371,7 +360,7 @@ class AlignMusePointing(object):
                     "please check input name_muse_images")
             self.nimages = 0
             return
-        #print(self.list_muse_images)
+
         # Number of images to deal with
         self.nimages = len(self.list_muse_images)
 
@@ -418,7 +407,7 @@ class AlignMusePointing(object):
         # Projecting the reference image onto the MUSE field
         tmphdr = muse_hdu.header.totextfile(name_musehdr,
                                             overwrite=True)
-        proj_ref_hdu = self._project_reference_hdu(name_musehdr, muse_hdu=muse_hdu)
+        proj_ref_hdu = self._project_reference_hdu(name_musehdr)
 
         # Cleaning the images
         ima_ref = self._prepare_image(proj_ref_hdu.data)
@@ -510,33 +499,12 @@ class AlignMusePointing(object):
 
         return lperc, hperc
 
-    def _project_reference_hdu(self, name_hdr, muse_hdu=None):
+    def _project_reference_hdu(self, name_hdr):
         """Project the reference image onto the MUSE field
         """
-        if self.use_montage:
-            # The original way. Sometimes this introduces an offset
-            hdu_repr = montage.reproject_hdu(self.reference_hdu, header=name_hdr, 
-                                             exact_size=True)
-        else:
-            # The mpdaf way
-            if muse_hdu is not None:
-                             
-                wcs_ref = WCS(hdr=self.reference_hdu.header)
-                ima_ref = Image(data=self.reference_hdu.data, wcs=wcs_ref)
-            
-                wcs_muse = WCS(hdr=muse_hdu.header)
-                ima_muse = Image(data=muse_hdu.data, wcs=wcs_muse)
-        
-                ima_ref = ima_ref.align_with_image(ima_muse, flux=True)
-            
-                hdu_repr = ima_ref.get_data_hdu()
-            
-            else:
-                hdu_repre = None
-                print("Warning: provide target HDU when not using montage to reproject")
-        
-                  
-        return hdu_repr
+
+        return montage.reproject_hdu(self.reference_hdu,
+                     header=name_hdr, exact_size=True)
 
     def _add_user_arc_offset(self, extra_arcsec=[0., 0.], nima=0):
         """Add user offset in arcseconds
@@ -579,8 +547,7 @@ class AlignMusePointing(object):
         self.list_offmuse_hdu[nima] = pyfits.PrimaryHDU(self.list_muse_hdu[nima].data, header=newhdr)
 
         tmphdr = self.list_offmuse_hdu[nima].header.totextfile(self.list_name_offmusehdr[nima], overwrite=True)
-        self.list_proj_refhdu[nima] = self._project_reference_hdu(self.list_name_offmusehdr[nima], 
-                                                                  muse_hdu=self.list_offmuse_hdu[nima])
+        self.list_proj_refhdu[nima] = self._project_reference_hdu(self.list_name_offmusehdr[nima])
 
 
     def compare(self, muse_hdu=None, ref_hdu=None, factor=1.0, 
@@ -604,17 +571,15 @@ class AlignMusePointing(object):
         else:
             musedata = muse_hdu.data
             refdata = ref_hdu.data
-        
-        
+
         # If normalising, using the median ratio fit
         if normalise :
             polypar = get_image_norm_poly(musedata, refdata, chunk_size=15)
             if self.verbose:
                 upipe.print_info("Renormalising the MUSE data as NewMUSE = "
                         "{1:8.4f} * ({0:8.4f} + MUSE)".format(polypar.beta[0], polypar.beta[1]))
-            
+
             musedata = (polypar.beta[0] + musedata) * polypar.beta[1]
-            
             self.ima_polynorm[nima] = polypar.beta
 
         # Getting the range of relevant fluxes
