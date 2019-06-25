@@ -10,6 +10,10 @@ import os
 
 from setuptools import setup, find_packages
 
+version = {}
+with open("pymusepipe/version.py") as fp:
+    exec(fp.read(), version)
+
 with open('README.md') as f:
     readme = f.read()
 
@@ -17,7 +21,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(name='pymusepipe',
-      version='1.7.1',
+      version = version['__version__'],
       description='python module to reduce MUSE Raw data and combine them',
       long_description=readme,
       keywords='MUSE, PHANGS',

@@ -62,7 +62,7 @@ import pymusepipe.util_pipe as upipe
 # likwid = "likwid-pin -c N:"
 
 # Included an astropy table
-__version__ = '1.0.0 (11 June 2019)'
+__version__ = '2.0.0 (19 June 2019)'
 #__version__ = '0.2.0 (22 May 2018)'
 #__version__ = '0.1.0 (03 April    2018)'
 #__version__ = '0.0.2 (08 March    2018)'

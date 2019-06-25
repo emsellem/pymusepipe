@@ -158,7 +158,7 @@ class PipePrep(SofPipe) :
             return group_table.groups[group_table.groups.keys['tpls'] == tpl]
         
     @print_my_function_name
-    def run_all_recipes(self, fraction=0.8, illum=True, bypointing=True):
+    def run_all_recipes(self, fraction=0.8, illum=True):
         """Running all recipes in one shot
         """
         #for recipe in self.list_recipes:
@@ -171,16 +171,14 @@ class PipePrep(SofPipe) :
         self.run_standard()
         self.run_sky(fraction=fraction)
         self.run_prep_align()
-        if bypointing:
-            self.run_align_bypointing()
-        else:
-            self.run_align_bygroup()
+        self.run_align_bypointing()
+        self.run_align_bygroup()
         self.run_scipost()
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
         self.run_combine_pointing()
 
     @print_my_function_name
-    def run_all_phangs_recipes(self, fraction=0.8, illum=True, bypointing=True):
+    def run_all_phangs_recipes(self, fraction=0.8, illum=True):
         """Running all recipes in one shot
         """
         #for recipe in self.list_recipes:
@@ -193,10 +191,8 @@ class PipePrep(SofPipe) :
         self.run_standard()
         self.run_sky(fraction=fraction)
         self.run_prep_align()
-        if bypointing:
-            self.run_align_bypointing()
-        else:
-            self.run_align_bygroup()
+        self.run_align_bypointing()
+        self.run_align_bygroup()
         self.run_scipost()
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
         self.run_combine_pointing()
@@ -656,7 +652,7 @@ class PipePrep(SofPipe) :
                                                    velocity=self.vsystemic, 
                                                    lambda_window=lambda_window)
 
-        suffix = extra_kwargs.pop("suffix", "")
+        suffix = extra_kwargs.pop("suffix", "palign")
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
