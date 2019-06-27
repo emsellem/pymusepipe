@@ -652,7 +652,7 @@ class PipePrep(SofPipe) :
                                                    velocity=self.vsystemic, 
                                                    lambda_window=lambda_window)
 
-        suffix = extra_kwargs.pop("suffix", "palign")
+        suffix = extra_kwargs.pop("suffix", "_palign")
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
