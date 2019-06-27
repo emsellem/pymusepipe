@@ -554,6 +554,10 @@ class MusePipe(PipePrep, PipeRecipes):
             # Writing up the table
             self.Tables.Rawfiles.write(name_table, format="fits", 
                     overwrite=self._overwrite_astropy_table)
+
+            if len(self.Tables.Rawfiles) == 0:
+                upipe.print_warning("Raw Files Table is empty: please check your 'Raw' folder")
+
             # Going back to the original folder
             self.goto_prevfolder()
 
@@ -614,6 +618,10 @@ class MusePipe(PipePrep, PipeRecipes):
 
         if strong_checkmode is not None : self.strong_checkmode = strong_checkmode
         else : strong_checkmode = self.strong_checkmode
+
+        if len(self.Tables.Rawfiles) == 0:
+            upipe.print_error("Raw files is empty, hence cannot be sorted")
+            return
 
         # Sorting alphabetically (thus by date)
         for expotype in listexpo_types.keys() :
