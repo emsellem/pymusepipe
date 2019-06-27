@@ -90,10 +90,10 @@ class PipeRecipes(object) :
     def write_logfile(self, text):
         """Writing in log file
         """
-        fulltext = "# At : {0}{1}\n{2}\n".format(
+        fulltext = "# At : {0}{1} - pymusepipe version {2}\n{3}\n".format(
                 upipe.formatted_time(),
                 " FAKEMODE" if self.fakemode else "",
-                text) 
+                pymusepipe.__version__, text) 
         upipe.append_file(self.paths.logfile, fulltext)
 
     def run_oscommand(self, command, log=True) :

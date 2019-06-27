@@ -112,7 +112,6 @@ def _get_combine_products(filter_list='white'):
 
     return name_products, suffix_products, suffix_prefinalnames
 
-
 ###################################################################
 # Class for preparing the launch of recipes
 ###################################################################

@@ -38,7 +38,7 @@ def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)
 
 def print_warning(text, **kwargs) :
-    toprint = WARNING + "# MusePipeWarning " + ENDC + text
+    toprint = "# MusePipeWarning " + text
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
@@ -51,7 +51,7 @@ def print_info(text, **kwargs) :
     print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
 def print_error(text, **kwargs) :
-    toprint = ERROR + "# MusePipeError " + ENDC + text
+    toprint = "# MusePipeError " + text
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
