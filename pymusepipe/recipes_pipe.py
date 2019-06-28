@@ -20,6 +20,7 @@ from os.path import join as joinpath
 # pymusepipe modules
 from pymusepipe import util_pipe as upipe
 from pymusepipe.mpdaf_pipe import MuseCube
+from .version import __version__ as pipeversion
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"
@@ -93,7 +94,7 @@ class PipeRecipes(object) :
         fulltext = "# At : {0}{1} - pymusepipe version {2}\n{3}\n".format(
                 upipe.formatted_time(),
                 " FAKEMODE" if self.fakemode else "",
-                pymusepipe.__version__, text) 
+                pipeversion, text) 
         upipe.append_file(self.paths.logfile, fulltext)
 
     def run_oscommand(self, command, log=True) :
