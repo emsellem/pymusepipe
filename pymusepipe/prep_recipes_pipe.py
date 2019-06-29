@@ -61,6 +61,8 @@ dic_products_scipost = {
         'autocal': ['AUTOCAL_FACTORS']
         }
 
+suffix_for_align = "_palign"
+
 # =======================================================
 # Few useful functions
 # =======================================================
@@ -651,7 +653,7 @@ class PipePrep(SofPipe) :
                                                    velocity=self.vsystemic, 
                                                    lambda_window=lambda_window)
 
-        suffix = extra_kwargs.pop("suffix", "_palign")
+        suffix = extra_kwargs.pop("suffix", suffix_for_align)
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
@@ -910,7 +912,7 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        suffix = "_{0}".format(filter_for_alignment)
+        suffix = "{0}_{1}".format(suffix_for_align, filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
@@ -993,7 +995,7 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        suffix = "_{0}".format(filter_for_alignment)
+        suffix = "{0}_{1}".format(suffix_for_align, filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
@@ -1092,7 +1094,7 @@ class PipePrep(SofPipe) :
         self.align_group = []
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        suffix = "_{0}".format(filter_for_alignment)
+        suffix = "{0}_{1}".format(suffix_for_align, filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
