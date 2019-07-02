@@ -635,7 +635,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line=None, **extra_kwargs):
+            line=None, suffix="", **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -653,7 +653,7 @@ class PipePrep(SofPipe) :
                                                    velocity=self.vsystemic, 
                                                    lambda_window=lambda_window)
 
-        suffix = extra_kwargs.pop("suffix", suffix_for_align)
+        suffix = "{0}{1}".format(suffix, suffix_for_align)
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
@@ -825,7 +825,7 @@ class PipePrep(SofPipe) :
             if offset_list :
                 self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
                         '{0}{1}_{2}_{3}.fits'.format(dic_files_products['ALIGN'][0], 
-                            suffix_for_align, filter_for_alignment, tpl))]
+                            suffix, filter_for_alignment, tpl))]
 
             # Selecting only exposures to be treated
             # We need to force 'OBJECT' to make sure scipost will deal with the exposure
@@ -864,27 +864,6 @@ class PipePrep(SofPipe) :
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
-
-#    def _get_align_products(self, list_expo=[], filter_list='white'):
-#        """Provide a set of key output products for exp_align
-#        """
-#        name_products = []
-#        suffix_products = []
-#        list_options = save.split(',')
-#        for option in list_options:
-#            for prod in dic_products_scipost[option]:
-#                if prod == "IMAGE_FOV":
-#                    for i in range(len(filter_list.split(','))):
-#                        suffix_products.append("_{0:04d}".format(i+1))
-#                        name_products.append(prod)
-#                elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY']):
-#                    for i in range(len(list_expo)):
-#                        suffix_products.append("_{0:04d}".format(i+1))
-#                        name_products.append(prod)
-#                else :
-#                    name_products.append(prod)
-#                    suffix_products.append("")
-#        return name_products, suffix_products
 
     @print_my_function_name
     def run_align_bygroup(self, sof_filename='exp_align', expotype="OBJECT", 
@@ -1153,6 +1132,7 @@ class PipePrep(SofPipe) :
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
+
         # Use the pointing as a suffix for the names
         pointing = "P{0:02d}".format(self.pointing)
         # Save option
@@ -1173,9 +1153,9 @@ class PipePrep(SofPipe) :
         if offset_list :
             offset_list_tablename = kwargs.pop("offset_list_tablename", None)
             if offset_list_tablename is None:
-                offset_list_tablename = "{0}{1}_{2}_{3}_{4}_{5}.fits".format(
-                        dic_files_products['ALIGN'][0], suffix, filter_for_alignment, 
-                        expotype, pointing, tpl)
+                offset_list_tablename = "{0}{1}{2}_{3}_{4}_{5}_{6}.fits".format(
+                        dic_files_products['ALIGN'][0], suffix, suffix_for_align,
+                        filter_for_alignment, expotype, pointing, tpl)
             if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
                 upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
                         offset_list_tablename, folder_expo), pipe=self)
