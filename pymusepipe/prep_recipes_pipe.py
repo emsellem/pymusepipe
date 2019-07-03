@@ -987,8 +987,8 @@ class PipePrep(SofPipe) :
         self._sofdict.clear()
         # Producing the list of IMAGES and add them to the SOF
         long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
-        long_suffix_align = "{0}{1}_{2}_{3}".format(suffix, self._suffix_prealign,
-                             filter_for_alignment, mytpl)
+        long_suffix_align = "{0}{1}_{2}".format(suffix, self._suffix_prealign,
+                             filter_for_alignment)
         list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                        'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(
                           long_suffix_align, row['tpls'], row['iexpo'])) 
