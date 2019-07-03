@@ -1170,7 +1170,6 @@ class PipePrep(SofPipe) :
             if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
                 upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
                         offset_list_tablename, folder_expo), pipe=self)
-                return
 
             self._sofdict['OFFSET_LIST'] = [joinpath(folder_expo, offset_list_tablename)]
 
