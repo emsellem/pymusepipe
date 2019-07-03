@@ -859,7 +859,7 @@ class PipePrep(SofPipe) :
             if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])
             else: suffix_expo = ""
             self.save_expo_table(expotype, scipost_table, "reduced", 
-                    "IMAGES_FOV{0}_{1}_{2}{3}_list_table.fits".format(
+                    "IMAGES_FOV{0}_{1}{2}_{3}_list_table.fits".format(
                         suffix, expotype, suffix_expo, tpl), 
                         aggregate=False, update=True)
 
@@ -931,7 +931,7 @@ class PipePrep(SofPipe) :
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
                     namein_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
-                    nameout_align.append('{0}{1}_{2:04d}'.format(iter_file, long_suffix_align, iexpo))
+                    nameout_align.append('{0}_bygroup_{1}_{2:04d}'.format(iter_file, long_suffix_align, iexpo))
             self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, mytpl, "group", **kwargs)
 
             # Write the MASTER files Table and save it
@@ -1009,8 +1009,8 @@ class PipePrep(SofPipe) :
         for iter_file in dic_files_iexpo_products['ALIGN']:
             for i, row in enumerate(align_table):
                 namein_align.append('{0}_{1:04d}'.format(iter_file, i+1))
-                nameout_align.append('{0}{1}_{2}_{3:04d}'.format(
-                    iter_file, long_suffix_align, row['tpls'], row['iexpo']))
+                nameout_align.append('{0}_bypointing_{1}_{2}_{3:04d}'.format(
+                    iter_file, long_suffix, row['tpls'], row['iexpo']))
 
         # Find the alignment - Note that Pointing is used and tpl reflects the given selection
         self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, 

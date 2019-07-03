@@ -248,8 +248,9 @@ class PipeRecipes(object) :
 
             # Now if in need of an alignment image and it is the filter image
             # Copying it in the Alignment folder or write it 
-            if self._save_alignment_images and filter_for_alignment in fitsname_out:
-                name_imageout_align = ("{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
+            if self._save_alignment_images and filter_for_alignment in fitsname_out 
+                and self._suffix_prealign in fitsname_out:
+                name_imageout_align = ("{name_imaout}{suffix}_P{pointing:02d}_{myfilter}"
                                       "_{tpl}{suff_post}.fits".format(
                                       name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
                                       myfilter=filter_for_alignment, suff_post=suff_post, 
