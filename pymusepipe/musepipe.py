@@ -198,6 +198,8 @@ dic_astro_wcs = {
 
 future_date = '2099-01-01'
 
+suffix_prealign = "_prealign"
+
 ############################################################
 #                      END
 ############################################################
@@ -263,6 +265,8 @@ class MusePipe(PipePrep, PipeRecipes):
         # Verbose option
         self.verbose = verbose
         self._debug = kwargs.pop("debug", False)
+
+        self._suffix_prealign = kwargs.pop("suffix_prealign", suffix_prealign)
 
         # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')

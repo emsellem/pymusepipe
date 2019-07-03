@@ -651,6 +651,9 @@ class PipePrep(SofPipe) :
                                                    velocity=self.vsystemic, 
                                                    lambda_window=lambda_window)
 
+        # Tag the suffix with the prealign suffix
+        suffix = "{0}{1}".format(suffix, self._suffix_prealign)
+
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
@@ -864,7 +867,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
-    def run_align_bygroup(self, sof_filename='exp_align', expotype="OBJECT", 
+    def run_align_bygroup(self, sof_filename='exp_align_bygroup', expotype="OBJECT", 
             list_expo=[], stage="processed", line=None, suffix="",
             tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
@@ -911,9 +914,11 @@ class PipePrep(SofPipe) :
                             pipe=self)
                 continue
             long_suffix = "{0}_{1}_{2}".format(suffix, filter_for_alignment, mytpl)
+            long_suffix_align = "{0}{1}_{2}_{3}".format(suffix, self._suffix_prealign,
+                                 filter_for_alignment, mytpl)
             list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                                           'IMAGE_FOV{0}_{1:04d}.fits'.format(
-                                              long_suffix, iexpo)) 
+                                              long_suffix_align, iexpo)) 
                                               for iexpo in list_group_expo]
             self._sofdict['IMAGE_FOV'] = list_images
             create_offset_table(list_images, table_folder=self.paths.pipe_products, 
@@ -926,19 +931,19 @@ class PipePrep(SofPipe) :
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
                     namein_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
-                    nameout_align.append('{0}{1}_{2:04d}'.format(iter_file, long_suffix, iexpo))
+                    nameout_align.append('{0}{1}_{2:04d}'.format(iter_file, long_suffix_align, iexpo))
             self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, mytpl, "group", **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, align_table, "reduced", 
-                    "ALIGNED_IMAGES_{0}{1}_list_table.fits".format(expotype, 
+                    "ALIGNED_IMAGES_BYGROUP_{0}{1}_list_table.fits".format(expotype, 
                         long_suffix), aggregate=False, update=True)
         
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
         
     @print_my_function_name
-    def run_align_bypointing(self, sof_filename='exp_align', expotype="OBJECT", 
+    def run_align_bypointing(self, sof_filename='exp_align_bypointing', expotype="OBJECT", 
             list_expo=[], stage="processed", line=None, suffix="",
             tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
@@ -982,9 +987,11 @@ class PipePrep(SofPipe) :
         self._sofdict.clear()
         # Producing the list of IMAGES and add them to the SOF
         long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
+        long_suffix_align = "{0}{1}_{2}_{3}".format(suffix, self._suffix_prealign,
+                             filter_for_alignment, mytpl)
         list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                        'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(
-                          long_suffix, row['tpls'], row['iexpo'])) 
+                          long_suffix_align, row['tpls'], row['iexpo'])) 
                           for row in align_table]
         self._sofdict['IMAGE_FOV'] = list_images
         upipe.print_info("Creating empty OFFSET_LIST.fits using images list")
@@ -1003,7 +1010,7 @@ class PipePrep(SofPipe) :
             for i, row in enumerate(align_table):
                 namein_align.append('{0}_{1:04d}'.format(iter_file, i+1))
                 nameout_align.append('{0}{1}_{2}_{3:04d}'.format(
-                    iter_file, long_suffix, row['tpls'], row['iexpo']))
+                    iter_file, long_suffix_align, row['tpls'], row['iexpo']))
 
         # Find the alignment - Note that Pointing is used and tpl reflects the given selection
         self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, 
@@ -1011,7 +1018,7 @@ class PipePrep(SofPipe) :
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, align_table, "reduced", 
-                "ALIGNED_IMAGES_{0}{1}_{2}_{3}_list_table.fits".format(expotype, 
+                "ALIGNED_IMAGES_BYPOINTING_{0}{1}_{2}_{3}_list_table.fits".format(expotype, 
                 long_suffix, pointing, tpl), aggregate=False, update=True)
         
         # Go back to original folder
