@@ -61,8 +61,6 @@ dic_products_scipost = {
         'autocal': ['AUTOCAL_FACTORS']
         }
 
-suffix_for_align = "_palign"
-
 # =======================================================
 # Few useful functions
 # =======================================================
@@ -653,7 +651,6 @@ class PipePrep(SofPipe) :
                                                    velocity=self.vsystemic, 
                                                    lambda_window=lambda_window)
 
-        suffix = "{0}{1}".format(suffix, suffix_for_align)
         if line is not None: 
             suffix = "{0}_{1}".format(suffix, line)
 
@@ -859,15 +856,16 @@ class PipePrep(SofPipe) :
             if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])
             else: suffix_expo = ""
             self.save_expo_table(expotype, scipost_table, "reduced", 
-                    "IMAGES_FOV_{0}_{1}{2}_list_table.fits".format(expotype, 
-                        suffix_expo, tpl), aggregate=False, update=True)
+                    "IMAGES_FOV{0}_{1}_{2}{3}_list_table.fits".format(
+                        suffix, expotype, suffix_expo, tpl), 
+                        aggregate=False, update=True)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
     def run_align_bygroup(self, sof_filename='exp_align', expotype="OBJECT", 
-            list_expo=[], stage="processed", line=None, 
+            list_expo=[], stage="processed", line=None, suffix="",
             tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
@@ -891,7 +889,6 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        suffix = "{0}_{1}".format(suffix_for_align, filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
@@ -913,35 +910,36 @@ class PipePrep(SofPipe) :
                     upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this group",
                             pipe=self)
                 continue
+            long_suffix = "{0}_{1}_{2}".format(suffix, filter_for_alignment, mytpl)
             list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                                          'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) 
-                                          for iexpo in list_group_expo]
+                                          'IMAGE_FOV{0}_{1:04d}.fits'.format(
+                                              long_suffix, iexpo)) 
+                                              for iexpo in list_group_expo]
             self._sofdict['IMAGE_FOV'] = list_images
             create_offset_table(list_images, table_folder=self.paths.pipe_products, 
                                 table_name="{0}.fits".format(dic_files_products['ALIGN'][0]))
             upipe.print_info("Creating empty OFFSET_LIST.fits using images list")
-            self.write_sof(sof_filename=sof_filename + "{0}_{1}".format(suffix, mytpl), new=True)
+            self.write_sof(sof_filename=sof_filename + long_suffix, new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             namein_align = deepcopy(dic_files_products['ALIGN'])
-            nameout_align = [name + "{0}_{1}".format(suffix, mytpl) 
-                             for name in deepcopy(dic_files_products['ALIGN'])] 
+            nameout_align = [name + long_suffix for name in deepcopy(dic_files_products['ALIGN'])] 
             for iter_file in dic_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
                     namein_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
-                    nameout_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, mytpl, iexpo))
+                    nameout_align.append('{0}{1}_{2:04d}'.format(iter_file, long_suffix, iexpo))
             self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, mytpl, "group", **kwargs)
 
             # Write the MASTER files Table and save it
             self.save_expo_table(expotype, align_table, "reduced", 
-                    "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, 
-                        suffix, mytpl), aggregate=False, update=True)
+                    "ALIGNED_IMAGES_{0}{1}_list_table.fits".format(expotype, 
+                        long_suffix), aggregate=False, update=True)
         
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
         
     @print_my_function_name
     def run_align_bypointing(self, sof_filename='exp_align', expotype="OBJECT", 
-            list_expo=[], stage="processed", line=None, 
+            list_expo=[], stage="processed", line=None, suffix="",
             tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
@@ -974,7 +972,6 @@ class PipePrep(SofPipe) :
 
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        suffix = "{0}_{1}".format(suffix_for_align, filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
@@ -984,8 +981,11 @@ class PipePrep(SofPipe) :
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
         # Producing the list of IMAGES and add them to the SOF
+        long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
         list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-            'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) for row in align_table]
+                       'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(
+                          long_suffix, row['tpls'], row['iexpo'])) 
+                          for row in align_table]
         self._sofdict['IMAGE_FOV'] = list_images
         upipe.print_info("Creating empty OFFSET_LIST.fits using images list")
         create_offset_table(list_images, table_folder=self.paths.pipe_products, 
@@ -993,15 +993,17 @@ class PipePrep(SofPipe) :
 
         # Write the SOF
         self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}_{3}".format(
-                       suffix, expotype, pointing, tpl), new=True)
+                       long_suffix, expotype, pointing, tpl), new=True)
         dir_align = self._get_fullpath_expo('OBJECT', "processed")
         namein_align = deepcopy(dic_files_products['ALIGN'])
-        nameout_align = [name + "{0}_{1}_{2}_{3}".format(suffix, expotype, pointing, tpl) 
-                         for name in deepcopy(dic_files_products['ALIGN'])] 
+        nameout_align = [name + "{0}_{1}_{2}_{3}".format(
+                         long_suffix, expotype, pointing, tpl) 
+                             for name in deepcopy(dic_files_products['ALIGN'])] 
         for iter_file in dic_files_iexpo_products['ALIGN']:
             for i, row in enumerate(align_table):
                 namein_align.append('{0}_{1:04d}'.format(iter_file, i+1))
-                nameout_align.append('{0}{1}_{2}_{3:04d}'.format(iter_file, suffix, row['tpls'], row['iexpo']))
+                nameout_align.append('{0}{1}_{2}_{3:04d}'.format(
+                    iter_file, long_suffix, row['tpls'], row['iexpo']))
 
         # Find the alignment - Note that Pointing is used and tpl reflects the given selection
         self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, 
@@ -1009,8 +1011,8 @@ class PipePrep(SofPipe) :
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, align_table, "reduced", 
-                "ALIGNED_IMAGES_{0}{1}_{2}_list_table.fits".format(expotype, 
-                suffix, tpl), aggregate=False, update=True)
+                "ALIGNED_IMAGES_{0}{1}_{2}_{3}_list_table.fits".format(expotype, 
+                long_suffix, pointing, tpl), aggregate=False, update=True)
         
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
@@ -1057,7 +1059,7 @@ class PipePrep(SofPipe) :
         
     @print_my_function_name
     def get_align_group(self, name_ima_reference=None, list_expo=[], line=None, 
-            bygroup=False):
+            suffix="", bygroup=False):
         """Extract the needed information for a set of exposures to be aligned
         """
         # Selecting the table with the right iexpo
@@ -1073,7 +1075,6 @@ class PipePrep(SofPipe) :
         self.align_group = []
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
-        suffix = "{0}_{1}".format(suffix_for_align, filter_for_alignment)
         if line is not None:
             suffix += "_{0}".format(line)
 
@@ -1082,14 +1083,16 @@ class PipePrep(SofPipe) :
             for gtable in align_table.groups:
                 mytpl, mymjd = self._get_tpl_meanmjd(gtable)
                 list_group_expo = gtable['iexpo'].data
+                long_suffix = "{0}_{1}_{2}".format(suffix, filter_for_alignment, mytpl)
                 list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                    'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, mytpl, iexpo)) 
+                    'IMAGE_FOV{0}_{1:04d}.fits'.format(long_suffix, iexpo)) 
                     for iexpo in list_group_expo]
                 self.align_group.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
         # If not by group
         else:
+            long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
             list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(suffix, row['tpls'], row['iexpo'])) 
+                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(long_suffix, row['tpls'], row['iexpo'])) 
                 for row in align_table]
             # Giving a reference image name, doing the alignment w.r.t. to that specific image
             if name_ima_reference is None:
@@ -1150,12 +1153,13 @@ class PipePrep(SofPipe) :
         # And looking for that table, adding it to the sof file
         offset_list = kwargs.pop("offset_list", "True")
         folder_expo = self._get_fullpath_expo(expotype, stage)
+        long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
         if offset_list :
             offset_list_tablename = kwargs.pop("offset_list_tablename", None)
             if offset_list_tablename is None:
-                offset_list_tablename = "{0}{1}{2}_{3}_{4}_{5}_{6}.fits".format(
-                        dic_files_products['ALIGN'][0], suffix, suffix_for_align,
-                        filter_for_alignment, expotype, pointing, tpl)
+                offset_list_tablename = "{0}{1}_{2}_{3}_{4}.fits".format(
+                        dic_files_products['ALIGN'][0], long_suffix,
+                        expotype, pointing, tpl)
             if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
                 upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
                         offset_list_tablename, folder_expo), pipe=self)
@@ -1173,7 +1177,7 @@ class PipePrep(SofPipe) :
                    '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo'])) for row in
                    combine_table]
         self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
-            suffix, tpl), new=True)
+            long_suffix, tpl), new=True)
 
         # Product names
         dir_products = self._get_fullpath_expo(expotype, stage)

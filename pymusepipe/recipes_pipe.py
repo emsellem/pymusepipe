@@ -211,12 +211,13 @@ class PipeRecipes(object) :
     #       suff_post = number of expo if relevant (2 integer)
     def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[""], 
             suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
-            save='cube,skymodel', filter_list='white', filter_for_alignment='Cousins_R',
+            save='cube,skymodel', filter_list='white', 
             skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, 
             astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="",
-            autocalib='none', rvcorr='bary'):
+            autocalib='none', rvcorr='bary', **kwargs):
         """Running the esorex muse_scipost recipe
         """
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
                 "--astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
@@ -233,40 +234,6 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_pre, suff_post in zip(name_products, suffix_products, 
                 suffix_prefinalnames, suffix_postfinalnames) :
-
-## Old way, using mpdaf
-##            # Create extra filter image if requested
-##            if 'CUBE' in name_prod and not self.fakemode \
-##                    and not filter_for_alignment in filter_list:
-##                upipe.print_info("Deriving filter alignment image "
-##                                 "[filter: {0}]".format(filter_for_alignment))
-##                cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
-##                mycube = MuseCube(filename=cube_name)
-##                myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
-##                        filter_folder=self.paths.root, 
-##                        dic_extra_filters=self.pipe_params._dic_extra_filters)
-##                name_imageout = ("{name_imaout}_{suffix}{myfilter}_{tpl}"
-##                                 "{suff_post}.fits".format(
-##                                 name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
-##                                 myfilter=filter_for_alignment, suff_post=suff_post, 
-##                                 tpl=tpl, suffix=suffix))
-##                upipe.print_info("Adding filter alignment image [filter: {0}] "
-##                                 "to Object folder".format(filter_for_alignment))
-##                myimage.write(name_imageout, savemask='nan')
-##
-##                # Save the alignment image in the right folder
-##                if self._save_alignment_images:
-##                    name_imageout_align = ("{name_imaout}_P{pointing:02d}_{suffix}{myfilter}"
-##                                          "_{tpl}{suff_post}.fits".format(
-##                                          name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
-##                                          myfilter=filter_for_alignment, suff_post=suff_post, 
-##                                          tpl=tpl, suffix=suffix, pointing=self.pointing))
-##                    upipe.print_info("Adding filter alignment image [filter: {0}] "
-##                                     "to Alignment folder {1}".format(
-##                                         filter_for_alignment,
-##                                         self.paths.alignment))
-##                    myimage.write(name_imageout_align, savemask='nan')
-## end of old way
 
             # In any case move the file from Pipe_products to the right folder
             fitsname_out = "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(
@@ -287,7 +254,6 @@ class PipeRecipes(object) :
                                       name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
                                       myfilter=filter_for_alignment, suff_post=suff_post, 
                                       tpl=tpl, suffix=suffix, pointing=self.pointing))
-#                if filter_for_alignment in filter_list :
                 self.run_oscommand("{nocache} cp {fitsname} {nameima_out}".format(
                                    nocache=self.nocache, fitsname=fitsname_out,
                                    nameima_out=name_imageout_align))
@@ -312,9 +278,10 @@ class PipeRecipes(object) :
             suffix_products=[""], suffix_prefinalnames=[""], 
             save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white',
-            filter_for_alignment="Cousins_R", lambdamin=4000., lambdamax=10000.):
+            lambdamin=4000., lambdamax=10000., **kwargs):
         """Running the muse_exp_combine recipe for one single pointing
         """
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         self.run_oscommand("{esorex}  --log-file=exp_combine_cube_{expotype}_{tpl}.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                "--format={form} --filter={filt} "
@@ -325,21 +292,6 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):
-## Old way with mpdaf
-##            if 'CUBE' in name_prod and not self.fakemode \
-##                    and not filter_for_alignment in filter_list:
-##                cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
-##                mycube = MuseCube(filename=cube_name)
-##                myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
-##                        filter_folder=self.paths.root, 
-##                        dic_extra_filters=self.pipe_params._dic_extra_filters)
-##                name_imageout = ("{name_imaout}_{suffix}{myfilter}_{pointing}_{tpl}"
-##                                 ".fits".format(
-##                                 name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
-##                                 myfilter=filter_for_alignment, 
-##                                 pointing="P{0:02d}".format(self.pointing),
-##                                 tpl=tpl, suffix=suffix))
-##                myimage.write(name_imageout, savemask='nan')
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                 '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
@@ -352,10 +304,10 @@ class PipeRecipes(object) :
             suffix_products=[""], suffix_prefinalnames=[""], 
             save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white', 
-            lambdamin=4000., lambdamax=10000.,
-            filter_for_alignment="Cousins_R"):
+            lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for pointings
         """
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         self.run_oscommand("{esorex}  --log-file=exp_combine_pointings.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                "--format={form} --filter={filt} "
@@ -367,19 +319,6 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
                 suffix_prefinalnames):
-             # Create extra filter image if requested
-## Old way with mpdaf
-##             if 'CUBE' in name_prod and not self.fakemode \
-##                     and not filter_for_alignment in filter_list:
-##                 cube_name = "{0}.fits".format(self.joinprod(name_prod+suff_prod))
-##                 mycube = MuseCube(filename=cube_name)
-##                 myimage = mycube.get_filter_image(filter_name=filter_for_alignment,
-##                         filter_folder=self.paths.root, 
-##                         dic_extra_filters=self.pipe_params._dic_extra_filters)
-##                 name_imageout = ("{name_imaout}_{myfilter}{suffix}.fits".format(
-##                                  name_imaout=joinpath(dir_products, "IMAGE_FOV"), 
-##                                  myfilter=filter_for_alignment, suffix=suffix))
-##                 myimage.write(name_imageout, savemask='nan')
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                               "{name_imaout}{suffix}{suff_pre}.fits".format(
