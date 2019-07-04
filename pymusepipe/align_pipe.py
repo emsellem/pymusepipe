@@ -679,6 +679,7 @@ class AlignMusePointing(object):
         upipe.print_info("Total in ARCSEC")
         for nima in range(self.nimages):
             upipe.print_info("Image {0}: {1:8.4f} {2:8.4f}".format(
+                    nima,
                     fits_table['RA_OFFSET'][nima]*3600 \
                             * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                     fits_table['DEC_OFFSET'][nima]*3600.))
