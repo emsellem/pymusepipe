@@ -161,6 +161,9 @@ def chunk_stats(list_data, chunk_size=15):
                             list_data[k][i*chunk_size:(i+1)*chunk_size, 
                             j*chunk_size:(j+1)*chunk_size], ignore_nan=True)
 
+    # Cleaning in case of Nan
+    med_data = np.nan_to_num(med_data)
+    std_data = np.nan_to_num(std_data)
     return med_data, std_data
 
 def my_linear_model(B, x):
