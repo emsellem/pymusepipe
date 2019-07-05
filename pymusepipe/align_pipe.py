@@ -608,12 +608,13 @@ class AlignMusePointing(object):
                     1., self.offset_table['FLUX_SCALE'])
             for nima, mjd in enumerate(self.ima_mjdobs):
                 if mjd in values:
+                    # Find the index of the value array where mjd
                     ind = np.nonzero(values == mjd)[0][0]
                     self.init_off_arcsec[nima] = [
-                            self.offset_table['RA_OFFSET'][ind] * 3600. \
+                            self.offset_table['RA_OFFSET'][ind_table[ind]] * 3600. \
                                     * np.cos(np.deg2rad(self.list_dec_muse[nima])),
-                            self.offset_table['DEC_OFFSET'][ind] * 3600.]
-                    self.init_flux_scale[nima] = nonan_flux_scale_table[ind]
+                            self.offset_table['DEC_OFFSET'][ind_table[ind]] * 3600.]
+                    self.init_flux_scale[nima] = nonan_flux_scale_table[ind_table[ind]]
                 else :
                     self.init_flux_scale[nima] = 1.0
                     self.init_off_arcsec[nima] = [0., 0.]
