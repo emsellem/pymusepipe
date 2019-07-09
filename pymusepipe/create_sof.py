@@ -137,11 +137,11 @@ class SofPipe(object) :
         """
         if self._time_astrometry :
             calfolder = self.pipe_params.musecalib_time
-            listkeys = list(musepipe.dic_geo_table.keys())
+            listkeys = list(musepipe.dic_geo_astrowcs_table.keys())
             listkeys.append(musepipe.future_date)
             for ikey in range(len(listkeys) - 1):
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
-                    geofile = musepipe.dic_geo_table[listkeys[ikey]]
+                    geofile = musepipe.dic_geo_astrowcs_table[listkeys[ikey]][0]
         else:
             calfolder = self.pipe_params.musecalib
             geofile = self.pipe_params.geo_table
@@ -154,11 +154,11 @@ class SofPipe(object) :
         """
         if self._time_astrometry :
             calfolder = self.pipe_params.musecalib_time
-            listkeys = list(musepipe.dic_astro_wcs.keys())
+            listkeys = list(musepipe.dic_geo_astrowcs_table.keys())
             listkeys.append(musepipe.future_date)
             for ikey in range(len(listkeys) - 1):
                 if tpls >= listkeys[ikey] and tpls < listkeys[ikey+1]:
-                    astrofile = musepipe.dic_astro_wcs[listkeys[ikey]]
+                    astrofile = musepipe.dic_geo_astrowcs_table[listkeys[ikey]][1]
         else :
             calfolder = self.pipe_params.musecalib
             astrofile = self.pipe_params.astro_table
