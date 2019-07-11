@@ -386,7 +386,7 @@ class MusePipe(PipePrep, PipeRecipes):
                          abs(date_dt - self._dic_geoastro[name][1])) : 
                          name for name in self._dic_geoastro}
         # Find the minimum distance and get the name
-        ga_sufix = nearstart[min(near.keys())]
+        ga_sufix = near[min(near.keys())]
         # Build the name with the prefix, suffix and mode
         ga_name = "{0}_{1}_{2}.fits".format(dic_pre[filetype],
                                             mode, ga_suffix)
