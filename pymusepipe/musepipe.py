@@ -52,6 +52,9 @@ except ImportError :
 import warnings
 from astropy.utils.exceptions import AstropyWarning
 
+import datetime
+from datetime import datetime as dt
+
 # Importing pymusepipe modules
 from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.recipes_pipe import PipeRecipes
@@ -115,78 +118,50 @@ exclude_list_checkmode = ['BIAS', 'DARK']
 
 esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
         
+# Final date for the astrometry/geometry
+starting_date = '2000-01-01'
+future_date = '2099-01-01'
+
 # Time varying calibrations for the astrometry
 dic_geo_astrowcs_table = {
-  '2014-02-09': ["geometry_table_wfm_comm1.fits",   
-                 "astrometry_wcs_wfm_comm1.fits"],
-  '2014-04-28': ["geometry_table_wfm_comm2a.fits",  
-                 "astrometry_wcs_wfm_comm2a.fits"],
-  '2014-07-31': ["geometry_table_wfm_comm2b.fits",  
-                 "astrometry_wcs_wfm_comm2b.fits"],
-  '2014-10-23': ["geometry_table_wfm_gto02.fits",   
-                 "astrometry_wcs_wfm_gto02.fits"],
-  '2014-11-21': ["geometry_table_wfm_gto03.fits",   
-                 "astrometry_wcs_wfm_gto03.fits"],
-  '2014-12-01': ["geometry_table_wfm_2014dec.fits", 
-                 "astrometry_wcs_wfm_2014dec.fits"],
-  '2015-04-15': ["geometry_table_wfm_gto05.fits",   
-                 "astrometry_wcs_wfm_gto05.fits"],
-  '2015-05-10': ["geometry_table_wfm_gto06.fits",   
-                 "astrometry_wcs_wfm_gto06.fits"],
-  '2015-08-24': ["geometry_table_wfm_gto07.fits",   
-                 "astrometry_wcs_wfm_gto07.fits"],
-  '2015-09-08': ["geometry_table_wfm_gto08.fits",   
-                 "astrometry_wcs_wfm_gto08.fits"],
-  '2015-10-11': ["geometry_table_wfm_gto09.fits",   
-                 "astrometry_wcs_wfm_gto09.fits"],
-  '2015-11-07': ["geometry_table_wfm_gto10.fits",   
-                 "astrometry_wcs_wfm_gto10.fits"],
-  '2016-02-02': ["geometry_table_wfm_gto11.fits",   
-                 "astrometry_wcs_wfm_gto11.fits"],
-  '2016-03-10': ["geometry_table_wfm_gto12.fits",   
-                 "astrometry_wcs_wfm_gto12.fits"],
-  '2016-04-03': ["geometry_table_wfm_gto13.fits",   
-                 "astrometry_wcs_wfm_gto13.fits"],
-  '2016-09-02': ["geometry_table_wfm_gto15.fits",   
-                 "astrometry_wcs_wfm_gto15.fits"],
-  '2017-01-30': ["geometry_table_wfm_gto16.fits",   
-                 "astrometry_wcs_wfm_gto16.fits"],
-  '2017-04-24': ["geometry_table_wfm_gto17.fits",   
-                 "astrometry_wcs_wfm_gto17.fits"],
-  '2017-09-24': ["geometry_table_wfm_gto19.fits",   
-                 "astrometry_wcs_wfm_gto19.fits"],
-  '2017-10-20': ["geometry_table_wfm_gto20.fits",   
-                 "astrometry_wcs_wfm_gto20.fits"],
-  '2017-11-17': ["geometry_table_wfm_gto21.fits",   
-                 "astrometry_wcs_wfm_gto21.fits"],
-  '2018-02-13': ["geometry_table_wfm_gto22.fits",   
-                 "astrometry_wcs_wfm_gto22.fits"],
-  '2018-03-15': ["geometry_table_wfm_gto23.fits",   
-                 "astrometry_wcs_wfm_gto23.fits"],
-  '2018-04-14': ["geometry_table_wfm_gto24.fits",   
-                 "astrometry_wcs_wfm_gto24.fits"],
-  '2018-05-12': ["geometry_table_wfm_gto25.fits",   
-                 "astrometry_wcs_wfm_gto25.fits"],
-  '2018-08-14': ["geometry_table_wfm_gto26.fits",   
-                 "astrometry_wcs_wfm_gto26.fits"],
-  '2018-09-11': ["geometry_table_wfm_gto27.fits",   
-                 "astrometry_wcs_wfm_gto27.fits"],
-  '2018-10-14': ["geometry_table_wfm_gto28.fits",   
-                 "astrometry_wcs_wfm_gto28.fits"],
-  '2018-11-14': ["geometry_table_wfm_gto29.fits",   
-                 "astrometry_wcs_wfm_gto29.fits"],
-  '2019-01-09': ["geometry_table_wfm_gto31.fits",   
-                 "astrometry_wcs_wfm_gto31.fits"],
-  '2019-03-05': ["geometry_table_wfm_gto32.fits",   
-                 "astrometry_wcs_wfm_gto32.fits"],
-  '2019-04-01': ["geometry_table_wfm_gto33.fits",   
-                 "astrometry_wcs_wfm_gto33.fits"],
-  '2019-05-04': ["geometry_table_wfm_gto34.fits",   
-                 "astrometry_wcs_wfm_gto34.fits"]  
-        }
-
-# Final date for the astrometry/geometry
-future_date = '2099-01-01'
+    'comm1' :   ['2014-02-09', '2014-02-09'], # mean date
+    'comm2a':   ['2014-04-27', '2014-05-06'],
+    'comm2b':   ['2014-07-24', '2014-08-03'],
+    'gto01' :   ['2014-09-13', '2014-09-26'],
+    'gto02' :   ['2014-10-18', '2014-10-29'],
+    'gto03' :   ['2014-11-16', '2014-11-27'],
+    '2014d' :   ['2014-12-16', '2014-12-25'],
+    'gto05' :   ['2015-04-14', '2015-04-25'],
+    'gto06' :   ['2015-05-10', '2015-05-23'],
+    'gto07' :   ['2015-08-17', '2015-08-24'],
+    'gto08' :   ['2015-09-07', '2015-09-12'],
+    'gto09' :   ['2015-10-09', '2015-10-16'],
+    'gto10' :   ['2015-11-04', '2015-11-13'],
+    'gto11' :   ['2016-01-31', '2016-02-06'],
+    'gto12' :   ['2016-03-09', '2016-03-14'],
+    'gto13' :   ['2016-04-05', '2016-04-10'],
+    'gto14' :   ['2016-05-06', '2016-05-12'],
+    'gto15' :   ['2016-08-29', '2016-09-06'],
+    'gto16' :   ['2017-01-27', '2017-02-03'],
+    'gto17' :   ['2017-04-22', '2017-04-25'],
+    'gto18' :   ['2017-05-20', '2017-05-23'],
+    'gto19' :   ['2017-09-19', '2017-09-25'],
+    'gto20' :   ['2017-10-16', '2017-10-26'],
+    'gto21' :   ['2017-11-15', '2017-11-20'],
+    'gto22' :   ['2018-02-11', '2018-02-16'],
+    'gto23' :   ['2018-03-14', '2018-03-19'],
+    'gto24' :   ['2018-04-11', '2018-04-19'],
+    'gto25' :   ['2018-05-10', '2018-05-13'],
+    'gto26' :   ['2018-08-12', '2018-08-18'],
+    'gto27' :   ['2018-09-05', '2018-09-15'],
+    'gto28' :   ['2018-10-07', '2018-10-15'],
+    'gto29' :   ['2018-11-14', '2018-11-14'], # mean date
+    # 'gto30' is missing
+    'gto31' :   ['2019-01-09', '2019-01-09'], # mean date
+    'gto32' :   ['2019-03-05', '2019-03-05'], # mean date
+    'gto33' :   ['2019-04-01', '2019-04-01'], # mean date
+    'gto34' :   ['2019-05-04', '2019-05-04']  # mean date
+}
 
 # Suffix for the pre-alignment files. Will be part of the output names
 suffix_prealign = "_prealign"
@@ -373,6 +348,53 @@ class MusePipe(PipePrep, PipeRecipes):
         self.init_raw_table()
         self.read_all_astro_tables()
         # ===========================================================
+        # Transform input dictionary of geo/astro files for later
+        # This is useful for the creation of the sof files
+        self._init_geoastro_dates()
+
+    def _init_geoastro_dates(self):
+        """Initialise the dictionary for the geo and astrometry files
+        Transforms the dates into datetimes
+        """
+        self._dic_geoastro = {}
+        for name in dic_geo_astrowcs_table:
+            startd = dt.strptime(dic_geo_astrowcs_table[name][0], 
+                                 "%y/%m/%d").date()
+            endd = dt.strptime(dic_geo_astrowcs_table[name][1], 
+                               "%y/%m/%d").date()
+            self._dic_geoastro[name] = [stard, endd]
+
+    def retrieve_geoastro_name(date_str, ftype='geo', mode='wfm'):
+        """Retrieving the astrometry or geometry fits file name
+
+        Parameters
+        ----------
+        date_str: str
+            Date as a string (DD/MM/YYYY)
+        ftype: str
+            'geo' or 'astro', type of the needed file
+        mode: str
+            'wfm' or 'nfm' - MUSE mode
+        """
+        dic_pre = {'geo': 'geometry_table', 
+                      'astro': 'astrometry_wcs'}
+        if ftype not in dic_pre.keys():
+            upipe.print_error("Could not decipher the ftype option "
+                              "in retrieve_geoastro")
+            return None
+    
+        # Transform into a datetime date
+        date_dt = dt.strptime(date_str).date()
+        # get all the distance to the dates (start+end together)
+        near = {min(abs(date_dt - self._dic_geoastro[name][0]), 
+                         abs(date_dt - self._dic_geoastro[name][1])) : 
+                         name for name in self._dic_geoastro}
+        # Find the minimum distance and get the name
+        ga_sufix = nearstart[min(near.keys())]
+        # Build the name with the prefix, suffix and mode
+        ga_name = "{0}_{1}_{2}.fits".format(dic_pre[ftype],
+                                            mode, ga_suffix)
+        return ga_name
 
     def _set_option_astropy_table(self, overwrite=None, update=None):
         """Set the options for overwriting or updating the astropy tables
