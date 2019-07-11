@@ -364,7 +364,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                "%Y-%m-%d").date()
             self._dic_geoastro[name] = [startd, endd]
 
-    def retrieve_geoastro_name(date_str, filetype='geo', mode='wfm'):
+    def retrieve_geoastro_name(self, date_str, filetype='geo', mode='wfm'):
         """Retrieving the astrometry or geometry fits file name
 
         Parameters
