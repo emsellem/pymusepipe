@@ -362,7 +362,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                  "%Y-%m-%d").date()
             endd = dt.strptime(dic_geo_astrowcs_table[name][1], 
                                "%Y-%m-%d").date()
-            self._dic_geoastro[name] = [stard, endd]
+            self._dic_geoastro[name] = [startd, endd]
 
     def retrieve_geoastro_name(date_str, ftype='geo', mode='wfm'):
         """Retrieving the astrometry or geometry fits file name
