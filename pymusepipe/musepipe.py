@@ -359,9 +359,9 @@ class MusePipe(PipePrep, PipeRecipes):
         self._dic_geoastro = {}
         for name in dic_geo_astrowcs_table:
             startd = dt.strptime(dic_geo_astrowcs_table[name][0], 
-                                 "%y-%m-%d").date()
+                                 "%Y-%m-%d").date()
             endd = dt.strptime(dic_geo_astrowcs_table[name][1], 
-                               "%y-%m-%d").date()
+                               "%Y-%m-%d").date()
             self._dic_geoastro[name] = [stard, endd]
 
     def retrieve_geoastro_name(date_str, ftype='geo', mode='wfm'):
