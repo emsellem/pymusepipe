@@ -364,22 +364,22 @@ class MusePipe(PipePrep, PipeRecipes):
                                "%Y-%m-%d").date()
             self._dic_geoastro[name] = [startd, endd]
 
-    def retrieve_geoastro_name(date_str, ftype='geo', mode='wfm'):
+    def retrieve_geoastro_name(date_str, filetype='geo', mode='wfm'):
         """Retrieving the astrometry or geometry fits file name
 
         Parameters
         ----------
         date_str: str
             Date as a string (DD/MM/YYYY)
-        ftype: str
+        filetype: str
             'geo' or 'astro', type of the needed file
         mode: str
             'wfm' or 'nfm' - MUSE mode
         """
         dic_pre = {'geo': 'geometry_table', 
                       'astro': 'astrometry_wcs'}
-        if ftype not in dic_pre.keys():
-            upipe.print_error("Could not decipher the ftype option "
+        if filetype not in dic_pre.keys():
+            upipe.print_error("Could not decipher the filetype option "
                               "in retrieve_geoastro")
             return None
     
@@ -392,7 +392,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # Find the minimum distance and get the name
         ga_sufix = nearstart[min(near.keys())]
         # Build the name with the prefix, suffix and mode
-        ga_name = "{0}_{1}_{2}.fits".format(dic_pre[ftype],
+        ga_name = "{0}_{1}_{2}.fits".format(dic_pre[filetype],
                                             mode, ga_suffix)
         return ga_name
 
