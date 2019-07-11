@@ -118,10 +118,6 @@ exclude_list_checkmode = ['BIAS', 'DARK']
 
 esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
         
-# Final date for the astrometry/geometry
-starting_date = '2000-01-01'
-future_date = '2099-01-01'
-
 # Time varying calibrations for the astrometry
 dic_geo_astrowcs_table = {
     'comm1' :   ['2014-02-09', '2014-02-09'], # mean date
@@ -384,7 +380,7 @@ class MusePipe(PipePrep, PipeRecipes):
             return None
     
         # Transform into a datetime date
-        date_dt = dt.strptime(date_str).date()
+        date_dt = dt.strptime(date_str, "%Y-%m-%dT%H:%M:%S").date()
         # get all the distance to the dates (start+end together)
         near = {min(abs(date_dt - self._dic_geoastro[name][0]), 
                          abs(date_dt - self._dic_geoastro[name][1])) : 
