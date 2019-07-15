@@ -1,4 +1,4 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT style license - see LICENSE
 
 """MUSE-PHANGS core module
 """
@@ -6,16 +6,20 @@
 from __future__ import print_function
 
 __authors__   = "Eric Emsellem"
-__copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__copyright__ = "(c) 2017-2019, ESO + CRAL"
+__license__   = "MIT license"
 __contact__   = " <eric.emsellem@eso.org>"
 
-# This module has been largely inspired by one developed 
-# by Kyriakos and Martina from the GTO MUSE MAD team
-# and further rewritten by Mark van den Brok. Thanks to all three for this!
+# This module has been initially inspired by pieces of python codes
+# developed by Kyriakos and Martina from the GTO MUSE MAD team
+# and further rewritten by Mark van den Brok. 
+# Thanks to all three for this!
+# Note that several python packages exist which would provide
+# similar functionalities. 
 #
 # Eric Emsellem adapted a version from early 2017, provided by Mark
 # and adapted it for the needs of the PHANGS project (PI Schinnerer)
+# Completely rewritten structure and standards
 
 # Importing modules
 import numpy as np
@@ -23,13 +27,8 @@ import numpy as np
 # Standard modules
 import os
 from os.path import join as joinpath
-import copy
 
-# cpl module to link with esorex
-#try :
-#    import cpl
-#except ImportError :
-#    raise Exception("cpl is required for this - MUSE related - module")
+import copy
 
 # Pyfits from astropy
 try :
@@ -61,11 +60,10 @@ from pymusepipe.recipes_pipe import PipeRecipes
 from pymusepipe.prep_recipes_pipe import PipePrep
 import pymusepipe.util_pipe as upipe
 
-# Likwid command
-# likwid = "likwid-pin -c N:"
-
-# Included an astropy table
-__version__ = '2.0.0 (19 June 2019)'
+__version__ = '2.0.1 (09 July 2019)'
+#       Cleaning and adding comments
+#__version__ = '2.0.0 (19 June 2019)'
+#       Included an astropy table
 #__version__ = '0.2.0 (22 May 2018)'
 #__version__ = '0.1.0 (03 April    2018)'
 #__version__ = '0.0.2 (08 March    2018)'
@@ -173,13 +171,13 @@ suffix_rawfiles = ['fits.fz']
 # Useful Classes for the Musepipe
 #########################################################################
 class MyDict(dict) :
-    """New Dictionary with extra attributes
+    """Dictionary with extra attributes
     """
     def __init__(self) :
         dict.__init__(self)
 
 class PipeObject(object) :
-    """New class to store the tables
+    """Class to store the tables
     """
     def __init__(self, info=None) :
         """Initialise the nearly empty class
@@ -194,10 +192,11 @@ def lower_rep(text) :
 # Main class
 #                           MusePipe
 #########################################################################
-    
 class MusePipe(PipePrep, PipeRecipes):
     """Main Class to define and run the MUSE pipeline, given a certain galaxy name
-    
+    This is the main class used throughout the running of the pipeline
+    which contains functions and attributes all associated with the reduction
+    of MUSE exposures.
     """
 
     def __init__(self, targetname=None, pointing=0, rc_filename=None, 
@@ -205,27 +204,44 @@ class MusePipe(PipePrep, PipeRecipes):
             verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
             strong_checkmode=False, **kwargs):
         """Initialise the file parameters to be used during the run
+        Create the python structure which allows the pipeline to run 
+        either individual recipes or global ones
 
-        Input
-        -----
-        targetname: string (e.g., 'NGC1208'). default is None. 
-
-        rc_filename: filename to initialise folders
-        cal_filename: filename to initiale FIXED calibration MUSE files
-        verbose: boolean. Give more information as output (default is True)
-        musemode: string (default is WFM_N) String to define the mode to be considered
-        checkmode: boolean (default is True) Check the mode or not when reducing
-        strong_checkmode: boolean (default is False) Enforce the checkmode for all if True, 
-                         or exclude DARK/BIAS if False
-        vsystemic: float (default is 0), indicating the systemic velocity of the galaxy [in km/s]
+        Parameters
+        ----------
+        targetname: str [None]
+            Name of the target (e.g., 'NGC1208').
+        pointing: int [0]
+            Number of the pointing to consider
+        rc_filename: str
+            Name of the input configuration file with the root folders
+        cal_filename: str
+            Name of the input configuration file with calibration file names
+        logfile: str ['MusePipe.log']
+            Name of the log file where all pymusepipe output will be recorded
+        reset_log: bool [False]
+            If True, log file will be reset to an empty file before starting
+        verbose: bool [True]
+            Give more information as output
+        musemode: str ['WFM_NOAO_N'] 
+            String to define the mode to be considered
+        checkmode: bool [True]
+            Check the mode when reducing
+        strong_checkmode: bool [True]
+            Enforce the checkmode for all if True, 
+            or exclude DARK/BIAS from check if False
+        vsystemic: float [0.0]
+            Systemic velocity of the galaxy [in km/s]
 
         Other possible entries
         ----------------------
-        overwrite_astropy_table: boolean (default is False). Overwrite the astropy table even when
-            it exists.
-        warnings: strong  ('ignore'by default. If set to ignore, will ignore the Astropy Warnings.
-        time_astrometry: boolean (default is True). Use the time dependent geo_table and astrometry_wcs
-
+        overwrite_astropy_table: bool [False]
+            Overwrite the astropy table even when it exists.
+        warnings: str ['ignore']
+            If set to 'ignore', will ignore the Astropy Warnings.
+        time_astrometry: bool [True]
+            Use the time dependent geo_table and astrometry_wcs files
+            following on the date of the input exposures (MJD)
         """
         # Verbose option
         self.verbose = verbose
@@ -272,7 +288,6 @@ class MusePipe(PipePrep, PipeRecipes):
         self.checkmode = checkmode
         # Checking if mode is correct also for BIAS & DARK
         self.strong_checkmode = strong_checkmode
-
         # End of parameter settings #########################
 
         # Init of the subclasses
@@ -406,12 +421,24 @@ class MusePipe(PipePrep, PipeRecipes):
             
     def goto_prevfolder(self, addtolog=False) :
         """Go back to previous folder
+
+        Parameters
+        ----------
+        addtolog: bool [False]
+            Adding the folder move to the log file
         """
         upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder))
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
             
     def goto_folder(self, newpath, addtolog=False, verbose=True) :
         """Changing directory and keeping memory of the old working one
+
+        Parameters
+        ----------
+        addtolog: bool [False]
+            Adding the folder move to the log file
+        verbose: bool [True]
+            Adding some written info
         """
         try: 
             prev_folder = os.getcwd()
@@ -496,8 +523,12 @@ class MusePipe(PipePrep, PipeRecipes):
         
     def init_raw_table(self, reset=False):
         """ Create a fits table with all the information from
-        the Raw files
-        Also create an astropy table with the same info
+        the Raw files. Also create an astropy table with the same info
+
+        Parameters
+        ----------
+        reset: bool [False]
+            Resetting the raw astropy table if True
         """
         if self.verbose :
             upipe.print_info("Creating the astropy fits raw data table")

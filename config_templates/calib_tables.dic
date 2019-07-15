@@ -1,0 +1,16 @@
+# Muse calibration files (common to all)
+geo_table geometry_table_wfm.fits,
+# Calibration files (specific to OBs)
+astro_table astrometry_wcs_wfm.fits
+# Raw Data files
+badpix_table badpix_table.fits
+# Reduced files
+vignetting_mask vignetting_mask.fits
+# Pixel tables
+std_flux_table std_flux_table.fits
+# Sky Flat files
+extinct_table extinct_table.fits
+# Line Catalog
+line_catalog line_catalog.fits
+# Filter list
+filter_list my_filter_list.fits

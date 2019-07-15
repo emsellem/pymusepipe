@@ -1,17 +1,20 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT license - see LICENSE
 
-"""MUSE-PHANGS initialisation of folders
+"""MUSE-PHANGS pipeline wrapper
+   initialisation of folders
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # Standard modules
 import os
 from os.path import join as joinpath
+
 import copy
+
 from pymusepipe import util_pipe as upipe
 
 ############################################################
@@ -20,6 +23,7 @@ from pymusepipe import util_pipe as upipe
 # the specific pipeline to be used
 ############################################################
 # Default hard-coded folders
+# The setting of these folders can be overwritten by a given rc file if provided
 dic_user_folders = {
         # values provide the folder and whether or not this should be attempted to create
             # Muse calibration files (common to all)
@@ -30,6 +34,7 @@ dic_user_folders = {
             "root" : "/mnt/fhgfs/PHANGS/MUSE/LP_131117/",
             }
 
+# Extra filters which may be used in the course of the reduction
 dic_extra_filters = {
         # Narrow band filter 
         "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
@@ -38,7 +43,7 @@ dic_extra_filters = {
         }
 
 # Default hard-coded fits files - Calibration Tables
-# This should be replaced by an ascii file reading at some point
+# These are also overwritten by the given calib input file (if provided)
 dic_calib_tables = {
             # Muse calibration files (common to all)
             "geo_table": "geometry_table_wfm.fits",
@@ -61,10 +66,10 @@ dic_calib_tables = {
             }
 
 ############################################################
-#                      END
+#                      END of USER-related setup
 ############################################################
 
-######################################################mp######
+############################################################
 # Some fixed parameters for the structure
 ############################################################
 def add_suffix_tokeys(dic, suffix="_folder") :
@@ -75,6 +80,9 @@ def add_suffix_tokeys(dic, suffix="_folder") :
 # Default initialisation file
 default_rc_filename = "~/.musepiperc"
 
+# Default structure folders
+# If already existing, won't be created
+# If not, will be created automatically
 dic_input_folders = {
             # Raw Data files
             "rawfiles" : "Raw/",
@@ -90,8 +98,10 @@ dic_input_folders = {
             "log": "Log/"
             }
 
+# Values provide the folder names for the file structure
+# If already existing, won't be created
+# If not, will be created automatically
 dic_folders = {
-        # values provide the folder and whether or not this should be attempted to create
             # Master Calibration files
             "master" : "Master/",
             # Object files
@@ -110,7 +120,9 @@ dic_folders = {
             "figures" : "Figures/",
             }
 
-# This dictionary shows the folders to be created within the TARGET name
+# This dictionary includes extra folders for certain specific task
+# e.g., alignment - associated with the target
+# Will be created automatically if not already existing
 dic_folders_target = {
         "alignment" : "Alignment/"
         }
@@ -120,9 +132,23 @@ dic_folders_target = {
 ############################################################
 
 class InitMuseParameters(object) :
-    def __init__(self, dirname="Config/", rc_filename=None, cal_filename=None, verbose=True, **kwargs) :
+    def __init__(self, dirname="Config/", 
+                 rc_filename=None, cal_filename=None, 
+                 verbose=True, **kwargs) :
         """Define the default parameters (folders/calibration files) 
         and name suffixes for the MUSE data reduction
+
+        Parameters
+        ----------
+        dirname: str
+            Name of the input folder for the configurations files
+        rc_filename: str
+            Name of the configuration file 
+            including root input folder names
+        cal_filename: str
+            Name of the configuration file including
+            the calibration input folders 
+        verbose: bool [True]
         """
         self.verbose = verbose
         # Will first test if there is an rc_file provided
