@@ -17,7 +17,7 @@ pymusepipe needs a number of standard modules/packages including:
 
 In any cases, I would recommend that you actually install these super useful packages as default to your python installation.
 
-This package will also make use of **mpdaf** for allowing some basic checks and image reconstruction. It is also used for the alignment module.
+    * This package makes use of **mpdaf** for allowing some basic checks and image reconstruction. **mpdaf** is a great package to deal with MUSE datasets, and is also used for the pymusepipe alignment module: please have a look at the [mpdaf web site](https://mpdaf.readthedocs.io/en/latest/) and install it via pip.
 
 ### Installing
 
