@@ -13,12 +13,18 @@ __contact__   = " <eric.emsellem@eso.org>"
 # and further rewritten by Mark van den Brok. 
 # Thanks to all !
 
+# Numpy
+import numpy as np
+
 # Standard modules
 import os
 from os.path import join as joinpath
+
 import collections
 from collections import OrderedDict
-import musepipe as mpipe
+
+from pymusepipe import util_pipe as upipe
+from pymusepipe import musepipe
 
 class SofDict(OrderedDict) :
     """New Dictionary for the SOF writing
@@ -36,27 +42,25 @@ class SofPipe(object) :
         # Creating an empty dictionary for the SOF writing
         self._sofdict = SofDict()
 
-    def write_sof(self, sof_filename, sof_folder=None, new=False, verbose=None) :
+    def write_sof(self, sof_filename, new=False, verbose=None) :
         """Feeding an sof file with input filenames from a dictionary
         """
-        # Setting the default SOF folder if not provided
-        if sof_folder is None : sof_folder = self.paths.sof
 
         # Removing the extension of the file if already set
         if not sof_filename.lower().endswith(".sof") :
             sof_filename = sof_filename + ".sof"
 
-        sof = joinpath(sof_folder, sof_filename)
+        sof = joinpath(self.paths.sof, sof_filename)
         # If new file, start from scratch (overwrite)
         if new :
             sof_file = open(sof, "w+")
             if verbose :
-                mpipe.print_info("Writing in file {0}".format(sof))
+                upipe.print_info("Writing in file {0}".format(sof))
         # if not new, then append
         else :
             sof_file = open(sof, "a")
             if verbose :
-                mpipe.print_info("Appending in file {0}".format(sof))
+                upipe.print_info("Appending in file {0}".format(sof))
     
         # Use dictionary to write up the lines
         for key in self._sofdict.keys() :
@@ -64,11 +68,92 @@ class SofPipe(object) :
                 text_to_write = "{0} {1}\n".format(item, key)
                 sof_file.write(text_to_write)
                 if verbose :
-                    mpipe.print_info(text_to_write)
+                    upipe.print_info(text_to_write)
 
         sof_file.close()
         # Returning the current sof as relative path
-        self.current_sof = mpipe.normpath(os.path.relpath(sof))
+        self.current_sof = upipe.normpath(os.path.relpath(sof))
 
-    def add_XX_tosof(self) :
-        pass
+    def _select_closest_mjd(self, mjdin, group_table) :
+        """Get the closest frame within the expotype
+        If the attribute does not exist in Tables, it tries to read
+        the table from the folder
+        """
+        # Get the closest tpl
+        index = np.argmin((mjdin - group_table['mjd'])**2)
+        closest_tpl = group_table[index]['tpls']
+        return index, closest_tpl
+    
+    def _add_list_tplmaster_to_sofdict(self, mean_mjd, list_expotype):
+        """Add a list of masterfiles to the SOF
+        """
+        for expotype in list_expotype :
+            self._add_tplmaster_to_sofdict(mean_mjd, expotype)
+
+    def _add_tplmaster_to_sofdict(self, mean_mjd, expotype, reset=False):
+        """ Add item to dictionary for the sof writing
+        """
+        if reset: self._sofdict.clear()
+        # Finding the best tpl for this master
+        index, this_tpl = self._select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
+        dir_master = self._get_fullpath_expo(expotype)
+        self._sofdict[self._get_suffix_product(expotype)] = [upipe.normpath(joinpath(dir_master, 
+            self._get_suffix_product(expotype) + "_" + this_tpl + ".fits"))]
+
+    def _add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
+        """ Add item to dictionary for the sof writing
+        """
+        if reset: self._sofdict.clear()
+        # Finding the best tpl for this raw file type
+        expo_table = self._get_table_expo(expotype, "raw")
+        index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
+        self._sofdict[expotype] = [upipe.normpath(joinpath(self.paths.rawfiles, 
+            expo_table['filename'][index]))]
+
+    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", suffix="", 
+            perexpo=False, reset=False):
+        """ Add item to dictionary for the sof writing
+        """
+        if reset: self._sofdict.clear()
+        # Finding the best tpl for this sky calib file type
+        expo_table = self._get_table_expo(expotype, stage)
+        index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
+        dir_calib = self._get_fullpath_expo(expotype, stage)
+        if perexpo:
+            iexpo = expo_table[index]['iexpo']
+            suffix += "_{0:04d}".format(iexpo)
+        self._sofdict[tag] = [joinpath(dir_calib, "{0}_{1}{2}.fits".format(tag, this_tpl, suffix))]
+
+    def _add_calib_to_sofdict(self, calibtype, reset=False):
+        """Adding a calibration file for the SOF 
+        """
+        if reset: self._sofdict.clear()
+        calibfile = getattr(self.pipe_params, calibtype.lower())
+        self._sofdict[calibtype] = [joinpath(self.pipe_params.musecalib, calibfile)]
+
+    def _add_geometry_to_sofdict(self, tpls):
+        """Extract the geometry table and add it to the dictionary
+        for the SOF file
+        """
+        if self._time_astrometry :
+            calfolder = self.pipe_params.musecalib_time
+            geofile = self.retrieve_geoastro_name(tpls, filetype='geo')
+        else:
+            calfolder = self.pipe_params.musecalib
+            geofile = self.pipe_params.geo_table
+
+        self._sofdict['GEOMETRY_TABLE']=["{folder}{geo}".format(folder=calfolder, geo=geofile)]
+
+    def _add_astrometry_to_sofdict(self, tpls):
+        """Extract the astrometry table and add it to the dictionary
+        for the SOF file
+        """
+        if self._time_astrometry :
+            calfolder = self.pipe_params.musecalib_time
+            astrofile = self.retrieve_geoastro_name(tpls, filetype='astro')
+        else :
+            calfolder = self.pipe_params.musecalib
+            astrofile = self.pipe_params.astro_table
+
+        self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]
+

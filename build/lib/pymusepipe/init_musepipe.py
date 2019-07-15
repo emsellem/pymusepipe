@@ -1,18 +1,21 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT license - see LICENSE
 
-"""MUSE-PHANGS initialisation of folders
+"""MUSE-PHANGS pipeline wrapper
+   initialisation of folders
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # Standard modules
 import os
 from os.path import join as joinpath
+
 import copy
-import musepipe as mpipe
+
+from pymusepipe import util_pipe as upipe
 
 ############################################################
 #                      BEGIN
@@ -20,16 +23,27 @@ import musepipe as mpipe
 # the specific pipeline to be used
 ############################################################
 # Default hard-coded folders
+# The setting of these folders can be overwritten by a given rc file if provided
 dic_user_folders = {
         # values provide the folder and whether or not this should be attempted to create
             # Muse calibration files (common to all)
             "musecalib": "/home/mcelroy/reflex/install/calib/muse-2.2/cal/'",
+            # Time varying calibrations
+            "musecalib_time": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/LP_131117/astrocal/",
             # Calibration files (specific to OBs)
             "root" : "/mnt/fhgfs/PHANGS/MUSE/LP_131117/",
             }
 
+# Extra filters which may be used in the course of the reduction
+dic_extra_filters = {
+        # Narrow band filter 
+        "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
+        # Broad band filter
+        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt"
+        }
+
 # Default hard-coded fits files - Calibration Tables
-# This should be replaced by an ascii file reading at some point
+# These are also overwritten by the given calib input file (if provided)
 dic_calib_tables = {
             # Muse calibration files (common to all)
             "geo_table": "geometry_table_wfm.fits",
@@ -45,47 +59,14 @@ dic_calib_tables = {
             "extinct_table" : "extinct_table.fits",
             # Line Catalog
             "line_catalog" : "line_catalog.fits",
+            # Sky lines
+            "sky_lines" : "sky_lines.fits",
             # Filter List
             "filter_list" : "filter_list.fits",
             }
 
-import dateutils
-from dateutil import parser
-dic_geo_table = {
-        '2000-01-01': "geometry_table_wfm.fits",
-        '2014-12-01': "geometry_table_wfm.fits",
-        '2015-04-16': "geometry_table_wfm.fits",
-        '2015-09-08': "geometry_table_wfm.fits",
-        }
-
-dic_astro_table = {
-        '2000-01-01': "astrometry_table_wfm.fits",
-        '2014-12-01': "astrometry_table_wfm.fits",
-        '2015-04-16': "astrometry_table_wfm.fits",
-        '2015-09-08': "astrometry_table_wfm.fits",
-        }
-
-
-# ----------------- Galaxies and Pointings ----------------#
-
-# Sample of galaxies
-# For each galaxy, we provide the pointings numbers and the run attached to that pointing
-MUSEPIPE_sample = {
-        "NGC628": {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0},
-        "NGC1087": {1:1}, 
-        "NGC1672": {1:1, 2:1, 3:1, 4:1, 5:1}
-        }
-
-# List of MUSEPIPE Observing runs
-# For each Observing run, we provide the start and end dates
-MUSEPIPE_runs = {
-        'Run00' : ['P099','2017-10-01','2017-10-31'],
-        'Run01' : ['P100','2017-10-01','2017-10-31'], 
-        'Run02' : ['P101','2017-11-01','2017-11-30']
-        }
-
 ############################################################
-#                      END
+#                      END of USER-related setup
 ############################################################
 
 ############################################################
@@ -99,42 +80,75 @@ def add_suffix_tokeys(dic, suffix="_folder") :
 # Default initialisation file
 default_rc_filename = "~/.musepiperc"
 
+# Default structure folders
+# If already existing, won't be created
+# If not, will be created automatically
 dic_input_folders = {
             # Raw Data files
             "rawfiles" : "Raw/",
             # Config files
             "config" : "Config/",
+            # Tables
+            "astro_tables" : "Astro_tables/",
+            # esores log files
+            "esorex_log" : "Esorex_log/",
+            # Data Products - first writing
+            "pipe_products": "Pipe_products/",
+            # Log
+            "log": "Log/"
             }
 
+# Values provide the folder names for the file structure
+# If already existing, won't be created
+# If not, will be created automatically
 dic_folders = {
-        # values provide the folder and whether or not this should be attempted to create
             # Master Calibration files
             "master" : "Master/",
-            # Reduced files
-            "reduced" : "Reduced/",
             # Object files
             "object" : "Object/",
             # Sky files
             "sky" : "Sky/",
+            # Std files
+            "std" : "Std/",
             # Cubes
             "cubes" : "Cubes/",
             # Reconstructed Maps
             "maps" : "Maps/",
             # SOF folder 
-            "sof" : "SOF/", 
+            "sof" : "Sof/", 
             # Figure
             "figures" : "Figures/",
             }
 
+# This dictionary includes extra folders for certain specific task
+# e.g., alignment - associated with the target
+# Will be created automatically if not already existing
+dic_folders_target = {
+        "alignment" : "Alignment/"
+        }
 
 ############################################################
 # Main class InitMuseParameters
 ############################################################
 
 class InitMuseParameters(object) :
-    def __init__(self, dirname="Config/", rc_filename=None, cal_filename=None, verbose=True, **kwargs) :
+    def __init__(self, dirname="Config/", 
+                 rc_filename=None, cal_filename=None, 
+                 verbose=True, **kwargs) :
         """Define the default parameters (folders/calibration files) 
         and name suffixes for the MUSE data reduction
+
+        Parameters
+        ----------
+        dirname: str
+            Name of the input folder for the configurations files
+        rc_filename: str
+            Name of the configuration file 
+            including root input folder names
+        cal_filename: str
+            Name of the configuration file including
+            the calibration input folders 
+        verbose: bool [True]
         """
         self.verbose = verbose
         # Will first test if there is an rc_file provided
@@ -145,11 +159,12 @@ class InitMuseParameters(object) :
         # attributing the dictionaries
         self._dic_folders = dic_folders
         self._dic_input_folders = dic_input_folders
-        self._dic_user_folders = dic_input_folders
+        self._dic_folders_target = dic_folders_target
+        self._dic_extra_filters = dic_extra_filters
 
         if rc_filename is None :
             if not os.path.isfile(default_rc_filename):
-                mpipe.print_warning(("No filename or {default_rc} file "
+                upipe.print_warning(("No filename or {default_rc} file "
                      "to initialise from. We will use the default hardcoded " 
                      "in the init_musepipe.py module").format(default_rc=default_rc_filename))
                 self.init_default_param(dic_user_folders)
@@ -182,7 +197,7 @@ class InitMuseParameters(object) :
         """
         for key in dic_param.keys() :
             if self.verbose :
-                mpipe.print_info("Default initialisation of attribute {0}".format(key))
+                upipe.print_info("Default initialisation of attribute {0}".format(key))
             setattr(self, key, dic_param[key])
 
     def read_param_file(self, filename, dic_param) :
@@ -190,7 +205,7 @@ class InitMuseParameters(object) :
         """
         # Testing existence of filename
         if not os.path.isfile(filename) :
-            mpipe.print_info(("ERROR: input parameter {inputname} cannot be found. "
+            upipe.print_info(("ERROR: input parameter {inputname} cannot be found. "
                     "We will use the default hardcoded in the "
                     "init_musepipe.py module").format(inputname=filename))
             return
@@ -207,7 +222,7 @@ class InitMuseParameters(object) :
             sline = line.split()
             if sline[0] in dic_param.keys() :
                 if self.verbose :
-                    mpipe.print_info("Initialisation of attribute {0}".format(sline[0]))
+                    upipe.print_info("Initialisation of attribute {0}".format(sline[0]))
                 setattr(self, sline[0], sline[1]) 
                 # Here we drop the item which was initialised
                 val = dummy_dic_param.pop(sline[0])
@@ -218,31 +233,7 @@ class InitMuseParameters(object) :
         not_initialised_param = dummy_dic_param.keys()
         # Listing them as warning and using the hardcoded default
         for key in not_initialised_param :
-            mpipe.print_info(("WARNING: parameter {param} not initialised "
+            upipe.print_info(("WARNING: parameter {param} not initialised "
                    "We will use the default hardcoded value from "
                    "init_musepipe.py").format(param=key))
             setattr(self, key, dic_param[key])
-
-
-####################################################
-# Defining classes to get samples and objects
-####################################################
-class MusepipeSample(object) :
-    def __init__(self) :
-        self.sample = MUSEPIPE_sample
-        self.targets = MUSEPIPE_sample.keys()
-
-class MusepipeTarget(object) :
-    def __init__(self, galaxyname=None, pointing=1) :
-        if galaxyname not in MUSEPIPE_sample.keys() :
-            mpipe.print_error("ERROR: no Galaxy named {gal} in the defined sample".format(gal=galaxyname))
-            return
-
-        mpipe.print_info("Initialising Target {name}".format(name=galaxyname))
-        self.targetname = galaxyname
-        self.info_pointings = MUSEPIPE_sample[galaxyname]
-        if pointing not in self.info_pointings.keys() :
-            mpipe.print_error("ERROR: no pointing {pointing} for the Galaxy".format(pointing))
-            return
-        self.pointing = pointing
-        self.run = self.info_pointings[pointing]

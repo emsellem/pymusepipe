@@ -10,14 +10,14 @@ Here are some basic instructions to get you going with pymusepipe.
 pymusepipe uses Python 3. It is not compatible with python 2.7. If you are still using python 2.7 I would recommend you to switch asap as it won't be supported much longer anyway.
 
 pymusepipe needs a number of standard modules/packages including:
-   * numpy
-   * scipy for the alignment module
-   * matplotlib if you wish to make some plots (e.g. via the check_pipe module)
-   * astropy as a general provider of many useful functions and structures, most importantly the astropy Tables.
+   * **numpy**
+   * **scipy** for the alignment module
+   * **matplotlib** if you wish to make some plots (e.g. via the check_pipe module)
+   * **astropy** as a general provider of many useful functions and structures, most importantly the astropy Tables.
 
 In any cases, I would recommend that you actually install these super useful packages as default to your python installation.
 
-This package will also make use of mpdaf for allowing some basic checks and image reconstruction. It is also used for the alignment module.
+This package will also make use of **mpdaf** for allowing some basic checks and image reconstruction. It is also used for the alignment module.
 
 ### Installing
 
@@ -166,4 +166,4 @@ Most of the information you may need is actually stored in the python "MusePipe"
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
-I would like to thank people who have initially sent me their code-samples, including Bernd Husemann, Dimitri Gadotti, Lodovico Coccato, Mark den Brok.
+I would like to thank people who have initially sent me their code-samples, including Bernd Husemann, Dimitri Gadotti, Lodovico Coccato, Mark den Brok. I would also like to specifically and warmly thank Francesco Santoro who has significantly contributed in the testing, debugging of the code, and proposed dedicated python lines to be integrated in pymusepipe.
