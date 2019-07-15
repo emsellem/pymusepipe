@@ -123,24 +123,26 @@ It contains a series of given fits files which will be used by the pipeline. Mos
    * *filter_list* : name of the fits filter list. This is used in case you wish to provide your own. Note that it needs to follow the MUSE standard for such a table.
 
 ### Recipes
-Most MUSE pipeline recipes are run while run_all_recipes is launched. This can be changed in the prep_recipes_pipe.py or just scripted. Actually run_all_recipes() is just a function which launches:
+Most MUSE pipeline recipes are run while run_all_recipes is launched. This can be changed in the prep_recipes_pipe.py or just scripted. Actually run_all_recipes() is just a function which launches (assuming 'mypipe' is your MusePipe structure, see above):
 ```
-        self.run_bias()
-        self.run_flat()
-        self.run_wave()
-        self.run_lsf()
-        self.run_twilight(illum=illum)
-        self.run_scibasic_all(illum=illum)
-        self.run_standard()
-        self.run_sky(fraction=fraction)
-        self.run_prep_align()
-        self.run_align_bypointing()
-        self.run_align_bygroup()
-        self.run_scipost()
-        self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
-        self.run_combine_pointing()
+        mypipe.run_bias()
+        mypipe.run_flat()
+        mypipe.run_wave()
+        mypipe.run_lsf()
+        mypipe.run_twilight(illum=illum)
+        mypipe.run_scibasic_all(illum=illum)
+        mypipe.run_standard()
+        mypipe.run_sky(fraction=fraction)
+        mypipe.run_prep_align()
+        mypipe.run_align_bypointing()
+        mypipe.run_align_bygroup()
+        mypipe.run_scipost()
+        mypipe.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
+        mypipe.run_combine_pointing()
 ```
 where "illum" is a boolean (default is True), fraction is 0.8.
+
+Feel free to launch these steps one by one (the order is important as in any data reduction process).
 
 ### Structure of the output
 
