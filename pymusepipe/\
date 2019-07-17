@@ -759,16 +759,11 @@ class AlignMusePointing(object):
     def open_offset_table(self, name_table=None):
         """Read offset table from fits file
          
-        Input
-        -----
-        name_table: str
-            Name of the input OFFSET table
-
+        Keywords
+        --------
+        
         Returns
         -------
-        status: None if no table name is given, False if file does not
-            exist, True if it does
-        Table: the result of a astropy.Table.read of the fits table
         """
         if name_table is None:
             if not hasattr(self, "name_table"):
@@ -784,12 +779,13 @@ class AlignMusePointing(object):
         return True, Table.read(name_table)
 
     def print_offset_fromfits(self, name_table=None):
-        """Print offset table from fits file
+        """Print out the offset
          
-        Input
-        -----
-        name_table: str
-            Name of the input OFFSET table
+        Keywords
+        --------
+        
+        Returns
+        -------
         """
         exist_table, fits_table = self.open_offset_table(name_table)
         if exist_table is None:
@@ -811,7 +807,13 @@ class AlignMusePointing(object):
                     fits_table['DEC_OFFSET'][nima]*3600.))
 
     def print_offset(self):
-        """Print out the offset from the Alignment class
+        """Print out the offset
+         
+        Keywords
+        --------
+        
+        Returns
+        -------
         """
         upipe.print_info("#---- Offset recorded so far ----#")
         upipe.print_info("Total in ARCSEC")
@@ -829,21 +831,11 @@ class AlignMusePointing(object):
             overwrite=False, suffix=""):
         """Save the Offsets into a fits Table
          
-        Input
-        -----
-        name_outpout_table: str
-            Name of the output fits table. If None (default) it will
-            use the one given in self.name_output_table
-        overwrite: bool [False]
-            If True, overwrite if the file exists
-        suffix: str [""]
-            Suffix to be used to add to the input name. This is handy
-            to just modify the given fits name with a suffix 
-            (e.g., version number).
+        Keywords
+        --------
         
-        Creates
+        Returns
         -------
-        A fits table with the given name (using the suffix if any)
         """
         if name_output_table is None: 
             if self.name_offset_table is None:
@@ -900,30 +892,11 @@ class AlignMusePointing(object):
     def run(self, nima=0, **kwargs):
         """Run the offset and comparison
          
-        Input
-        -----
-        nima: int
-            Index of the image to consider
-        extra_pixel: list of 2 floats [0,0]
-            Offsets in X and Y in pixels to add to the existing
-            guessed offsets
-            IMPORTANT NOTE: extra_pixel will be considered first
-            (before extra_arcsec).
-        extra_arcsec: list of 2 floats [0,0]
-            Offsets in X and Y in arcsec to add to the existing
-            guessed offsets. Ignored if extra_pixel is given.
-        rotation: float [0]
-            Angle to rotate the image (in degrees)
-        threshold_muse: float [0]
-            Threshold to consider when plotting the comparison
+        Keywords
+        --------
         
-        Plots (if self.plot is True)
-        ----------------------------
-        This plots a set of comparison maps:
-           * flux comparison (1 to 1)
-           * Map of the flux ratio
-           * Contours of the two scaled maps
-           * Cuts of the division between the 2 maps
+        Returns
+        -------
         """
         if nima not in range(self.nimages) :
             upipe.print_error("nima not within the range "
@@ -953,6 +926,12 @@ class AlignMusePointing(object):
     def _get_list_muse_images(self):
         """Extract the name of the muse images
         and build the list
+         
+        Keywords
+        --------
+        
+        Returns
+        -------
         """
         from pathlib import Path
 
@@ -1045,6 +1024,12 @@ class AlignMusePointing(object):
 
     def _open_ref_hdu(self):
         """Open the reference image hdu
+         
+        Keywords
+        --------
+        
+        Returns
+        -------
         """
         # Open the images
         hdulist_reference = pyfits.open(self.folder_reference 
@@ -1062,15 +1047,16 @@ class AlignMusePointing(object):
         """Run the cross correlation peaks on all MUSE images
         Derive the self.cross_off_pixel/arcsec parameters
          
-        Input
-        -----
+        Keywords
+        --------
         list_nima: list of indices for images to process
-            Should be a list. Default is None
-            and all images are processed
+                Should be a list. Default is None
+                and all images are processed
 
-        minflux: float [None]
-            minimum flux to be used in the cross-correlation
-            Flux below that value will be set to 0.
+        minflux: minimum flux to be used in the cross-correlation
+                Flux below that value will be set to 0.
+                Default is 0.
+        
         """
         if list_nima is None:
             list_nima = range(self.nimages)
@@ -1088,8 +1074,8 @@ class AlignMusePointing(object):
     def find_cross_peak(self, muse_hdu, name_musehdr, rotation=0.0, minflux=None):
         """Aligns the MUSE HDU to a reference HDU
          
-        Input
-        -----
+        Keywords
+        --------
         muse_hdu: MUSE hdu file
         name_musehdr: name of the muse hdr to save
         rotation: Angle in degrees (0). 
@@ -1165,16 +1151,11 @@ class AlignMusePointing(object):
     def save_image(self, newfits_name=None, nima=0):
         """Save the newly determined hdu
          
-        Input
-        -----
-        newfits_name: str
-            Name of the fits file to be used
-        nima: int [0]
-            Index of the image to save
-
-        Creates
+        Keywords
+        --------
+        
+        Returns
         -------
-        A new fits file
         """
         if hasattr(self, "list_offmuse_hdu"):
             if newfits_name is None:
@@ -1185,20 +1166,13 @@ class AlignMusePointing(object):
             upipe.print_error("There are not yet any new hdu to save")
 
     def _get_flux_range(self, data, low=10, high=99):
-        """Get the range of fluxes within the array
-        by looking at percentiles.
+        """Process image and return it
          
-        Input
-        -----
-        data: 2d array
-            Input array with signal to process
-        low, high: two floats (10, 99)
-            Percentiles to consider to filter
+        Keywords
+        --------
         
         Returns
         -------
-        lperc, hperc: 2 floats
-            Low and high percentiles
         """
         # Omit the border pixels
         data = crop_data(data, self.border)
@@ -1212,19 +1186,12 @@ class AlignMusePointing(object):
 
     def _project_reference_hdu(self, muse_hdu=None, rotation=0.0):
         """Project the reference image onto the MUSE field
-        Hidden function, as only used internally
          
-        Input
-        -----
-        muse_hdu: HDU [None]
-            Input hdu
-        rotation: float [0]
-            Rotation angle in degrees
+        Keywords
+        --------
         
         Returns
         -------
-        hdu_repr: HDU
-            Reprojected HDU. None if nothing is provided
         """
         # The mpdaf way to project an image onto an other one
         # WARNING: the reference image will be converted in flux
@@ -1252,12 +1219,11 @@ class AlignMusePointing(object):
         """Add user offset in arcseconds
         and update total_off_pixel and arcsec
          
-        Input
-        -----
-        extra_arcsec: list of 2 floats [0,0]
-            Extra offsets (x,y) in arcseconds
-        nima: int
-            Index of image to consider
+        Keywords
+        --------
+        
+        Returns
+        -------
         """
         # Transforming the arc into pix
         self.extra_off_arcsec[nima] = extra_arcsec
@@ -1273,31 +1239,25 @@ class AlignMusePointing(object):
                 self.total_off_arcsec[nima])
 
     def shift_arcsecond(self, extra_arcsec=[0., 0.], nima=0):
-        """Shift image with index nima with the total offset
-        after adding any extra given offset
-        This does not return anything but could in principle
-        if using the output of the self.shift
+        """Apply shift in arcseconds
          
-        Input
-        -----
-        extra_arcsec: list of 2 floats [0,0]
-            Extra offsets (x,y) in arcseconds
-        nima: int
-            Index of image to consider
+        Keywords
+        --------
+        
+        Returns
+        -------
         """
         self._add_user_arc_offset(extra_arcsec, nima)
-        mdata, rdata = self.shift(nima)
+        self.shift(nima)
 
     def shift(self, nima=0):
-        """Create New HDU after shifting it with the right offset
-        (only considering image with index nima)
+        """Create New HDU and send it back
          
-        Input
-        -----
-        nima: int
-            Index of image to consider
+        Keywords
+        --------
         
-        Does not return anything, but could in principle
+        Returns
+        -------
         """
         # Create a new Header
         newhdr = copy.deepcopy(self.list_muse_hdu[nima].header)
@@ -1344,26 +1304,11 @@ class AlignMusePointing(object):
             threshold_muse=None):
         """Get the normalisation factor for image nima
          
-        Input
-        -----
-        nima: int
-            Index of image to consider
-        median_filter: bool
-            If True, will median filter
-        convolve_muse: float [0]
-            Will convolve the image with index nima
-            with a gaussian with that sigma. 0 means no convolution
-        convolve_reference: float [0]
-            Will convolve the reference image
-            with a gaussian with that sigma. 0 means no convolution
-        threshold_muse: float [None]
-            Threshold for the input image flux to consider
+        Keywords
+        --------
         
         Returns
         -------
-        data: 2d array
-        refdata: 2d array
-            The 2 arrays (input, reference) after processing
         """
         # If median filter do the filtermed_image process including the border
         # Both for the muse data and the reference data
@@ -1408,42 +1353,11 @@ class AlignMusePointing(object):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
          
-        Input
-        -----
-        nima: int
-            Index of image to consider
-        showcontours: bool [True]
-        showcuts: bool [True]
-        shownormalise: bool [True]
-        showdiff: bool [True]
-            All options corresponding to 1 specific plot. By default
-            show them all (all True)
-        ncuts: int [5]
-            Number of vertical / horizontal cuts along the ratio
-            between the 2 maps to be shown ("cuts")
-        percentage: float [5]
-            Used to compute which percentile to show
-        rotation: float [0]
-            Adding a rotation (in degrees) in case it is needed
-        start_nfig: int [1]
-            Number of the matplotlib Figure to start with
-        nlevels: int [10]
-            Number of levels for the contour plots
-        levels: list of float [None]
-            Specific list of levels if any (default is None)
-        convolve_muse: float [0]
-            If not 0, will convolve with a gaussian of that sigma
-        convolve_reference: float [0]
-            If not 0, will convolve the reference image
-            with a gaussian of that sigma
-        samecontour: bool [True]
-            If True, will use the same levels for both images
-            (this is recommended). Otherwise levels can be
-            automatically derived from percentiles, but will
-            not necessarily be the same (which can bring
-            confusion but may sometimes be useful).
+        Keywords
+        --------
         
-        Makes a maximum of 4 figures
+        Returns
+        -------
         """
         # Getting the data
         musedata, refdata = self.get_image_normfactor(nima=nima, 
@@ -1525,7 +1439,6 @@ class AlignMusePointing(object):
                 levels_ref = np.linspace(np.log10(lowlevel_ref),
                         np.log10(highlevel_ref), nlevels)
                 mylevels = levels_muse
-                samecontour = False
             cmuseset = ax.contour(np.log10(musedata), mylevels, colors='k',
                     origin='lower', linestyles='solid')
             # Second contours - Ref

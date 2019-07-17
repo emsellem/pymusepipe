@@ -822,10 +822,17 @@ class PipePrep(SofPipe) :
                 self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', 
                         "processed", perexpo=True, suffix=suffix_skycontinuum)
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
-            if offset_list :
-                self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                        '{0}{1}_{2}_{3}.fits'.format(dic_files_products['ALIGN'][0], 
-                            suffix, filter_for_alignment, tpl))]
+
+            # Getting the expo list
+            list_group_expo = gtable['iexpo'].data
+            # If less than 1 expo, don't load the OFFSET_LIST
+            if len(list_group_expo) <= 1:
+                upipe.print_info("Only one exposure in this group, hence no filter list to be loaded")
+            else:
+                if offset_list :
+                    self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                            '{0}{1}_{2}_{3}.fits'.format(dic_files_products['ALIGN'][0], 
+                                suffix, filter_for_alignment, tpl))]
 
             # Selecting only exposures to be treated
             # We need to force 'OBJECT' to make sure scipost will deal with the exposure
@@ -833,7 +840,6 @@ class PipePrep(SofPipe) :
             pixtable_name = self._get_suffix_product('OBJECT')
             pixtable_name_thisone = self._get_suffix_product(expotype)
             self._sofdict[pixtable_name] = []
-            list_group_expo = gtable['iexpo'].data
             for iexpo in list_group_expo:
                 if old_naming_convention:
                    self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
@@ -1130,7 +1136,7 @@ class PipePrep(SofPipe) :
 
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2
-        if len(combine_table) <= 1:
+        if len(list_expo) <= 1:
             if self.verbose:
                 upipe.print_warning("The combined pointing has only one exposure: process aborted",
                         pipe=self)
