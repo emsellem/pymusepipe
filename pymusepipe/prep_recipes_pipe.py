@@ -138,7 +138,8 @@ class PipePrep(SofPipe) :
         """Selecting a subset of files from a certain type
         """
         if expotype not in musepipe.listexpo_types.keys() :
-            upipe.print_info("ERROR: input {0} is not in the list of possible values".format(expotype))
+            upipe.print_info("ERROR: input {0} is not in the list of possible values".format(expotype),
+                    pipe=self)
             return 
 
         MUSE_subtable = self._get_table_expo(expotype, stage)
@@ -492,7 +493,8 @@ class PipePrep(SofPipe) :
             # Number of objects
             Nexpo = len(self._sofdict[expotype])
             if self.verbose:
-                upipe.print_info("Number of expo is {Nexpo} for {expotype}".format(Nexpo=Nexpo, expotype=expotype))
+                upipe.print_info("Number of expo is {Nexpo} for {expotype}".format(
+                                 Nexpo=Nexpo, expotype=expotype), pipe=self)
             # Finding the best tpl for BIAS
             if illum:
                 self._add_tplraw_to_sofdict(mean_mjd, "ILLUM") 
@@ -643,7 +645,8 @@ class PipePrep(SofPipe) :
         # Filter used for the alignment
         filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         if self.verbose:
-            upipe.print_info("Filter for alignment is {0}".format(filter_for_alignment))
+            upipe.print_info("Filter for alignment is {0}".format(
+                filter_for_alignment), pipe=self)
 
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
@@ -681,7 +684,7 @@ class PipePrep(SofPipe) :
         list_options = save.split(',')
         if filter_list is None: filter_list = self.filter_list
         if self.verbose:
-            upipe.print_info("Filter list is {0}".format(filter_list))
+            upipe.print_info("Filter list is {0}".format(filter_list), pipe=self)
         for option in list_options:
             for prod in dic_products_scipost[option]:
                 if prod == "IMAGE_FOV":
@@ -827,7 +830,8 @@ class PipePrep(SofPipe) :
             list_group_expo = gtable['iexpo'].data
             # If less than 1 expo, don't load the OFFSET_LIST
             if len(list_group_expo) <= 1:
-                upipe.print_info("Only one exposure in this group, hence no filter list to be loaded")
+                upipe.print_info("Only one exposure in this group, "
+                                 "hence no filter list to be loaded", pipe=self)
             else:
                 if offset_list :
                     self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
@@ -929,7 +933,8 @@ class PipePrep(SofPipe) :
             self._sofdict['IMAGE_FOV'] = list_images
             create_offset_table(list_images, table_folder=self.paths.pipe_products, 
                                 table_name="{0}.fits".format(dic_files_products['ALIGN'][0]))
-            upipe.print_info("Creating empty OFFSET_LIST.fits using images list")
+            upipe.print_info("Creating empty OFFSET_LIST.fits using images list", 
+                    pipe=self)
             self.write_sof(sof_filename=sof_filename + long_suffix, new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             namein_align = deepcopy(dic_files_products['ALIGN'])
@@ -1000,7 +1005,7 @@ class PipePrep(SofPipe) :
                           long_suffix_align, row['tpls'], row['iexpo'])) 
                           for row in align_table]
         self._sofdict['IMAGE_FOV'] = list_images
-        upipe.print_info("Creating empty OFFSET_LIST.fits using images list")
+        upipe.print_info("Creating empty OFFSET_LIST.fits using images list", pipe=self)
         create_offset_table(list_images, table_folder=self.paths.pipe_products, 
                             table_name="{0}.fits".format(dic_files_products['ALIGN'][0]))
 

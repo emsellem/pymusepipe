@@ -586,7 +586,8 @@ class MusePipe(PipePrep, PipeRecipes):
                         upipe.print_warning("File {0} will be ignored "
                                             "from the Raw files "
                                             "(it may be a download duplicate - "
-                                            " please check)".format(f))
+                                            " please check)".format(f),
+                                            pipe=self)
 
             # Transforming into numpy arrayimport pymusepipe
             for k in fulldic.keys() :
