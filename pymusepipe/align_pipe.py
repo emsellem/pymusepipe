@@ -1286,7 +1286,7 @@ class AlignMusePointing(object):
             Index of image to consider
         """
         self._add_user_arc_offset(extra_arcsec, nima)
-        mdata, rdata = self.shift(nima)
+        self.shift(nima)
 
     def shift(self, nima=0):
         """Create New HDU after shifting it with the right offset
