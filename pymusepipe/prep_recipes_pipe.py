@@ -158,9 +158,15 @@ class PipePrep(SofPipe) :
             return group_table.groups[group_table.groups.keys['tpls'] == tpl]
         
     @print_my_function_name
-    def run_all_recipes(self, fraction=0.8, illum=True):
+    def run_all_recipes(self, fraction=0.8, illum=True, **kwargs):
         """Running all recipes in one shot
         """
+
+        # Flexibility to define the skymethod
+        # Accounting for runs which do not have sky frames
+        # then you can define it as "none"
+        skymethod = kwargs.pop("skymethod", "model")
+
         #for recipe in self.list_recipes:
         self.run_bias()
         self.run_flat()
@@ -170,17 +176,21 @@ class PipePrep(SofPipe) :
         self.run_scibasic_all(illum=illum)
         self.run_standard()
         self.run_sky(fraction=fraction)
-        self.run_prep_align()
+        self.run_prep_align(skymethod=skymethod)
         self.run_align_bypointing()
         self.run_align_bygroup()
-        self.run_scipost()
+        self.run_scipost(skymethod=skymethod)
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
         self.run_combine_pointing()
 
     @print_my_function_name
-    def run_all_phangs_recipes(self, fraction=0.8, illum=True):
+    def run_all_phangs_recipes(self, fraction=0.8, illum=True, **kwargs):
         """Running all recipes in one shot
         """
+        # Flexibility to define the skymethod
+        # Accounting for runs which do not have sky frames
+        skymethod = kwargs.pop("skymethod", "model")
+
         #for recipe in self.list_recipes:
         self.run_bias()
         self.run_flat()
@@ -190,10 +200,10 @@ class PipePrep(SofPipe) :
         self.run_scibasic_all(illum=illum)
         self.run_standard()
         self.run_sky(fraction=fraction)
-        self.run_prep_align()
+        self.run_prep_align(skymethod=skymethod)
         self.run_align_bypointing()
         self.run_align_bygroup()
-        self.run_scipost()
+        self.run_scipost(skymethod=skymethod)
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
         self.run_combine_pointing()
 
