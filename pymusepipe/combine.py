@@ -439,15 +439,15 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
 
     pixtable_basename = kwargs.pop("pixtable_basename", 
                                musepipe.dic_listObject['OBJECT'])
-    name_pixtable = "{0}_{1}-{2:2d}.fits".format(pixtable_basename, 
+    name_pixtable = "{0}_{1}-{2:02d}.fits".format(pixtable_basename, 
                                                  name_suffix, np.int(nifu))
     fullname_pixtable = joinpath(folder, name_pixtable)
 
     if os.path.isfile(fullname_pixtable):
         mypix = pyfits.open(fullname_pixtable, mode='update')
         if not angle_orig_keyword in mypix[0].header:
-            mypix[0][angle_orig_keyword] = mypix[0][angle_keyword]
-        mypix[0][angle_keyword] = mypix[0][angle_orig_keyword] + angle
+            mypix[0].header[angle_orig_keyword] = mypix[0].header[angle_keyword]
+        mypix[0].header[angle_keyword] = mypix[0].header[angle_orig_keyword] + angle
         upipe.print_info("Updating INS DROT POSANG for {0}".format(name_pixtable))
         mypix.flush()
     else:
