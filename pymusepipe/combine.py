@@ -452,5 +452,4 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
         mypix.flush()
     else:
         upipe.print_error("Input Pixtable {0} does not exist - Aborting".format(
-                              fullname_pixtable)
-
+                              fullname_pixtable))
