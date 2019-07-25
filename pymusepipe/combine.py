@@ -46,7 +46,7 @@ dic_combined_folders = {
         # Sof files
         "sof": "Sof/",
         # Combined products
-        "combined": "Combined/",
+        "cubes": "Cubes/",
          # esores log files
         "esorex_log" : "Esorex_log/",
         # Data Products - first writing
@@ -131,12 +131,15 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # =========================================================== 
         # ---------------------------------------------------------
-        # Now create full path folder 
-        for folder in self._dic_combined_folders.keys() :
-            upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
+        # Create the Combined folder
+        upipe.safely_create_folder(self.paths.data, verbose=verbose)
 
         # Go to the Combined Folder
         self.goto_folder(self.paths.data)
+
+        # Now create full path folder 
+        for folder in self._dic_combined_folders.keys() :
+            upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
 
         # Checking input pointings and pixtables
         self._check_pointings(dic_exposures_in_pointing)
@@ -373,7 +376,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename, self.targetname, suffix), new=True)
 
         # Product names
-        dir_products = upipe.normpath(self.paths.combined)
+        dir_products = upipe.normpath(self.paths.cubes)
         name_products, suffix_products, suffix_prefinalnames = \
                 prep_recipes_pipe._get_combine_products(filter_list) 
 
