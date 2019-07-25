@@ -129,11 +129,8 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # END Set up params =======================================
 
+        # =========================================================== 
         # ---------------------------------------------------------
-        # First create the data Combined folder
-        upipe.safely_create_folder(self.paths.data, verbose=verbose)
-
-        # =========================================================== #
         # Now create full path folder 
         for folder in self._dic_combined_folders.keys() :
             upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
