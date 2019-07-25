@@ -55,6 +55,8 @@ dic_combined_folders = {
         "log": "Log/"
         }
 
+default_filter_list = "white,Johnson_B,Johnson_V,Cousins_R,SDSS_g,SDSS_r,SDSS_i,WFI_BB"
+
 class MusePointings(SofPipe, PipeRecipes) :
     def __init__(self, targetname=None, list_pointings=[1], 
             dic_exposures_in_pointing=None,
@@ -90,6 +92,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Setting the default attibutes #####################
         self.targetname = targetname
         self.list_pointings = list_pointings
+        self.filter_list = kwargs.pop("filter_list", default_filter_list)
 
         self.combined_folder_name = combined_folder_name
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
@@ -336,7 +339,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Save options
         save = kwargs.pop("save", "cube,combined")
         # Filters
-        filter_list = kwargs.pop("filter_list", "white")
+        filter_list = kwargs.pop("filter_list", self.filter_list)
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.pop("offset_table_name", None)
