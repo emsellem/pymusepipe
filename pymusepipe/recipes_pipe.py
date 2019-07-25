@@ -308,7 +308,6 @@ class PipeRecipes(object) :
             lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for pointings
         """
-        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         self.run_oscommand("{esorex}  --log-file=exp_combine_pointings.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                "--format={form} --filter={filt} "

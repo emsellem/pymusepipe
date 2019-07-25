@@ -124,7 +124,7 @@ dic_folders = {
 # e.g., alignment - associated with the target
 # Will be created automatically if not already existing
 dic_folders_target = {
-        "alignment" : "Alignment/"
+        "alignment" : "Alignment/",
         }
 
 ############################################################

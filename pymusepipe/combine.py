@@ -130,6 +130,14 @@ class MusePointings(SofPipe, PipeRecipes) :
         # END Set up params =======================================
 
         # ---------------------------------------------------------
+        # First create the data Combined folder
+        upipe.safely_create_folder(self.paths.data, verbose=verbose)
+
+        # =========================================================== #
+        # Now create full path folder 
+        for folder in self._dic_combined_folders.keys() :
+            upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
+
         # Go to the Combined Folder
         self.goto_folder(self.paths.data)
 
@@ -144,14 +152,6 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Making the output folders in a safe mode
         if self.verbose:
             upipe.print_info("Creating directory structure")
-
-        # First create the data Combined folder
-        upipe.safely_create_folder(self.paths.data, verbose=verbose)
-
-        # =========================================================== #
-        # Now create full path folder 
-        for folder in self._dic_combined_folders.keys() :
-            upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
 
         # Going back to initial working directory
         self.goto_origfolder()
@@ -337,7 +337,6 @@ class MusePointings(SofPipe, PipeRecipes) :
         save = kwargs.pop("save", "cube,combined")
         # Filters
         filter_list = kwargs.pop("filter_list", "white")
-        filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.pop("offset_table_name", None)
@@ -387,7 +386,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                 suffix_prefinalnames=suffix_prefinalnames,
                 save=save, suffix=suffix, filter_list=filter_list, 
                 lambdamin=lambdamin, lambdamax=lambdamax,
-                filter_for_alignment=filter_for_alignment, **kwargs)
+                **kwargs)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
