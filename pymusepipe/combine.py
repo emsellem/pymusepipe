@@ -394,7 +394,7 @@ class MusePointings(SofPipe, PipeRecipes) :
 
 ## Useful function to change some pixtables
 def rotate_pixtables(folder="", name_suffix="", list_ifu=None, 
-                     angle=0., ***kwargs):
+                     angle=0., **kwargs):
     """Will update the derotator angle in each of the 24 pixtables
     Using a loop on rotate_pixtable
 
@@ -419,7 +419,7 @@ def rotate_pixtables(folder="", name_suffix="", list_ifu=None,
         rotate_pixtable(folder=folder, name_suffix=name_suffix, nifu=nifu, 
                         angle=angle, **kwargs)
 
-def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., ***kwargs):
+def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     """Rotate a single IFU PIXTABLE_OBJECT
     Will thus update the HIERARCH ESO INS DROT POSANG keyword.
 
