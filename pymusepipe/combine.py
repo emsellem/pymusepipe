@@ -437,7 +437,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     angle_keyword = "HIERARCH ESO INS DROT POSANG"
     angle_orig_keyword = "{0} ORIG".format(angle_keyword)
 
-    pixtable_basename = kwargs("pixtable_basename", 
+    pixtable_basename = kwargs.pop("pixtable_basename", 
                                musepipe.dic_listObject['OBJECT'])
     name_pixtable = "{0}_{1}-{2:2d}.fits".format(pixtable_basename, 
                                                  name_suffix, np.int(nifu))
