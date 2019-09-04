@@ -203,3 +203,108 @@ def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', l
         return full_muse_wavelength_range
     else:
         return [red_wavel - lambda_window/2., red_wavel + lambda_window/2.]
+
+####################################################################
+# Function to select (Mask) good values from a map
+# Using both Rectangle and Circular Zones from the Selection_Zone class
+#
+# Input is name of galaxy, and coordinates
+####################################################################
+def select_spaxels(maskDic, maskName, X, Y) :
+    """Selecting spaxels defined by their coordinates
+    using the masks defined by Circle or Rectangle Zones
+    """
+    ## All spaxels are set to GOOD (True) first
+    selgood = (X**2 >= 0)
+
+    ## If no Mask is provided, we just return the full set of input X, Y
+    if maskDic == None :
+        return selgood
+
+    ## We first check if the maskName is in the list of the defined Masks
+    ## If the galaxy is not in the list, then the selection is all True
+    if (maskName in maskDic.keys()) :
+        ## The mask is defined, so Get the list of Regions
+        ## From the defined dictionary
+        listRegions = maskDic[maskName]
+        ## For each region, select the good spaxels
+        for region in  listRegions :
+            selgood = selgood & region.select(X, Y)
+
+    return selgood
+#=================================================================
+####################################################################
+# Parent class for the various types of Zones
+####################################################################
+class Selection_Zone :
+    """
+    Parent class for Rectangle_Zone and Circle_Zone
+
+    Input
+    -----
+    params: list of floats
+        List of parameters for the selection zone
+    """
+    def __init__(self, params=None) :
+        self.params = params
+        if len(params) != self.nparams:
+            print_error("Error: {0} Zone need 5 input parameters".format(
+                            self.type))
+            print_error("Error: {0} given".format(len(params)))
+
+#=================================================================
+####################################################################
+class Rectangle_Zone(Selection_Zone) :
+    """Define a rectangular zone, given by 
+    a center, a length, a width and an angle
+    """
+    def __init__(self):
+        self.type = "Rectangle"
+        self.nparams = 5
+        Selection_Zone.__init__(self)
+
+    def select(self, xin, yin) :
+        """ Define a selection within a rectangle
+            It can be rotated by an angle theta (in degrees) 
+        Input
+        -----
+        xin, yin: 2d arrays
+            Input positions for the spaxels
+        """
+        if self.params == None :
+           return (xin**2 >=0)
+        [x0, y0, length, width, theta] = self.params
+        dx = xin - x0
+        dy = yin - y0
+        thetarad = np.deg2rad(theta)
+        nx =   dx * np.cos(thetarad) + dy * np.sin(thetarad)
+        ny = - dx * np.sin(thetarad) + dy * np.cos(thetarad)
+        selgood = (np.abs(ny) > width / 2.) | (np.abs(nx) > length / 2.)
+        return selgood
+#=================================================================
+####################################################################
+class Circle_Zone(Selection_Zone) :
+    """Define a Circular zone, defined by 
+    a center and a radius
+    """
+    def __init__(self):
+        self.type = "Circle"
+        self.nparams = 5
+        Selection_Zone.__init__(self)
+
+    def select(self, xin, yin) :
+        """ Define a selection within a circle 
+
+        Input
+        -----
+        xin, yin: 2d arrays
+            Input positions for the spaxels
+        """
+        if self.params == None :
+           return (xin**2 >=0)
+        [x0, y0, radius] = self.params
+        selgood = (np.sqrt((xin - x0)**2 + (yin - y0)**2) > radius)
+        return selgood
+#=================================================================
+
+

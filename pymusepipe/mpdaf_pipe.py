@@ -269,3 +269,36 @@ class MuseSetSpectra(list) :
                 upipe.print_warning("Overiding subtitle")
             self.subtitle = kwargs.get('subtitle', "")
 
+
+def select_spaxels_in_pixtable(pixtable_suffix, 
+        image_mask_name):
+    """Select all pixels from a pixtable outside the trail 
+    defined by an angle and a width. 
+    Then flushes the pixtable into a new one.
+
+    Input
+    -----
+    pixtable_suffix: str
+        Suffix used for the Pixtables.
+    image_mask: Image
+        Mask image
+    """
+    pass
+
+def build_image_mask(image_name, masklist):
+    """Build an image mask using Circles or Rectangles
+    defined by Zone class
+
+    Input
+    -----
+    image_name: str
+        Name of the image to build a mask from
+    masklist: list
+        List of masks (Circles/Rectangles class)
+
+    Creates
+    -------
+    An output fits image with the corresponding mask
+    (0 and 1)
+    """
+    pass

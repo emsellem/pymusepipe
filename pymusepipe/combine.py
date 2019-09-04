@@ -38,7 +38,7 @@ from pymusepipe import musepipe, prep_recipes_pipe
 # Default keywords for MJD and DATE
 from pymusepipe.align_pipe import mjd_names, date_names
 
-__version__ = '0.0.2 (28 Feb 2019)'
+__version__ = '0.0.3 (4 Sep 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
 # 0.0.1 21 Nov, 2017 : just setting up the scene
 
@@ -55,7 +55,7 @@ dic_combined_folders = {
         "log": "Log/"
         }
 
-default_filter_list = "white,Johnson_B,Johnson_V,Cousins_R,SDSS_g,SDSS_r,SDSS_i,WFI_BB"
+default_filter_list = "white,Johnson_B,Johnson_V,Cousins_R,SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB"
 
 class MusePointings(SofPipe, PipeRecipes) :
     def __init__(self, targetname=None, list_pointings=[1], 
