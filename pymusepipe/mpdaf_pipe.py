@@ -346,6 +346,8 @@ class PixTableToMask(object):
         if not os.path.isfile(image_name):
             upipe.print_error("Input Image does not exist")
             return
+        self.image_name = image_name
+        self.pixtable_name = pixtable_name
 
         self.pixtable_folder, self.pixtable_name = os.path.split(pixtable_name)
         self.image_folder, self.image_name = os.path.split(self.image_name)
