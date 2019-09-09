@@ -244,8 +244,9 @@ class MuseImage(Image):
     def save_mask(self, mask_name="dummy_mask.fits"):
         """Save the mask into a 0-1 image
         """
-        newimage = self.mask.copy()
+        newimage = self.copy()
         newimage.data = np.where(self.mask, 0, 1.)
+        newimage.mask[:,:] = False
         newimage.write(mask_name)
 
 class MuseSetImages(list) :
