@@ -248,9 +248,8 @@ class Selection_Zone :
     def __init__(self, params=None) :
         self.params = params
         if len(params) != self.nparams:
-            print_error("Error: {0} Zone need 5 input parameters".format(
-                            self.type))
-            print_error("Error: {0} given".format(len(params)))
+            print_error("Error: {0} Zone needs {1} input parameters - {2} given".format(
+                            self.type, self.nparams, len(params)))
 
 #=================================================================
 ####################################################################
@@ -299,6 +298,31 @@ class Circle_Zone(Selection_Zone) :
         -----
         xin, yin: 2d arrays
             Input positions for the spaxels
+        """
+        if self.params == None :
+           return (xin**2 >=0)
+        [x0, y0, radius] = self.params
+        selgood = (np.sqrt((xin - x0)**2 + (yin - y0)**2) > radius)
+        return selgood
+#=================================================================
+####################################################################
+class Trail_Zone(Selection_Zone) :
+    """Define a Trail zone, defined by 
+    two points and a width
+    """
+    def __init__(self):
+        self.type = "Trail"
+        self.nparams = 5
+        Selection_Zone.__init__(self)
+
+    def select(self, xin, yin) :
+        """ Define a selection within trail
+
+        Input
+        -----
+        xin, yin: 2d arrays
+            Input positions for the spaxels
+
         """
         if self.params == None :
            return (xin**2 >=0)

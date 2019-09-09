@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-"""MUSE-PHANGS core module
+"""MUSE-PHANGS mpdaf-functions module
 """
 
 __authors__   = "Eric Emsellem"
@@ -27,6 +27,7 @@ except ImportError :
 from mpdaf.obj import Cube, Image
 from mpdaf.obj import Spectrum, WaveCoord
 from mpdaf.tools import add_mpdaf_method_keywords
+from mpdaf.drs import PixTable
 
 # Astropy
 from astropy.io import fits as pyfits
@@ -35,7 +36,8 @@ from astropy import units as units
 from pymusepipe import util_pipe as upipe
 
 # Versioning
-__version__ = '0.1.0 (31 May 2019)'
+__version__ = '0.2.0 (9 Sep 2019)' # Adding PixTableToMask
+#__version__ = '0.1.0 (31 May 2019)'
 
 #########################################################################
 # Main class
@@ -197,6 +199,55 @@ class MuseImage(Image):
         self.fwhm_startobs = self.primary_header['HIERARCH ESO TEL AMBI FWHM START']
         self.fwhm_endobs = self.primary_header['HIERARCH ESO TEL AMBI FWHM END']
 
+    def mask_trail(self, pq1=[0,0], pq2=[10,10], width=0.0, reset=False):
+        """Build an image mask from 2 points measured from a trail
+    
+        Input
+        -----
+        pq1: array or tuple (float)
+            p and q coordinates of point 1 along the trail
+        pq2: array or tuple (float) 
+            p and q coordinates of point 2 along the trail
+        width: float
+            Value of the full slit width to exclude
+        """
+        # If width = 0 just don't do anything
+        if width <= 0.:
+            upipe.print_warning("Trail width is 0, hence no doing anything")
+            return
+
+        # Create an index grid using the Image shape
+        # Note that p is the Y axis, while q is the X axis
+        ind = np.indices(self.data.shape)
+
+        # X2 - X1 -> note that X is q, hence the second value
+        x21 = pq2[1] - pq1[1]
+        # Y2 - Y1 -> note that Y is p, hence the first value
+        y21 = pq2[0] - pq1[0]
+
+        # Mask based on the distance to the line defined by the 2 points
+        mask_image = np.abs(y21 * (ind[1] - x1) - x21 * (ind[0] - y1)) \
+                       / np.sqrt(x21**2 +y21**2) < (width / 2.)
+
+        # Reset mask if requested
+        if reset:
+            self.reset_mask()
+
+        self.mask[mask_image] = True
+
+    def reset_mask(self):
+        """Resetting the Image mask
+        """
+        # just resetting the mask of the image
+        self.mask[:,:] = False
+
+    def save_mask(self, mask_name="dummy_mask.fits"):
+        """Save the mask into a 0-1 image
+        """
+        newimage = self.mask.copy()
+        newimage.data = np.where(self.mask, 0, 1.)
+        newimage.write(mask_name)
+
 class MuseSetImages(list) :
     """Set of images
     """
@@ -269,36 +320,90 @@ class MuseSetSpectra(list) :
                 upipe.print_warning("Overiding subtitle")
             self.subtitle = kwargs.get('subtitle', "")
 
-
-def select_spaxels_in_pixtable(pixtable_suffix, 
-        image_mask_name):
-    """Select all pixels from a pixtable outside the trail 
-    defined by an angle and a width. 
-    Then flushes the pixtable into a new one.
-
-    Input
-    -----
-    pixtable_suffix: str
-        Suffix used for the Pixtables.
-    image_mask: Image
-        Mask image
+class PixTableToMask(object):
+    """This class is meant to just be a simple tool to
+    mask out some regions from the PixTable using Image masks
     """
-    pass
+    def __init__(self, pixtable_name, image_name, suffix_out="tmask"):
+        """Class made to associate a PixTable and an Image
+        Used to select all pixels from a pixtable outside the trail 
+        defined by the trail mask of an image
+        Then flushes the pixtable into a new one.
 
-def build_image_mask(image_name, masklist):
-    """Build an image mask using Circles or Rectangles
-    defined by Zone class
+        Input
+        -----
+        pixtable_name: str
+            Name of the Pixel Table
+        image_name: str
+            Name of Image which should include a mask
+        suffix_out: str
+            Suffix to be used for the new PixTable
+        """
+        self.suffix_out = suffix_out
+        if not os.path.isfile(pixtable_name):
+            upipe.print_error("Input PixTable does not exist")
+            return
+        if not os.path.isfile(image_name):
+            upipe.print_error("Input Image does not exist")
+            return
 
-    Input
-    -----
-    image_name: str
-        Name of the image to build a mask from
-    masklist: list
-        List of masks (Circles/Rectangles class)
+        self.pixtable_folder, self.pixtable_name = os.path.split(pixtable_name)
+        self.image_folder, self.image_name = os.path.split(self.image_name)
 
-    Creates
-    -------
-    An output fits image with the corresponding mask
-    (0 and 1)
-    """
-    pass
+        self.image = MuseImage(image_name)
+
+    def imshow(self, **kwargs):
+        """ Just showing the image
+        """
+        self.image.plot(**kwargs)
+
+    def create_mask(self, pq1=[0,0], pq2=[10,10], width=0.0, reset=False,
+                        mask_name="dummy_mask.fits", **kwargs):
+        """Create the mask and save it in one go
+        """
+        self.image.mask_trail(pq1=pq1, pq2=pq2, width=width, reset=reset)
+        self.save_mask(mask_name, **kwargs)
+
+    def save_mask(self, mask_name="dummy_mask.fits", use_folder=True):
+        """Saving the mask from the Image into a fits file
+
+        Input
+        -----
+        mask_name: str
+            Name of the fits file for the mask
+
+        Creates
+        -------
+        A fits file with the mask as 0 and 1
+        """
+        if use_folder:
+            self.mask_name = joinpath(self.image_folder, mask_name)
+        else:
+            self.mask_name = mask_name
+
+        # Using the image folder to save the mask
+        self.image.save_mask(self.mask_name)
+
+    def mask_pixtable(self, mask_name=None, use_folder=True):
+        """Use the Image Mask and create a new Pixtable
+        """
+        # Open the PixTable
+        pixtable = PixTable(self.pixtable_name)
+
+        # Use the Image mask and create a pixtable mask
+        if mask_name is not None:
+            self.mask_name = mask_name
+        mask_col = pixtable.mask_column(self.mask_name)
+
+        # extract the right data using the pixtable mask
+        newpixtable = pixtable.extract_from_mask(mask_col)
+
+        # Rewrite a new pixtable
+        self.suffix_out = kwargs.pop("suffix_out", self.suffix_out)
+        if use_folder:
+            self.newpixtable_name = joinpath(self.pixtable_folder, "{0}{1}".format(
+                                    self.suffix_out, self.pixtable_name))
+        else :
+            self.newpixtable_name = "{0}{1}".format(self.suffix_out, self.pixtable_name)
+
+        newpixtable.write(self.newpixtable_name)
