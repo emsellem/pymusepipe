@@ -226,7 +226,7 @@ class MuseImage(Image):
         y21 = pq2[0] - pq1[0]
 
         # Mask based on the distance to the line defined by the 2 points
-        mask_image = np.abs(y21 * (ind[1] - x1) - x21 * (ind[0] - y1)) \
+        mask_image = np.abs(y21 * (ind[1] - pq1[1]) - x21 * (ind[0] - pq1[0])) \
                        / np.sqrt(x21**2 +y21**2) < (width / 2.)
 
         # Reset mask if requested
