@@ -245,7 +245,7 @@ class MuseImage(Image):
         """Save the mask into a 0-1 image
         """
         newimage = self.copy()
-        newimage.data = np.where(self.mask, 0, 1.)
+        newimage.data = np.where(self.mask, 0, 1).astype(np.int)
         newimage.mask[:,:] = False
         newimage.write(mask_name)
 
@@ -391,14 +391,19 @@ class PixTableToMask(object):
         """Use the Image Mask and create a new Pixtable
         """
         # Open the PixTable
+        upipe.print_info("Opening the Pixtable {0}".format(
+                          self.pixtable_name))
         pixtable = PixTable(self.pixtable_name)
 
         # Use the Image mask and create a pixtable mask
         if mask_name is not None:
             self.mask_name = mask_name
+        upipe.print_info("Creating a column Mask from file {0}".format(
+                          self.mask_name))
         mask_col = pixtable.mask_column(self.mask_name)
 
         # extract the right data using the pixtable mask
+        upipe.print_info("Extracting the Mask")
         newpixtable = pixtable.extract_from_mask(mask_col)
 
         # Rewrite a new pixtable
@@ -409,4 +414,6 @@ class PixTableToMask(object):
         else :
             self.newpixtable_name = "{0}{1}".format(self.suffix_out, self.pixtable_name)
 
+        upipe.print_info("Writing the new PixTable in {0}".format(
+                          self.newpixtable_name))
         newpixtable.write(self.newpixtable_name)
