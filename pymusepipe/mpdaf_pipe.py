@@ -352,7 +352,7 @@ class PixTableToMask(object):
         self.pixtable_folder, self.pixtable_name = os.path.split(pixtable_name)
         self.image_folder, self.image_name = os.path.split(self.image_name)
 
-        self.image = MuseImage(image_name)
+        self.image = MuseImage(filename=image_name)
 
     def imshow(self, **kwargs):
         """ Just showing the image
