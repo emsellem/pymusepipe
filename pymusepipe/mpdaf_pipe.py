@@ -404,7 +404,7 @@ class PixTableToMask(object):
 
         # extract the right data using the pixtable mask
         upipe.print_info("Extracting the Mask")
-        newpixtable = pixtable.extract_from_mask(mask_col)
+        newpixtable = pixtable.extract_from_mask(mask_col.maskcol)
 
         # Rewrite a new pixtable
         self.suffix_out = kwargs.pop("suffix_out", self.suffix_out)
