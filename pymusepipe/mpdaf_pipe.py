@@ -387,8 +387,19 @@ class PixTableToMask(object):
         # Using the image folder to save the mask
         self.image.save_mask(self.mask_name)
 
-    def mask_pixtable(self, mask_name=None, use_folder=True):
+    def mask_pixtable(self, mask_name=None, **kwargs):
         """Use the Image Mask and create a new Pixtable
+
+        Input
+        -----
+        mask_name: str
+            Name of the mask to be used (FITS file)
+        use_folder: bool
+            If True, use the same folder as the Pixtable
+            Otherwise just write where you stand
+        suffix_out: str
+            Suffix for the name of the output Pixtable
+            If provided, will overwrite the one in self.suffix_out
         """
         # Open the PixTable
         upipe.print_info("Opening the Pixtable {0}".format(
@@ -408,6 +419,7 @@ class PixTableToMask(object):
 
         # Rewrite a new pixtable
         self.suffix_out = kwargs.pop("suffix_out", self.suffix_out)
+        use_folder = kwargs.pop("use_folder", True)
         if use_folder:
             self.newpixtable_name = joinpath(self.pixtable_folder, "{0}{1}".format(
                                     self.suffix_out, self.pixtable_name))
