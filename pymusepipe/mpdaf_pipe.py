@@ -457,3 +457,18 @@ class PixTableToMask(object):
                 pass
         except:
             pass
+
+        # Patch to fix the extension names of the PixTable
+        # We have to put a number of extension in lowercase to make sure 
+        # the MUSE recipes understand them
+        descl = ['xpos', 'ypos', 'lambda', 'data', 'dq', 'stat', 'origin']
+        for d in descl:
+            try:
+                pyfits.setval(self.newpixtable_name, keyword='EXTNAME', 
+                        value=d, extname=d.upper())
+                upipe.print_warning("Rewriting extension name {0} as lowercase".format(
+                                       d.upper()))
+            except:
+                upipe.print_warning("Extension {0} not present - patch ignored".format(
+                                       d.upper())
+
