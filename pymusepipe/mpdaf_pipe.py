@@ -409,6 +409,11 @@ class PixTableToMask(object):
         # Use the Image mask and create a pixtable mask
         if mask_name is not None:
             self.mask_name = mask_name
+        else:
+            if not hasattr(self, "mask_name"):
+                upipe.print_error("Please provide a mask name (FITS file)")
+                return
+
         upipe.print_info("Creating a column Mask from file {0}".format(
                           self.mask_name))
         mask_col = pixtable.mask_column(self.mask_name)
@@ -429,3 +434,26 @@ class PixTableToMask(object):
         upipe.print_info("Writing the new PixTable in {0}".format(
                           self.newpixtable_name))
         newpixtable.write(self.newpixtable_name)
+
+        # Now transfer the flat field if it exists
+        ext_name = 'PIXTABLE_FLAT_FIELD'
+        try:
+            # Test if Extension exists by reading header
+            # If it exists then do nothing
+            test_data = pyfits.getheader(self.newpixtable_name, ext_name)
+            upipe.print_warning("Flat field extension already exists in masked PixTable - all good")
+        # If it does not exist test if it exists in the original PixTable
+        except KeyError:
+            try:
+                # Read data and header
+                ff_ext_data = pyfits.getdata(self.pixtable_name, ext_name)
+                ff_ext_h = pyfits.getheader(self.pixtable_name, ext_name)
+                upipe.print_warning("Flat field extension will be transferred from PixTable")
+                # Append it to the new pixtable
+                pyfits.append(self.newpixtable_name, ff_ext_data, ff_ext_h)
+            except KeyError:
+                upipe.print_warning("No Flat field extension to transfer - all good")
+            except:
+                pass
+        except:
+            pass
