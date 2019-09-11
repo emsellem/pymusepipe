@@ -470,5 +470,5 @@ class PixTableToMask(object):
                                        d.upper()))
             except:
                 upipe.print_warning("Extension {0} not present - patch ignored".format(
-                                       d.upper())
+                                       d.upper()))
 
