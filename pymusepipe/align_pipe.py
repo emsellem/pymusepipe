@@ -755,7 +755,7 @@ class AlignMusePointing(object):
         self.table_mjdobs = [None] * self.nimages
         self.init_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
         self.init_off_arcsec = np.zeros((self.nimages, 2), dtype=np.float64)
-        self.init_flux_scale = np.ones(self.nimages, dtype=np.int)
+        self.init_flux_scale = np.ones(self.nimages, dtype=np.float64)
         self.muse_rotangles = np.zeros(self.nimages, dtype=np.float64)
 
     def open_offset_table(self, name_table=None):
@@ -828,7 +828,7 @@ class AlignMusePointing(object):
                     self.total_off_pixel[nima][1]))
 
     def save_fits_offset_table(self, name_output_table=None, 
-            overwrite=False, suffix=""):
+            overwrite=False, suffix="", save_flux=True):
         """Save the Offsets into a fits Table
          
         Input
@@ -842,6 +842,9 @@ class AlignMusePointing(object):
             Suffix to be used to add to the input name. This is handy
             to just modify the given fits name with a suffix 
             (e.g., version number).
+        save_flux: bool
+            If True, saving the flux in FLUX_SCALE
+            If False, do not save the flux conversion
         
         Creates
         -------
@@ -862,6 +865,14 @@ class AlignMusePointing(object):
             upipe.print_error("Save is aborted")
             return
 
+        # Checking if overwrite and exist_table do go together
+        if exist_table and not overwrite:
+            upipe.print_warning("Table already exists, "
+                                "but overwrite is set to False")
+            upipe.print_warning("If you wish to overwrite the table {0}, "
+                    "please set overwrite to True".format(name_output_table))
+            return
+
         # Check if RA_OFFSET is there
         exist_ra_offset =  ('RA_OFFSET' in fits_table.columns)
 
@@ -873,7 +884,10 @@ class AlignMusePointing(object):
         fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600. \
                 / np.cos(np.deg2rad(self.list_dec_muse))
         fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
-        fits_table['FLUX_SCALE'] = self.ima_norm_factors
+        if save_flux:
+            fits_table['FLUX_SCALE'] = self.ima_norm_factors
+        else:
+            fits_table['FLUX_SCALE'] = 1.0
 
         # Deal with RA_OFFSET_ORIG if needed
         if exist_ra_offset:
@@ -888,14 +902,7 @@ class AlignMusePointing(object):
                 / np.cos(np.deg2rad(self.list_dec_muse))
         fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:,1] / 3600.
 
-        # Writing it up
-        if exist_table and not overwrite:
-            upipe.print_warning("Table already exists, "
-                                "but overwrite is set to False")
-            upipe.print_warning("If you wish to overwrite the table {0}, "
-                    "please set overwrite to True".format(name_output_table))
-            return
-
+        # Writing up
         fits_table.write(self.name_output_table, overwrite=overwrite)
         self.name_output_table = name_output_table
 
