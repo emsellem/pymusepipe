@@ -199,7 +199,7 @@ class MuseImage(Image):
         self.fwhm_startobs = self.primary_header['HIERARCH ESO TEL AMBI FWHM START']
         self.fwhm_endobs = self.primary_header['HIERARCH ESO TEL AMBI FWHM END']
 
-    def mask_trail(self, pq1=[0,0], pq2=[10,10], width=0.0, reset=False):
+    def mask_trail(self, pq1=[0,0], pq2=[10,10], width=0.0, reset=False, extent=None):
         """Build an image mask from 2 points measured from a trail
     
         Input
@@ -209,7 +209,11 @@ class MuseImage(Image):
         pq2: array or tuple (float) 
             p and q coordinates of point 2 along the trail
         width: float
-            Value of the full slit width to exclude
+            Value (in pixel) of the full slit width to exclude
+        extent: float
+            Value (in pixel) to extend the slit beyond the 2 extrema
+            If 0, this means limiting it to the extrema themselves.
+            Default is None, which mean infinitely long slit
         """
         # If width = 0 just don't do anything
         if width <= 0.:
@@ -221,13 +225,20 @@ class MuseImage(Image):
         ind = np.indices(self.data.shape)
 
         # X2 - X1 -> note that X is q, hence the second value
-        x21 = pq2[1] - pq1[1]
         # Y2 - Y1 -> note that Y is p, hence the first value
-        y21 = pq2[0] - pq1[0]
+        y21, x21 = np.array(pq2) - np.array(pq1)
 
         # Mask based on the distance to the line defined by the 2 points
         mask_image = np.abs(y21 * (ind[1] - pq1[1]) - x21 * (ind[0] - pq1[0])) \
-                       / np.sqrt(x21**2 +y21**2) < (width / 2.)
+                       / np.sqrt(x21**2 + y21**2) < (width / 2.)
+        # Mask based on the extent of the slit
+        if extent is not None:
+            y01, x01 = ind[0] - pq1[0], ind[1] - pq1[1]
+            y02, x02 = ind[0] - pq2[0], ind[1] - pq2[1]
+            angle21 = np.arctan2(y01, x01) - np.arctan2(y21, x21)
+            xcoord1 = np.hypot(x01, y01) * np.cos(angle21)
+            ext_mask = (xcoord1 > -extent) & (xcoord1 - np.hypot(x21, y21) < extent)  
+            mask_image = mask_image & ext_mask
 
         # Reset mask if requested
         if reset:
@@ -361,10 +372,26 @@ class PixTableToMask(object):
         self.image.plot(**kwargs)
 
     def create_mask(self, pq1=[0,0], pq2=[10,10], width=0.0, reset=False,
-                        mask_name="dummy_mask.fits", **kwargs):
+                        mask_name="dummy_mask.fits", extent=None, **kwargs):
         """Create the mask and save it in one go
+   
+        Input
+        -----
+        pq1: array or tuple (float)
+            p and q coordinates of point 1 along the trail
+        pq2: array or tuple (float) 
+            p and q coordinates of point 2 along the trail
+        width: float
+            Value (in pixel) of the full slit width to exclude
+        reset: bool
+            By default False, so the mask goes on top of the existing one
+            If True, will reset the mask before building it.
+        extent: float
+            Value (in pixel) to extend the slit beyond the 2 extrema
+            If 0, this means limiting it to the extrema themselves.
+            Default is None, which mean infinitely long slit
         """
-        self.image.mask_trail(pq1=pq1, pq2=pq2, width=width, reset=reset)
+        self.image.mask_trail(pq1=pq1, pq2=pq2, width=width, reset=reset, extent=extent)
         self.save_mask(mask_name, **kwargs)
 
     def save_mask(self, mask_name="dummy_mask.fits", use_folder=True):
@@ -374,6 +401,9 @@ class PixTableToMask(object):
         -----
         mask_name: str
             Name of the fits file for the mask
+        use_folder: bool
+            If True (default) will look for the mask in the image_folder.
+            If False, will just look for it where the command is run.
 
         Creates
         -------

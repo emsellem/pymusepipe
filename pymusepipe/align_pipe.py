@@ -828,7 +828,7 @@ class AlignMusePointing(object):
                     self.total_off_pixel[nima][1]))
 
     def save_fits_offset_table(self, name_output_table=None, 
-            overwrite=False, suffix="", save_flux=True):
+            overwrite=False, suffix="", save_flux_scale=True):
         """Save the Offsets into a fits Table
          
         Input
@@ -842,7 +842,7 @@ class AlignMusePointing(object):
             Suffix to be used to add to the input name. This is handy
             to just modify the given fits name with a suffix 
             (e.g., version number).
-        save_flux: bool
+        save_flux_scale: bool
             If True, saving the flux in FLUX_SCALE
             If False, do not save the flux conversion
         
@@ -884,7 +884,7 @@ class AlignMusePointing(object):
         fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600. \
                 / np.cos(np.deg2rad(self.list_dec_muse))
         fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
-        if save_flux:
+        if save_flux_scale:
             fits_table['FLUX_SCALE'] = self.ima_norm_factors
         else:
             fits_table['FLUX_SCALE'] = 1.0
