@@ -60,6 +60,8 @@ default_filter_list = "white,Johnson_B,Johnson_V,Cousins_R,SDSS_g,SDSS_r,SDSS_i,
 class MusePointings(SofPipe, PipeRecipes) :
     def __init__(self, targetname=None, list_pointings=[1], 
             dic_exposures_in_pointing=None,
+            suffix_fixed_pixtables="tmask",
+            use_fixed_pixtables=False,
             rc_filename=None, cal_filename=None, 
             combined_folder_name="Combined", suffix="",
             offset_table_name=None,
@@ -71,10 +73,19 @@ class MusePointings(SofPipe, PipeRecipes) :
         -----
         targetname: string (e.g., 'NGC1208'). default is None. 
 
-        rc_filename: filename to initialise folders
-        cal_filename: filename to initiale FIXED calibration MUSE files
-        verbose: boolean. Give more information as output (default is True)
-        vsystemic: float (default is 0), indicating the systemic velocity of the galaxy [in km/s]
+        rc_filename: str
+            filename to initialise folders
+        cal_filename: str
+            filename to initiale FIXED calibration MUSE files
+        verbose: bool 
+            Give more information as output (default is True)
+        vsystemic: float 
+            Default is 0. Systemic velocity of the galaxy [in km/s]
+        suffix_fixed_pixtables: str
+            Default is "tmask". Suffix for fixed PixTables
+        use_fixed_pixtables: bool
+            Default is False. If True, will use suffix_fixed_pixtables to filter out
+            Pixtables which have been fixed.
 
         Other possible entries
         ----------------------
@@ -122,6 +133,10 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
+
+        # Including or not the fixed Pixtables in place of the original ones
+        self.use_fixed_pixtables = use_fixed_pixtables
+        self.suffix_fixed_pixtables = suffix_fixed_pixtables
 
         # Setting all the useful paths
         self.set_fullpath_names()
@@ -178,6 +193,33 @@ class MusePointings(SofPipe, PipeRecipes) :
             list_pixtabs = glob.glob(path_pointing + self.pipe_params.object + 
                     "{0}{1}*fits".format(pixtable_suffix, self.suffix))
 
+            # Take (or not) the fixed pixtables
+            if self.use_fixed_pixtables:
+                suffix_to_consider = "{0}{1}".format(self.suffix_fixed_pixtables,
+                        pixtable_suffix)
+                list_fixed_pixtabs = glob.glob(path_pointing + self.pipe_params.object + 
+                    "{0}{1}*fits".format(suffix_to_consider, self.suffix))
+
+                # Looping over the existing fixed pixtables
+                for fixed_pixtab in list_fixed_pixtabs:
+                    # Finding the name of the original one
+                    orig_pixtab = fixed_pixtab.replace(suffix_to_consider, 
+                                            pixtable_suffix)
+                    if orig_pixtab in list_pixtabs:
+                        # If it exists, remove it
+                        list_pixtabs.remove(orig_pixtab)
+                        # and add the fixed one
+                        list_pixtabs.append(fixed_pixtab)
+                        upipe.print_warning("Fixed PixTable {0} was included".format(
+                                fixed_pixtab))
+                        upipe.print_warning("and Pixtable {0} was thus removed".format(
+                                orig_pixtab))
+                    else:
+                        upipe.print_warning("Original Pixtable {0} not found".format(
+                                orig_pixtab))
+                        upipe.print_warning("Hence will not include fixed PixTable "
+                                "{0}".format(fixed_pixtab))
+
             # if no selection on exposure names are given
             # Select all existing pixtabs
             if self.dic_exposures_in_pointings is None:
@@ -191,12 +233,12 @@ class MusePointings(SofPipe, PipeRecipes) :
                     # We loop on that list
                     for expo in list_expo:
                         # Check whether this exists in the our cube list
-                        for cube_name in list_pixtabs:
-                            if expo in cube_name:
+                        for pixtab in list_pixtabs:
+                            if expo in pixtab:
                                 # We select the cube
-                                select_list_pixtabs.append(cube_name)
+                                select_list_pixtabs.append(pixtab)
                                 # And remove it from the list
-                                list_pixtabs.remove(cube_name)
+                                list_pixtabs.remove(pixtab)
                                 # We break out of the cube for loop
                                 break
                 except:
