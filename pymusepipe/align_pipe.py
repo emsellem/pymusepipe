@@ -634,6 +634,7 @@ class AlignMusePointing(object):
         self.ima_polypar = [None] * self.nimages
         # Normalisation factor to be saved or used
         self.ima_norm_factors = np.zeros((self.nimages), dtype=np.float64)
+        self.ima_background = np.zeros((self.nimages), dtype=np.float64)
         self.threshold_muse = np.zeros_like(self.ima_norm_factors) + threshold_muse
         # Default lists for date and mjd of the MUSE images
         self.ima_dateobs = [None] * self.nimages
@@ -725,25 +726,38 @@ class AlignMusePointing(object):
             self.table_mjdobs = self.offset_table[mjd_names['table']]
             # Now finding the right match with the Images
             # Warning, needs > numpy 1.15.0
-            values, ind_ima, ind_table = np.intersect1d(
+            mjd_values, ind_ima, ind_table = np.intersect1d(
                     self.ima_mjdobs, self.table_mjdobs,
                     return_indices=True, assume_unique=True)
+            # Extracting the flux scale from table
             nonan_flux_scale_table = np.where(
                     np.isnan(self.offset_table['FLUX_SCALE']), 
                     1., self.offset_table['FLUX_SCALE'])
+            # Extracting the rotangle, but only if there
+            if ('ROTANGLE' in self.offset_table.columns):
+                nonan_rotangle_table = np.where(
+                        np.isnan(self.offset_table['ROTANGLE']), 
+                        0., self.offset_table['ROTANGLE'])
+
+            # Loop over the images, using MJD
             for nima, mjd in enumerate(self.ima_mjdobs):
-                if mjd in values:
+                # Test if mjd is in the set of mjd_values
+                if mjd in mjd_values:
                     # Find the index of the value array where mjd
-                    ind = np.nonzero(values == mjd)[0][0]
+                    ind = np.nonzero(mjd_values == mjd)[0][0]
                     self.init_off_arcsec[nima] = [
                             self.offset_table['RA_OFFSET'][ind_table[ind]] * 3600. \
                                     * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                             self.offset_table['DEC_OFFSET'][ind_table[ind]] * 3600.]
                     self.init_flux_scale[nima] = nonan_flux_scale_table[ind_table[ind]]
+                    self.muse_rotangles[nima] = nonan_rotangle_table[ind_table[ind]]
+                # Otherwise use default values
                 else :
                     self.init_flux_scale[nima] = 1.0
                     self.init_off_arcsec[nima] = [0., 0.]
+                    self.muse_rotangles[nima] = 0.0
 
+                # Transform into pixel values
                 self.init_off_pixel[nima] = arcsec_to_pixel(
                         self.list_muse_hdu[nima],
                         self.init_off_arcsec[nima])
@@ -828,7 +842,8 @@ class AlignMusePointing(object):
                     self.total_off_pixel[nima][1]))
 
     def save_fits_offset_table(self, name_output_table=None, 
-            overwrite=False, suffix="", save_flux_scale=True):
+            overwrite=False, suffix="", save_flux_scale=True,
+            save_other_params=True):
         """Save the Offsets into a fits Table
          
         Input
@@ -843,8 +858,11 @@ class AlignMusePointing(object):
             to just modify the given fits name with a suffix 
             (e.g., version number).
         save_flux_scale: bool
-            If True, saving the flux in FLUX_SCALE
+            If True (default), saving the flux in FLUX_SCALE
             If False, do not save the flux conversion
+        save_other_params: bool
+            If True (default), saving the background + rotation
+            If False, do not save these 2 parameters.
         
         Creates
         -------
@@ -888,6 +906,9 @@ class AlignMusePointing(object):
             fits_table['FLUX_SCALE'] = self.ima_norm_factors
         else:
             fits_table['FLUX_SCALE'] = 1.0
+        if save_otherparams:
+            fits_table['BACKGROUND'] = self.ima_norm_factors
+            fits_table['ROTANGLE'] = self.muse_rotangles
 
         # Deal with RA_OFFSET_ORIG if needed
         if exist_ra_offset:
@@ -1404,6 +1425,7 @@ class AlignMusePointing(object):
                         threshold1=self.threshold_muse[nima])
         if self.use_polynorm:
             self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
+            self.ima_background[nima] = self.ima_polypar[nima].beta[0]
         return musedata, refdata
 
     def compare(self, start_nfig=1, nlevels=10, levels=None, convolve_muse=0.,
