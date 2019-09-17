@@ -734,10 +734,12 @@ class AlignMusePointing(object):
                     np.isnan(self.offset_table['FLUX_SCALE']), 
                     1., self.offset_table['FLUX_SCALE'])
             # Extracting the rotangle, but only if there
+            rotangle_exist = False
             if ('ROTANGLE' in self.offset_table.columns):
                 nonan_rotangle_table = np.where(
                         np.isnan(self.offset_table['ROTANGLE']), 
                         0., self.offset_table['ROTANGLE'])
+                rotangle_exist = True
 
             # Loop over the images, using MJD
             for nima, mjd in enumerate(self.ima_mjdobs):
@@ -750,7 +752,10 @@ class AlignMusePointing(object):
                                     * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                             self.offset_table['DEC_OFFSET'][ind_table[ind]] * 3600.]
                     self.init_flux_scale[nima] = nonan_flux_scale_table[ind_table[ind]]
-                    self.muse_rotangles[nima] = nonan_rotangle_table[ind_table[ind]]
+                    if rotange_exist:
+                        self.muse_rotangles[nima] = nonan_rotangle_table[ind_table[ind]]
+                    else:
+                        self.muse_rotangles[nima] = 0.0
                 # Otherwise use default values
                 else :
                     self.init_flux_scale[nima] = 1.0
