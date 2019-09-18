@@ -1141,7 +1141,8 @@ class AlignMusePointing(object):
         ypix_cross: x and y pixel coordinates of the cross-correlation peak
         """
         # Projecting the reference image onto the MUSE field
-        tmphdr = muse_hdu.header.totextfile(name_musehdr, overwrite=True)
+        tmphdr = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
+                                            name_musehdr), overwrite=True)
         proj_ref_hdu = self._project_reference_hdu(muse_hdu, rotation=rotation)
 
         # Cleaning the images
