@@ -1364,7 +1364,7 @@ class AlignMusePointing(object):
 
         # Writing this up in an ascii file for record purposes
         tmphdr = self.list_offmuse_hdu[nima].header.totextfile(
-                self.header_folder_name + self.list_name_offmusehdr[nima], 
+                joinpath(self.header_folder_name, self.list_name_offmusehdr[nima]), 
                 overwrite=True)
 
         # Reprojecting the Reference image onto the new MUSE frame
