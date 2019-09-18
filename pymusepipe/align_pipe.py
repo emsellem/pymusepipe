@@ -705,6 +705,7 @@ class AlignMusePointing(object):
                                 "a first guess of the alignment")
 
         if firstguess == "crosscorr":
+            upipe.print_info("Using cross-correlation as the initial guess")
             self.init_off_arcsec = self.cross_off_arcsec * 1.0
             self.init_off_pixel = self.cross_off_pixel * 1.0
         elif firstguess == "fits":
@@ -716,6 +717,8 @@ class AlignMusePointing(object):
                 self._reset_init_guess_values()
                 return
 
+            upipe.print_info("Using input FITS table as initial guess: {0}".format(
+                                 self.name_offset_table))
             # First get the right indices for the table by comparing MJD_OBS
             if mjd_names['table'] not in self.offset_table.columns:
                 upipe.print_warning("Input table does not "
