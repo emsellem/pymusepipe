@@ -627,6 +627,7 @@ class AlignMusePointing(object):
         self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
         self.total_off_arcsec = np.zeros_like(self.cross_off_pixel)
+        # RESET! all parameters
         self._reset_init_guess_values()
 
         # Cross normalisation for the images
@@ -634,7 +635,8 @@ class AlignMusePointing(object):
         self.ima_polypar = [None] * self.nimages
         # Normalisation factor to be saved or used
         self.ima_norm_factors = np.zeros((self.nimages), dtype=np.float64)
-        self.ima_background = np.zeros((self.nimages), dtype=np.float64)
+        self.ima_background = np.zeros_like(self.ima_norm_factors)
+        self.muse_rotangles = np.zeros_like(self.ima_norm_factors)
         self.threshold_muse = np.zeros_like(self.ima_norm_factors) + threshold_muse
         # Default lists for date and mjd of the MUSE images
         self.ima_dateobs = [None] * self.nimages
@@ -650,9 +652,13 @@ class AlignMusePointing(object):
             return
 
         # find the cross correlation peaks for each image
+        # This is using zero offset and zero rotation
+        # as all parameters have been reset above
+        # New values will be taken out from the cross-correlation or fits table 
+        # just below with the init_guess_offset
         self.find_ncross_peak()
 
-        # Initialise the offset
+        # Initialise the offsets using the cross-correlation or FITS table
         self.init_guess_offset(self.firstguess, **kwargs)
 
         self.total_off_arcsec = self.init_off_arcsec + self.extra_off_arcsec
@@ -756,14 +762,14 @@ class AlignMusePointing(object):
                             self.offset_table['DEC_OFFSET'][ind_table[ind]] * 3600.]
                     self.init_flux_scale[nima] = nonan_flux_scale_table[ind_table[ind]]
                     if rotangle_exist:
-                        self.muse_rotangles[nima] = nonan_rotangle_table[ind_table[ind]]
+                        self.init_muse_rotangles[nima] = nonan_rotangle_table[ind_table[ind]]
                     else:
-                        self.muse_rotangles[nima] = 0.0
+                        self.init_muse_rotangles[nima] = 0.0
                 # Otherwise use default values
                 else :
                     self.init_flux_scale[nima] = 1.0
                     self.init_off_arcsec[nima] = [0., 0.]
-                    self.muse_rotangles[nima] = 0.0
+                    self.init_muse_rotangles[nima] = 0.0
 
                 # Transform into pixel values
                 self.init_off_pixel[nima] = arcsec_to_pixel(
@@ -778,7 +784,7 @@ class AlignMusePointing(object):
         self.init_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
         self.init_off_arcsec = np.zeros((self.nimages, 2), dtype=np.float64)
         self.init_flux_scale = np.ones(self.nimages, dtype=np.float64)
-        self.muse_rotangles = np.zeros(self.nimages, dtype=np.float64)
+        self.init_muse_rotangles = np.zeros(self.nimages, dtype=np.float64)
 
     def open_offset_table(self, name_table=None):
         """Read offset table from fits file
@@ -952,6 +958,9 @@ class AlignMusePointing(object):
             guessed offsets. Ignored if extra_pixel is given.
         rotation: float [0]
             Angle to rotate the image (in degrees)
+        use_rotangles: bool
+            Default is False. If True, use the rotation value
+            from self.init_muse_rotangles
         threshold_muse: float [0]
             Threshold to consider when plotting the comparison
         
@@ -978,7 +987,17 @@ class AlignMusePointing(object):
         else:
             extra_arcsec = kwargs.pop("extra_arcsec", [0., 0.])
 
-        self.muse_rotangles[nima] = kwargs.pop("rotation", 0.0)
+        use_rotangles = kwargs.pop("use_rotangles", False)
+        if use_rotangles:
+            # Using the initial given value
+            self.muse_rotangles[nima] = self.init_muse_rotangles[nima]
+            upipe.print_warning("Rotation angle read from the initial values "
+                                "in self.init_muse_rotangles")
+        else:
+            # Using default 0 rotation and threshold for this run
+            self.muse_rotangles[nima] = kwargs.pop("rotation", 0.0)
+        upipe.print_warning("Rotation will be = {0} degrees".format(
+                                 self.muse_rotangles[nima]))
         self.threshold_muse[nima] = kwargs.pop("threshold_muse", 0.0)
 
         # Add the offset from user
@@ -1061,7 +1080,7 @@ class AlignMusePointing(object):
         self.list_dec_muse = np.array([muse_wcs.get_crval2()
                               for muse_wcs in self.list_wcs_muse])
         # Getting the orientation angles
-        self.list_orig_rotangles = [musewcs.get_rot() 
+        self.list_wcs_rotangles = [musewcs.get_rot() 
                                     for musewcs in self.list_wcs_muse]
 
         # Filling in the MJD and DATE OBS keywords for the MUSE images
