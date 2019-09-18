@@ -912,7 +912,7 @@ class AlignMusePointing(object):
         else:
             fits_table['FLUX_SCALE'] = 1.0
         if save_other_params:
-            fits_table['BACKGROUND'] = self.ima_norm_factors
+            fits_table['BACKGROUND'] = self.ima_background
             fits_table['ROTANGLE'] = self.muse_rotangles
 
         # Deal with RA_OFFSET_ORIG if needed
