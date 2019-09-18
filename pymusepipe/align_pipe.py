@@ -752,7 +752,7 @@ class AlignMusePointing(object):
                                     * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                             self.offset_table['DEC_OFFSET'][ind_table[ind]] * 3600.]
                     self.init_flux_scale[nima] = nonan_flux_scale_table[ind_table[ind]]
-                    if rotange_exist:
+                    if rotangle_exist:
                         self.muse_rotangles[nima] = nonan_rotangle_table[ind_table[ind]]
                     else:
                         self.muse_rotangles[nima] = 0.0
