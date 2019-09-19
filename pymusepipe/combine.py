@@ -394,7 +394,7 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Additional suffix if needed
         for pointing in list_pointings:
-            run_combine_single_pointing(pointing, add_suffix=add_suffix,
+            self.run_combine_single_pointing(pointing, add_suffix=add_suffix,
                     sof_filename=sof_filename, lambdaminmax=lambdaminmax,
                     **kwargs)
 
@@ -423,7 +423,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         suffix = "{0}P{1:02d}".format(add_suffix, np.int(pointing))
 
         # Running the combine for that single pointing
-        run_combine(list_pointings=[np.int(pointing)], suffix=suffix, 
+        self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix, 
                         lambdaminmax=lambdaminmax,
                         sof_filename=sof_filename, **kwargs)
 
