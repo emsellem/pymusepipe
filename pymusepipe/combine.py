@@ -364,8 +364,72 @@ class MusePointings(SofPipe, PipeRecipes) :
         for name in list(self.pipe_params._dic_folders_target.keys()):
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
 
-    def run_combine(self, sof_filename='pointings_combine', expotype="REDUCED", 
-            list_pointing=None, lambdaminmax=[4000.,10000.], suffix="", **kwargs):
+    def run_combine_all_single_pointings(self,
+            add_suffix="",
+            sof_filename='pointings_combine',
+            lambdaminmax=[4000.,10000.], 
+            **kwargs):
+        """Run for all pointings individually, provided in the 
+        list of pointings
+
+        Input
+        -----
+        list_pointings: list of int
+            By default to None (using the default self.list_pointings).
+            Otherwise a list of pointings you wish to conduct
+            a combine but for each individual pointing.
+        add_suffix: str
+            Additional suffix. 'PXX' where XX is the pointing number
+            will be automatically added to that add_suffix for 
+            each individual pointing.
+        sof_filename: str
+            Name (suffix only) of the sof file for this combine.
+            By default, it is set to 'pointings_combine'.
+        lambdaminmax: list of 2 floats [in Angstroems]
+            Minimum and maximum lambda values to consider for the combine.
+            Default is 4000 and 10000 for the lower and upper limits, resp.
+        """
+        # If list_pointings is None using the initially set up one
+        list_pointings = kwargs("list_pointings", self.list_pointings)
+
+        # Additional suffix if needed
+        for pointing in list_pointings:
+            run_combine_single_pointing(pointing, add_suffix=add_suffix,
+                    sof_filename=sof_filename, lambdaminmax=lambdaminmax,
+                    **kwargs)
+
+    def run_combine_single_pointing(self, pointing, add_suffix="", 
+            sof_filename='pointings_combine',
+            lambdaminmax=[4000.,10000.], 
+            **kwargs):
+        """Running the combine routine on just one single pointing
+
+        Input
+        =====
+        pointing: int
+            Pointing number. No default: must be provided.
+        add_suffix: str
+            Additional suffix. 'PXX' where XX is the pointing number
+            will be automatically added to that add_suffix.
+        sof_filename: str
+            Name (suffix only) of the sof file for this combine.
+            By default, it is set to 'pointings_combine'.
+        lambdaminmax: list of 2 floats [in Angstroems]
+            Minimum and maximum lambda values to consider for the combine.
+            Default is 4000 and 10000 for the lower and upper limits, resp.
+        """
+
+        # getting the suffix with the additional PXX
+        suffix = "{0}P{1:02d}".format(add_suffix, np.int(pointing))
+
+        # Running the combine for that single pointing
+        run_combine(list_pointings=[np.int(pointing)], suffix=suffix, 
+                        lambdaminmax=lambdaminmax,
+                        sof_filename=sof_filename, **kwargs)
+
+    def run_combine(self, sof_filename='pointings_combine', 
+            lambdaminmax=[4000.,10000.], 
+            suffix="", **kwargs):
         """MUSE Exp_combine treatment of the reduced pixtables
         Will run the esorex muse_exp_combine routine
 
@@ -373,8 +437,10 @@ class MusePointings(SofPipe, PipeRecipes) :
         ----------
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
-        tpl: ALL by default or a special tpl time
-        list_expo: list of integers providing the exposure numbers
+        lambdaminmax: list of 2 floats
+            Minimum and maximum lambda values to consider for the combine
+        suffix: str
+            Suffix to be used for the output name
         """
         # Lambda min and max?
         [lambdamin, lambdamax] = lambdaminmax
@@ -382,6 +448,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         save = kwargs.pop("save", "cube,combined")
         # Filters
         filter_list = kwargs.pop("filter_list", self.filter_list)
+        expotype = kwargs("expotype", 'REDUCED')
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.pop("offset_table_name", None)
@@ -391,10 +458,13 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
 
+        # If list_pointings is None using the initially set up one
+        list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2
         nexpo_tocombine = sum(len(self.dic_pixtabs_in_pointings[pointing]) 
-                              for pointing in self.list_pointings)
+                              for pointing in list_pointings)
         if nexpo_tocombine <= 1:
             if self.verbose:
                 upipe.print_warning("All considered pointings only "
@@ -413,9 +483,9 @@ class MusePointings(SofPipe, PipeRecipes) :
             self._sofdict['OFFSET_LIST'] = [joinpath(self.folder_offset_table, 
                                                      self.offset_table_name)]
 
-        pixtable_name = musepipe.dic_listObject['REDUCED']
+        pixtable_name = musepipe.dic_listObject[expotype]
         self._sofdict[pixtable_name] = []
-        for pointing in self.list_pointings:
+        for pointing in list_pointings:
             self._sofdict[pixtable_name] += self.dic_pixtabs_in_pointings[pointing]
 
         self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename, self.targetname, suffix), new=True)
