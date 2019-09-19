@@ -420,7 +420,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         """
 
         # getting the suffix with the additional PXX
-        suffix = "{0}P{1:02d}".format(add_suffix, np.int(pointing))
+        suffix = "{0}_P{1:02d}".format(add_suffix, np.int(pointing))
 
         # Running the combine for that single pointing
         self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix, 
