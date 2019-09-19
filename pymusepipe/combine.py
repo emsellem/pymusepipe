@@ -390,7 +390,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             Default is 4000 and 10000 for the lower and upper limits, resp.
         """
         # If list_pointings is None using the initially set up one
-        list_pointings = kwargs("list_pointings", self.list_pointings)
+        list_pointings = kwargs.pop("list_pointings", self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
@@ -448,7 +448,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         save = kwargs.pop("save", "cube,combined")
         # Filters
         filter_list = kwargs.pop("filter_list", self.filter_list)
-        expotype = kwargs("expotype", 'REDUCED')
+        expotype = kwargs.pop("expotype", 'REDUCED')
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.pop("offset_table_name", None)
