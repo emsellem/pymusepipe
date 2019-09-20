@@ -478,6 +478,15 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Producing the list of REDUCED PIXTABLES
         self._add_calib_to_sofdict("FILTER_LIST")
 
+        # Adding a WCS if needed
+        ref_wcs = kwargs.pop("ref_wcs", None)
+        folder_ref_wcs = kwargs.pop("folder_ref_wcs", None)
+        if ref_wcs is not None:
+            if folder_ref_wcs is None:
+                folder_ref_wcs = upipe.normpath(self.paths.cubes)
+            self._sofdict['OUTPUT_WCS'] = joinpath(folder_ref_wcs, 
+                                                    ref_wcs)
+
         # Setting the default option of offset_list
         if self.offset_table_name is not None:
             self._sofdict['OFFSET_LIST'] = [joinpath(self.folder_offset_table, 

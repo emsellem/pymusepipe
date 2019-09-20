@@ -762,7 +762,8 @@ class PipePrep(SofPipe) :
         return found_expo, list_expo, group_list_expo, group_table
 
     @print_my_function_name
-    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", stage="processed", list_expo=[], 
+    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
+            stage="processed", list_expo=[], 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
