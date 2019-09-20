@@ -138,14 +138,19 @@ class MuseCube(Cube):
         except ValueError:
             # initialise the filter file
             upipe.print_info("Reading private reference filter {0}".format(filter_name))
-            if dic_extra_filters is None:
-                upipe.print_error("No extra filter directory given for private filter "
-                        "[get_filter_image in mpdaf_pipe]")
-            if filter_name in dic_extra_filters.keys():
-                filter_file = dic_extra_filters[filter_name]
+            if dic_extra_filters is not None:
+                if filter_name in dic_extra_filters.keys():
+                    filter_file = dic_extra_filters[filter_name]
+                else:
+                    upipe.print_error("Filter name not in private dictionary"
+                            "[get_filter_image in mpdaf_pipe]")
+                    upipe.print_error("Aborting"
+                    return
             else:
                 if own_filter_file is None:
-                    upipe.print_error("Private filter file is not set")
+                    upipe.print_error("No extra filter dictionary and...")
+                    upipe.print_error("the private filter file is not set")
+                    upipe.print_error("Aborting"
                     return
                 else:
                     filter_file = own_filter_file
