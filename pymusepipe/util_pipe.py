@@ -330,5 +330,21 @@ class Trail_Zone(Selection_Zone) :
         selgood = (np.sqrt((xin - x0)**2 + (yin - y0)**2) > radius)
         return selgood
 #=================================================================
+from pymusepipe.combine import default_filter_list
+def reconstruct_filter_images(cubename, filter_list=default_filter_list, 
+        filter_fits_file="filter_list.fits"):
+    """ Reconstruct all images in a list of Filters
+    cubename: str
+        Name of the cube
+    filter_list: str
+        List of filters, e.g., "Cousins_R,Johnson_I"
+        By default, the default_filter_list from pymusepipe.combine
 
-
+    filter_fits_file: str
+        Name of the fits file containing all the filter characteristics
+        Usually in filter_list.fits (MUSE default)
+    """
+    
+    command = "muse_cube_filter -f {0} {1} {2}".format(
+                  filter_list, cubename, filter_fits_file)
+    os.command(command)
