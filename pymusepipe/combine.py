@@ -484,8 +484,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         if ref_wcs is not None:
             if folder_ref_wcs is None:
                 folder_ref_wcs = upipe.normpath(self.paths.cubes)
-            self._sofdict['OUTPUT_WCS'] = joinpath(folder_ref_wcs, 
-                                                    ref_wcs)
+            self._sofdict['OUTPUT_WCS'] = [joinpath(folder_ref_wcs, ref_wcs)]
 
         # Setting the default option of offset_list
         if self.offset_table_name is not None:
