@@ -21,6 +21,7 @@ from astropy.io import fits as pyfits
 # Import package modules
 from pymusepipe.emission_lines import list_emission_lines
 from pymusepipe.emission_lines import full_muse_wavelength_range
+from pymusepipe.config_pipe import default_filter_list
 
 import collections
 from collections import OrderedDict
@@ -331,7 +332,6 @@ class Trail_Zone(Selection_Zone) :
         selgood = (np.sqrt((xin - x0)**2 + (yin - y0)**2) > radius)
         return selgood
 #=================================================================
-from pymusepipe.combine import default_filter_list
 def reconstruct_filter_images(cubename, filter_list=default_filter_list, 
         filter_fits_file="filter_list.fits"):
     """ Reconstruct all images in a list of Filters
