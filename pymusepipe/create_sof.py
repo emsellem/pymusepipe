@@ -112,7 +112,7 @@ class SofPipe(object) :
             expo_table['filename'][index]))]
 
     def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", suffix="", 
-            perexpo=False, reset=False, norm_sky_continuum=1.0):
+            perexpo=False, reset=False, norm_sky_continuum=1.0, suffix_iexpo=""):
         """ Add item to dictionary for the sof writing
         """
         if reset: self._sofdict.clear()
@@ -131,7 +131,7 @@ class SofPipe(object) :
         # Use the normalisation, even if 1.0 to produce
         # A new SKY_CONTINUUM file (with _norm at the end of the name)
         if (tag == "SKY_CONTINUUM"): 
-            add_suffix = "norm"
+            add_suffix = "{0}{1}".format(add_suffix, suffix_iexpo)
             newname = normalise_sky_continuum(folder=dir_calib, 
                                     filename=name_skycalib,
                                     norm_factor=norm_sky_continuum,
