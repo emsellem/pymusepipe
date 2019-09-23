@@ -768,12 +768,22 @@ class PipePrep(SofPipe) :
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
 
-        Parameters
-        ----------
+        Input
+        -----
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
         list_expo: list of integers providing the exposure numbers
+
+        norm_sky_continuum: float
+            Normalisation factor for the sky continuum
+        skymethod: str
+            Type of skymethod. See MUSE manual.
+        offset_list: bool
+            If True, using an OFFSET list. Default is True.
+        filter_list: str
+            List of filters to be considered for reconstructed images.
+            By Default will use the list in self.filter_list.
         """
         # Backward compatibility
         old_naming_convention = kwargs.pop("old_naming_convention", False)
@@ -793,6 +803,10 @@ class PipePrep(SofPipe) :
         else :
             # If skymethod is none, no need to save the skymodel...
             save = kwargs.pop("save", "cube,individual")
+
+        # Normalisation factor for the skies
+        norm_sky_continuum = kwargs.pop("norm_sky_continuum", 1.0)
+
         # Filters
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
