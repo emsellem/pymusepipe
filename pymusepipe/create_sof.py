@@ -25,7 +25,7 @@ from collections import OrderedDict
 
 from pymusepipe import util_pipe as upipe
 from pymusepipe import musepipe
-from pymusepipe import mpdaf_pipe
+from pymusepipe.mpdaf_pipe import normalise_sky_continuum
 
 class SofDict(OrderedDict) :
     """New Dictionary for the SOF writing
@@ -132,7 +132,7 @@ class SofPipe(object) :
         # A new SKY_CONTINUUM file (with _norm at the end of the name)
         if (tag == "SKY_CONTINUUM"): 
             add_suffix = "norm"
-            newname = mpdaf_pipe.normalise_sky_continuum(folder=dir_calib, 
+            newname = normalise_sky_continuum(folder=dir_calib, 
                                     filename=name_skycalib,
                                     norm_factor=norm_sky_continuum,
                                     suffix=add_suffix, overwrite=True)
