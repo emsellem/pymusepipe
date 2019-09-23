@@ -820,6 +820,14 @@ class PipePrep(SofPipe) :
         # Create the dictionary for scipost
         # Selecting either one or all of the exposures
         for gtable in scipost_table.groups:
+            # Getting the expo list
+            list_group_expo = gtable['iexpo'].data
+            # Adding the expo number if only 1 exposure is considered
+            if len(list_group_expo) == 1:
+                suffix_iexpo = "_{0:04d}".format(list_group_expo[0])
+            else :
+                suffix_iexpo = ""
+
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Now starting with the standard recipe
@@ -831,23 +839,26 @@ class PipePrep(SofPipe) :
             self._add_astrometry_to_sofdict(tpl)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
+
+#            # If less than 1 expo, don't load the OFFSET_LIST
+#            if len(list_group_expo) <= 1:
+#                upipe.print_info("Only one exposure in this group, "
+#                                 "hence no filter list to be loaded", pipe=self)
+#            else:
+            # Eric E - 23/09/2019 --------------------------------------------
+            # We Commented out the previous test, as we wish to be able to also 
+            # load an OFFSET table even if just one exposure is provided
+            if offset_list :
+                self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                        '{0}{1}_{2}_{3}.fits'.format(dic_files_products['ALIGN'][0], 
+                            suffix, filter_for_alignment, tpl))]
+
+            # The sky subtraction method and spectra
             if skymethod != "none" :
                 self._add_calib_to_sofdict("SKY_LINES")
                 self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', 
                         "processed", perexpo=True, suffix=suffix_skycontinuum)
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
-
-            # Getting the expo list
-            list_group_expo = gtable['iexpo'].data
-            # If less than 1 expo, don't load the OFFSET_LIST
-            if len(list_group_expo) <= 1:
-                upipe.print_info("Only one exposure in this group, "
-                                 "hence no filter list to be loaded", pipe=self)
-            else:
-                if offset_list :
-                    self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                            '{0}{1}_{2}_{3}.fits'.format(dic_files_products['ALIGN'][0], 
-                                suffix, filter_for_alignment, tpl))]
 
             # Selecting only exposures to be treated
             # We need to force 'OBJECT' to make sure scipost will deal with the exposure
@@ -862,8 +873,11 @@ class PipePrep(SofPipe) :
                 else:
                    self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
                        '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
-            self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
-                suffix, tpl), new=True)
+
+            # Adding the suffix_sof to the end of the name if needed
+            # This is the expo number if only 1 exposure is present in the list
+            self.write_sof(sof_filename="{0}_{1}{2}_{3}{4}".format(sof_filename, expotype, 
+                suffix, tpl, suffix_sof), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames = \

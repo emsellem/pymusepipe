@@ -111,7 +111,7 @@ class SofPipe(object) :
             expo_table['filename'][index]))]
 
     def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", suffix="", 
-            perexpo=False, reset=False):
+            perexpo=False, reset=False, norm_sky_continuum=1.0):
         """ Add item to dictionary for the sof writing
         """
         if reset: self._sofdict.clear()
@@ -122,7 +122,28 @@ class SofPipe(object) :
         if perexpo:
             iexpo = expo_table[index]['iexpo']
             suffix += "_{0:04d}".format(iexpo)
-        self._sofdict[tag] = [joinpath(dir_calib, "{0}_{1}{2}.fits".format(tag, this_tpl, suffix))]
+
+        # New name for the sky calibration file
+        name_skycalib = "{0}_{1}{2}.fits".format(tag, this_tpl, suffix)
+
+        # If we are processing the sky continuum
+        # Use the normalisation, even if 1.0 to produce
+        # A new SKY_CONTINUUM file (with _norm at the end of the name)
+        if (tag == "SKY_CONTINUUM"): 
+            add_suffix = "norm"
+            newname = normalise_sky_continuum(folder=dir_calib, 
+                                    filename=name_skycalib,
+                                    norm_factor=norm_sky_continuum,
+                                    suffix=add_suffix, overwrite=True)
+            # If None it means an error occurred
+            if newname is None:
+                upipe.print_warning("Cannot normalise the Sky continuum")
+                upipe.print_warning("Will try to use the un-normalised one")
+            # Otherwise just proceed with the new name
+            else:
+                name_skycalib = newname
+
+        self._sofdict[tag] = [joinpath(dir_calib, name_skycalib)]
 
     def _add_calib_to_sofdict(self, calibtype, reset=False):
         """Adding a calibration file for the SOF 
