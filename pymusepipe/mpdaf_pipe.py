@@ -39,6 +39,63 @@ from pymusepipe import util_pipe as upipe
 __version__ = '0.2.0 (9 Sep 2019)' # Adding PixTableToMask
 #__version__ = '0.1.0 (31 May 2019)'
 
+
+#========================================================================
+# A few useful routines
+# =====================
+def normalise_sky_continuum(folder="", filename="SKY_CONTINUUM.fits",
+                            norm_factor=1.0, suffix="norm",
+                            overwrite=False):
+    """Normalises a sky continuum spectrum and save it
+    within a new fits file
+
+    Input
+    -----
+    folder: str
+        Folder of the sky continuum file
+    filename: str
+        Name of the fits file to consider
+    norm_factor: float
+        Scale factor to multiply the input continuum
+    suffix: str
+        Suffix for the new continuum fits name. Default
+        is 'norm', so that the new file is 'norm_oldname.fits'
+    overwrite: bool
+        If True, existing file will be overwritten.
+        Default is False.
+    """
+    full_filename = joinpath(folder, filename)
+    if suffix == "":
+        upipe.print_error("The new and old sky continuum fits files will share")
+        upipe.print_error("the same name. This is not recommended. Aborting")
+        return None
+
+    newfilename = "{0}_{1}".format(suffix, filename)
+    full_newfilename = joinpath(folder, newfilename)
+
+    # If file does not exists
+    if not os.path.isfile(full_filename):
+        upipe.print_error("Cannot normalise sky continuum")
+        upipe.print_error("File {0} does not exist".format(full_filename))
+        return None
+
+    # Opening the fits file
+    skycont = pyfits.open(full_filename)
+
+    # getting the data
+    dcont = skycont['CONTINUUM'].data
+
+    # Create new continuum
+    # ------------------------------
+    new_cont = dcont['flux'] * norm_factor
+    skycont['CONTINUUM'].data['flux'] = new_cont
+
+    # Writing to the new file
+    skycont.writeto(full_newfilename, overwrite=overwrite)
+    upipe.print_info('Normalised Sky Continuum %s has been created'%(full_newfilename))
+    return newfilename
+
+#------------------------------------------------------------------------
 #########################################################################
 # Main class
 #                           check_musepipe
