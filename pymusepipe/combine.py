@@ -115,6 +115,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
         # Creating the full list for that pointing
         full_list = []
         for tpl in dic_tpl.keys():
+            dic_tpl[tpl].sort()
             full_list.append((tpl, dic_tpl[tpl]))
 
         # And now filling in the dictionary for that pointing
