@@ -238,20 +238,21 @@ class MusePointings(SofPipe, PipeRecipes) :
                 list_expo = self.dic_exposures_in_pointings[pointing]
                 # We loop on that list
                 for expotuple in list_expo:
-                    tpl, expo = expotuple[0], expotuple[1]
-                    # Check whether this exists in the our cube list
-                    suffix_expo = "{0}_{1:04d}".format(tpl, expo)
-                    if self.debug:
-                        upipe.print_debug("Checking which exposures are tested")
-                        upipe.print_debug(suffix_expo)
-                    for pixtab in list_pixtabs:
-                        if suffix_expo in pixtab:
-                            # We select the cube
-                            select_list_pixtabs.append(pixtab)
-                            # And remove it from the list
-                            list_pixtabs.remove(pixtab)
-                            # We break out of the cube for loop
-                            break
+                    tpl, nexpo = expotuple[0], expotuple[1]
+                    for expo in nexpo:
+                        # Check whether this exists in the our cube list
+                        suffix_expo = "{0}_{1:04d}".format(tpl, expo)
+                        if self.debug:
+                            upipe.print_debug("Checking which exposures are tested")
+                            upipe.print_debug(suffix_expo)
+                        for pixtab in list_pixtabs:
+                            if suffix_expo in pixtab:
+                                # We select the cube
+                                select_list_pixtabs.append(pixtab)
+                                # And remove it from the list
+                                list_pixtabs.remove(pixtab)
+                                # We break out of the cube for loop
+                                break
 
             select_list_pixtabs.sort()
             self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs
