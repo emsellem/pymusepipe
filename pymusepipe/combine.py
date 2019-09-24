@@ -104,6 +104,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
             expo = sl[1][-9:-5]
             # Find the tpl
             tpl = sl[1].split("_" + expo)[0]
+            print(expo, tpl)
             # If not already there, add it
             if tpl not in dic_tpl.keys():
                 dic_tpl[tpl] = [np.int(expo)]
