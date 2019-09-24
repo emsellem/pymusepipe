@@ -33,13 +33,13 @@ WARNING = '\033[1;31;20m'
 INFO = '\033[1;32;20m'
 ERROR = '\033[91m'
 ENDC = '\033[0m'
-BOLD = "\033[1m"
-DEBUG = "\033[1m"
+BOLD = '\033[1m'
+DEBUG = '\033[1m'
 
 def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)
 
-def print_warning(text, **kwargs) :
+def print_warning(text, **kwargs):
     toprint = "# MusePipeWarning " + text
     mypipe = kwargs.pop("pipe", None)
     try:
@@ -49,7 +49,7 @@ def print_warning(text, **kwargs) :
 
     print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
 
-def print_info(text, **kwargs) :
+def print_info(text, **kwargs):
     toprint = "# MusePipeInfo " + text
     mypipe = kwargs.pop("pipe", None)
     try:
@@ -64,7 +64,7 @@ def print_debug(text, **kwargs) :
     mypipe = kwargs.pop("pipe", None)
     print(DEBUG + "# DebugInfo " + ENDC + text, **kwargs)
 
-def print_error(text, **kwargs) :
+def print_error(text, **kwargs):
     toprint = "# MusePipeError " + text
     mypipe = kwargs.pop("pipe", None)
     try:
