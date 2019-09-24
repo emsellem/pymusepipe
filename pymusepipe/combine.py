@@ -238,9 +238,10 @@ class MusePointings(SofPipe, PipeRecipes) :
                     # this is the list of exposures to consider
                     list_expo = self.dic_exposures_in_pointings[pointing]
                     # We loop on that list
-                    for expo in list_expo:
+                    for expotuple in list_expo:
+                        tpl, expo = expotuple[0], expotuple[1]
                         # Check whether this exists in the our cube list
-                        suffix_expo = "{0:04d}.fits".format(expo)
+                        suffix_expo = "{0}_{0:04d}".format(tpl, expo)
                         if self.debug:
                             upipe.print_debug("Checking which exposures are tested")
                             upipe.print_debug(suffix_expo)
