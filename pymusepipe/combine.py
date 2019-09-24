@@ -83,6 +83,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
         for folder in list_folders:
             list_pointings.append(np.int(folder[-2:]))
 
+    list_pointings.sort()
     upipe.print_info("Pointings list: {0}".format(str(list_pointings)))
 
     # Looping over the pointings
