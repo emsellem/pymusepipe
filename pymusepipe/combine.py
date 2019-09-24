@@ -13,6 +13,7 @@ import numpy as np
 import os
 from os.path import join as joinpath
 import glob
+import copy
 
 try :
     import astropy as apy
