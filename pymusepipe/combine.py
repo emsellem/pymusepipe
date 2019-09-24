@@ -188,6 +188,7 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Initialise the dictionary of pixtabs to be found in each pointing
         self.dic_pixtabs_in_pointings = {}
+        self.dic_allpixtabs_in_pointings = {}
         # Loop on Pointings
         for pointing in self.list_pointings:
             # get the path
@@ -223,6 +224,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                         upipe.print_warning("Hence will not include fixed PixTable "
                                 "{0}".format(fixed_pixtab))
 
+            self.dic_allpixtabs_in_pointings[pointing] = list_pixtabs
             if self.debug:
                 upipe.print_debug(list_pixtabs)
 
