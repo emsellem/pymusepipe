@@ -91,7 +91,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
         # get the path of the pointing
         path_pointing = joinpath(target_path, "P{0:02d}".format(np.int(pointing)))
         # List existing pixtabs, using the given suffix
-        list_pixtabs = glob.glob(path_pointing + "Object/" + 
+        list_pixtabs = glob.glob(path_pointing + "/Object/" + 
                 "{0}{1}*fits".format(pixtable_suffix, suffix))
 
         # Reset the needed temporary dictionary
