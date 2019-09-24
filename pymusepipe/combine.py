@@ -224,7 +224,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                         upipe.print_warning("Hence will not include fixed PixTable "
                                 "{0}".format(fixed_pixtab))
 
-            self.dic_allpixtabs_in_pointings[pointing] = list_pixtabs
+            self.dic_allpixtabs_in_pointings[pointing] = copy.copy(list_pixtabs)
 
             # if no selection on exposure names are given
             # Select all existing pixtabs
