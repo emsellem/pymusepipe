@@ -225,8 +225,6 @@ class MusePointings(SofPipe, PipeRecipes) :
                                 "{0}".format(fixed_pixtab))
 
             self.dic_allpixtabs_in_pointings[pointing] = list_pixtabs
-            if self.debug:
-                upipe.print_debug(list_pixtabs)
 
             # if no selection on exposure names are given
             # Select all existing pixtabs
