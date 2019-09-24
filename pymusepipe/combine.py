@@ -78,7 +78,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
     # Defining the pointing list if not provided
     # Done by scanning the target path
     if list_pointings is None:
-        list_folders = glob.glob(target_path + "P??")
+        list_folders = glob.glob(target_path + "/P??")
         list_pointings = []
         for folder in list_folders:
             list_pointings.append(np.int(folder[-2:]))
