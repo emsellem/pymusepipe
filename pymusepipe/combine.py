@@ -244,7 +244,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                     tpl, nexpo = expotuple[0], expotuple[1]
                     for expo in nexpo:
                         # Check whether this exists in the our cube list
-                        suffix_expo = "_{1:04d}".format(expo)
+                        suffix_expo = "_{0:04d}".format(expo)
                         if self.debug:
                             upipe.print_debug("Checking which exposures are tested")
                             upipe.print_debug(suffix_expo)
