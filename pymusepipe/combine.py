@@ -57,6 +57,69 @@ dic_combined_folders = {
         "log": "Log/"
         }
 
+def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
+    """Provide a list of reduced pixtables
+
+    Input
+    -----
+    target_path: str
+        Path for the target folder
+    list_pointings: list of int
+        List of integers, providing the list of pointings to consider
+    suffix: str
+        Additional suffix, if needed, for the names of the PixTables.
+    """
+    # Getting the pieces of the names to be used for pixtabs
+    pixtable_suffix = prep_recipes_pipe.dic_products_scipost['individual'][0]
+
+    # Initialise the dictionary of pixtabs to be found in each pointing
+    dic_pixtables = {}
+
+    # Defining the pointing list if not provided
+    # Done by scanning the target path
+    if list_pointings is None:
+        list_folders = glob.glob(target_path + "P??")
+        list_pointings = []
+        for folder in list_folders:
+            list_pointings.append(np.int(folder[-2:]))
+
+    upipe.print_info("Pointings list: {0}".format(str(list_pointings)))
+
+    # Looping over the pointings
+    for pointing in list_pointings:
+        # get the path of the pointing
+        path_pointing = joinpath(target_path, "P{0:02d}".format(np.int(pointing)))
+        # List existing pixtabs, using the given suffix
+        list_pixtabs = glob.glob(path_pointing + "Object/" + 
+                "{0}{1}*fits".format(pixtable_suffix, suffix))
+
+        # Reset the needed temporary dictionary
+        dic_tpl = {}
+        # Loop over the pixtables for that pointing
+        for pixtab in list_pixtabs:
+            # Split over the PIXTABLE_REDUCED string
+            sl = pixtab.split(pixtable_suffix + "_")
+            # Find the expo number
+            expo = sl[1][-9:-5]
+            # Find the tpl
+            tpl = sl[1].split("_" + expo)[0]
+            # If not already there, add it
+            if tpl not in dic_tpl.keys():
+                dic_tpl[tpl] = [np.int(expo)]
+            # if already accounted for, add the expo number
+            else:
+                dic_tpl[tpl].append(np.int(expo))
+
+        # Creating the full list for that pointing
+        full_list = []
+        for tpl in dic_tpl.keys():
+            full_list.append((tpl, dic_tpl[tpl]))
+
+        # And now filling in the dictionary for that pointing
+        dic_pixtables[pointing] = full_list
+
+    return dic_pixtables
+
 class MusePointings(SofPipe, PipeRecipes) :
     def __init__(self, targetname=None, list_pointings=[1], 
             dic_exposures_in_pointing=None,
@@ -85,7 +148,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         vsystemic: float 
             Default is 0. Systemic velocity of the galaxy [in km/s]
         suffix_fixed_pixtables: str
-            Default is "tmask". Suffix for fixed PixTables
+            Suffix for fixed PixTables. Default is ''.
         use_fixed_pixtables: bool
             Default is False. If True, will use suffix_fixed_pixtables to filter out
             Pixtables which have been fixed.
