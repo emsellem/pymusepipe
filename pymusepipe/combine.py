@@ -232,8 +232,9 @@ class MusePointings(SofPipe, PipeRecipes) :
                     # We loop on that list
                     for expo in list_expo:
                         # Check whether this exists in the our cube list
+                        suffix_expo = "{0:04d}.fits".format(expo)
                         for pixtab in list_pixtabs:
-                            if expo in pixtab:
+                            if suffix_expo in pixtab:
                                 # We select the cube
                                 select_list_pixtabs.append(pixtab)
                                 # And remove it from the list
