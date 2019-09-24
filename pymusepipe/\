@@ -34,7 +34,6 @@ INFO = '\033[1;32;20m'
 ERROR = '\033[91m'
 ENDC = '\033[0m'
 BOLD = "\033[1m"
-DEBUG = "\033[1m"
 
 def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)

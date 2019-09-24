@@ -65,7 +65,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             combined_folder_name="Combined", suffix="",
             offset_table_name=None,
             logfile="MusePipeCombine.log", reset_log=False,
-            verbose=True, **kwargs):
+            verbose=True, debug=False, **kwargs):
         """Initialisation of class muse_expo
 
         Input
@@ -78,6 +78,9 @@ class MusePointings(SofPipe, PipeRecipes) :
             filename to initiale FIXED calibration MUSE files
         verbose: bool 
             Give more information as output (default is True)
+        debug: bool
+            Allows to get more messages when needed
+            Default is False
         vsystemic: float 
             Default is 0. Systemic velocity of the galaxy [in km/s]
         suffix_fixed_pixtables: str
@@ -93,6 +96,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         """
         # Verbose option
         self.verbose = verbose
+        self.debug = debug
 
         # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')
@@ -219,6 +223,9 @@ class MusePointings(SofPipe, PipeRecipes) :
                         upipe.print_warning("Hence will not include fixed PixTable "
                                 "{0}".format(fixed_pixtab))
 
+            if self.debug:
+                upipe.print_debug(list_pixtabs)
+
             # if no selection on exposure names are given
             # Select all existing pixtabs
             if self.dic_exposures_in_pointings is None:
@@ -227,12 +234,16 @@ class MusePointings(SofPipe, PipeRecipes) :
             # Otherwise use the ones which are given via their expo numbers
             else:
                 try:
+                    select_list_pixtabs = []
                     # this is the list of exposures to consider
                     list_expo = self.dic_exposures_in_pointings[pointing]
                     # We loop on that list
                     for expo in list_expo:
                         # Check whether this exists in the our cube list
                         suffix_expo = "{0:04d}.fits".format(expo)
+                        if self.debug:
+                            upipe.print_debug("Checking which exposures are tested")
+                            upipe.print_debug(suffix_expo)
                         for pixtab in list_pixtabs:
                             if suffix_expo in pixtab:
                                 # We select the cube
