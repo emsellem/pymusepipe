@@ -59,8 +59,11 @@ from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.recipes_pipe import PipeRecipes
 from pymusepipe.prep_recipes_pipe import PipePrep
 import pymusepipe.util_pipe as upipe
+from pymusepipe.config_pipe import (suffix_rawfiles,suffix_prealign,
+        listexpo_files,dic_listObject,dic_listMaster,listexpo_types,
+        dic_geo_astrowcs_table)
 
-__version__ = '2.0.1 (09 July 2019)'
+__version__ = '2.0.2 (25/09/2019)'
 #       Cleaning and adding comments
 #__version__ = '2.0.0 (19 June 2019)'
 #       Included an astropy table
@@ -69,110 +72,8 @@ __version__ = '2.0.1 (09 July 2019)'
 #__version__ = '0.0.2 (08 March    2018)'
 #__version__ = '0.0.1 (21 November 2017)'
 
-############################################################
-#                      BEGIN
-# The following parameters can be adjusted for the need of
-# the specific pipeline to be used
-############################################################
-
-# NOTE: most of the parameters have now been migrated to
-# init_musepipe.py for consistency.
-
-listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
-        'ILLUM': 'FLAT,LAMP,ILLUM', 'TWILIGHT': 'FLAT,SKY', 
-        'WAVE': 'WAVE', 'STD': 'STD', 'AST': 'AST',
-        'OBJECT': 'OBJECT', 'SKY': 'SKY'
-        }
-
-# This dictionary contains the types
-dic_listMaster = {'DARK': 'MASTER_DARK', 
-        'BIAS': 'MASTER_BIAS', 
-        'FLAT': 'MASTER_FLAT',
-        'TRACE': 'TRACE_TABLE',
-        'TWILIGHT': 'TWILIGHT_CUBE', 
-        'WAVE': 'WAVECAL_TABLE', 
-        'LSF': 'LSF_PROFILE', 
-        'STD': 'PIXTABLE_STD' 
-        }
-
-dic_listObject = {'OBJECT': 'PIXTABLE_OBJECT', 
-        'SKY': 'PIXTABLE_SKY', 
-        'STD': 'PIXTABLE_STD',
-        'REDUCED': 'PIXTABLE_REDUCED'
-        }
-
-listexpo_files = {
-        "OBJECT" : ['object', 'OBJECT', str, '20A'],
-        "TYPE" : ['type', 'ESO DPR TYPE', str, '20A'],
-        "DATE":  ['mjd', 'MJD-OBS', np.float, 'E'],
-        "MODE":  ['mode', 'ESO INS MODE', str, '10A'],
-        "EXPTIME":  ['exptime', 'EXPTIME', float, 'E'],
-        "TPLS":  ['tpls', 'ESO TPL START', str, '30A'],
-        "TPLN":  ['tplnexp', 'ESO TPL NEXP', np.int, 'J'],
-        "TPLNO":  ['tplno', 'ESO TPL EXPNO', np.int, 'J']
-         }
-
-exclude_list_checkmode = ['BIAS', 'DARK']
-
-esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
-        
-# Time varying calibrations for the astrometry
-dic_geo_astrowcs_table = {
-    'comm1' :   ['2014-02-09', '2014-02-09'], # mean date
-    'comm2a':   ['2014-04-27', '2014-05-06'],
-    'comm2b':   ['2014-07-24', '2014-08-03'],
-    'gto01' :   ['2014-09-13', '2014-09-26'],
-    'gto02' :   ['2014-10-18', '2014-10-29'],
-    'gto03' :   ['2014-11-16', '2014-11-27'],
-    '2014d' :   ['2014-12-16', '2014-12-25'],
-    'gto05' :   ['2015-04-14', '2015-04-25'],
-    'gto06' :   ['2015-05-10', '2015-05-23'],
-    'gto07' :   ['2015-08-17', '2015-08-24'],
-    'gto08' :   ['2015-09-07', '2015-09-12'],
-    'gto09' :   ['2015-10-09', '2015-10-16'],
-    'gto10' :   ['2015-11-04', '2015-11-13'],
-    'gto11' :   ['2016-01-31', '2016-02-06'],
-    'gto12' :   ['2016-03-09', '2016-03-14'],
-    'gto13' :   ['2016-04-05', '2016-04-10'],
-    'gto14' :   ['2016-05-06', '2016-05-12'],
-    'gto15' :   ['2016-08-29', '2016-09-06'],
-    'gto16' :   ['2017-01-27', '2017-02-03'],
-# Initial gto17 is actually extended with gto18
-# which did not have a solution
-#    'gto17' :   ['2017-04-22', '2017-04-25'],
-#    'gto18' :   ['2017-05-20', '2017-05-23'],
-    'gto17' :   ['2017-04-22', '2017-05-23'],
-    'gto19' :   ['2017-09-19', '2017-09-25'],
-    'gto20' :   ['2017-10-16', '2017-10-26'],
-    'gto21' :   ['2017-11-15', '2017-11-20'],
-    'gto22' :   ['2018-02-11', '2018-02-16'],
-    'gto23' :   ['2018-03-14', '2018-03-19'],
-    'gto24' :   ['2018-04-11', '2018-04-19'],
-    'gto25' :   ['2018-05-10', '2018-05-13'],
-    'gto26' :   ['2018-08-12', '2018-08-18'],
-    'gto27' :   ['2018-09-05', '2018-09-15'],
-    'gto28' :   ['2018-10-07', '2018-10-15'],
-# gto30 did not provide a solution hence
-# gto29 also includes gto30 run
-#    'gto29' :   ['2018-07-14', '2018-11-14'], 
-#    'gto30' :   ['2018-12-06', '2018-12-12'],
-    'gto29' :   ['2018-07-14', '2018-12-12'],
-    'gto31' :   ['2019-01-02', '2019-01-09'],
-    'gto32' :   ['2019-03-04', '2019-03-07'],
-    'gto33' :   ['2019-04-05', '2019-04-11'],
-    'gto34' :   ['2019-05-03', '2019-05-05'] 
-}
-
-# Suffix for the pre-alignment files. Will be part of the output names
-suffix_prealign = "_prealign"
-
-# List of suffix you wish to have scanned
-suffix_rawfiles = ['fits.fz']
-
-############################################################
-#                      END
-############################################################
-
+# esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
+   
 #########################################################################
 # Useful Classes for the Musepipe
 #########################################################################
@@ -713,6 +614,57 @@ class MusePipe(PipePrep, PipeRecipes):
         except AttributeError:
             upipe.print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
             return Table()
+
+    def _get_name_calibfile(calibtype):
+        """Get the name of the calibration file
+        """
+        calibfile = getattr(self.pipe_params, calibtype.lower())
+        return joinpath(self.pipe_params.musecalib, calibfile)
+
+    def _read_offset_table(self, offset_table_name=None, folder_offset_table=None):
+        """Reading the Offset Table
+
+        Input
+        -----
+        offset_table_name: str
+            Name of the offset table
+            Default is None
+        folder_offset_table: str
+            Name of the folder to find the offset table
+            Default is None
+        """
+        self.offset_table_name = offset_table_name
+        if self.offset_table_name is None:
+            upipe.print_warning("No Offset table name given")
+            self.offset_table = Table()
+            return
+        
+        # Using the given folder name, alignment one by default
+        if folder_offset_table is None:
+            self.folder_offset_table = self.paths.alignment
+        else:
+            self.folder_offset_table = folder_offset_table
+
+        full_offset_table_name = joinpath(self.folder_offset_table,
+                                    self.offset_table_name)
+        if not os.path.isfile(full_offset_table_name):
+            upipe.print_error("Offset table [{0}] not found".format(
+                full_offset_table_name))
+            self.offset_table = Table()
+            return
+
+        # Opening the offset table
+        self.offset_table = Table.read(full_offset_table_name)
+
+    def _select_closest_mjd(self, mjdin, group_table) :
+        """Get the closest frame within the expotype
+        If the attribute does not exist in Tables, it tries to read
+        the table from the folder
+        """
+        # Get the closest tpl
+        index = np.argmin((mjdin - group_table['mjd'])**2)
+        closest_tpl = group_table[index]['tpls']
+        return index, closest_tpl
 
     def _get_suffix_product(self, expotype):
         return self._dic_listMasterObject[expotype]

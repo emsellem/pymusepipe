@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT license - see LICENSE
 
 """MUSE-PHANGS preparation recipe module
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # Importing modules
@@ -23,6 +23,8 @@ from pymusepipe import util_pipe as upipe
 from pymusepipe.create_sof import SofPipe
 from pymusepipe.align_pipe import create_offset_table
 from pymusepipe import musepipe
+from pymusepipe.mpdaf_pipe import MuseSkyContinuum,MuseFilter
+from pymusepipe.config_pipe import mjd_names
 
 try :
     import astropy as apy
@@ -683,6 +685,26 @@ class PipePrep(SofPipe) :
                     offset_list=False, filter_list=filter_for_alignment,
                     **extra_kwargs)
 
+    @print_my_function_name
+    def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT", 
+                            tpl="ALL", stage="processed", list_expo=[], 
+                            lambdaminmax=[4000.,10000.], suffix="", **kwargs)
+        """Launch the scipost command exposure per exposure
+        """
+        # First selecting the files via the grouped table
+        object_table = self._get_table_expo(expotype, stage)
+
+        # Processing individual exposures to get the full cube and image
+        for i in range(len(object_table)):
+            iexpo = np.int(object_table['iexpo'][i])
+            mytpl = object_table['tpls'][i]
+            if tpl != "ALL" and tpl != mytpl :
+                continue
+            # Running scipost now on the individual exposure
+            self.run_scipost(sof_filename=sof_filename, expotype=expotype,
+                    tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
+                    lambdaminmax=lambdaminmax, **kwargs)
+
     def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list=None):
         """Provide a set of key output products depending on the save mode
         for scipost
@@ -761,6 +783,67 @@ class PipePrep(SofPipe) :
 
         return found_expo, list_expo, group_list_expo, group_table
 
+    def _normalise_skycontinuum(self, mjd_expo, expotype, tpl_expo, iexpo, 
+            suffix="", offset_table_name=None, **kwargs):
+        """Create a normalised continuum, to be included in the sof file
+        """
+        stage = "processed"
+        # Finding the best tpl for this sky calib file type
+        expo_table = self._get_table_expo(expotype, stage)
+        index, this_tpl = self._select_closest_mjd(mjd_expo, expo_table) 
+        dir_calib = self._get_fullpath_expo(expotype, stage)
+
+        # Adding the expo number of the SKY continuum
+        iexpo_cont = expo_table[index]['iexpo']
+        suffix += "_{0:04d}".format(iexpo_cont)
+
+        # Name for the sky calibration file
+        name_skycalib = "SKY_CONTINUUM_{0}{1}.fits".format(this_tpl, suffix)
+        mycont = MuseSkyContinuum(joinpath(dir_calib, name_skycalib))
+
+        # Check if normalise factor or from offset table background value
+        normalise_factor = kwargs.pop("normalise_factor", None)
+        status = 0
+        if normalise_factor is None:
+            # Checking input offset table and corresponding pixtables
+            folder_offset_table = kwargs.pop("folder_offset_table", None)
+            self._read_offset_table(offset_table_name, folder_offset_table)
+            # Get the background value
+            if mjd_names['table'] not in self.offset_table.columns:
+                upipe.print_warning("No MJD column in offset table {0}".format(
+                                     offset_table_name))
+                status = -1
+            else:    
+                table_mjdobs = self.offset_table[mjd_names['table']]
+                if (mjd_expo in table_mjdobs) and ('BACKGROUND' in self.offset_table.columns):
+                    ind_table = np.argwhere(table_mjdobs == mjd_expo)[0]
+                    background = self.offset_table['BACKGROUND'][ind_table[0]]
+                else:
+                    status = -1
+
+            if status < 0:
+                upipe.print_error("Could not find MJD or BACKGROUND value in offset table"
+                upipe.print_warning("A background of 0 will be assumed, and")
+                upipe.print_warning("a normalisation of 1 will be used for the SKY_CONTINUUM")
+                return ""
+
+            # Getting the muse filter for sky continuum
+            filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+            filter_fits_file = self._get_name_calibfile("FILTER_LIST")
+            mymusefilter = MuseFilter(filter_name=filter_for_alignment,
+                                      filter_fits_file=filter_fits_file)
+            # Find the background value from the offset table
+            # Integration the continuum in that filter
+            mycont.integrate(mymusefilter)
+            mycont.get_normfactor(background, filter_for_alignment)
+            normalise_factor = getattr(mycont, filter_for_alignment).norm
+
+        # Returning the name of the normalised continuum
+        prefix_skycont = "norm_{0}_{1:04d}".format(tpl_expo, iexpo)
+        mycont.save_normalised(normalise_factor, prefix=prefix_skycont)
+
+        return prefix_skycont
+
     @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
             stage="processed", list_expo=[], 
@@ -774,20 +857,30 @@ class PipePrep(SofPipe) :
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
         list_expo: list of integers providing the exposure numbers
+        lambdaminmax: tuple of 2 floats
+            Minimum and Maximum wavelength to pass to the muse_scipost recipe
+        suffix: str
+            Suffix to add to the input pixtables.
 
-        norm_sky_continuum: float
-            Normalisation factor for the sky continuum
+        norm_skycontinuum: bool
+            Normalise the skycontinuum or not. Default is False.
+            If normalisation is to be done, it will use the offset_table
+            and the tabulated background value to renormalise the sky 
+            continuum.
         skymethod: str
             Type of skymethod. See MUSE manual.
         offset_list: bool
             If True, using an OFFSET list. Default is True.
+        offset_table_name: str
+            Name of the offset table table. If not provided, will use the 
+            default name produced during the pipeline run.
+        filter_for_alignment: str
+            Name of the filter used for alignment. 
+            Default is self.filter_for_alignment
         filter_list: str
             List of filters to be considered for reconstructed images.
             By Default will use the list in self.filter_list.
         """
-        # Backward compatibility
-        old_naming_convention = kwargs.pop("old_naming_convention", False)
-
         # Selecting the table with the right iexpo
         found_expo, list_expo, group_list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
@@ -804,13 +897,14 @@ class PipePrep(SofPipe) :
             # If skymethod is none, no need to save the skymodel...
             save = kwargs.pop("save", "cube,individual")
 
-        # Normalisation factor for the skies
-        norm_sky_continuum = kwargs.pop("norm_sky_continuum", 1.0)
+        # Normalisation of the sky continuum
+        norm_skycontinuum = kwargs.pop("norm_skycontinuum", False)
 
         # Filters
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
-        offset_list = kwargs.pop("offset_list", "True")
+        offset_list = kwargs.pop("offset_list", True)
+        offset_table_name = kwargs.pop("offset_table_name", None)
 
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
@@ -863,17 +957,30 @@ class PipePrep(SofPipe) :
             # We Commented out the previous test, as we wish to be able to also 
             # load an OFFSET table even if just one exposure is provided
             if offset_list :
-                self._sofdict['OFFSET_LIST'] = [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                        '{0}{1}_{2}_{3}.fits'.format(dic_files_products['ALIGN'][0], 
-                            suffix, filter_for_alignment, tpl))]
+                if offset_table_name is None:
+                    offset_table_name = joinpath(self._get_fullpath_expo(expotype, "processed"),
+                                           '{0}{1}_{2}_{3}.fits'.format(
+                                           dic_files_products['ALIGN'][0], 
+                                           suffix, filter_for_alignment, tpl))
+                self._sofdict['OFFSET_LIST'] = [offset_table_name]
 
-            # The sky subtraction method and spectra
+            # The sky subtraction method on the sky continuum to normalise it
+            # But only if requested
+            if norm_skycontinuum:
+                if len(list_group_expo) > 1:
+                    upipe.print_warning("More than 1 exposure in group table (scipost)")
+                    upipe.print_warning("The sky continuum will be "
+                                        "normalised according to the first exposure")
+                prefix_skycontinuum = self._normalise_skycontinuum(mjd_expo=mean_mjd, 
+                        expotype=expotype, tpl_expo=tpl, iexpo=list_group_expo[0], 
+                        suffix=suffix_skycontinuum, offset_table_name=offset_table_name)
+            else:
+                prefix_skycontinuum = ""
             if skymethod != "none" :
                 self._add_calib_to_sofdict("SKY_LINES")
                 self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', 
-                        "processed", perexpo=True, suffix=suffix_skycontinuum,
-                        norm_sky_continuum=norm_sky_continuum,
-                        suffix_iexpo=suffix_iexpo)
+                        "processed", suffix=suffix_skycontinuum, 
+                        prefix=prefix_skycontinuum)
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
 
             # Selecting only exposures to be treated
@@ -883,12 +990,8 @@ class PipePrep(SofPipe) :
             pixtable_name_thisone = self._get_suffix_product(expotype)
             self._sofdict[pixtable_name] = []
             for iexpo in list_group_expo:
-                if old_naming_convention:
-                   self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                       '{0}_{1:04d}-{2:02d}.fits'.format(pixtable_name_thisone, iexpo, j+1)) for j in range(24)]
-                else:
-                   self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                       '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
+               self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                   '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
 
             # Adding the suffix_sof to the end of the name if needed
             # This is the expo number if only 1 exposure is present in the list
@@ -1169,9 +1272,6 @@ class PipePrep(SofPipe) :
         """Produce a cube from all frames in the pointing
         list_expo or tpl specific arguments can still reduce the selection if needed
         """
-        # Backward compatibility
-        old_naming_convention = kwargs.pop("old_naming_convention", False)
-
         # Selecting the table with the right iexpo
         found_expo, list_expo, group_list_expo, combine_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
         if not found_expo:
@@ -1210,7 +1310,7 @@ class PipePrep(SofPipe) :
 
         # Setting the default option of offset_list
         # And looking for that table, adding it to the sof file
-        offset_list = kwargs.pop("offset_list", "True")
+        offset_list = kwargs.pop("offset_list", True)
         folder_expo = self._get_fullpath_expo(expotype, stage)
         long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
         if offset_list :
@@ -1227,13 +1327,9 @@ class PipePrep(SofPipe) :
 
         self._sofdict[pixtable_name] = []
         for prod in pixtable_name_thisone:
-            if old_naming_convention:
-               self._sofdict[pixtable_name] += [joinpath(folder_expo,
-                   '{0}_{1:04d}.fits'.format(prod, row['iexpo'])) for row in combine_table]
-            else:
-               self._sofdict[pixtable_name] += [joinpath(folder_expo,
-                   '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo'])) for row in
-                   combine_table]
+            self._sofdict[pixtable_name] += [joinpath(folder_expo,
+                '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo'])) for row in
+                combine_table]
         self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
             long_suffix, tpl), new=True)
 

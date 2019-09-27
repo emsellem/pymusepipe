@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT license - see LICENSE
 
 """MUSE-PHANGS creating sof file module
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # This module has been largely inspired by work of
@@ -25,7 +25,6 @@ from collections import OrderedDict
 
 from pymusepipe import util_pipe as upipe
 from pymusepipe import musepipe
-from pymusepipe.mpdaf_pipe import normalise_sky_continuum
 
 class SofDict(OrderedDict) :
     """New Dictionary for the SOF writing
@@ -75,16 +74,6 @@ class SofPipe(object) :
         # Returning the current sof as relative path
         self.current_sof = upipe.normpath(os.path.relpath(sof))
 
-    def _select_closest_mjd(self, mjdin, group_table) :
-        """Get the closest frame within the expotype
-        If the attribute does not exist in Tables, it tries to read
-        the table from the folder
-        """
-        # Get the closest tpl
-        index = np.argmin((mjdin - group_table['mjd'])**2)
-        closest_tpl = group_table[index]['tpls']
-        return index, closest_tpl
-    
     def _add_list_tplmaster_to_sofdict(self, mean_mjd, list_expotype):
         """Add a list of masterfiles to the SOF
         """
@@ -111,8 +100,8 @@ class SofPipe(object) :
         self._sofdict[expotype] = [upipe.normpath(joinpath(self.paths.rawfiles, 
             expo_table['filename'][index]))]
 
-    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", suffix="", 
-            perexpo=False, reset=False, norm_sky_continuum=1.0, suffix_iexpo=""):
+    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", 
+            suffix="", prefix="", reset=False):
         """ Add item to dictionary for the sof writing
         """
         if reset: self._sofdict.clear()
@@ -120,29 +109,11 @@ class SofPipe(object) :
         expo_table = self._get_table_expo(expotype, stage)
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
         dir_calib = self._get_fullpath_expo(expotype, stage)
-        if perexpo:
-            iexpo = expo_table[index]['iexpo']
-            suffix += "_{0:04d}".format(iexpo)
+        iexpo = expo_table[index]['iexpo']
+        suffix += "_{0:04d}".format(iexpo)
 
-        # New name for the sky calibration file
-        name_skycalib = "{0}_{1}{2}.fits".format(tag, this_tpl, suffix)
-
-        # If we are processing the sky continuum
-        # Use the normalisation, even if 1.0 to produce
-        # A new SKY_CONTINUUM file (with _norm at the end of the name)
-        if (tag == "SKY_CONTINUUM"): 
-            add_suffix = "{0}{1}".format(add_suffix, suffix_iexpo)
-            newname = normalise_sky_continuum(folder=dir_calib, 
-                                    filename=name_skycalib,
-                                    norm_factor=norm_sky_continuum,
-                                    suffix=add_suffix, overwrite=True)
-            # If None it means an error occurred
-            if newname is None:
-                upipe.print_warning("Cannot normalise the Sky continuum")
-                upipe.print_warning("Will try to use the un-normalised one")
-            # Otherwise just proceed with the new name
-            else:
-                name_skycalib = newname
+        # Name for the sky calibration file
+        name_skycalib = "{0}{1}_{2}{3}.fits".format(prefix, tag, this_tpl, suffix)
 
         self._sofdict[tag] = [joinpath(dir_calib, name_skycalib)]
 
@@ -150,8 +121,7 @@ class SofPipe(object) :
         """Adding a calibration file for the SOF 
         """
         if reset: self._sofdict.clear()
-        calibfile = getattr(self.pipe_params, calibtype.lower())
-        self._sofdict[calibtype] = [joinpath(self.pipe_params.musecalib, calibfile)]
+        self._sofdict[calibtype] = [self._get_name_calibfile(calibfile)]
 
     def _add_geometry_to_sofdict(self, tpls):
         """Extract the geometry table and add it to the dictionary

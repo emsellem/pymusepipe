@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT license - see LICENSE
 
 """MUSE-PHANGS mpdaf-functions module
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # This module uses some mpdaf routines and wrap some of their
@@ -13,6 +13,10 @@ __contact__   = " <eric.emsellem@eso.org>"
 
 # Importing modules
 import numpy as np
+
+# Import scipy
+import scipy
+from scipy.integrate import simps
 
 # Standard modules
 import os
@@ -39,62 +43,42 @@ from pymusepipe import util_pipe as upipe
 __version__ = '0.2.0 (9 Sep 2019)' # Adding PixTableToMask
 #__version__ = '0.1.0 (31 May 2019)'
 
-
 #========================================================================
 # A few useful routines
 # =====================
-def normalise_sky_continuum(folder="", filename="SKY_CONTINUUM.fits",
-                            norm_factor=1.0, suffix="norm",
-                            overwrite=False):
-    """Normalises a sky continuum spectrum and save it
-    within a new fits file
+def get_sky_spectrum(specname) :
+    """Read sky spectrum from MUSE data reduction
+    """
+    if not os.path.isfile(specname):
+        upipe.print_error("{0} not found".format(specname))
+        return None
+
+    sky = pyfits.getdata(specname)
+    crval = sky['lambda'][0]
+    cdelt = sky['lambda'][1] - crval
+    wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=units.angstrom)
+    spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
+    return spec
+#== ------------------------------------
+def integrate_spectrum(spectrum, muse_filter):
+    """Integrate a spectrum using a certain Muse Filter file.
 
     Input
     -----
-    folder: str
-        Folder of the sky continuum file
-    filename: str
-        Name of the fits file to consider
-    norm_factor: float
-        Scale factor to multiply the input continuum
-    suffix: str
-        Suffix for the new continuum fits name. Default
-        is 'norm', so that the new file is 'norm_oldname.fits'
-    overwrite: bool
-        If True, existing file will be overwritten.
-        Default is False.
+    spectrum: Spectrum
+    muse_filter: MuseFilter
     """
-    full_filename = joinpath(folder, filename)
-    if suffix == "":
-        upipe.print_error("The new and old sky continuum fits files will share")
-        upipe.print_error("the same name. This is not recommended. Aborting")
-        return None
+    # interpolation linearly the filter throughput onto
+    # the spectrum wavelength
+    effS = np.interp(spectrum.wave.coord(), muse_filter.wave, muse_filter.throughput)
+    filtwave = np.sum(effS) 
+    if filtwave > 0:
+        muse_filter.flux_cont = np.sum(spectrum.data * effS) / filtwave 
+    else:
+        muse_filter.flux_cont = 0.0
 
-    newfilename = "{0}_{1}".format(suffix, filename)
-    full_newfilename = joinpath(folder, newfilename)
-
-    # If file does not exists
-    if not os.path.isfile(full_filename):
-        upipe.print_error("Cannot normalise sky continuum")
-        upipe.print_error("File {0} does not exist".format(full_filename))
-        return None
-
-    # Opening the fits file
-    skycont = pyfits.open(full_filename)
-
-    # getting the data
-    dcont = skycont['CONTINUUM'].data
-
-    # Create new continuum
-    # ------------------------------
-    new_cont = dcont['flux'] * norm_factor
-    skycont['CONTINUUM'].data['flux'] = new_cont
-
-    # Writing to the new file
-    skycont.writeto(full_newfilename, overwrite=overwrite)
-    upipe.print_info('Normalised Sky Continuum %s has been created'%(full_newfilename))
-    return newfilename
-
+    return muse_filter
+#== ------------------------------------
 #------------------------------------------------------------------------
 #########################################################################
 # Main class
@@ -225,15 +209,160 @@ class MuseCube(Cube):
 #        data_refimage = pyfits.HDUList([refimage[0], refimage[1]])
         return refimage
 
-def get_sky_spectrum(filename) :
-    """Read sky spectrum from MUSE data reduction
-    """
-    sky = pyfits.getdata(filename)
-    crval = sky['lambda'][0]
-    cdelt = sky['lambda'][1] - crval
-    wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit= units.angstrom)
-    spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
-    return spec
+class MuseSkyContinuum(object):
+    def __init__(self, filename):
+        self.filename = filename
+        self.read()
+
+    def read(self):
+        """Read sky continuum spectrum from MUSE data reduction
+        """
+        if not os.path.isfile(self.filename):
+            upipe.print_error("{0} not found".format(self.filename))
+            crval = np.zeros(0)
+            data = np.zeros(0)
+            cdelt = 1.0
+        else:
+            sky = pyfits.getdata(self.filename)
+            crval = sky['lambda'][0]
+            cdelt = sky['lambda'][1] - crval
+            data = sky['flux']
+        wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=units.angstrom)
+        self.spec = Spectrum(wave=wavein, data=data)
+
+    def integrate(self, muse_filter):
+        """Integrate a sky continuum spectrum using a certain filter file.
+        If the file is a fits file, use it as the MUSE filter list.
+        Otherwise use it as an ascii file
+    
+        Input
+        -----
+        muse_filter: MuseFilter
+        """
+        # interpolation linearly the filter throughput onto
+        # the spectrum wavelength
+        muse_filter.flux_cont = integrate_spectrum(self.spec, muse_filter)
+        setattr(self, muse_filter.filter_name, muse_filter)
+
+    def get_normfactor(self, background, filter_name="Cousins_R"):
+        """Get the normalisation factor given a backgroun value
+        Takes the background value and the sky continuuum spectrum
+        and convert this to the scaling Ks needed for this sky continuum
+        The principle relies on having the background measured as:
+        MUSE_calib = ((MUSE - Sky_cont) + Background) * Norm
+
+        as measured from the alignment procedure.
+
+        Since we want:
+        MUSE_calib = ((MUSE - Ks * Sky_cont) + 0) * Norm
+
+        This means that: Ks * Sky_cont = Sky_cont - Background
+        ==> Ks = 1 - Background / Sky_cont
+
+        So we integrate the Sky_cont to get the corresponding S value
+        and then provide Ks as 1-B/S
+
+        Input
+        -----
+        background: float
+            Value of the background to consider
+        filter_name: str
+            Name of the filter to consider
+        """
+        if not hasattr(self, filter_name):
+            upipe.print_error("No integration value for filter {0}".format(
+                                  filter_name))
+            norm = 1.
+        else :
+            muse_filter = getattr(self, filter_name)
+            if muse_filter.flux_cont != 0.:
+                norm = 1. - background / muse_filter.flux_cont
+            else:
+                norm = 1.
+
+        # Saving the norm value for that filter
+        muse_filter.norm = norm
+        muse_filter.background = background
+
+    def save_normalised(norm_factor=1.0, prefix="norm", overwrite=False):
+        """Normalises a sky continuum spectrum and save it
+        within a new fits file
+    
+        Input
+        -----
+        norm_factor: float
+            Scale factor to multiply the input continuum
+        prefix: str
+            Prefix for the new continuum fits name. Default
+            is 'norm', so that the new file is 'norm_oldname.fits'
+        overwrite: bool
+            If True, existing file will be overwritten.
+            Default is False.
+        """
+        if prefix == "":
+            upipe.print_error("The new and old sky continuum fits files will share")
+            upipe.print_error("the same name. This is not recommended. Aborting")
+            return
+    
+        folder_spec, filename = os.path.split(self.filename)
+        newfilename = "{0}_{1}".format(prefix, filename)
+        norm_filename = joinpath(folder_spec, newfilename)
+    
+        # Opening the fits file
+        skycont = pyfits.open(self.filename)
+    
+        # getting the data
+        dcont = skycont['CONTINUUM'].data
+    
+        # Create new continuum
+        # ------------------------------
+        new_cont = dcont['flux'] * norm_factor
+        skycont['CONTINUUM'].data['flux'] = new_cont
+    
+        # Writing to the new file
+        skycont.writeto(norm_filename, overwrite=overwrite)
+        upipe.print_info('Normalised Sky Continuum %s has been created'%(norm_filename))
+
+# Routine to read filters
+class MuseFilter(object):
+    def __init__(self, filter_name="Cousins_R", 
+        filter_fits_file="filter_list.fits", 
+        filter_ascii_file=None):
+        """Routine to read the throughput of a filter
+
+        Input
+        -----
+        filter_name: str
+            Name of the filter, required if filter_file is a fit file.
+        filter_fits_file: str
+            Name of the fits file for the filter list
+        filter_ascii_file: str
+            Name of the ascii file with the lambda, throughout values
+            By default, it is None and ignored. If not, this is taken
+            as the input for the filter throughput
+        """
+        self.filter_fits_file = filter_fits_file
+        self.filter_name = filter_name
+        self.filter_ascii_file = filter_ascii_file
+        self.read()
+
+    def read(self):
+        """Reading the data in the file
+        """
+        if self.filter_ascii_file is None:
+            try:
+                upipe.print_info("Using the fit file {0} as input".format(self.filter_fits_file))
+                filter_data = pyfits.getdata(self.filter_fits_file, extname=self.filter_name)
+                self.wave = filter_data['lambda']
+                self.throughput = filter_data['throughput']
+            except:
+                upipe.print_error("Problem opening the filter fits file {0}".format(self.filter_fits_file))
+                upipe.print_error("Did not manage to get the filter {0} throughput".format(self.filter_name))
+                self.wave = np.zeros(0)
+                self.throughput = np.zeros(0)
+        else:
+            upipe.print_info("Using the ascii file {0} as input".format(self.filter_ascii_file))
+            self.wave, self.throughput = np.loadtxt(self.filter_ascii_file, unpack=True)
 
 class MuseImage(Image): 
     """Wrapper around the mpdaf Image functionalities

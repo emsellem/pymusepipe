@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT license - see LICENSE
 
-"""MUSE-PHANGS core module
+"""MUSE-PHANGS combine module
 """
 
 __authors__   = "Eric Emsellem"
-__copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__copyright__ = "(c) 2017-2019, ESO + CRAL"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # Importing modules
@@ -35,7 +35,7 @@ from pymusepipe.create_sof import SofPipe
 from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe 
-from pymusepipe.config_pipe import default_filter_list
+from pymusepipe.config_pipe import default_filter_list, dic_combined_folders
 
 # Default keywords for MJD and DATE
 from pymusepipe.align_pipe import mjd_names, date_names
@@ -43,19 +43,6 @@ from pymusepipe.align_pipe import mjd_names, date_names
 __version__ = '0.0.3 (4 Sep 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
 # 0.0.1 21 Nov, 2017 : just setting up the scene
-
-dic_combined_folders = {
-        # Sof files
-        "sof": "Sof/",
-        # Combined products
-        "cubes": "Cubes/",
-         # esores log files
-        "esorex_log" : "Esorex_log/",
-        # Data Products - first writing
-        "pipe_products": "Pipe_products/",
-        # Log
-        "log": "Log/"
-        }
 
 def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
     """Provide a list of reduced pixtables
@@ -328,31 +315,22 @@ class MusePointings(SofPipe, PipeRecipes) :
 
     def _check_offset_table(self, offset_table_name=None, folder_offset_table=None):
         """Checking if DATE-OBS and MJD-OBS are in the OFFSET Table
+
+        Input
+        -----
+        offset_table_name: str
+            Name of the offset table
+            Default is None
+        folder_offset_table: str
+            Name of the folder to find the offset table
+            Default is None
         """
-        self.offset_table_name = offset_table_name
-        if self.offset_table_name is None:
-            upipe.print_warning("No Offset table given")
-            return
-        
-        # Using the given folder name, alignment one by default
-        if folder_offset_table is None:
-            self.folder_offset_table = self.paths.alignment
-        else:
-            self.folder_offset_table = folder_offset_table
-
-        full_offset_table_name = joinpath(self.folder_offset_table,
-                                    self.offset_table_name)
-        if not os.path.isfile(full_offset_table_name):
-            upipe.print_error("Offset table [{0}] not found".format(
-                full_offset_table_name))
-            return
-
-        # Opening the offset table
-        offset_table = Table.read(full_offset_table_name)
+        self.read_offset_table(offset_table_name=offset_table_name,
+                               folder_offset_table=folder_offset_table)
 
         # getting the MJD and DATE from the OFFSET table
-        self.table_mjdobs = offset_table[mjd_names['table']]
-        self.table_dateobs = offset_table[date_names['table']]
+        self.table_mjdobs = self.offset_table[mjd_names['table']]
+        self.table_dateobs = self.offset_table[date_names['table']]
 
         # Checking existence of each pixel_table in the offset table
         nexcluded_pixtab = 0

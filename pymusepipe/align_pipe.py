@@ -44,22 +44,12 @@ def is_sequence(arg):
 
 # Import needed modules from pymusepipe
 import pymusepipe.util_pipe as upipe
+from pymusepipe.config_pipe import mjd_names, date_names, default_offset_table
 
 # ================== Default units ======================== #
 # Define useful units
 default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
 default_reference_unit = u.microJansky
-
-# ================== Default keywords ===================== #
-# Define useful keywords for fits table and images
-mjd_names = {'table': "MJD_OBS", 'image': "MJD-OBS"}
-date_names = {'table': "DATE_OBS", 'image': "DATE-OBS"}
-
-default_offset_table = {'date': [date_names['table'], 'S23', ""],
-                        'mjd' : [mjd_names['table'], 'f8', 0.0],
-                        'ora':["RA_OFFSET", 'f8', 0.0],
-                        'odec':["DEC_OFFSET", 'f8', 0.0],
-                        'scale':["FLUX_SCALE", 'f8', 1.0]}
 
 # ================== Useful function ====================== #
 def create_offset_table(image_names=[], table_folder="", 
@@ -125,6 +115,9 @@ def create_offset_table(image_names=[], table_folder="",
     # Write the table
     offset_table.write(table_fullname, overwrite=overwrite)
 
+# WCS plotting routine
+# This is a matplotlib feature, using the option of "projection"
+# for adding a subplot. This guarantees the right WCS
 def open_new_wcs_figure(nfig, mywcs=None):
     """Open a new figure with wcs projection.
     

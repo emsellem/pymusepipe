@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT license - see LICENSE
 
 """MUSE-PHANGS utility functions for pymusepipe
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # Importing modules
@@ -211,6 +211,7 @@ def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', l
     else:
         return [red_wavel - lambda_window/2., red_wavel + lambda_window/2.]
 
+    
 ####################################################################
 # Function to select (Mask) good values from a map
 # Using both Rectangle and Circular Zones from the Selection_Zone class
@@ -344,7 +345,7 @@ def reconstruct_filter_images(cubename, filter_list=default_filter_list,
         Name of the cube
     filter_list: str
         List of filters, e.g., "Cousins_R,Johnson_I"
-        By default, the default_filter_list from pymusepipe.combine
+        By default, the default_filter_list from pymusepipe.config_pipe
 
     filter_fits_file: str
         Name of the fits file containing all the filter characteristics
