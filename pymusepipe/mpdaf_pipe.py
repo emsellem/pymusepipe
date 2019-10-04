@@ -60,24 +60,29 @@ def get_sky_spectrum(specname) :
     spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
     return spec
 #== ------------------------------------
-def integrate_spectrum(spectrum, muse_filter):
+def integrate_spectrum(spectrum, wave_filter, throughput_filter):
     """Integrate a spectrum using a certain Muse Filter file.
 
     Input
     -----
     spectrum: Spectrum
-    muse_filter: MuseFilter
+        Input spectrum given as an mpdaf Spectrum
+    wave_filter: float array
+        Array of wavelength for the filter
+    throughput_filter: float array
+        Array of throughput (between 0 and 1) for the filter. Should be the 
+        same dimension (1D, N floats) as wave_filter
     """
     # interpolation linearly the filter throughput onto
     # the spectrum wavelength
-    effS = np.interp(spectrum.wave.coord(), muse_filter.wave, muse_filter.throughput)
+    effS = np.interp(spectrum.wave.coord(), wave_filter, throughput_filter)
     filtwave = np.sum(effS) 
     if filtwave > 0:
-        muse_filter.flux_cont = np.sum(spectrum.data * effS) / filtwave 
+        flux_cont = np.sum(spectrum.data * effS) / filtwave 
     else:
-        muse_filter.flux_cont = 0.0
+        flux_cont = 0.0
 
-    return muse_filter
+    return flux_cont
 #== ------------------------------------
 #------------------------------------------------------------------------
 #########################################################################
@@ -241,7 +246,9 @@ class MuseSkyContinuum(object):
         """
         # interpolation linearly the filter throughput onto
         # the spectrum wavelength
-        muse_filter.flux_cont = integrate_spectrum(self.spec, muse_filter)
+        muse_filter.flux_cont = integrate_spectrum(self.spec, 
+                                                   muse_filter.wave, 
+                                                   muse_filter.throughput)
         setattr(self, muse_filter.filter_name, muse_filter)
 
     def get_normfactor(self, background, filter_name="Cousins_R"):
@@ -333,7 +340,7 @@ class MuseFilter(object):
         Input
         -----
         filter_name: str
-            Name of the filter, required if filter_file is a fit file.
+            Name of the filter, required if filter_file is a fits file.
         filter_fits_file: str
             Name of the fits file for the filter list
         filter_ascii_file: str
@@ -351,7 +358,7 @@ class MuseFilter(object):
         """
         if self.filter_ascii_file is None:
             try:
-                upipe.print_info("Using the fit file {0} as input".format(self.filter_fits_file))
+                upipe.print_info("Using the fits file {0} as input".format(self.filter_fits_file))
                 filter_data = pyfits.getdata(self.filter_fits_file, extname=self.filter_name)
                 self.wave = filter_data['lambda']
                 self.throughput = filter_data['throughput']
