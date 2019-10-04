@@ -822,7 +822,7 @@ class PipePrep(SofPipe) :
                     status = -1
 
             if status < 0:
-                upipe.print_error("Could not find MJD or BACKGROUND value in offset table"
+                upipe.print_error("Could not find MJD or BACKGROUND value in offset table")
                 upipe.print_warning("A background of 0 will be assumed, and")
                 upipe.print_warning("a normalisation of 1 will be used for the SKY_CONTINUUM")
                 return ""
