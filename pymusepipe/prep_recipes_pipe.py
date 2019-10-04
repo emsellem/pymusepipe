@@ -907,7 +907,6 @@ class PipePrep(SofPipe) :
         offset_list = kwargs.pop("offset_list", True)
         offset_table_name = kwargs.pop("offset_table_name", None)
         folder_offset_table = kwargs.pop("folder_offset_table", None)
-        print("Coucou", offset_table_name, folder_offset_table)
 
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
@@ -959,15 +958,15 @@ class PipePrep(SofPipe) :
             # Eric E - 23/09/2019 --------------------------------------------
             # We Commented out the previous test, as we wish to be able to also 
             # load an OFFSET table even if just one exposure is provided
+            if offset_table_name is None:
+                folder_offset_table = self._get_fullpath_expo(expotype, "processed")
+                offset_table_name = '{0}{1}_{2}_{3}.fits'.format(
+                                       dic_files_products['ALIGN'][0], 
+                                       suffix, filter_for_alignment, tpl)
+            else:
+                if folder_offset_table is None:
+                    folder_offset_table = self.paths.alignment
             if offset_list :
-                if offset_table_name is None:
-                    folder_offset_table = self._get_fullpath_expo(expotype, "processed")
-                    offset_table_name = '{0}{1}_{2}_{3}.fits'.format(
-                                           dic_files_products['ALIGN'][0], 
-                                           suffix, filter_for_alignment, tpl)
-                else:
-                    if folder_offset_table is None:
-                        folder_offset_table = self.paths.alignment
                 self._sofdict['OFFSET_LIST'] = [joinpath(folder_offset_table, offset_table_name)]
 
             # The sky subtraction method on the sky continuum to normalise it
