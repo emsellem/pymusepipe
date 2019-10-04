@@ -121,7 +121,7 @@ class SofPipe(object) :
         """Adding a calibration file for the SOF 
         """
         if reset: self._sofdict.clear()
-        self._sofdict[calibtype] = [self._get_name_calibfile(calibfile)]
+        self._sofdict[calibtype] = [self._get_name_calibfile(calibtype)]
 
     def _add_geometry_to_sofdict(self, tpls):
         """Extract the geometry table and add it to the dictionary
