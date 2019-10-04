@@ -50,6 +50,8 @@ dic_listObject = {'OBJECT': 'PIXTABLE_OBJECT',
         'REDUCED': 'PIXTABLE_REDUCED'
         }
 
+dic_listMasterObject = {**dic_listMaster, **dic_listObject}
+
 listexpo_files = {
         "OBJECT" : ['object', 'OBJECT', str, '20A'],
         "TYPE" : ['type', 'ESO DPR TYPE', str, '20A'],
@@ -255,3 +257,8 @@ default_offset_table = {'date': [date_names['table'], 'S23', ""],
                         'odec':["DEC_OFFSET", 'f8', 0.0],
                         'scale':["FLUX_SCALE", 'f8', 1.0]}
 #-- END ---------------------------------------------------------------#
+
+def get_suffix_product(expotype):
+    return dic_listMasterObject[expotype]
+ 
+

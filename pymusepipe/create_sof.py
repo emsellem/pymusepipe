@@ -25,6 +25,7 @@ from collections import OrderedDict
 
 from pymusepipe import util_pipe as upipe
 from pymusepipe import musepipe
+from pymusepipe.config_pipe import get_suffix_product
 
 class SofDict(OrderedDict) :
     """New Dictionary for the SOF writing
@@ -87,8 +88,8 @@ class SofPipe(object) :
         # Finding the best tpl for this master
         index, this_tpl = self._select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
         dir_master = self._get_fullpath_expo(expotype)
-        self._sofdict[self._get_suffix_product(expotype)] = [upipe.normpath(joinpath(dir_master, 
-            self._get_suffix_product(expotype) + "_" + this_tpl + ".fits"))]
+        self._sofdict[get_suffix_product(expotype)] = [upipe.normpath(joinpath(dir_master, 
+            get_suffix_product(expotype) + "_" + this_tpl + ".fits"))]
 
     def _add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
         """ Add item to dictionary for the sof writing
@@ -123,6 +124,12 @@ class SofPipe(object) :
         """
         if reset: self._sofdict.clear()
         self._sofdict[calibtype] = [self._get_name_calibfile(calibtype)]
+
+    def _get_name_calibfile(self, calibtype):
+        """Get the name of the calibration file
+        """
+        calibfile = getattr(self.pipe_params, calibtype.lower())
+        return joinpath(self.pipe_params.musecalib, calibfile)    
 
     def _add_geometry_to_sofdict(self, tpls):
         """Extract the geometry table and add it to the dictionary

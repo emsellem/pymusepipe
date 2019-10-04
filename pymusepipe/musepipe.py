@@ -60,8 +60,8 @@ from pymusepipe.recipes_pipe import PipeRecipes
 from pymusepipe.prep_recipes_pipe import PipePrep
 import pymusepipe.util_pipe as upipe
 from pymusepipe.config_pipe import (suffix_rawfiles,suffix_prealign,
-        listexpo_files,dic_listObject,dic_listMaster,listexpo_types,
-        dic_geo_astrowcs_table)
+        listexpo_files,dic_listObject,dic_listMaster,dic_listMasterObject,
+        listexpo_types,dic_geo_astrowcs_table)
 
 __version__ = '2.0.2 (25/09/2019)'
 #       Cleaning and adding comments
@@ -245,7 +245,7 @@ class MusePipe(PipePrep, PipeRecipes):
         for objecttype in dic_listObject.keys() :
             upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=self.verbose)
 
-        self._dic_listMasterObject = {**dic_listMaster, **dic_listObject}
+        self._dic_listMasterObject = dic_listMasterObject
 
         # ==============================================
         # Creating the folders in the TARGET root folder 
@@ -615,12 +615,6 @@ class MusePipe(PipePrep, PipeRecipes):
             upipe.print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
             return Table()
 
-    def _get_name_calibfile(self, calibtype):
-        """Get the name of the calibration file
-        """
-        calibfile = getattr(self.pipe_params, calibtype.lower())
-        return joinpath(self.pipe_params.musecalib, calibfile)
-
     def _read_offset_table(self, offset_table_name=None, folder_offset_table=None):
         """Reading the Offset Table
 
@@ -666,9 +660,6 @@ class MusePipe(PipePrep, PipeRecipes):
         closest_tpl = group_table[index]['tpls']
         return index, closest_tpl
 
-    def _get_suffix_product(self, expotype):
-        return self._dic_listMasterObject[expotype]
- 
     def _get_path_expo(self, expotype, stage="master"):
         masterfolder = upipe.lower_allbutfirst_letter(expotype)
         if stage.lower() == "master":

@@ -24,7 +24,7 @@ from pymusepipe.create_sof import SofPipe
 from pymusepipe.align_pipe import create_offset_table
 from pymusepipe import musepipe
 from pymusepipe.mpdaf_pipe import MuseSkyContinuum,MuseFilter
-from pymusepipe.config_pipe import mjd_names
+from pymusepipe.config_pipe import mjd_names,get_suffix_product
 
 try :
     import astropy as apy
@@ -244,7 +244,7 @@ class PipePrep(SofPipe) :
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Bias
-            name_bias = self._get_suffix_product('BIAS')
+            name_bias = get_suffix_product('BIAS')
             dir_bias = self._get_fullpath_expo('BIAS', "master")
             # Run the recipe
             self.recipe_bias(self.current_sof, dir_bias, name_bias, tpl)
@@ -294,10 +294,9 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Flat and Trace Table
             dir_flat = self._get_fullpath_expo('FLAT', "master")
-            name_flat =  self._get_suffix_product('FLAT')
-
+            name_flat = get_suffix_product('FLAT')
             dir_trace = self._get_fullpath_expo('TRACE', "master")
-            name_tracetable = self._get_suffix_product('TRACE')
+            name_tracetable = get_suffix_product('TRACE')
             # Run the recipe
             self.recipe_flat(self.current_sof, dir_flat, name_flat, dir_trace, name_tracetable, tpl)
 
@@ -348,7 +347,7 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Wave
             dir_wave = self._get_fullpath_expo('WAVE', "master")
-            name_wave = self._get_suffix_product('WAVE')
+            name_wave = get_suffix_product('WAVE')
             # Run the recipe
             self.recipe_wave(self.current_sof, dir_wave, name_wave, tpl)
 
@@ -398,7 +397,7 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Name of final Master Wave
             dir_lsf = self._get_fullpath_expo('LSF', "master")
-            name_lsf = self._get_suffix_product('LSF')
+            name_lsf = get_suffix_product('LSF')
             # Run the recipe
             self.recipe_lsf(self.current_sof, dir_lsf, name_lsf, tpl)
 
@@ -517,7 +516,7 @@ class PipePrep(SofPipe) :
             # Run the recipe to reduce the standard (muse_scibasic)
 
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            suffix = self._get_suffix_product(expotype)
+            suffix = get_suffix_product(expotype)
             name_products = []
             list_expo = np.arange(Nexpo).astype(np.int) + 1
             for iexpo in list_expo:
@@ -998,8 +997,8 @@ class PipePrep(SofPipe) :
             # Selecting only exposures to be treated
             # We need to force 'OBJECT' to make sure scipost will deal with the exposure
             # even if it is e.g., a SKY
-            pixtable_name = self._get_suffix_product('OBJECT')
-            pixtable_name_thisone = self._get_suffix_product(expotype)
+            pixtable_name = get_suffix_product('OBJECT')
+            pixtable_name_thisone = get_suffix_product(expotype)
             self._sofdict[pixtable_name] = []
             for iexpo in list_group_expo:
                self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
@@ -1317,7 +1316,7 @@ class PipePrep(SofPipe) :
         # Selecting only exposures to be treated
         # Producing the list of REDUCED PIXTABLES
         self._add_calib_to_sofdict("FILTER_LIST")
-        pixtable_name = self._get_suffix_product('REDUCED')
+        pixtable_name = get_suffix_product('REDUCED')
         pixtable_name_thisone = dic_products_scipost['individual']
 
         # Setting the default option of offset_list
