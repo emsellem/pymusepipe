@@ -968,6 +968,7 @@ class PipePrep(SofPipe) :
                     if folder_offset_table is None:
                         folder_offset_table = self.paths.alignment
                 print("Coucou", offset_table_name, folder_offset_table)
+                upipe.print_warning("coucou")
                 self._sofdict['OFFSET_LIST'] = [joinpath(folder_offset_table, offset_table_name)]
 
             # The sky subtraction method on the sky continuum to normalise it
