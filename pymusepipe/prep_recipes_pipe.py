@@ -688,7 +688,7 @@ class PipePrep(SofPipe) :
     @print_my_function_name
     def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT", 
                             tpl="ALL", stage="processed", list_expo=[], 
-                            lambdaminmax=[4000.,10000.], suffix="", **kwargs)
+                            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
         """Launch the scipost command exposure per exposure
         """
         # First selecting the files via the grouped table
@@ -993,10 +993,10 @@ class PipePrep(SofPipe) :
                self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
                    '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
 
-            # Adding the suffix_sof to the end of the name if needed
+            # Adding the suffix_iexpo to the end of the name if needed
             # This is the expo number if only 1 exposure is present in the list
             self.write_sof(sof_filename="{0}_{1}{2}_{3}{4}".format(sof_filename, expotype, 
-                suffix, tpl, suffix_sof), new=True)
+                suffix, tpl, suffix_iexpo), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames = \
