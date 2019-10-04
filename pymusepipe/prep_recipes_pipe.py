@@ -841,7 +841,7 @@ class PipePrep(SofPipe) :
 
         # Returning the name of the normalised continuum
         prefix_skycont = "norm_{0}_{1:04d}_".format(tpl_expo, iexpo)
-        mycont.save_normalised(normalise_factor, prefix=prefix_skycont)
+        mycont.save_normalised(normalise_factor, prefix=prefix_skycont, overwrite=True)
 
         return prefix_skycont
 
