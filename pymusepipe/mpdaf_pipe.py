@@ -219,7 +219,7 @@ class MuseSkyContinuum(object):
         """
         if not os.path.isfile(self.filename):
             upipe.print_error("{0} not found".format(self.filename))
-            crval = np.zeros(0)
+            crval = 0.0
             data = np.zeros(0)
             cdelt = 1.0
         else:
