@@ -981,7 +981,7 @@ class PipePrep(SofPipe) :
                 self._add_calib_to_sofdict("SKY_LINES")
                 self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', 
                         "processed", suffix=suffix_skycontinuum, 
-                        prefix=prefix_skycontinuum)
+                        prefix=prefix_skycontinuum, perexpo=True)
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
 
             # Selecting only exposures to be treated

@@ -101,7 +101,7 @@ class SofPipe(object) :
             expo_table['filename'][index]))]
 
     def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", 
-            suffix="", prefix="", reset=False):
+            suffix="", prefix="", reset=False, perexpo=False):
         """ Add item to dictionary for the sof writing
         """
         if reset: self._sofdict.clear()
@@ -109,8 +109,9 @@ class SofPipe(object) :
         expo_table = self._get_table_expo(expotype, stage)
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
         dir_calib = self._get_fullpath_expo(expotype, stage)
-        iexpo = expo_table[index]['iexpo']
-        suffix += "_{0:04d}".format(iexpo)
+        if perexpo:
+            iexpo = expo_table[index]['iexpo']
+            suffix += "_{0:04d}".format(iexpo)
 
         # Name for the sky calibration file
         name_skycalib = "{0}{1}_{2}{3}.fits".format(prefix, tag, this_tpl, suffix)
