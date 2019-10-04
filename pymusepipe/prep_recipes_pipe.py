@@ -783,11 +783,12 @@ class PipePrep(SofPipe) :
 
         return found_expo, list_expo, group_list_expo, group_table
 
-    def _normalise_skycontinuum(self, mjd_expo, expotype, tpl_expo, iexpo, 
+    def _normalise_skycontinuum(self, mjd_expo, tpl_expo, iexpo, 
             suffix="", offset_table_name=None, **kwargs):
         """Create a normalised continuum, to be included in the sof file
         """
         stage = "processed"
+        expotype = "SKY"
         # Finding the best tpl for this sky calib file type
         expo_table = self._get_table_expo(expotype, stage)
         index, this_tpl = self._select_closest_mjd(mjd_expo, expo_table) 
@@ -972,7 +973,7 @@ class PipePrep(SofPipe) :
                     upipe.print_warning("The sky continuum will be "
                                         "normalised according to the first exposure")
                 prefix_skycontinuum = self._normalise_skycontinuum(mjd_expo=mean_mjd, 
-                        expotype=expotype, tpl_expo=tpl, iexpo=list_group_expo[0], 
+                        tpl_expo=tpl, iexpo=list_group_expo[0], 
                         suffix=suffix_skycontinuum, offset_table_name=offset_table_name)
             else:
                 prefix_skycontinuum = ""
