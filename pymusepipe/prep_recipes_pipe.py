@@ -735,7 +735,7 @@ class PipePrep(SofPipe) :
                         name_products.append(prod)
                         suffix_products.append("_{0:04d}".format(i+1))
                         suffix_prefinalnames.append("")
-                        suffix_postfinalnames.append("_{0:04d}".format(i+1))
+                        suffix_postfinalnames.append("_{0:04d}".format(list_expo[i]))
                 else :
                     if "DATACUBE" in prod:
                         if len(list_expo) == 1 :
