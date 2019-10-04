@@ -312,7 +312,7 @@ class MuseSkyContinuum(object):
             return
     
         folder_spec, filename = os.path.split(self.filename)
-        newfilename = "{0}_{1}".format(prefix, filename)
+        newfilename = "{0}{1}".format(prefix, filename)
         norm_filename = joinpath(folder_spec, newfilename)
     
         # Opening the fits file

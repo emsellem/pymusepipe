@@ -840,7 +840,7 @@ class PipePrep(SofPipe) :
             normalise_factor = getattr(mycont, filter_for_alignment).norm
 
         # Returning the name of the normalised continuum
-        prefix_skycont = "norm_{0}_{1:04d}".format(tpl_expo, iexpo)
+        prefix_skycont = "norm_{0}_{1:04d}_".format(tpl_expo, iexpo)
         mycont.save_normalised(normalise_factor, prefix=prefix_skycont)
 
         return prefix_skycont
