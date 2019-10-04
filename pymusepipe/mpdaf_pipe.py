@@ -291,7 +291,7 @@ class MuseSkyContinuum(object):
         muse_filter.norm = norm
         muse_filter.background = background
 
-    def save_normalised(norm_factor=1.0, prefix="norm", overwrite=False):
+    def save_normalised(self, norm_factor=1.0, prefix="norm", overwrite=False):
         """Normalises a sky continuum spectrum and save it
         within a new fits file
     
