@@ -687,9 +687,13 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT", 
-                            tpl="ALL", stage="processed", list_expo=[], 
-                            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
+                            tpl="ALL", stage="processed", 
+                            suffix="", offset_list=False, **kwargs):
         """Launch the scipost command exposure per exposure
+
+        Input
+        -----
+        See run_scipost parameters
         """
         # First selecting the files via the grouped table
         object_table = self._get_table_expo(expotype, stage)
@@ -702,8 +706,9 @@ class PipePrep(SofPipe) :
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
-                    tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
-                    lambdaminmax=lambdaminmax, **kwargs)
+                    tpl=mytpl, list_expo=[iexpo], suffix=suffix,
+                    offset_list=offset_list,
+                    **kwargs)
 
     def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list=None):
         """Provide a set of key output products depending on the save mode
@@ -857,7 +862,9 @@ class PipePrep(SofPipe) :
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
-        list_expo: list of integers providing the exposure numbers
+        list_expo: list of integers
+            Exposure numbers. By default, an empty list which means that all
+            exposures will be used.
         lambdaminmax: tuple of 2 floats
             Minimum and Maximum wavelength to pass to the muse_scipost recipe
         suffix: str
