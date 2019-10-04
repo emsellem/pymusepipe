@@ -967,11 +967,11 @@ class PipePrep(SofPipe) :
                 else:
                     if folder_offset_table is None:
                         folder_offset_table = self.paths.alignment
+                print("Coucou", offset_table_name, folder_offset_table)
                 self._sofdict['OFFSET_LIST'] = [joinpath(folder_offset_table, offset_table_name)]
 
             # The sky subtraction method on the sky continuum to normalise it
             # But only if requested
-            print(offset_table_name, folder_offset_table)
             if norm_skycontinuum:
                 if len(list_group_expo) > 1:
                     upipe.print_warning("More than 1 exposure in group table (scipost)")
