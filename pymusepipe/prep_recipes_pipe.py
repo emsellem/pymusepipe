@@ -971,6 +971,7 @@ class PipePrep(SofPipe) :
 
             # The sky subtraction method on the sky continuum to normalise it
             # But only if requested
+            print(offset_table_name, folder_offset_table)
             if norm_skycontinuum:
                 if len(list_group_expo) > 1:
                     upipe.print_warning("More than 1 exposure in group table (scipost)")
