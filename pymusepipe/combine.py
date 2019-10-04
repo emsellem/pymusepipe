@@ -313,6 +313,41 @@ class MusePointings(SofPipe, PipeRecipes) :
             select_list_pixtabs.sort()
             self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs
 
+    def _read_offset_table(self, offset_table_name=None, folder_offset_table=None):
+        """Reading the Offset Table
+
+        Input
+        -----
+        offset_table_name: str
+            Name of the offset table
+            Default is None
+        folder_offset_table: str
+            Name of the folder to find the offset table
+            Default is None
+        """
+        self.offset_table_name = offset_table_name
+        if self.offset_table_name is None:
+            upipe.print_warning("No Offset table name given")
+            self.offset_table = Table()
+            return
+        
+        # Using the given folder name, alignment one by default
+        if folder_offset_table is None:
+            self.folder_offset_table = self.paths.alignment
+        else:
+            self.folder_offset_table = folder_offset_table
+
+        full_offset_table_name = joinpath(self.folder_offset_table,
+                                    self.offset_table_name)
+        if not os.path.isfile(full_offset_table_name):
+            upipe.print_error("Offset table [{0}] not found".format(
+                full_offset_table_name))
+            self.offset_table = Table()
+            return
+
+        # Opening the offset table
+        self.offset_table = Table.read(full_offset_table_name)
+
     def _check_offset_table(self, offset_table_name=None, folder_offset_table=None):
         """Checking if DATE-OBS and MJD-OBS are in the OFFSET Table
 
