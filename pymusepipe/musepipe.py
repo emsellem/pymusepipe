@@ -615,7 +615,7 @@ class MusePipe(PipePrep, PipeRecipes):
             upipe.print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
             return Table()
 
-    def _get_name_calibfile(calibtype):
+    def _get_name_calibfile(self, calibtype):
         """Get the name of the calibration file
         """
         calibfile = getattr(self.pipe_params, calibtype.lower())
