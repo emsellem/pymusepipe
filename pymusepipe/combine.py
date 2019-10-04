@@ -325,7 +325,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             Name of the folder to find the offset table
             Default is None
         """
-        self.read_offset_table(offset_table_name=offset_table_name,
+        self._read_offset_table(offset_table_name=offset_table_name,
                                folder_offset_table=folder_offset_table)
 
         # getting the MJD and DATE from the OFFSET table
