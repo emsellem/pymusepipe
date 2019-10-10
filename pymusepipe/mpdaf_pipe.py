@@ -38,6 +38,7 @@ from astropy.io import fits as pyfits
 from astropy import units as units
 
 from pymusepipe import util_pipe as upipe
+from pymusepipe.config_pipe import default_wave_wcs
 
 # Versioning
 __version__ = '0.2.0 (9 Sep 2019)' # Adding PixTableToMask
@@ -127,7 +128,7 @@ class MuseCube(Cube):
         return MuseImage(source=self[central_lambda - lambda_halfwindow: 
             central_lambda + lambda_halfwindow + 1, :, :].sum(axis=0))
 
-    def create_onespectral_cube(self, wave1=None, outcube_name=None, **kwargs) :
+    def create_onespectral_cube(self, wave1=default_wave_wcs, outcube_name=None, **kwargs) :
         """Create a single pixel cube extracted from this one
 
         Input

@@ -270,14 +270,14 @@ class MusePointings(SofPipe, PipeRecipes) :
                         list_pixtabs.remove(orig_pixtab)
                         # and add the fixed one
                         list_pixtabs.append(fixed_pixtab)
-                        upipe.print_warning("Fixed PixTable {0} was included".format(
+                        upipe.print_warning("Fixed PixTable {0} was included in the list".format(
                                 fixed_pixtab))
-                        upipe.print_warning("and Pixtable {0} was thus removed".format(
+                        upipe.print_warning("and Pixtable {0} was thus removed from the list".format(
                                 orig_pixtab))
                     else:
                         upipe.print_warning("Original Pixtable {0} not found".format(
                                 orig_pixtab))
-                        upipe.print_warning("Hence will not include fixed PixTable "
+                        upipe.print_warning("Hence will not include fixed PixTable in the list"
                                 "{0}".format(fixed_pixtab))
 
             full_list = copy.copy(list_pixtabs)
