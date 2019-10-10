@@ -162,6 +162,7 @@ class MuseCube(Cube):
         upipe.print_info("Writing up single wave-cube {0}\n"
                          "in folder {1}".format(outcube_name, cube_folder))
         subcube.write(joinpath(cube_folder, outcube_name))
+        return cube_folder, outcube_name
 
     def get_set_spectra(self) :
         """Get a set of standard spectra from the Cube

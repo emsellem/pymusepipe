@@ -577,7 +577,14 @@ class MusePointings(SofPipe, PipeRecipes) :
         prefix = kwargs.pop("prefix_wcs", default_prefix_wcs)
         upipe.print_info("Now creating the Reference WCS cube using prefix {0}".format(
                           prefix))
-        refcube.create_onespectral_cube(prefix=prefix, **kwargs)
+        cfolder, cname = refcube.create_onespectral_cube(prefix=prefix, **kwargs)
+
+        # Now transforming this into a bona fide 1 extension WCS file
+        full_cname = joinpath(cfolder, cname)
+        d = pyfits.getdata(full_cname, ext=1)
+        h = pyfits.getheader(full_cname, ext=1)
+        hdu = pyfits.PrimaryHDU(data=d, header=h)
+        hdu.writeto(full_cname, overwrite=True)
         upipe.print_info("...Done")
 
     def run_combine(self, sof_filename='pointings_combine', 
