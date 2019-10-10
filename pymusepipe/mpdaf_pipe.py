@@ -127,6 +127,38 @@ class MuseCube(Cube):
         return MuseImage(source=self[central_lambda - lambda_halfwindow: 
             central_lambda + lambda_halfwindow + 1, :, :].sum(axis=0))
 
+    def create_onespectral_cube(self, wave1=None, outcube_name=None, **kwargs) :
+        """Create a single pixel cube extracted from this one
+
+        Input
+        ----
+        wave1: float
+            Value of the wavelength to extract. In Angstroems.
+        outcube_name: str
+            Name of the output cube
+        prefix: str
+            If outcube_name is None (default), use that prefix to append
+            in front of the input cube name (same folder)
+
+        Write
+        -----
+        A new cube with only 1 lambda. To be used as a WCS reference for
+        masks.
+        """
+
+        # Find the wavelength
+        k1 = self.wave.pixel([wave1], nearest=True)[0]
+
+        # extracting the cube
+        subcube = self[k1:k1+1, :, :]
+
+        cube_folder, cube_name = os.path.split(self.filename)
+
+        if outcube_name is None:
+            prefix = kwargs.pop("prefix", "l{0:.0f}_".format(wave1))
+            outcube_name = "{0}{1}".format(prefix, cube_name)
+        subcube.write(joinpath(cube_folder, outcube_name))
+
     def get_set_spectra(self) :
         """Get a set of standard spectra from the Cube
         """

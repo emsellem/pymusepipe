@@ -258,7 +258,8 @@ default_offset_table = {'date': [date_names['table'], 'S23', ""],
                         'scale':["FLUX_SCALE", 'f8', 1.0]}
 #-- END ---------------------------------------------------------------#
 
+#--- Some useful functions using the input configuration --------------#
 def get_suffix_product(expotype):
     return dic_listMasterObject[expotype]
- 
 
+default_prefix_wcs = "refwcs_"

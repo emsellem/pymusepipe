@@ -36,6 +36,8 @@ from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe 
 from pymusepipe.config_pipe import default_filter_list, dic_combined_folders
+from pymusepipe.config_pipe import default_prefix_wcs
+from pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
 from pymusepipe.align_pipe import mjd_names, date_names
@@ -491,7 +493,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                     **kwargs)
 
     def run_combine_single_pointing(self, pointing, add_suffix="", 
-            sof_filename='pointings_combine',
+            sof_filename='pointing_combine',
             lambdaminmax=[4000.,10000.], 
             **kwargs):
         """Running the combine routine on just one single pointing
@@ -518,6 +520,59 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix, 
                         lambdaminmax=lambdaminmax,
                         sof_filename=sof_filename, **kwargs)
+
+    def create_all_pointing_masks(self, **kwargs):
+        """Create all pointing masks
+        """
+        # If list_pointings is None using the initially set up one
+        list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+
+        # Additional suffix if needed
+        for pointing in list_pointings:
+            self.create_pointing_mask(pointing=pointing, **kwargs)
+
+    def create_pointing_mask(self, pointing,**kwargs):
+        """Create the mask of a given pointing
+
+        Input
+        -----
+        pointing: int
+            Number of the pointing
+        """
+        self.run_combine_single_pointing(pointing=pointing, 
+                                         add_suffix="mask",
+                                         sof_filename="pointing_mask",
+                                         wcs_auto=True, **kwargs)
+
+    def create_reference_wcs(self, **kwargs):
+        """Create the reference WCS from the full mosaic
+
+        Input
+        -----
+        wave1: float - optional
+            Wavelength taken for the extraction. Should only
+            be present in all spaxels you wish to get.
+        prefix: str - optional
+            Prefix to be added to the name of the input cube.
+            By default, will use "refwcs".
+        outcube_name: str - optional
+            Name of the output cube.  
+        """
+        # getting the name of the final datacube (mosaic)
+        cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+        name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
+
+        # test if cube exists
+        if not os.path.isfile(name_cube):
+            upipe.print_error("File {0} does not exist. Aborting.".format(
+                                   name_cube))
+
+        # Opening the cube via MuseCube
+        refcube = MuseCube(filename=name_cube)
+
+        # Creating the new cube
+        prefix = kwargs.pop("prefix_wcs", default_prefix_wcs)
+        refcube.create_onespectral_cube(prefix=prefix, **kwargs)
 
     def run_combine(self, sof_filename='pointings_combine', 
             lambdaminmax=[4000.,10000.], 
@@ -571,11 +626,28 @@ class MusePointings(SofPipe, PipeRecipes) :
         self._add_calib_to_sofdict("FILTER_LIST")
 
         # Adding a WCS if needed
-        ref_wcs = kwargs.pop("ref_wcs", None)
+        wcs_auto = kwargs.pop("wcs_auto", False)
+        if wcs_auto:
+            # getting the name of the final datacube (mosaic)
+            prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+            cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
+        else :
+            ref_wcs = kwargs.pop("ref_wcs", None)
+
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", None)
         if ref_wcs is not None:
             if folder_ref_wcs is None:
                 folder_ref_wcs = upipe.normpath(self.paths.cubes)
+            full_ref_wcs = joinpath(folder_ref_wcs, ref_wcs)
+            if not os.path.isfile(full_ref_wcs):
+                upipe.print_error("Reference WCS file {0} does not exist".format(
+                                       full_ref_wcs))
+                upipe.print_error("Consider using the create_reference_wcs recipe"
+                                  " if you wish to create pointing masks. Else"
+                                  " just check that the WCS reference file exists.")
+                return
+                                    
             self._sofdict['OUTPUT_WCS'] = [joinpath(folder_ref_wcs, ref_wcs)]
 
         # Setting the default option of offset_list
