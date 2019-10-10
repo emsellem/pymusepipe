@@ -521,7 +521,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                         lambdaminmax=lambdaminmax,
                         sof_filename=sof_filename, **kwargs)
 
-    def create_all_pointing_masks(self, **kwargs):
+    def create_all_pointing_masks(self, filter_list="Cousins_R", **kwargs):
         """Create all pointing masks
         """
         # If list_pointings is None using the initially set up one
@@ -529,9 +529,11 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Additional suffix if needed
         for pointing in list_pointings:
-            self.create_pointing_mask(pointing=pointing, **kwargs)
+            self.create_pointing_mask(pointing=pointing, 
+                                      filter_list=filter_list, 
+                                      **kwargs)
 
-    def create_pointing_mask(self, pointing,**kwargs):
+    def create_pointing_mask(self, pointing, filter_list="Cousins_R", **kwargs):
         """Create the mask of a given pointing
 
         Input
@@ -541,6 +543,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         """
         self.run_combine_single_pointing(pointing=pointing, 
                                          add_suffix="mask",
+                                         filter_list=filter_list,
                                          sof_filename="pointing_mask",
                                          wcs_auto=True, **kwargs)
 
