@@ -151,7 +151,7 @@ class MuseCube(Cube):
         k1 = self.wave.pixel([wave1], nearest=True)[0]
 
         # extracting the cube
-        subcube = self[k1:k1+1, :, :]
+        subcube = self[k1:k1+2, :, :]
 
         cube_folder, cube_name = os.path.split(self.filename)
 
