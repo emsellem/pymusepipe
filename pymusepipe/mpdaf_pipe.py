@@ -158,6 +158,8 @@ class MuseCube(Cube):
         if outcube_name is None:
             prefix = kwargs.pop("prefix", "l{0:.0f}_".format(wave1))
             outcube_name = "{0}{1}".format(prefix, cube_name)
+
+        upipe.print_info("Writing up single wave-cube {0}".format(outcube_name))
         subcube.write(joinpath(cube_folder, outcube_name))
 
     def get_set_spectra(self) :

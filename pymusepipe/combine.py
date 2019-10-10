@@ -572,7 +572,10 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Creating the new cube
         prefix = kwargs.pop("prefix_wcs", default_prefix_wcs)
+        upipe.print_info("Now creating the Reference WCS cube using prefix {0}".format(
+                          prefix))
         refcube.create_onespectral_cube(prefix=prefix, **kwargs)
+        upipe.print_info("...Done")
 
     def run_combine(self, sof_filename='pointings_combine', 
             lambdaminmax=[4000.,10000.], 
