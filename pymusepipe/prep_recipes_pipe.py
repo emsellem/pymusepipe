@@ -107,12 +107,12 @@ def _get_combine_products(filter_list='white', prefix_all=""):
             for i, value in enumerate(filter_list.split(','), start=1):
                 suffix_products.append("_{0:04d}".format(i))
                 suffix_prefinalnames.append("_{0}".format(value))
-                name_products.append("{0}{1}".format(prod))
+                name_products.append(prod)
                 prefix_products.append(prefix_all)
         else :
             suffix_products.append("")
             suffix_prefinalnames.append("")
-            name_products.append("{0}".format(prod))
+            name_products.append(prod)
             prefix_products.append(prefix_all)
 
     return name_products, suffix_products, suffix_prefinalnames, prefix_products
