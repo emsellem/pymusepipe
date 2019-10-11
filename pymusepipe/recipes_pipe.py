@@ -303,7 +303,7 @@ class PipeRecipes(object) :
 
     def recipe_combine_pointings(self, sof, dir_products, name_products,
             suffix_products=[""], suffix_prefinalnames=[""], 
-            save='cube', pixfrac=0.6, suffix="", 
+            prefix_products=[""], save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white', 
             lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for pointings
@@ -317,13 +317,13 @@ class PipeRecipes(object) :
                    filt=filter_list, sof=sof, 
                    lmin=lambdamin, lmax=lambdamax))
 
-        for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
-                suffix_prefinalnames):
+        for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products, 
+                suffix_prefinalnames, prefix_products):
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                               "{name_imaout}{suffix}{suff_pre}.fits".format(
                                   nocache=self.nocache, 
                                   name_imain=self.joinprod(name_prod+suff_prod), 
-                                  name_imaout=joinpath(dir_products, name_prod),
+                                  name_imaout=joinpath(dir_products, pre_prod+name_prod),
                                   suff_pre=suff_pre, suffix=suffix))
 

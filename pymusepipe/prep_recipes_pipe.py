@@ -101,18 +101,21 @@ def _get_combine_products(filter_list='white', prefix_all=""):
     name_products = []
     suffix_products = []
     suffix_prefinalnames = []
+    prefix_products = []
     for prod in dic_products_scipost['cube']:
         if prod == "IMAGE_FOV":
             for i, value in enumerate(filter_list.split(','), start=1):
                 suffix_products.append("_{0:04d}".format(i))
                 suffix_prefinalnames.append("_{0}".format(value))
-                name_products.append("{0}{1}".format(prefix_all, prod))
+                name_products.append("{0}{1}".format(prod))
+                prefix_products.append(prefix_all)
         else :
             suffix_products.append("")
             suffix_prefinalnames.append("")
-            name_products.append("{0}{1}".format(prefix_all, prod))
+            name_products.append("{0}".format(prod))
+            prefix_products.append(prefix_all)
 
-    return name_products, suffix_products, suffix_prefinalnames
+    return name_products, suffix_products, suffix_prefinalnames, prefix_products
 
 ###################################################################
 # Class for preparing the launch of recipes
@@ -1347,13 +1350,14 @@ class PipePrep(SofPipe) :
 
         # Product names
         dir_products = self._get_fullpath_expo(expotype, stage)
-        name_products, suffix_products, suffix_prefinalnames = _get_combine_products(filter_list,
-                                        prefix=prefix_all) 
+        name_products, suffix_products, suffix_prefinalnames, prefix_products = \
+                _get_combine_products(filter_list, prefix_all=prefix_all) 
 
         # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, 
                 tpl, expotype, suffix_products=suffix_products,
                 suffix_prefinalnames=suffix_prefinalnames,
+                prefix_products=prefix_products,
                 lambdamin=lambdamin, lambdamax=lambdamax,
                 filter_for_alignment=filter_for_alignment,
                 save=save, suffix=suffix, filter_list=filter_list, **kwargs)

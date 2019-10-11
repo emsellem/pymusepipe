@@ -143,7 +143,7 @@ class MuseCube(Cube):
 
         Write
         -----
-        A new cube with only 1 lambda. To be used as a WCS reference for
+        A new cube with only 2 lambda. To be used as a WCS reference for
         masks.
         """
 

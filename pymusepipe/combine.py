@@ -36,7 +36,7 @@ from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe 
 from pymusepipe.config_pipe import default_filter_list, dic_combined_folders
-from pymusepipe.config_pipe import default_prefix_wcs
+from pymusepipe.config_pipe import default_prefix_wcs, default_mask_prefix
 from pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -541,13 +541,41 @@ class MusePointings(SofPipe, PipeRecipes) :
         pointing: int
             Number of the pointing
         """
+        # Running combine with the ref WCS with only 2 spectral pixels
         self.run_combine_single_pointing(pointing=pointing, 
                                          filter_list=filter_list,
                                          sof_filename="pointing_mask",
                                          add_targetname=True,
-                                         prefix_all="mask_",
+                                         prefix_all=default_mask_prefix,
                                          wcs_auto=True, **kwargs)
 
+        # Adding target name as prefix or not
+        add_targetname = kwargs.pop("add_targetname", True)
+        prefix_all = default_mask_prefix
+        if add_targetname:
+            prefix_all = "{0}_{1}".format(self.targetname, prefix_all)
+
+        # Now creating the mask with 0's and 1's
+        dir_mask = upipe.normpath(self.paths.cubes)
+        name_mask = "{0}IMAGE_FOV_P{1:02d}_white.fits".format(
+                         prefix_all, np.int(pointing))
+        finalname_mask = "{0}_{1:02d}.fits".format(prefix_all,
+                         np.int(pointing))
+
+        # Opening the data and header
+        d = pyfits.getdata(joinpath(dir_mask, name_mask))
+        h = pyfits.getheader(joinpath(dir_mask, name_mask))
+
+        # Changing to 0's and 1's
+        d_int = np.zeros_like(d, dtype=np.int)
+        d_int[np.isnan(d)] = np.int(0)
+        d_int[~np.isnan(d)] = np.int(1)
+
+        # Writing it out in the final mask 
+        upipe.info("Writing the output mask {0}".format(
+                        joinpath(dir_mask, finalname_mask))
+        hdu = pyfits.PrimaryHDU(data=d_int, header=h)
+        hdu.writeto(joinpath(dir_mask, finalname_mask), overwrite=True)
 
     def create_reference_wcs(self, **kwargs):
         """Create the reference WCS from the full mosaic
@@ -685,11 +713,13 @@ class MusePointings(SofPipe, PipeRecipes) :
         for pointing in list_pointings:
             self._sofdict[pixtable_name] += self.dic_pixtabs_in_pointings[pointing]
 
-        self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename, self.targetname, suffix), new=True)
+        self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename, 
+                                                        self.targetname, 
+                                                        suffix), new=True)
 
         # Product names
         dir_products = upipe.normpath(self.paths.cubes)
-        name_products, suffix_products, suffix_prefinalnames = \
+        name_products, suffix_products, suffix_prefinalnames, prefix_products = \
                 prep_recipes_pipe._get_combine_products(filter_list, 
                                                         prefix_all=prefix_all) 
 
@@ -697,6 +727,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.recipe_combine_pointings(self.current_sof, dir_products, name_products, 
                 suffix_products=suffix_products,
                 suffix_prefinalnames=suffix_prefinalnames,
+                prefix_products=prefix_products,
                 save=save, suffix=suffix, filter_list=filter_list, 
                 lambdamin=lambdamin, lambdamax=lambdamax,
                 **kwargs)
