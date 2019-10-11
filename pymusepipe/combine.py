@@ -573,7 +573,7 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Writing it out in the final mask 
         upipe.info("Writing the output mask {0}".format(
-                        joinpath(dir_mask, finalname_mask))
+                        joinpath(dir_mask, finalname_mask)))
         hdu = pyfits.PrimaryHDU(data=d_int, header=h)
         hdu.writeto(joinpath(dir_mask, finalname_mask), overwrite=True)
 
