@@ -521,7 +521,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                         lambdaminmax=lambdaminmax,
                         sof_filename=sof_filename, **kwargs)
 
-    def create_all_pointing_masks(self, filter_list="Cousins_R", **kwargs):
+    def create_all_pointing_masks(self, filter_list="white", **kwargs):
         """Create all pointing masks
         """
         # If list_pointings is None using the initially set up one
@@ -533,7 +533,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                                       filter_list=filter_list, 
                                       **kwargs)
 
-    def create_pointing_mask(self, pointing, filter_list="Cousins_R", **kwargs):
+    def create_pointing_mask(self, pointing, filter_list="white", **kwargs):
         """Create the mask of a given pointing
 
         Input
@@ -542,10 +542,12 @@ class MusePointings(SofPipe, PipeRecipes) :
             Number of the pointing
         """
         self.run_combine_single_pointing(pointing=pointing, 
-                                         add_suffix="mask",
                                          filter_list=filter_list,
                                          sof_filename="pointing_mask",
+                                         add_targetname=True,
+                                         prefix_all="mask_",
                                          wcs_auto=True, **kwargs)
+
 
     def create_reference_wcs(self, **kwargs):
         """Create the reference WCS from the full mosaic
@@ -574,10 +576,10 @@ class MusePointings(SofPipe, PipeRecipes) :
         refcube = MuseCube(filename=name_cube)
 
         # Creating the new cube
-        prefix = kwargs.pop("prefix_wcs", default_prefix_wcs)
+        prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         upipe.print_info("Now creating the Reference WCS cube using prefix {0}".format(
-                          prefix))
-        cfolder, cname = refcube.create_onespectral_cube(prefix=prefix, **kwargs)
+                          prefix_wcs))
+        cfolder, cname = refcube.create_onespectral_cube(prefix=prefix_wcs, **kwargs)
 
         # Now transforming this into a bona fide 1 extension WCS file
         full_cname = joinpath(cfolder, cname)
@@ -604,11 +606,21 @@ class MusePointings(SofPipe, PipeRecipes) :
         """
         # Lambda min and max?
         [lambdamin, lambdamax] = lambdaminmax
+
         # Save options
         save = kwargs.pop("save", "cube,combined")
+
         # Filters
         filter_list = kwargs.pop("filter_list", self.filter_list)
+
+        # Expotype
         expotype = kwargs.pop("expotype", 'REDUCED')
+
+        # Adding target name as prefix or not
+        add_targetname = kwargs.pop("add_targetname", True)
+        prefix_all = kwargs.pop("prefix_all", "")
+        if add_targetname:
+            prefix_all = "{0}_{1}".format(self.targetname, prefix_all)
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.pop("offset_table_name", None)
@@ -678,7 +690,8 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Product names
         dir_products = upipe.normpath(self.paths.cubes)
         name_products, suffix_products, suffix_prefinalnames = \
-                prep_recipes_pipe._get_combine_products(filter_list) 
+                prep_recipes_pipe._get_combine_products(filter_list, 
+                                                        prefix_all=prefix_all) 
 
         # Combine the exposures 
         self.recipe_combine_pointings(self.current_sof, dir_products, name_products, 

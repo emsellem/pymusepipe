@@ -94,7 +94,7 @@ def print_my_function_name(f):
         return f(*myargs, **mykwargs)
     return wrapped
 
-def _get_combine_products(filter_list='white'):
+def _get_combine_products(filter_list='white', prefix_all=""):
     """Provide a set of key output products depending on the filters
     for combine
     """
@@ -106,11 +106,11 @@ def _get_combine_products(filter_list='white'):
             for i, value in enumerate(filter_list.split(','), start=1):
                 suffix_products.append("_{0:04d}".format(i))
                 suffix_prefinalnames.append("_{0}".format(value))
-                name_products.append(prod)
+                name_products.append("{0}{1}".format(prefix_all, prod))
         else :
             suffix_products.append("")
             suffix_prefinalnames.append("")
-            name_products.append(prod)
+            name_products.append("{0}{1}".format(prefix_all, prod))
 
     return name_products, suffix_products, suffix_prefinalnames
 
@@ -1305,6 +1305,7 @@ class PipePrep(SofPipe) :
         # Setting the default alignment filter
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
+        prefix_all = kwargs.pop("prefix_all", "")
 
         # Use the pointing as a suffix for the names
         pointing = "P{0:02d}".format(self.pointing)
@@ -1346,7 +1347,8 @@ class PipePrep(SofPipe) :
 
         # Product names
         dir_products = self._get_fullpath_expo(expotype, stage)
-        name_products, suffix_products, suffix_prefinalnames = _get_combine_products(filter_list) 
+        name_products, suffix_products, suffix_prefinalnames = _get_combine_products(filter_list,
+                                        prefix=prefix_all) 
 
         # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, 
