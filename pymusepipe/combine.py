@@ -559,12 +559,12 @@ class MusePointings(SofPipe, PipeRecipes) :
         dir_mask = upipe.normpath(self.paths.cubes)
         name_mask = "{0}IMAGE_FOV_P{1:02d}_white.fits".format(
                          prefix_all, np.int(pointing))
-        finalname_mask = "{0}_P{1:02d}.fits".format(prefix_all,
+        finalname_mask = "{0}P{1:02d}.fits".format(prefix_all,
                          np.int(pointing))
 
         # Opening the data and header
         d = pyfits.getdata(joinpath(dir_mask, name_mask))
-        h = pyfits.getheader(joinpath(dir_mask, name_mask))
+        h = pyfits.getheader(joinpath(dir_mask, name_mask), extname='DATA')
 
         # Changing to 0's and 1's
         d_int = np.zeros_like(d, dtype=np.int)
