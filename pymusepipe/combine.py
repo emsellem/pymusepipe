@@ -36,7 +36,7 @@ from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe 
 from pymusepipe.config_pipe import default_filter_list, dic_combined_folders
-from pymusepipe.config_pipe import default_prefix_wcs, default_mask_prefix
+from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask
 from pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -521,7 +521,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                         lambdaminmax=lambdaminmax,
                         sof_filename=sof_filename, **kwargs)
 
-    def create_all_pointing_masks(self, filter_list="white", **kwargs):
+    def create_all_pointing_mask_wcs(self, filter_list="white", **kwargs):
         """Create all pointing masks
         """
         # If list_pointings is None using the initially set up one
@@ -529,37 +529,43 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Additional suffix if needed
         for pointing in list_pointings:
-            self.create_pointing_mask(pointing=pointing, 
+            self.create_pointing_mask_wcs(pointing=pointing, 
                                       filter_list=filter_list, 
                                       **kwargs)
 
-    def create_pointing_mask(self, pointing, filter_list="white", **kwargs):
+    def create_pointing_mask_wcs(self, pointing, filter_list="white", **kwargs):
         """Create the mask of a given pointing
+        And also a WCS
 
         Input
         -----
         pointing: int
             Number of the pointing
         """
+        # Adding target name as prefix or not
+        add_targetname = kwargs.pop("add_targetname", True)
+        prefix_mask = kwargs.pop("prefix_mask", default_prefix_mask)
+        prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+
         # Running combine with the ref WCS with only 2 spectral pixels
         self.run_combine_single_pointing(pointing=pointing, 
                                          filter_list=filter_list,
                                          sof_filename="pointing_mask",
                                          add_targetname=True,
-                                         prefix_all=default_mask_prefix,
+                                         prefix_all=prefix_mask,
                                          wcs_auto=True, **kwargs)
 
-        # Adding target name as prefix or not
-        add_targetname = kwargs.pop("add_targetname", True)
-        prefix_all = default_mask_prefix
         if add_targetname:
-            prefix_all = "{0}_{1}".format(self.targetname, prefix_all)
+            prefix_mask = "{0}_{1}".format(self.targetname, prefix_mask)
+            prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
 
         # Now creating the mask with 0's and 1's
         dir_mask = upipe.normpath(self.paths.cubes)
         name_mask = "{0}IMAGE_FOV_P{1:02d}_white.fits".format(
-                         prefix_all, np.int(pointing))
-        finalname_mask = "{0}P{1:02d}.fits".format(prefix_all,
+                         prefix_mask, np.int(pointing))
+        finalname_mask = "{0}P{1:02d}.fits".format(prefix_mask,
+                         np.int(pointing))
+        finalname_wcs = "{0}P{1:02d}.fits".format(prefix_wcs,
                          np.int(pointing))
 
         # Opening the data and header
@@ -576,6 +582,21 @@ class MusePointings(SofPipe, PipeRecipes) :
                         joinpath(dir_mask, finalname_mask)))
         hdu = pyfits.PrimaryHDU(data=d_int, header=h)
         hdu.writeto(joinpath(dir_mask, finalname_mask), overwrite=True)
+
+        # Now also creating a version of this without the full mosaic
+        # To be used as WCS for that pointing
+        ind = np.indices(d_int.shape)
+        sel_1 = (d_int > 0)
+        subd_int = d[np.min(ind[0][sel_1]): np.max(ind[0][sel_1]),
+                 np.min(ind[1][sel_1]): np.max(ind[1][sel_1])]
+        h['CRPIX1'] -= np.min(ind[1][sel_1])
+        h['CRPIX2'] -= np.min(ind[0][sel_1])
+        subhdu = pyfits.PrimaryHDU(data=subd_int, header=h)
+        
+        # Writing the output to get a wcs reference for this pointing
+        upipe.print_info("Writing the output mask {0}".format(
+                        joinpath(dir_mask, finalname_wcs)))
+        subhdu.writeto(joinpath(dir_mask, finalname_wcs), overwrite=True)
 
     def create_reference_wcs(self, **kwargs):
         """Create the reference WCS from the full mosaic

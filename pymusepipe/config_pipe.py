@@ -264,4 +264,4 @@ def get_suffix_product(expotype):
 
 default_prefix_wcs = "refwcs_"
 default_wave_wcs = 6500.0
-default_mask_prefix = "mask_"
+default_prefix_mask = "mask_"
