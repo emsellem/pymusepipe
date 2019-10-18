@@ -461,7 +461,7 @@ class MusePointings(SofPipe, PipeRecipes) :
     def run_combine_all_single_pointings(self,
             add_suffix="",
             sof_filename='pointings_combine',
-            lambdaminmax=[4000.,10000.], 
+            wcs_from_mosaic=True,
             **kwargs):
         """Run for all pointings individually, provided in the 
         list of pointings
@@ -489,12 +489,11 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Additional suffix if needed
         for pointing in list_pointings:
             self.run_combine_single_pointing(pointing, add_suffix=add_suffix,
-                    sof_filename=sof_filename, lambdaminmax=lambdaminmax,
+                    sof_filename=sof_filename, wcs_from_mosaic=wcs_from_mosaic,
                     **kwargs)
 
     def run_combine_single_pointing(self, pointing, add_suffix="", 
             sof_filename='pointing_combine',
-            lambdaminmax=[4000.,10000.], 
             **kwargs):
         """Running the combine routine on just one single pointing
 
@@ -516,10 +515,29 @@ class MusePointings(SofPipe, PipeRecipes) :
         # getting the suffix with the additional PXX
         suffix = "{0}_P{1:02d}".format(add_suffix, np.int(pointing))
 
+        ref_wcs = kwargs.pop("ref_wcs", None)
+        wcs_mode = kwargs.pop("wcs_mode", "fits")
+
+        # Wcs_from_mosaic
+        # If true, use the reference wcs
+        if wcs_from_mosaic:
+            if ref_wcs is not None:
+                upipe.print_warning("wcs_from_mosaic is set to True. "
+                                    "Hence will overwrite ref_wcs/wcs_mode given input")
+            prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+            add_targetname = kwargs.pop("add_targetname", True)
+            if add_targetname:
+                prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
+            ref_wcs = "{0}P{1:02d}.fits".format(prefix_wcs,
+                             np.int(pointing))
+            wcs_mode = "fits"
+
         # Running the combine for that single pointing
         self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix, 
-                        lambdaminmax=lambdaminmax,
-                        sof_filename=sof_filename, **kwargs)
+                        sof_filename=sof_filename, 
+                        ref_wcs=ref_wcs,
+                        wcs_mode=wcs_mode,
+                        **kwargs)
 
     def create_all_pointing_mask_wcs(self, filter_list="white", **kwargs):
         """Create all pointing masks
@@ -626,6 +644,9 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Creating the new cube
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+        add_targetname = kwargs.pop("add_targetname", True)
+        if add_targetname:
+            prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
         upipe.print_info("Now creating the Reference WCS cube using prefix {0}".format(
                           prefix_wcs))
         cfolder, cname = refcube.create_onespectral_cube(prefix=prefix_wcs, **kwargs)
@@ -667,8 +688,10 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Adding target name as prefix or not
         add_targetname = kwargs.pop("add_targetname", True)
+        prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         prefix_all = kwargs.pop("prefix_all", "")
         if add_targetname:
+            prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
             prefix_all = "{0}_{1}".format(self.targetname, prefix_all)
 
         if "offset_table_name" in kwargs:
@@ -700,19 +723,20 @@ class MusePointings(SofPipe, PipeRecipes) :
         self._add_calib_to_sofdict("FILTER_LIST")
 
         # Adding a WCS if needed
-        wcs_auto = kwargs.pop("wcs_auto", False)
-        if wcs_auto:
+        wcs_mode = kwargs.pop("wcs_mode", "fits")
+        if wcs_mode == "mosaic":
             # getting the name of the final datacube (mosaic)
-            prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
             cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
             ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
-        else :
+        elif wcs_mode == "fits" :
+            ref_wcs = kwargs.pop("ref_wcs", None)
+        else:
+            upipe.print_warning("wcs_mode {0} not in list ['fits' or 'mosaic']. "
+                                "Will use default".format(wcs_mode))
             ref_wcs = kwargs.pop("ref_wcs", None)
 
-        folder_ref_wcs = kwargs.pop("folder_ref_wcs", None)
+        folder_ref_wcs = kwargs.pop("folder_ref_wcs", upipe.normpath(self.paths.cubes))
         if ref_wcs is not None:
-            if folder_ref_wcs is None:
-                folder_ref_wcs = upipe.normpath(self.paths.cubes)
             full_ref_wcs = joinpath(folder_ref_wcs, ref_wcs)
             if not os.path.isfile(full_ref_wcs):
                 upipe.print_error("Reference WCS file {0} does not exist".format(
