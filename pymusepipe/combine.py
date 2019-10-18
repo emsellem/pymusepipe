@@ -616,7 +616,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                         joinpath(dir_mask, finalname_wcs)))
         subhdu.writeto(joinpath(dir_mask, finalname_wcs), overwrite=True)
 
-    def create_reference_wcs(self, **kwargs):
+    def create_combined_wcs(self, **kwargs):
         """Create the reference WCS from the full mosaic
 
         Input
