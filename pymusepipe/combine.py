@@ -647,7 +647,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         add_targetname = kwargs.pop("add_targetname", True)
         if add_targetname:
             prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
-        upipe.print_info("Now creating the Reference WCS cube using prefix {0}".format(
+        upipe.print_info("Now creating the Reference WCS cube using prefix '{0}'".format(
                           prefix_wcs))
         cfolder, cname = refcube.create_onespectral_cube(prefix=prefix_wcs, **kwargs)
 
@@ -724,12 +724,13 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Adding a WCS if needed
         wcs_auto = kwargs.pop("wcs_auto", False)
+        ref_wcs = kwargs.pop("ref_wcs", None)
         if wcs_auto:
+            upipe.print_warning("wcs_auto is True, hence overwriting ref_wcs name")
             # getting the name of the final datacube (mosaic)
             cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
             ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
-        else:
-            ref_wcs = kwargs.pop("ref_wcs", None)
+            upipe.print_warning("ref_wcs used is {0}".format(ref_wcs))
 
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", upipe.normpath(self.paths.cubes))
         if ref_wcs is not None:
