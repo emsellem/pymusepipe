@@ -671,7 +671,7 @@ class AlignMusePointing(object):
                     nima,
                     self.init_flux_scale[nima], 
                     self.ima_polypar[nima].beta[1],
-                    self.ima_norm_factors[nima]),
+                    self.ima_norm_factors[nima],
                     self.ima_background[nima]))
 
     def show_linearfit_values(self):
