@@ -130,7 +130,7 @@ class MusePipe(PipePrep, PipeRecipes):
             If True, log file will be reset to an empty file before starting
         verbose: bool [True]
             Give more information as output
-        musemode: str ['WFM_NOAO_N'] 
+        musemode: str ['WFM-NOAO-N'] 
             String to define the mode to be considered
         checkmode: bool [True]
             Check the mode when reducing

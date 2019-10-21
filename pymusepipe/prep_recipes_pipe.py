@@ -841,8 +841,9 @@ class PipePrep(SofPipe) :
             mymusefilter = MuseFilter(filter_name=filter_for_alignment,
                                       filter_fits_file=filter_fits_file)
             # Find the background value from the offset table
-            # Integration the continuum in that filter
-            mycont.integrate(mymusefilter)
+            # Integration of the continuum in that filter
+            thisfile_musemode = expo_table[0]['mode']
+            mycont.integrate(mymusefilter, AO_mask=("-AO-" in thisfile_musemode))
             mycont.get_normfactor(background, filter_for_alignment)
             normalise_factor = getattr(mycont, filter_for_alignment).norm
 

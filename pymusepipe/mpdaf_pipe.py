@@ -38,7 +38,7 @@ from astropy.io import fits as pyfits
 from astropy import units as units
 
 from pymusepipe import util_pipe as upipe
-from pymusepipe.config_pipe import default_wave_wcs
+from pymusepipe.config_pipe import default_wave_wcs, AO_mask_lambda
 
 # Versioning
 __version__ = '0.2.0 (9 Sep 2019)' # Adding PixTableToMask
@@ -61,7 +61,7 @@ def get_sky_spectrum(specname) :
     spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
     return spec
 #== ------------------------------------
-def integrate_spectrum(spectrum, wave_filter, throughput_filter):
+def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
     """Integrate a spectrum using a certain Muse Filter file.
 
     Input
@@ -77,9 +77,13 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter):
     # interpolation linearly the filter throughput onto
     # the spectrum wavelength
     effS = np.interp(spectrum.wave.coord(), wave_filter, throughput_filter)
-    filtwave = np.sum(effS) 
+    if AO_mask:
+        goodpix = (wave_filter < AO_mask_lambda[0]) or (wave_filter > AO_mask_lambda[1])
+    else:
+        goodpix = (np.abs(effS) >= 0)
+    filtwave = np.sum(effS[goodpix]) 
     if filtwave > 0:
-        flux_cont = np.sum(spectrum.data * effS) / filtwave 
+        flux_cont = np.sum(spectrum.data[goodpix] * effS[goodpix]) / filtwave 
     else:
         flux_cont = 0.0
 
@@ -272,7 +276,7 @@ class MuseSkyContinuum(object):
         wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=units.angstrom)
         self.spec = Spectrum(wave=wavein, data=data)
 
-    def integrate(self, muse_filter):
+    def integrate(self, muse_filter, AO_mask=False):
         """Integrate a sky continuum spectrum using a certain filter file.
         If the file is a fits file, use it as the MUSE filter list.
         Otherwise use it as an ascii file
@@ -285,7 +289,8 @@ class MuseSkyContinuum(object):
         # the spectrum wavelength
         muse_filter.flux_cont = integrate_spectrum(self.spec, 
                                                    muse_filter.wave, 
-                                                   muse_filter.throughput)
+                                                   muse_filter.throughput,
+                                                   AO_mask=AO_mask)
         setattr(self, muse_filter.filter_name, muse_filter)
 
     def get_normfactor(self, background, filter_name="Cousins_R"):
