@@ -78,7 +78,7 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
     # the spectrum wavelength
     effS = np.interp(spectrum.wave.coord(), wave_filter, throughput_filter)
     if AO_mask:
-        goodpix = (wave_filter < AO_mask_lambda[0]) or (wave_filter > AO_mask_lambda[1])
+        goodpix = (wave_filter < AO_mask_lambda[0]) | (wave_filter > AO_mask_lambda[1])
     else:
         goodpix = (np.abs(effS) >= 0)
     filtwave = np.sum(effS[goodpix]) 

@@ -843,6 +843,7 @@ class PipePrep(SofPipe) :
             # Find the background value from the offset table
             # Integration of the continuum in that filter
             thisfile_musemode = expo_table[0]['mode']
+            upipe.print_info("For this sky continuum, we use MUSE Mode = {0}".format(thisfile_musemode))
             mycont.integrate(mymusefilter, AO_mask=("-AO-" in thisfile_musemode))
             mycont.get_normfactor(background, filter_for_alignment)
             normalise_factor = getattr(mycont, filter_for_alignment).norm
