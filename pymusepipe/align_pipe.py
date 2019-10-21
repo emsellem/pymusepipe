@@ -667,7 +667,7 @@ class AlignMusePointing(object):
         print("Normalisation factors")
         print("Image # : InitFluxScale     SlopeFit       NormFactor       Background")
         for nima in range(self.nimages):
-            print("Image {0:02d}:  {1:10.6e}   {2:10.6e}     {3:10.6e}     {3:10.6e}".format(
+            print("Image {0:02d}:  {1:10.6e}   {2:10.6e}     {3:10.6e}     {4:10.6e}".format(
                     nima,
                     self.init_flux_scale[nima], 
                     self.ima_polypar[nima].beta[1],
