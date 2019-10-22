@@ -114,7 +114,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
 
 class MusePointings(SofPipe, PipeRecipes) :
     def __init__(self, targetname=None, list_pointings=[1], 
-            dic_exposures_in_pointing=None,
+            dic_exposures_in_pointings=None,
             suffix_fixed_pixtables="tmask",
             use_fixed_pixtables=False,
             rc_filename=None, cal_filename=None, 
@@ -219,7 +219,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
 
         # Checking input pointings and pixtables
-        self._check_pointings(dic_exposures_in_pointing)
+        self._check_pointings(dic_exposures_in_pointings)
 
         # Checking input offset table and corresponding pixtables
         folder_offset_table = kwargs.pop("folder_offset_table", self.paths.alignment)
