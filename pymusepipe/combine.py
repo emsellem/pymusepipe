@@ -539,8 +539,16 @@ class MusePointings(SofPipe, PipeRecipes) :
                         ref_wcs=ref_wcs,
                         **kwargs)
 
-    def create_all_pointing_mask_wcs(self, filter_list="white", **kwargs):
-        """Create all pointing masks
+    def create_all_pointings_mask_wcs(self, filter_list="white", **kwargs):
+        """Create all pointing masks one by one
+        as well as the wcs for each individual pointings. Using the grid
+        from the global WCS of the mosaic but restricting it to the 
+        range of non-NaN.
+
+        Input
+        -----
+        filter_list = list of str
+            List of filter names to be used. 
         """
         # If list_pointings is None using the initially set up one
         list_pointings = kwargs.pop("list_pointings", self.list_pointings)
@@ -559,7 +567,10 @@ class MusePointings(SofPipe, PipeRecipes) :
         -----
         pointing: int
             Number of the pointing
+        filter_list = list of str
+            List of filter names to be used.         
         """
+
         # Adding target name as prefix or not
         add_targetname = kwargs.pop("add_targetname", True)
         prefix_mask = kwargs.pop("prefix_mask", default_prefix_mask)
@@ -738,7 +749,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             if not os.path.isfile(full_ref_wcs):
                 upipe.print_error("Reference WCS file {0} does not exist".format(
                                        full_ref_wcs))
-                upipe.print_error("Consider using the create_reference_wcs recipe"
+                upipe.print_error("Consider using the create_combined_wcs recipe"
                                   " if you wish to create pointing masks. Else"
                                   " just check that the WCS reference file exists.")
                 return
