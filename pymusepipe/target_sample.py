@@ -217,7 +217,6 @@ class MusePipeSample(object):
 
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
             upipe.print_info(python_command)
-            upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
             self.history.append(python_command)
             mypipe = MusePipe(targetname=targetname, pointing=pointing, 
                               rc_filename=rc_filename, cal_filename=cal_filename,
@@ -225,6 +224,7 @@ class MusePipeSample(object):
 
             self.pipelines.append(mypipe)
             mypipe.run_all_phangs_recipes()
+            upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def combine_all_targets(self):
         pass
