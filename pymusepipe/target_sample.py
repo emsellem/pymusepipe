@@ -193,7 +193,7 @@ class MusePipeSample(object):
                 kwargs[attr] = config_args[attr]
 
         # extracting the kwargs
-        list_kwargs = ', '.join(['{}={!r}'.format(k, v) for k, v in kwargs.items()]))
+        list_kwargs = ', '.join(['{}={!r}'.format(k, v) for k, v in kwargs.items()])
 #        list_kwargs = ""
 #        for k in kwargs.keys():
 #            list_kwargs += ", {0}={1}".format(k, kwargs[k])
