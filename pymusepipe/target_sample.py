@@ -203,8 +203,8 @@ class MusePipeSample(object):
         self.history = []
         for pointing in list_pointings:
             # Setting up the names of the output files
-            python_command = ("mypipe = musepipe.MusePipe(targetname={0}, "
-                              "pointing={1}{2})".format(
+            python_command = ("mypipe = musepipe.MusePipe(targetname='{0}', "
+                              "pointing={1}, {2})".format(
                                   targetname, pointing, list_kwargs))
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
             upipe.print_info(python_command)

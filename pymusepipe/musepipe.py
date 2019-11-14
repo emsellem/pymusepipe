@@ -107,7 +107,7 @@ class MusePipe(PipePrep, PipeRecipes):
     """
 
     def __init__(self, targetname=None, pointing=0, rc_filename=None, 
-            cal_filename=None, logfile="MusePipe.log", reset_log=False,
+            cal_filename=None, log_filename="MusePipe.log", reset_log=False,
             verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
             strong_checkmode=False, **kwargs):
         """Initialise the file parameters to be used during the run
@@ -124,7 +124,7 @@ class MusePipe(PipePrep, PipeRecipes):
             Name of the input configuration file with the root folders
         cal_filename: str
             Name of the input configuration file with calibration file names
-        logfile: str ['MusePipe.log']
+        log_filename: str ['MusePipe.log']
             Name of the log file where all pymusepipe output will be recorded
         reset_log: bool [False]
             If True, log file will be reset to an empty file before starting
@@ -183,10 +183,10 @@ class MusePipe(PipePrep, PipeRecipes):
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
-        if logfile is None : 
-            logfile = "log_{timestamp}.txt".format(timestamp=upipe.create_time_name())
-            upipe.print_info("The Log file will be {log}".format(log=logfile))
-        self.logfile = logfile
+        if log_filename is None : 
+            log_filename = "log_{timestamp}.txt".format(timestamp=upipe.create_time_name())
+            upipe.print_info("The Log file will be {log}".format(log=log_filename))
+        self.log_filename = log_filename
 
         # Further reduction options =====================================
         # Mode of the observations
@@ -213,7 +213,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Create full path folder 
         self.set_fullpath_names()
-        self.paths.logfile = joinpath(self.paths.log, logfile)
+        self.paths.log_filename = joinpath(self.paths.log, log_filename)
 
         # Go to the data directory
         # and Recording the folder where we start
@@ -354,7 +354,7 @@ class MusePipe(PipePrep, PipeRecipes):
             if verbose :
                 upipe.print_info("Going to folder {0}".format(newpath))
             if addtolog :
-                upipe.append_file(self.paths.logfile, "cd {0}\n".format(newpath))
+                upipe.append_file(self.paths.log_filename, "cd {0}\n".format(newpath))
             self.paths._prev_folder = prev_folder 
         except OSError:
             if not os.path.isdir(newpath):

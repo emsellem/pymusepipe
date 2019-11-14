@@ -120,7 +120,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             rc_filename=None, cal_filename=None, 
             combined_folder_name="Combined", suffix="",
             offset_table_name=None,
-            logfile="MusePipeCombine.log", reset_log=False,
+            log_filename="MusePipeCombine.log", reset_log=False,
             verbose=True, debug=False, **kwargs):
         """Initialisation of class muse_expo
 
@@ -168,10 +168,10 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
-        if logfile is None : 
-            logfile = "log_{timestamp}.txt".format(timestamp = upipe.create_time_name())
-            upipe.print_info("The Log file will be {0}".format(logfile))
-        self.logfile = logfile
+        if log_filename is None : 
+            log_filename = "log_{timestamp}.txt".format(timestamp = upipe.create_time_name())
+            upipe.print_info("The Log file will be {0}".format(log_filename))
+        self.log_filename = log_filename
         self.suffix = suffix
 
         # End of parameter settings #########################
@@ -199,7 +199,7 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Setting all the useful paths
         self.set_fullpath_names()
-        self.paths.logfile = joinpath(self.paths.log, logfile)
+        self.paths.log_filename = joinpath(self.paths.log, log_filename)
 
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
@@ -425,7 +425,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             if verbose :
                 upipe.print_info("Going to folder {0}".format(newpath))
             if addtolog :
-                upipe.append_file(self.paths.logfile, "cd {0}\n".format(newpath))
+                upipe.append_file(self.paths.log_filename, "cd {0}\n".format(newpath))
             self.paths._prev_folder = prev_folder 
         except OSError:
             if not os.path.isdir(newpath):

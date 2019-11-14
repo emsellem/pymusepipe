@@ -95,7 +95,7 @@ class PipeRecipes(object) :
                 upipe.formatted_time(),
                 " FAKEMODE" if self.fakemode else "",
                 pipeversion, text) 
-        upipe.append_file(self.paths.logfile, fulltext)
+        upipe.append_file(self.paths.log_filename, fulltext)
 
     def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
