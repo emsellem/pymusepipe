@@ -106,9 +106,9 @@ class MusePipe(PipePrep, PipeRecipes):
     of MUSE exposures.
     """
 
-    def __init__(self, targetname=None, pointing=0, rc_filename=None, 
-            cal_filename=None, log_filename="MusePipe.log", reset_log=False,
-            verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
+    def __init__(self, targetname=None, pointing=0, folder_config="Config/",
+            rc_filename=None, cal_filename=None, log_filename="MusePipe.log", 
+            reset_log=False, verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
             strong_checkmode=False, **kwargs):
         """Initialise the file parameters to be used during the run
         Create the python structure which allows the pipeline to run 
@@ -120,6 +120,8 @@ class MusePipe(PipePrep, PipeRecipes):
             Name of the target (e.g., 'NGC1208').
         pointing: int [0]
             Number of the pointing to consider
+        folder_config: str
+            Folder name for the configuration files
         rc_filename: str
             Name of the input configuration file with the root folders
         cal_filename: str
@@ -205,7 +207,8 @@ class MusePipe(PipePrep, PipeRecipes):
         # Setting up the folders and names for the data reduction
         # Can be initialised by either an rc_file, 
         # or a default rc_file or harcoded defaults.
-        self.pipe_params = InitMuseParameters(rc_filename=rc_filename, 
+        self.pipe_params = InitMuseParameters(folder_config=folder_config,
+                            rc_filename=rc_filename, 
                             cal_filename=cal_filename)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing

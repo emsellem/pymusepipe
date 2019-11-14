@@ -62,7 +62,6 @@ class InitMuseParameters(object) :
         self._dic_input_folders = dic_input_folders
         self._dic_folders_target = dic_folders_target
         self._dic_extra_filters = dic_extra_filters
-        folder_config = kwargs.pop("folder_config", self._dic_input_folders['config'])
 
         if rc_filename is None :
             if not os.path.isfile(default_rc_filename):
