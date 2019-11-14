@@ -184,18 +184,25 @@ class PipePrep(SofPipe) :
         self.run_prep_align(skymethod=skymethod)
         self.run_align_bypointing()
         self.run_align_bygroup()
-        self.run_scipost(skymethod=skymethod)
+        self.run_scipost_perexpo(skymethod=skymethod)
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
         self.run_combine_pointing()
 
     @print_my_function_name
-    def run_all_phangs_recipes(self, fraction=0.8, illum=True, **kwargs):
-        """Running all recipes in one shot
-        """
-        # Flexibility to define the skymethod
-        # Accounting for runs which do not have sky frames
-        skymethod = kwargs.pop("skymethod", "model")
+    def run_all_phangs_recipes(self, fraction=0.8, illum=True, skymethod="model",
+                               **kwargs):
+        """Running all PHANGS recipes in one shot
 
+        Input
+        -----
+        fraction: float
+            Fraction of sky to consider in sky frames for the sky spectrum
+            Default is 0.8.
+        illum: bool
+            Default is True (use illumination during twilight calibration)
+        skymethod: str
+            Default is "model".
+        """
         #for recipe in self.list_recipes:
         self.run_bias()
         self.run_flat()
@@ -208,9 +215,10 @@ class PipePrep(SofPipe) :
         self.run_prep_align(skymethod=skymethod)
         self.run_align_bypointing()
         self.run_align_bygroup()
-        self.run_scipost(skymethod=skymethod)
+        self.run_scipost_perexpo(skymethod=skymethod)
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
-        self.run_combine_pointing()
+#   Not really useful at this stage
+#        self.run_combine_pointing()
 
     @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
@@ -704,6 +712,7 @@ class PipePrep(SofPipe) :
         for i in range(len(object_table)):
             iexpo = np.int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
+            # Skip this exposure if tpl does not match
             if tpl != "ALL" and tpl != mytpl :
                 continue
             # Running scipost now on the individual exposure

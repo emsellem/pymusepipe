@@ -95,6 +95,10 @@ dic_user_folders = {
 # Default initialisation file
 default_rc_filename = "~/.musepiperc"
 
+PHANGS_config = {'fakemode':False, 'nocache':False, 'checkmode':False, 
+                 'overwrite_astropy_table':True, 'filter_list':"white,WFI_BB", 
+                 'filter_for_alignment':"WFI_BB"}
+
 # Extra filters which may be used in the course of the reduction
 dic_extra_filters = {
         # Narrow band filter 
@@ -106,15 +110,15 @@ dic_extra_filters = {
 # Default hard-coded fits files - Calibration Tables
 # These are also overwritten by the given calib input file (if provided)
 dic_calib_tables = {
-            # Muse calibration files (common to all)
+            # Muse geometric file
             "geo_table": "geometry_table_wfm.fits",
-            # Calibration files (specific to OBs)
+            # Astrometry
             "astro_table" : "astrometry_wcs_wfm.fits",
-            # Raw Data files
+            # Bad pixel table
             "badpix_table" : "badpix_table_2015-06-02.fits",
-            # Reduced files
+            # Vignetting
             "vignetting_mask" : "vignetting_mask.fits",
-            # Pixel tables
+            # Flux table
             "std_flux_table" : "std_flux_table.fits",
             # Sky Flat files
             "extinct_table" : "extinct_table.fits",
@@ -156,8 +160,6 @@ dic_folders = {
             "sky" : "Sky/",
             # Std files
             "std" : "Std/",
-            # Cubes
-            "cubes" : "Cubes/",
             # Reconstructed Maps
             "maps" : "Maps/",
             # SOF folder 
