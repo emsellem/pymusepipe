@@ -204,8 +204,11 @@ class MusePipeSample(object):
         for pointing in list_pointings:
             # Setting up the names of the output files
             python_command = ("mypipe = musepipe.MusePipe(targetname='{0}', "
-                              "pointing={1}, {2})".format(
-                                  targetname, pointing, list_kwargs))
+                              "pointing={1}, rc_filename='{2}', "
+                              "cal_filename='{3}', log_filename='{4}', "
+                              "{5})".format(targetname, pointing, rc_filename,
+                                  cal_filename, log_filename, list_kwargs))
+
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
             upipe.print_info(python_command)
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
