@@ -144,7 +144,7 @@ class MusePipeSample(object):
             If self.__phangs is set to True, this is overwritten with the default
             PHANGS configuration parameters as provided in config_pipe.py.
         """
-        if targetname not in self.dic_targets.keys():
+        if targetname not in self.targetnames:
             upipe.print_error("ERROR: no Target named {name} in the defined sample".format(
                                 name=targetname))
             return
