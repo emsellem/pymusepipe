@@ -193,9 +193,10 @@ class MusePipeSample(object):
                 kwargs[attr] = config_args[attr]
 
         # extracting the kwargs
-        list_kwargs = ""
-        for k in kwargs.keys():
-            list_kwargs += ", {0}={1}".format(k, kwargs[k])
+        list_kwargs = ', '.join(['{}={!r}'.format(k, v) for k, v in kwargs.items()]))
+#        list_kwargs = ""
+#        for k in kwargs.keys():
+#            list_kwargs += ", {0}={1}".format(k, kwargs[k])
 
         # Loop on the pointings
         self.pipelines = []
@@ -203,7 +204,7 @@ class MusePipeSample(object):
         for pointing in list_pointings:
             # Setting up the names of the output files
             python_command = ("mypipe = musepipe.MusePipe(targetname={0}, "
-                              "pointing={1}{2}".format(
+                              "pointing={1}{2})".format(
                                   targetname, pointing, list_kwargs))
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
             upipe.print_info(python_command)
