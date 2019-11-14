@@ -173,9 +173,9 @@ class MusePipeSample(object):
             upipe.print_error("rc_filename and/or cal_filename is None. Please define both.")
             return
 
-        folder_rc, rc_filename = os.path.splitext(update_rcfile(rc_filename, 
+        folder_rc, rc_filename = os.path.split(update_rcfile(rc_filename, 
                                     self.dic_targets[targetname].subfolder))
-        folder_cal, cal_filename = os.path.splitext(update_rcfile(cal_filename, 
+        folder_cal, cal_filename = os.path.split(update_rcfile(cal_filename, 
                                      self.dic_targets[targetname].subfolder))
 
         if folder_rc == folder_cal:
