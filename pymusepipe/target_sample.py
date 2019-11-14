@@ -179,7 +179,7 @@ class MusePipeSample(object):
                                      self.dic_targets[targetname].subfolder))
 
         if folder_rc == folder_cal:
-            kwargs['dirname'] = folder_rc
+            kwargs['folder_config'] = folder_rc
         else:
             rc_filename = joinpath(folder_rc, rc_filename)
             cal_filename = joinpath(folder_cal, cal_filename)
