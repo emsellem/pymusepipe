@@ -33,7 +33,7 @@ def add_suffix_tokeys(dic, suffix="_folder") :
 ############################################################
 
 class InitMuseParameters(object) :
-    def __init__(self, dirname="Config/", 
+    def __init__(self, folder_config="Config/", 
                  rc_filename=None, cal_filename=None, 
                  verbose=True, **kwargs) :
         """Define the default parameters (folders/calibration files) 
@@ -41,7 +41,7 @@ class InitMuseParameters(object) :
 
         Parameters
         ----------
-        dirname: str
+        folder_config: str
             Name of the input folder for the configurations files
         rc_filename: str
             Name of the configuration file 
@@ -74,7 +74,7 @@ class InitMuseParameters(object) :
                 self.read_param_file(default_rc_filename, dic_user_folders) 
             self.rcfile = "default_values"
         else :
-            rcfile = joinpath(dirname, rc_filename)
+            rcfile = joinpath(folder_config, rc_filename)
             self.read_param_file(rcfile, dic_user_folders)
             self.rcfile = rcfile
 
@@ -88,7 +88,7 @@ class InitMuseParameters(object) :
             self.init_default_param(dic_calib_tables)
             self.calfile = "default_values"
         else :
-            calfile = joinpath(dirname, cal_filename)
+            calfile = joinpath(folder_config, cal_filename)
             self.read_param_file(calfile, dic_calib_tables)
             self.calfile = calfile
 

@@ -173,10 +173,16 @@ class MusePipeSample(object):
             upipe.print_error("rc_filename and/or cal_filename is None. Please define both.")
             return
 
-        rc_filename = update_rcfile(rc_filename, 
-                                    self.dic_targets[targetname].subfolder)
-        cal_filename = update_rcfile(cal_filename, 
-                                     self.dic_targets[targetname].subfolder)
+        folder_rc, rc_filename = os.path.splitext(update_rcfile(rc_filename, 
+                                    self.dic_targets[targetname].subfolder))
+        folder_cal, cal_filename = os.path.splitext(update_rcfile(cal_filename, 
+                                     self.dic_targets[targetname].subfolder))
+
+        if folder_rc == folder_cal:
+            kwargs['dirname'] = folder_rc
+        else:
+            rc_filename = joinpath(folder_rc, rc_filename)
+            cal_filename = joinpath(folder_cal, cal_filename)
 
         def_log_filename = "{0}_{1}.log".format(targetname, version_pack)
         log_filename = kwargs.pop("log_filename", def_log_filename)
