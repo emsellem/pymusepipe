@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-"""MUSE-PHANGS initialisation of folders
+"""MUSE-PHANGS target sample module
 """
 
 __authors__   = "Eric Emsellem"
@@ -24,7 +24,9 @@ dic_SAMPLE_example = {
         "NGC628": ['P100', {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0}],
         "NGC1087": ['P101', {1:1}], 
         }
-def update_rcfile(filename, suffix=""):
+
+# Update the rc file with a subfolder name
+def update_rcfile(filename, subfolder=""):
     """Update the rcfile with a new root
     """
     if filename is None:
@@ -43,7 +45,7 @@ def update_rcfile(filename, suffix=""):
 
     # Create new file
     sfilename, extension = os.path.splitext(filename)
-    new_filename = "{0}_{1}{2}".format(sfilename, suffix, extension)
+    new_filename = "{0}_{1}{2}".format(sfilename, subfolder, extension)
     new_rc = open(new_filename, 'w')
 
     # loop on lines
@@ -53,10 +55,9 @@ def update_rcfile(filename, suffix=""):
             new_rc.write(line)
             continue
         if not os.path.isdir(sline[1]):
-            upipe.print_error("{} not an existing folder (from rcfile)".format(sline[1]))
-            continue
+            upipe.print_warning("{} not an existing folder (from rcfile)".format(sline[1]))
 
-        newline = line.replace(sline[1], joinpath(sline[1], suffix))
+        newline = line.replace(sline[1], joinpath(sline[1], subfolder))
         new_rc.write(newline)
 
     new_rc.close()
@@ -67,22 +68,22 @@ def update_rcfile(filename, suffix=""):
 # Defining classes to get samples and objects
 ####################################################
 class MusePipeTarget(object):
-    def __init__(self, period='P100', list_pointings=None):
-        self.period = period
+    def __init__(self, subfolder='P100', list_pointings=None):
+        self.subfolder = subfolder
         self.list_pointings = list_pointings
 
 class MusePipeSample(object):
     def __init__(self, TargetDic, rc_filename=None, cal_filename=None, **kwargs) :
         """Using a given dictionary to initialise the sample
         That dictionary should include the names of the targets
-        as keys and the period plus pointings to consider
+        as keys and the subfolder plus pointings to consider
 
         Input
         -----
         TargetDic: dic
             Dictionary of targets. Keys are target names.
             Values for each target name should be a list of 2 parameters.
-                - The first one is the name of the period (e.g. 'P101')
+                - The first one is the name of the subfolder (e.g. 'P101')
                 - The second one is the list of pointings, itself a dictionary
                   with a 0 or 1 for each pointing number depending on whether
                   this should be included in the reduction or not.
@@ -110,13 +111,13 @@ class MusePipeSample(object):
         """
         self.dic_targets = {}
         for target in self.targetnames:
-            period = self.sample[target][0]
+            subfolder = self.sample[target][0]
             lpoints = self.sample[target][1]
             list_pointings = []
             for lp in lpoints.keys():
                 if lpoints[lp] == 1:
                     list_pointings.append(lp)
-            self.dic_targets[target] = MusePipeTarget(period=period, 
+            self.dic_targets[target] = MusePipeTarget(subfolder=subfolder, 
                                                       list_pointings=list_pointings)
 
     def reduce_all_targets(self):
@@ -173,9 +174,9 @@ class MusePipeSample(object):
             return
 
         rc_filename = update_rcfile(rc_filename, 
-                                    self.dic_targets[targetname].period)
+                                    self.dic_targets[targetname].subfolder)
         cal_filename = update_rcfile(cal_filename, 
-                                     self.dic_targets[targetname].period)
+                                     self.dic_targets[targetname].subfolder)
 
         def_log_filename = "{0}_{1}.log".format(targetname, version_pack)
         log_filename = kwargs.pop("log_filename", def_log_filename)
