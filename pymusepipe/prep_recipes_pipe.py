@@ -217,8 +217,7 @@ class PipePrep(SofPipe) :
         self.run_align_bygroup()
         self.run_scipost_perexpo(skymethod=skymethod)
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
-#   Not really useful at this stage
-#        self.run_combine_pointing()
+        self.run_combine_pointing()
 
     @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
@@ -924,7 +923,7 @@ class PipePrep(SofPipe) :
         # Filters
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
-        offset_list = kwargs.pop("offset_list", True)
+        offset_list = kwargs.pop("offset_list", False)
         offset_table_name = kwargs.pop("offset_table_name", None)
         folder_offset_table = kwargs.pop("folder_offset_table", None)
 

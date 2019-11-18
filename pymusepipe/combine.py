@@ -233,6 +233,31 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Going back to initial working directory
         self.goto_origfolder()
 
+    def run_all_combine_recipes(self, combine=True, masks=True, individual=True):
+        """Run all combine recipes including WCS and masks
+
+        combine: bool [True]
+            Default is True. Will run the combine for all pointings.
+
+        masks: bool [True]
+            Will run the combined WCS and the individual ones (and masks).
+            
+        individual: bool [True]
+            Will run individual pointings using the WCS.
+        """
+        if combine:
+            upipe.print_info("Running the mosaic combine")
+            self.run_combine()
+
+        if masks:
+            upipe.print_info("Running the WCS and Masks routine")
+            self.create_combined_wcs
+            self.create_all_pointings_mask_wcs()
+
+        if individual:
+            upipe.print_info("Running the Individual Pointing combine")
+            self.run_combine_all_single_pointings()
+
     def _check_pointings(self, dic_exposures_in_pointings=None):
         """Check if pointings and dictionary are compatible
         """
@@ -317,6 +342,7 @@ class MusePointings(SofPipe, PipeRecipes) :
 
     def _read_offset_table(self, offset_table_name=None, folder_offset_table=None):
         """Reading the Offset Table
+        If readable, the table is read and set in the offset_table attribute.
 
         Input
         -----
@@ -433,6 +459,7 @@ class MusePointings(SofPipe, PipeRecipes) :
     
     def set_fullpath_names(self) :
         """Create full path names to be used
+        That includes: root, data, target, but also _dic_paths, paths
         """
         # initialisation of the full paths 
         self.paths = musepipe.PipeObject("All Paths useful for the pipeline")
@@ -463,7 +490,7 @@ class MusePointings(SofPipe, PipeRecipes) :
             sof_filename='pointings_combine',
             **kwargs):
         """Run for all pointings individually, provided in the 
-        list of pointings
+        list of pointings, by just looping over the pointings.
 
         Input
         -----
@@ -561,7 +588,8 @@ class MusePointings(SofPipe, PipeRecipes) :
 
     def create_pointing_mask_wcs(self, pointing, filter_list="white", **kwargs):
         """Create the mask of a given pointing
-        And also a WCS
+        And also a WCS file which can then be used to compute individual pointings
+        with a fixed WCS.
 
         Input
         -----
@@ -628,18 +656,19 @@ class MusePointings(SofPipe, PipeRecipes) :
         subhdu.writeto(joinpath(dir_mask, finalname_wcs), overwrite=True)
 
     def create_combined_wcs(self, **kwargs):
-        """Create the reference WCS from the full mosaic
+        """Create the reference WCS from the full mosaic.
 
         Input
         -----
         wave1: float - optional
             Wavelength taken for the extraction. Should only
             be present in all spaxels you wish to get.
-        prefix: str - optional
+        prefix_wcs: str - optional
             Prefix to be added to the name of the input cube.
             By default, will use "refwcs".
-        outcube_name: str - optional
-            Name of the output cube.  
+        add_targetname: bool
+            Add the name of the target to the name of the output
+            WCS reference cube. Default is True.
         """
         # getting the name of the final datacube (mosaic)
         cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
