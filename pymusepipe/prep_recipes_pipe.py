@@ -190,7 +190,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_all_phangs_recipes(self, fraction=0.8, illum=True, skymethod="model",
-                               **kwargs):
+                                start_recipe=0, **kwargs):
         """Running all PHANGS recipes in one shot
 
         Input
@@ -203,21 +203,45 @@ class PipePrep(SofPipe) :
         skymethod: str
             Default is "model".
         """
+        dic_recipes = {'all':0, 'bias':1, 'flat':2, 'wave':3, 'lsf':4, 
+                        'twilight':5, 'scibasic':6, 'standard':7,
+                        'sky':8, 'prep_align':9, 'align_pointing':10, 
+                        'align_group':11, 'scipost_perexpo':12,
+                        'scipost_sky':13, 'combine':14}
         #for recipe in self.list_recipes:
-        self.run_bias()
-        self.run_flat()
-        self.run_wave()
-        self.run_lsf()
-        self.run_twilight(illum=illum)
-        self.run_scibasic_all(illum=illum)
-        self.run_standard()
-        self.run_sky(fraction=fraction)
-        self.run_prep_align(skymethod=skymethod)
-        self.run_align_bypointing()
-        self.run_align_bygroup()
-        self.run_scipost_perexpo(skymethod=skymethod)
-        self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
-        self.run_combine_pointing()
+        if start_recipe == 'print':
+            print(dic_recipes)
+            return
+
+        ind_start = dic_recipes[start_recipe.lower()]
+        if ind_start < 2:
+            self.run_bias()
+        if ind_start < 3:
+            self.run_flat()
+        if ind_start < 4:
+            self.run_wave()
+        if ind_start < 5:
+            self.run_lsf()
+        if ind_start < 6:
+            self.run_twilight(illum=illum)
+        if ind_start < 7:
+            self.run_scibasic_all(illum=illum)
+        if ind_start < 8:
+            self.run_standard()
+        if ind_start < 9:
+            self.run_sky(fraction=fraction)
+        if ind_start < 10:
+            self.run_prep_align(skymethod=skymethod)
+        if ind_start < 11:
+            self.run_align_bypointing()
+        if ind_start < 12:
+            self.run_align_bygroup()
+        if ind_start < 13:
+            self.run_scipost_perexpo(skymethod=skymethod)
+        if ind_start < 14:
+            self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
+        if ind_start < 15:
+            self.run_combine_pointing()
 
     @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
