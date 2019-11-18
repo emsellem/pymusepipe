@@ -130,7 +130,7 @@ class MusePipeSample(object):
                                 target))
             self.reduce_target(targetname=target, start_recipe=start_recipe)
 
-    def reduce_target(self, targetname=None, list_pointings=None, start_recipe='all', **kwargs):
+    def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
         """Reduce one target for a list of pointings
 
         Input
@@ -195,6 +195,9 @@ class MusePipeSample(object):
         else:
             config_args = kwargs.pop("config_args", None)
 
+        start_recipe = kwargs.pop("start_recipe", "all")
+        reset_start = kwargs.pop("reset_start", False)
+
         # Over-writing the arguments in kwargs from config dictionary
         if config_args is not None:
             for attr in config_args.keys():
@@ -222,11 +225,15 @@ class MusePipeSample(object):
             self.history.append(python_command)
             mypipe = MusePipe(targetname=targetname, pointing=pointing, 
                               rc_filename=rc_filename, cal_filename=cal_filename,
-                              log_filename=log_filename, start_recipe=start_recipe, **kwargs)
+                              log_filename=log_filename, start_recipe=start_recipe, 
+                              **kwargs)
 
             self.pipelines.append(mypipe)
             mypipe.run_all_phangs_recipes()
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
+            # If reset start we reset start_recipe after the first pointing
+            if reset_start:
+                start_recipe = "all"
 
     def combine_all_targets(self):
         pass

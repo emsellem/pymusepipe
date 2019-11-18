@@ -213,7 +213,10 @@ class PipePrep(SofPipe) :
         start_recipe = kwargs.pop("start_recipe", self.start_recipe)
         #for recipe in self.list_recipes:
         if start_recipe == 'print':
+            upipe.print_info("=============================================")
+            upipe.print_info("The dictionary of recipes which can be run is")
             print(dic_recipes)
+            upipe.print_info("=============================================")
             return
 
         ind_start = dic_recipes[start_recipe.lower()]
