@@ -73,7 +73,7 @@ class MusePipeTarget(object):
         self.list_pointings = list_pointings
 
 class MusePipeSample(object):
-    def __init__(self, TargetDic, rc_filename=None, cal_filename=None, **kwargs) :
+    def __init__(self, TargetDic, rc_filename=None, cal_filename=None, start_recipe='all', **kwargs) :
         """Using a given dictionary to initialise the sample
         That dictionary should include the names of the targets
         as keys and the subfolder plus pointings to consider
@@ -102,6 +102,8 @@ class MusePipeSample(object):
         self.rc_filename = rc_filename
         self.cal_filename = cal_filename
 
+        self.start_recipe = start_recipe
+
         self.__phangs = kwargs.pop("PHANGS", False)
         self._init_targets()
 
@@ -120,15 +122,15 @@ class MusePipeSample(object):
             self.dic_targets[target] = MusePipeTarget(subfolder=subfolder, 
                                                       list_pointings=list_pointings)
 
-    def reduce_all_targets(self):
+    def reduce_all_targets(self, start_recipe='all'):
         """Reduce all targets already initialised
         """
         for target in self.dic_targets.keys():
             upipe.print_info("Starting the reduction of target {name}".format(
                                 target))
-            self.reduce_target(targetname=target)
+            self.reduce_target(targetname=target, start_recipe=start_recipe)
 
-    def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
+    def reduce_target(self, targetname=None, list_pointings=None, start_recipe='all', **kwargs):
         """Reduce one target for a list of pointings
 
         Input
@@ -220,7 +222,7 @@ class MusePipeSample(object):
             self.history.append(python_command)
             mypipe = MusePipe(targetname=targetname, pointing=pointing, 
                               rc_filename=rc_filename, cal_filename=cal_filename,
-                              log_filename=log_filename, **kwargs)
+                              log_filename=log_filename, start_recipe=start_recipe, **kwargs)
 
             self.pipelines.append(mypipe)
             mypipe.run_all_phangs_recipes()

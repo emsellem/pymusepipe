@@ -123,12 +123,13 @@ def _get_combine_products(filter_list='white', prefix_all=""):
 class PipePrep(SofPipe) :
     """PipePrep class prepare the SOF files and launch the recipes
     """
-    def __init__(self):
+    def __init__(self, start_recipe="all"):
         """Initialisation of PipePrep
         """
         SofPipe.__init__(self)
 #        super(PipePrep, self).__init__()
         self.list_recipes = deepcopy(list_recipes)
+        self.start_recipe = start_recipe
 
     def _get_tpl_meanmjd(self, gtable):
         """Get tpl of the group and mean mjd of the group
@@ -190,7 +191,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_all_phangs_recipes(self, fraction=0.8, illum=True, skymethod="model",
-                                start_recipe=0, **kwargs):
+                                **kwargs):
         """Running all PHANGS recipes in one shot
 
         Input
@@ -208,6 +209,8 @@ class PipePrep(SofPipe) :
                         'sky':8, 'prep_align':9, 'align_pointing':10, 
                         'align_group':11, 'scipost_perexpo':12,
                         'scipost_sky':13, 'combine':14}
+
+        start_recipe = kwargs.pop("start_recipe", self.start_recipe)
         #for recipe in self.list_recipes:
         if start_recipe == 'print':
             print(dic_recipes)
