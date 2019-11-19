@@ -187,7 +187,8 @@ class MusePipe(PipePrep, PipeRecipes):
         # Setting other default attributes
         if log_filename is None : 
             log_filename = "log_{timestamp}.txt".format(timestamp=upipe.create_time_name())
-            upipe.print_info("The Log file will be {log}".format(log=log_filename))
+            if self.verbose:
+                upipe.print_info("The Log file will be {log}".format(log=log_filename))
         self.log_filename = log_filename
 
         # Further reduction options =====================================
@@ -262,6 +263,18 @@ class MusePipe(PipePrep, PipeRecipes):
         self.goto_origfolder()
 
         # ===========================================================
+        # Transform input dictionary of geo/astro files for later
+        # This is useful for the creation of the sof files
+        self._init_geoastro_dates()
+
+        initialise_tables = kwargs.pop("initialise_tables", True)
+        if initialise_tables:
+            self._init_tables()
+
+    def _init_tables(self):
+        """ Initialising all tables and dates
+        """
+        # ===========================================================
         # Now creating the raw table, and attribute containing the
         # astropy dataset probing the rawfiles folder
         # When creating the table, if the table already exists
@@ -269,10 +282,6 @@ class MusePipe(PipePrep, PipeRecipes):
         # is set to True.
         self.init_raw_table()
         self.read_all_astro_tables()
-        # ===========================================================
-        # Transform input dictionary of geo/astro files for later
-        # This is useful for the creation of the sof files
-        self._init_geoastro_dates()
 
     def _init_geoastro_dates(self):
         """Initialise the dictionary for the geo and astrometry files
@@ -428,8 +437,8 @@ class MusePipe(PipePrep, PipeRecipes):
                                 " empty one".format(name_table), pipe=self)
             return Table([[],[],[]], names=['tpls','mjd', 'tplnexp'])
         else :
-            if self.verbose : upipe.print_info("Reading Astropy fits Table {0}".format(
-                name_table))
+            if self.verbose : 
+                upipe.print_info("Reading Astropy fits Table {0}".format(name_table))
             return Table.read(name_table, format="fits")
         
     def init_raw_table(self, reset=False):
