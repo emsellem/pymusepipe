@@ -39,7 +39,7 @@ def insert_suffix(filename, suffix=""):
     """
     # Create new file
     sfilename, extension = os.path.splitext(filename)
-    return "{0}_{1}{2}".format(sfilename, subfolder, extension)
+    return "{0}_{1}{2}".format(sfilename, suffix, extension)
 
 # Update the rc file with a subfolder name
 def update_calib_file(filename, subfolder=""):
