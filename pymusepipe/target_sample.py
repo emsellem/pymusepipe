@@ -11,6 +11,9 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Standard modules
 import os
 from os.path import join as joinpath
+
+import numpy as np
+
 from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
 from pymusepipe.config_pipe import dic_user_folders, PHANGS_config
