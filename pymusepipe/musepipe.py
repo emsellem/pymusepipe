@@ -200,8 +200,11 @@ class MusePipe(PipePrep, PipeRecipes):
         self.strong_checkmode = strong_checkmode
         # End of parameter settings #########################
 
-        # Init of the subclasses
+        # Extra parameters for the initialisation and starting of recipes
         start_recipe = kwargs.pop("start_recipe", "all")
+        initialise_tables = kwargs.pop("initialise_tables", True)
+
+        # Init of the subclasses
         PipePrep.__init__(self, start_recipe=start_recipe)
         PipeRecipes.__init__(self, **kwargs)
 
@@ -267,7 +270,6 @@ class MusePipe(PipePrep, PipeRecipes):
         # This is useful for the creation of the sof files
         self._init_geoastro_dates()
 
-        initialise_tables = kwargs.pop("initialise_tables", True)
         if initialise_tables:
             self._init_tables()
 
