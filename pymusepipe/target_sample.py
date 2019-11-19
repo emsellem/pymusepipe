@@ -295,9 +295,9 @@ class MusePipeSample(object):
         list_kwargs = ', '.join(['{}={!r}'.format(k, v) for k, v in kwargs.items()])
 
         # Config files
-        rc_filename = self.targets[target].rc_filename
-        cal_filename = self.targets[target].cal_filename
-        folder_config = self.targets[target].folder_config
+        rc_filename = self.targets[targetname].rc_filename
+        cal_filename = self.targets[targetname].cal_filename
+        folder_config = self.targets[targetname].folder_config
         # Loop on the pointings
         for pointing in list_pointings:
             # New log file name with pointing included
