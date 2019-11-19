@@ -137,7 +137,8 @@ class MusePipeSample(object):
         """Initialise the calibration files with the new
         name using the subfolders
         """
-        self._subfolders = np.unique([self.sample[target][0] for target in self.targetnames])
+        self._subfolders = np.unique([self.sample[targetname][0] 
+                                for targetname in self.targetnames])
         for subfolder in self._subfolders:
             update_calib_file(self.rc_filename, subfolder)
             update_calib_file(self.cal_filename, subfolder)
@@ -180,23 +181,23 @@ class MusePipeSample(object):
         """
         self.targets = {}
         self.pipes = {}
-        for target in self.targetnames:
-            subfolder = self.sample[target][0]
-            lpoints = self.sample[target][1]
+        for targetname in self.targetnames:
+            subfolder = self.sample[targetname][0]
+            lpoints = self.sample[targetname][1]
             list_pointings = []
             for lp in lpoints.keys():
                 if lpoints[lp] == 1:
                     list_pointings.append(lp)
             # Defining the MusePipe for that target
-            self.targets[target] = MusePipeTarget(subfolder=subfolder, 
+            self.targets[targetname] = MusePipeTarget(subfolder=subfolder, 
                                                       list_pointings=list_pointings)
             # Shortcut to call the musepipe instance
-            self.pipes[target] = self.targets[target].pipes
+            self.pipes[targetname] = self.targets[targetname].pipes
 
-            folder_config, rc_filename, cal_filename = self._get_calib_filenames(target)
-            self.targets[target].rc_filename = rc_filename
-            self.targets[target].cal_filename = cal_filename
-            self.targets[target].folder_config = folder_config
+            folder_config, rc_filename, cal_filename = self._get_calib_filenames(targetname)
+            self.targets[targetname].rc_filename = rc_filename
+            self.targets[targetname].cal_filename = cal_filename
+            self.targets[targetname].folder_config = folder_config
 
     def _check_pointings(self, targetname, list_pointings):
         """Check if pointing is in the list of pointings
@@ -266,7 +267,7 @@ class MusePipeSample(object):
             return
 
         # Galaxy name
-        upipe.print_info("Initialising MusePipe for Target {name}".format(name=targetname))
+        upipe.print_info("=== Initialising MusePipe for Target {name} ===".format(name=targetname))
 
         # Check if pointings are valid
         list_pointings = self._check_pointings(targetname, list_pointings)
@@ -313,19 +314,19 @@ class MusePipeSample(object):
             upipe.print_info(python_command)
 
             # Creating the musepipe instance, using the shortcut
-            self.pipes[target][pointing] = MusePipe(targetname=targetname, 
+            self.pipes[targetname][pointing] = MusePipe(targetname=targetname, 
                             pointing=pointing, folder_config=folder_config, rc_filename=rc_filename, 
                             cal_filename=cal_filename, log_filename=log_filename_pointing, 
                             start_recipe=start_recipe, initialise_tables=False,
                             **kwargs)
 
-            self.pipes[target][pointing].history = python_command
+            self.pipes[targetname][pointing].history = python_command
 
             # If reset start we reset start_recipe after the first pointing
             if reset_start:
                 start_recipe = "all"
 
-    def reduce_all_targets(self, start_recipe='all'):
+    def reduce_all_targets(self, start_recipe='all', **kwargs):
         """Reduce all targets already initialised
 
         Input
@@ -335,7 +336,7 @@ class MusePipeSample(object):
         """
         for target in self.targets.keys():
             upipe.print_info("=== Start Reduction of Target {name} ===".format(target))
-            self.reduce_target(targetname=target, start_recipe=start_recipe)
+            self.reduce_target(targetname=target, start_recipe=start_recipe, **kwargs)
             upipe.print_info("===  End  Reduction of Target {name} ===".format(target))
 
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
