@@ -269,7 +269,7 @@ class MusePipeSample(object):
         upipe.print_info("Initialising MusePipe for Target {name}".format(name=targetname))
 
         # Check if pointings are valid
-        list_pointings = self.check_pointings(targetname, list_pointings)
+        list_pointings = self._check_pointings(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
