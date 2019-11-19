@@ -294,6 +294,10 @@ class MusePipeSample(object):
         # extracting the kwargs
         list_kwargs = ', '.join(['{}={!r}'.format(k, v) for k, v in kwargs.items()])
 
+        # Config files
+        rc_filename = self.targets[target].rc_filename
+        cal_filename = self.targets[target].cal_filename
+        folder_config = self.targets[target].folder_config
         # Loop on the pointings
         for pointing in list_pointings:
             # New log file name with pointing included
@@ -301,16 +305,16 @@ class MusePipeSample(object):
                                     log_filename, pointing, log_fileext)
             # Setting up the names of the output files
             python_command = ("mypipe = musepipe.MusePipe(targetname='{0}', "
-                              "pointing={1}, rc_filename='{2}', "
-                              "cal_filename='{3}', log_filename='{4}', "
-                              "{5})".format(targetname, pointing, rc_filename,
+                              "pointing={1}, folder_config='{2}', rc_filename='{3}', "
+                              "cal_filename='{4}', log_filename='{5}', "
+                              "{6})".format(targetname, pointing, folder_config, rc_filename,
                                   cal_filename, log_filename_pointing, list_kwargs))
 
             upipe.print_info(python_command)
 
             # Creating the musepipe instance, using the shortcut
             self.pipes[target][pointing] = MusePipe(targetname=targetname, 
-                            pointing=pointing, rc_filename=rc_filename, 
+                            pointing=pointing, folder_config=folder_config, rc_filename=rc_filename, 
                             cal_filename=cal_filename, log_filename=log_filename_pointing, 
                             start_recipe=start_recipe, initialise_tables=False,
                             **kwargs)
