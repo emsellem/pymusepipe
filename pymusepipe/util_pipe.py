@@ -146,7 +146,8 @@ def safely_create_folder(path, verbose=True):
             raise
             return
         if os.path.isdir(path):
-            print_endline("... Folder already exists, doing nothing.")
+            if verbose:
+                print_endline("... Folder already exists, doing nothing.")
 
 def append_file(filename, content):
     """Append in ascii file

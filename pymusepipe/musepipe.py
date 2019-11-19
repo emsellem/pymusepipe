@@ -214,7 +214,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # or a default rc_file or harcoded defaults.
         self.pipe_params = InitMuseParameters(folder_config=folder_config,
                             rc_filename=rc_filename, 
-                            cal_filename=cal_filename)
+                            cal_filename=cal_filename, verbose=self.verbose)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/P{1:02d}/".format(self.targetname, self.pointing)
