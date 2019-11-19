@@ -140,22 +140,34 @@ class MusePipeSample(object):
             update_calib_file(self.cal_filename, subfolder)
 
     def _get_calib_filenames(self, targetname):
-            # Checking the folders
-            folder_rc, rc_filename_target = os.path.split(insert_suffix(self.rc_filename, 
-                                        self.targets[targetname].subfolder))
-            folder_cal, cal_filename_target = os.path.split(insert_suffix(self.cal_filename, 
-                                         self.targets[targetname].subfolder))
+        """Get calibration file names
 
-            if rc_filename_target=="" or cal_filename_target=="":
-                upipe.print_error()
-                return
+        Input
+        ----
+        targetname: str
 
-            if folder_rc == folder_cal:
-                folder_config = folder_rc
-            else:
-                rc_filename_target = joinpath(folder_rc, rc_filename_target)
-                cal_filename_target = joinpath(folder_cal, cal_filename_target)
-                folder_config = ""
+        Returns
+        -------
+        folder_name: str
+        rcname: str
+        calname: str
+        """
+        # Checking the folders
+        folder_rc, rc_filename_target = os.path.split(insert_suffix(self.rc_filename, 
+                                    self.targets[targetname].subfolder))
+        folder_cal, cal_filename_target = os.path.split(insert_suffix(self.cal_filename, 
+                                     self.targets[targetname].subfolder))
+
+        if rc_filename_target=="" or cal_filename_target=="":
+            upipe.print_error()
+            return
+
+        if folder_rc == folder_cal:
+            folder_config = folder_rc
+        else:
+            rc_filename_target = joinpath(folder_rc, rc_filename_target)
+            cal_filename_target = joinpath(folder_cal, cal_filename_target)
+            folder_config = ""
 
         return folder_config, rc_filename_target, cal_filename_target
 
