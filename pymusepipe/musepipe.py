@@ -338,7 +338,8 @@ class MusePipe(PipePrep, PipeRecipes):
     def goto_origfolder(self, addtolog=False) :
         """Go back to original folder
         """
-        upipe.print_info("Going back to the original folder {0}".format(self.paths.orig))
+        if self.verbose:
+            upipe.print_info("Going back to the original folder {0}".format(self.paths.orig))
         self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
             
     def goto_prevfolder(self, addtolog=False) :
@@ -349,7 +350,8 @@ class MusePipe(PipePrep, PipeRecipes):
         addtolog: bool [False]
             Adding the folder move to the log file
         """
-        upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder))
+        if self.verbose:
+            upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder))
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
             
     def goto_folder(self, newpath, addtolog=False, verbose=True) :
