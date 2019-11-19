@@ -118,7 +118,7 @@ class MusePipeSample(object):
         self.__phangs = kwargs.pop("PHANGS", False)
 
         # Reading configuration filenames
-        if self.rc_filename is None or self.cal_filename is None:
+        if rc_filename is None or cal_filename is None:
             upipe.print_error("rc_filename and/or cal_filename is None. Please define both.")
             return
         self.cal_filename = cal_filename
