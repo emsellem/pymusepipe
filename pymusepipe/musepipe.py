@@ -343,7 +343,7 @@ class MusePipe(PipePrep, PipeRecipes):
             upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder))
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
             
-    def goto_folder(self, newpath, addtolog=False) :
+    def goto_folder(self, newpath, addtolog=False, **kwargs) :
         """Changing directory and keeping memory of the old working one
 
         Parameters
@@ -351,11 +351,12 @@ class MusePipe(PipePrep, PipeRecipes):
         addtolog: bool [False]
             Adding the folder move to the log file
         """
+        verbose = kwargs.pop("verbose", self.verbose)
         try: 
             prev_folder = os.getcwd()
             newpath = os.path.normpath(newpath)
             os.chdir(newpath)
-            if self.verbose:
+            if verbose:
                 upipe.print_info("Going to folder {0}".format(newpath))
             if addtolog :
                 upipe.append_file(self.paths.log_filename, "cd {0}\n".format(newpath))
