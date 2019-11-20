@@ -20,14 +20,15 @@ from pymusepipe.config_pipe import dic_user_folders, PHANGS_config
 from .version import __version__ as version_pack
 
 # ----------------- Galaxies and Pointings ----------------#
-
 # Sample of galaxies
 # For each galaxy, we provide the pointings numbers and the run attached to that pointing
 dic_SAMPLE_example = {
         "NGC628": ['P100', {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0}],
         "NGC1087": ['P101', {1:1}], 
         }
+# ----------------- Galaxies and Pointings ----------------#
 
+#=============== Useful function ==========================#
 def insert_suffix(filename, suffix=""):
     """Create a new filename including the 
     suffix in the name
@@ -78,6 +79,50 @@ def update_calib_file(filename, subfolder=""):
     new_rc.close()
     old_rc.close()
     return new_filename
+#------------ End of Useful functions -------------#
+
+####################################################
+# Defining Dictionary with running functions
+####################################################
+class PipeDict(dict) :
+    """Dictionary with extra attributes
+    """
+    def __init__(self, *args, **kwargs) :
+        self.update(*args, **kwargs)
+
+    def __setitem__(self, key, value):
+        """Setting the item by using the dictionary of the new values
+        """
+        for funcname in dir(value):
+            if callable(getattr(value, funcname)) and ("run" in funcname):
+                setattr(self, funcname, self.run_on_all_keys(self, funcname))
+
+        super(MyUpdateDict, self).__setitem__(key, value)
+
+    def update(self, *args, **kwargs):
+        if args:
+            if len(args) > 1:
+                raise TypeError("update expected at most 1 arguments, "
+                                "got %d" % len(args))
+            other = dict(args[0])
+            for key in other:
+                self[key] = other[key]
+        for key in kwargs:
+            self[key] = kwargs[key]
+
+    def setdefault(self, key, value=None):
+        if key not in self:
+            self[key] = value
+        return self[key]
+
+    def run_on_all_keys(self, funcname):
+        """Runs the given function on all the keys
+        """
+        def _function(**kwargs):
+            for key in self.keys():
+                getattr(self[key], funcname)(**kwargs)
+
+        return _function
 
 ####################################################
 # Defining classes to get samples and objects
@@ -86,7 +131,7 @@ class MusePipeTarget(object):
     def __init__(self, subfolder='P100', list_pointings=None):
         self.subfolder = subfolder
         self.list_pointings = list_pointings
-        self.pipes = {}
+        self.pipes = PipeDict()
 
 class MusePipeSample(object):
     def __init__(self, TargetDic, rc_filename=None, cal_filename=None, start_recipe='all', **kwargs) :
@@ -246,7 +291,8 @@ class MusePipeSample(object):
         else:
             return True
 
-    def set_pipe_target(self, targetname=None, list_pointings=None, **kwargs):
+    def set_pipe_target(self, targetname=None, list_pointings=None, verbose=False, 
+                        **kwargs):
         """Create the musepipe instance for that target and list of pointings
 
         Input
@@ -306,10 +352,12 @@ class MusePipeSample(object):
                                     log_filename, pointing, log_fileext)
             # Setting up the names of the output files
             python_command = ("mypipe = musepipe.MusePipe(targetname='{0}', "
-                              "pointing={1}, folder_config='{2}', rc_filename='{3}', "
-                              "cal_filename='{4}', log_filename='{5}', "
-                              "{6})".format(targetname, pointing, folder_config, rc_filename,
-                                  cal_filename, log_filename_pointing, list_kwargs))
+                              "pointing={1}, folder_config='{2}', " 
+                              "rc_filename='{3}', " "cal_filename='{4}', "
+                              "log_filename='{5}', verbose='{6}', "
+                              "{7})".format(targetname, pointing, folder_config, 
+                                  rc_filename, cal_filename, log_filename_pointing, 
+                                  verbose, list_kwargs))
 
             upipe.print_info(python_command)
 
@@ -368,6 +416,7 @@ class MusePipeSample(object):
             else:
                 self.pipes[target][pointing].run_all_recipes()
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
+
     def combine_all_targets(self):
         pass
 
