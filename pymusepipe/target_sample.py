@@ -95,7 +95,7 @@ class PipeDict(dict) :
         """
         for funcname in dir(value):
             if callable(getattr(value, funcname)) and ("run" in funcname):
-                setattr(self, funcname, self.run_on_all_keys(self, funcname))
+                setattr(self, funcname, self.run_on_all_keys(funcname))
 
         super(MyUpdateDict, self).__setitem__(key, value)
 
