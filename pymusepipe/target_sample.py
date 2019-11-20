@@ -370,7 +370,10 @@ class MusePipeSample(object):
                             start_recipe=start_recipe, init_raw_table=False,
                             verbose=verbose, **kwargs)
 
+            # Saving the command
             self.pipes[targetname][pointing].history = python_command
+            # Setting back verbose to True to make sure we have a full account
+            self.pipes[targetname][pointing].verbose = True
 
             # If reset start we reset start_recipe after the first pointing
             if reset_start:
