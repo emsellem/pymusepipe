@@ -893,10 +893,12 @@ class PipePrep(SofPipe) :
                     ind_table = np.argwhere(table_mjdobs == mjd_expo)[0]
                     background = self.offset_table['BACKGROUND'][ind_table[0]]
                 else:
-                    status = -1
+                    status = -2
 
             if status < 0:
-                upipe.print_error("Could not find MJD or BACKGROUND value in offset table")
+                dic_err = {-1: "MJD", -2: "BACKGROUND"}
+                upipe.print_error("Could not find {0} value in offset table".format(
+                                    dic_err[status])
                 upipe.print_warning("A background of 0 will be assumed, and")
                 upipe.print_warning("a normalisation of 1 will be used for the SKY_CONTINUUM")
                 return ""
