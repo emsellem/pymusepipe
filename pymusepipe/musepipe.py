@@ -202,7 +202,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Extra parameters for the initialisation and starting of recipes
         start_recipe = kwargs.pop("start_recipe", "all")
-        initialise_tables = kwargs.pop("initialise_tables", True)
+        init_raw_table = kwargs.pop("init_raw_table", True)
 
         # Init of the subclasses
         PipePrep.__init__(self, start_recipe=start_recipe)
@@ -270,19 +270,8 @@ class MusePipe(PipePrep, PipeRecipes):
         # This is useful for the creation of the sof files
         self._init_geoastro_dates()
 
-        if initialise_tables:
-            self._init_tables()
-
-    def _init_tables(self):
-        """ Initialising all tables and dates
-        """
-        # ===========================================================
-        # Now creating the raw table, and attribute containing the
-        # astropy dataset probing the rawfiles folder
-        # When creating the table, if the table already exists
-        # it will read the old one, except if an overwrite_astropy_table
-        # is set to True.
-        self.init_raw_table()
+        if init_raw_table:
+            self.init_raw_table()
         self.read_all_astro_tables()
 
     def _init_geoastro_dates(self):

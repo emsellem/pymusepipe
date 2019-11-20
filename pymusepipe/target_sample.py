@@ -327,6 +327,8 @@ class MusePipeSample(object):
         # Reading extra arguments from config dictionary
         if self.__phangs:
             config_args = PHANGS_config
+            # Set overwrite to False to keep existing tables
+            config_args['overwrite_astropy_table'] = False
         else:
             config_args = kwargs.pop("config_args", None)
 
@@ -365,7 +367,7 @@ class MusePipeSample(object):
             self.pipes[targetname][pointing] = MusePipe(targetname=targetname, 
                             pointing=pointing, folder_config=folder_config, rc_filename=rc_filename, 
                             cal_filename=cal_filename, log_filename=log_filename_pointing, 
-                            start_recipe=start_recipe, initialise_tables=False,
+                            start_recipe=start_recipe, init_raw_table=False,
                             verbose=verbose, **kwargs)
 
             self.pipes[targetname][pointing].history = python_command
