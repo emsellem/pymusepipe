@@ -409,9 +409,12 @@ class MusePipe(PipePrep, PipeRecipes):
         for expotype in listexpo_types.keys() :
             setattr(self.Tables.Raw, self._get_attr_expo(expotype), [])
 
-    def read_all_astro_tables(self) :
+    def read_all_astro_tables(self, reset=False) :
         """Initialise all existing Astropy Tables
         """
+        if reset or not hasattr(self, "Tables"):
+            self._reset_tables()
+
         for mastertype in dic_listMaster.keys():
             setattr(self._dic_tables["master"], self._get_attr_expo(mastertype),
                 self.read_astropy_table(mastertype, stage="master"))
