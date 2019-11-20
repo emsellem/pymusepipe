@@ -555,8 +555,9 @@ class MusePipe(PipePrep, PipeRecipes):
             # Check if we update
             if self._update_astropy_table:
                 # Reading the existing table
-                upipe.print_warning("Reading the existing Astropy table {0}".format(fits_tablename), 
-                        pipe=self)
+                upipe.print_warning("Reading the existing Astropy table {0} "
+                                    "in folder {1}".format(fits_tablename, 
+                                    self.paths.astro_tables), pipe=self)
                 existing_table = Table.read(full_tablename, format="fits")
                 # first try to see if they are compatible by using vstack
                 try: 
