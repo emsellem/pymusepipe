@@ -97,7 +97,7 @@ class PipeDict(dict) :
             if callable(getattr(value, funcname)) and ("run" in funcname):
                 setattr(self, funcname, self.run_on_all_keys(funcname))
 
-        super(MyUpdateDict, self).__setitem__(key, value)
+        super(PipeDict, self).__setitem__(key, value)
 
     def update(self, *args, **kwargs):
         if args:
