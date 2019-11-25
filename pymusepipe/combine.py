@@ -46,6 +46,28 @@ __version__ = '0.0.3 (4 Sep 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
 # 0.0.1 21 Nov, 2017 : just setting up the scene
 
+def get_list_pointings(target_path=""):
+    """Getting a list of existing pointings
+    for a given path
+
+    Input
+    -----
+    target_path: str
+
+    Return
+    ------
+    list_pointings: list of int
+    """
+    # Done by scanning the target path
+    list_folders = glob.glob(target_path + "/P??")
+    list_pointings = []
+    for folder in list_folders:
+        list_pointings.append(np.int(folder[-2:]))
+
+    list_pointings.sort()
+    upipe.print_info("Pointings list: {0}".format(str(list_pointings)))
+    return list_pointings
+
 def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
     """Provide a list of reduced pixtables
 
@@ -67,13 +89,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
     # Defining the pointing list if not provided
     # Done by scanning the target path
     if list_pointings is None:
-        list_folders = glob.glob(target_path + "/P??")
-        list_pointings = []
-        for folder in list_folders:
-            list_pointings.append(np.int(folder[-2:]))
-
-    list_pointings.sort()
-    upipe.print_info("Pointings list: {0}".format(str(list_pointings)))
+        list_pointings = get_list_pointings(target_path)
 
     # Looping over the pointings
     for pointing in list_pointings:
@@ -113,10 +129,11 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
     return dic_pixtables
 
 class MusePointings(SofPipe, PipeRecipes) :
-    def __init__(self, targetname=None, list_pointings=[1], 
+    def __init__(self, targetname=None, list_pointings=None, 
             dic_exposures_in_pointings=None,
             suffix_fixed_pixtables="tmask",
             use_fixed_pixtables=False,
+            folder_config="",
             rc_filename=None, cal_filename=None, 
             combined_folder_name="Combined", suffix="",
             offset_table_name=None,
@@ -161,7 +178,6 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Setting the default attibutes #####################
         self.targetname = targetname
-        self.list_pointings = list_pointings
         self.filter_list = kwargs.pop("filter_list", default_filter_list)
 
         self.combined_folder_name = combined_folder_name
@@ -184,8 +200,10 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Setting up the folders and names for the data reduction
         # Can be initialised by either an rc_file, 
         # or a default rc_file or harcoded defaults.
-        self.pipe_params = InitMuseParameters(rc_filename=rc_filename, 
-                            cal_filename=cal_filename)
+        self.pipe_params = InitMuseParameters(folder_config=folder_config,
+                            rc_filename=rc_filename, 
+                            cal_filename=cal_filename,
+                            verbose=verbose)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
@@ -200,6 +218,10 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
+
+        # Now the list of pointings
+        if list_pointings is None:
+            self.list_pointings = get_list_pointings(self.paths.target)
 
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()

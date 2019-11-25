@@ -16,7 +16,8 @@ import numpy as np
 
 from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
-from pymusepipe.config_pipe import dic_user_folders, PHANGS_config
+from pymusepipe.config_pipe import dic_user_folders
+from pymusepipe.config_pipe import PHANGS_reduc_config, PHANGS_combine_config
 from .version import __version__ as version_pack
 
 # ----------------- Galaxies and Pointings ----------------#
@@ -89,6 +90,7 @@ class PipeDict(dict) :
     """
     def __init__(self, *args, **kwargs) :
         self.update(*args, **kwargs)
+        self._initialised = False
 
     def __setitem__(self, key, value):
         """Setting the item by using the dictionary of the new values
@@ -134,7 +136,8 @@ class MusePipeTarget(object):
         self.pipes = PipeDict()
 
 class MusePipeSample(object):
-    def __init__(self, TargetDic, rc_filename=None, cal_filename=None, start_recipe='all', **kwargs) :
+    def __init__(self, TargetDic, rc_filename=None, cal_filename=None, 
+            start_recipe='all', **kwargs) :
         """Using a given dictionary to initialise the sample
         That dictionary should include the names of the targets
         as keys and the subfolder plus pointings to consider
@@ -176,6 +179,7 @@ class MusePipeSample(object):
         self._init_calib_files()
 
         # Initialisation of targets
+        self.init_pipes = kwargs.pop("init_pipes", True)
         self._init_targets()
 
     def _init_calib_files(self):
@@ -243,6 +247,9 @@ class MusePipeSample(object):
             self.targets[targetname].rc_filename = rc_filename
             self.targets[targetname].cal_filename = cal_filename
             self.targets[targetname].folder_config = folder_config
+
+            if self.init_pipes:
+                self.set_pipe_target[targename]
 
     def _check_pointings(self, targetname, list_pointings):
         """Check if pointing is in the list of pointings
@@ -326,7 +333,7 @@ class MusePipeSample(object):
 
         # Reading extra arguments from config dictionary
         if self.__phangs:
-            config_args = PHANGS_config
+            config_args = PHANGS_reduc_config
             # Set overwrite to False to keep existing tables
             config_args['overwrite_astropy_table'] = False
         else:
@@ -379,6 +386,8 @@ class MusePipeSample(object):
             if reset_start:
                 start_recipe = "all"
 
+        self.pipes[targetname]._initialised = True
+
     def reduce_all_targets(self, start_recipe='all', **kwargs):
         """Reduce all targets already initialised
 
@@ -411,19 +420,32 @@ class MusePipeSample(object):
         # General print out
         upipe.print_info("---- Starting the Data Reduction for Target={0} ----".format(
                             targetname))
+
+        # Initialise the pipe if needed
+        if not self.pipes[targetname]._initialise:
+            self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
+
         # Loop on the pointings
-        self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
         for pointing in list_pointings:
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
-            self.pipes[target][pointing]._init_tables()
+            self.pipes[targetname][pointing]._init_tables()
             if self.__phangs:
-                self.pipes[target][pointing].run_all_phangs_recipes()
+                self.pipes[targetname][pointing].run_all_phangs_recipes()
             else:
-                self.pipes[target][pointing].run_all_recipes()
+                self.pipes[targetname][pointing].run_all_recipes()
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
-    def combine_all_targets(self):
-        pass
-
-    def combine_target(self):
-        pass
+    def combine_target(self, targetname=None, list_pointings="all", 
+            offset_table_name=None, **kwargs):
+        """Combine the target pointings
+        """
+        log_filename = kwargs.pop("log_filename", "{0}_combine_{1}.log".format(targetname, version_pack))
+        self.combine[targetname] = combine.MusePointings(targetname=targetname,
+                list_pointings=list_pointings, 
+                rc_filename=self.targets[targetname].rc_filename,
+                cal_filename=self.targets[targetname].cal_filename,
+                folder_config=self.targets[targetname].folder_config,
+                offset_table_name=offset_table_name,
+                log_filename=log_filename,
+                **kwargs)
+        self.combine[targetname].run_combine()

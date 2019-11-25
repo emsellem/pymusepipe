@@ -29,7 +29,7 @@ class PipeRecipes(object) :
     """PipeRecipes class containing all the esorex recipes for MUSE data reduction
     """
     def __init__(self, nifu=-1, first_cpu=0, ncpu=24, list_cpu=[], likwid=default_likwid,
-            fakemode=True, domerge=True, nocache=True, nochecksum=True) :
+            fakemode=True, domerge=True, nocache=False, nochecksum=True) :
         """Initialisation of PipeRecipes
         """
         # Fake mode

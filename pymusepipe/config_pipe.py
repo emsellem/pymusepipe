@@ -42,6 +42,7 @@ dic_listMaster = {'DARK': 'MASTER_DARK',
         'WAVE': 'WAVECAL_TABLE', 
         'LSF': 'LSF_PROFILE', 
         'STD': 'PIXTABLE_STD' 
+        'REDUCED': 'PIXTABLE_REDUCED' 
         }
 
 dic_listObject = {'OBJECT': 'PIXTABLE_OBJECT', 
@@ -95,9 +96,10 @@ dic_user_folders = {
 # Default initialisation file
 default_rc_filename = "~/.musepiperc"
 
-PHANGS_config = {'fakemode':False, 'nocache':False, 'checkmode':False, 
+PHANGS_reduc_config = {'fakemode':False, 'nocache':False, 'checkmode':False, 
                  'overwrite_astropy_table':True, 'filter_list':"white,WFI_BB", 
                  'filter_for_alignment':"WFI_BB"}
+PHANGS_combine_config = {'fakemode':False, 'nocache':False}
 
 # Extra filters which may be used in the course of the reduction
 dic_extra_filters = {
