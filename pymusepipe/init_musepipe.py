@@ -125,6 +125,7 @@ class InitMuseParameters(object) :
             sline = re.split(r'(\s+)', line)
             keyword_name = sline[0]
             keyword = "".join(sline[2:])
+            print("Keyname=", keyword_name, " keyword=", keyword)
             if keyword_name in dic_param.keys() :
                 if self.verbose :
                     upipe.print_info("Initialisation of attribute {0}".format(keyword_name))
