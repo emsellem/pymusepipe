@@ -215,15 +215,15 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.use_fixed_pixtables = use_fixed_pixtables
         self.suffix_fixed_pixtables = suffix_fixed_pixtables
 
-        # Setting all the useful paths
-        self.set_fullpath_names()
-        self.paths.log_filename = joinpath(self.paths.log, log_filename)
-
         # Now the list of pointings
         if list_pointings is None:
             self.list_pointings = get_list_pointings(self.paths.target)
         else :
             self.list_pointings = list_pointings
+
+        # Setting all the useful paths
+        self.set_fullpath_names()
+        self.paths.log_filename = joinpath(self.paths.log, log_filename)
 
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
