@@ -109,7 +109,6 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
             expo = sl[1][-9:-5]
             # Find the tpl
             tpl = sl[1].split("_" + expo)[0]
-            print(expo, tpl)
             # If not already there, add it
             if tpl not in dic_tpl.keys():
                 dic_tpl[tpl] = [np.int(expo)]
@@ -205,7 +204,6 @@ class MusePointings(SofPipe, PipeRecipes) :
                             cal_filename=cal_filename,
                             verbose=verbose)
 
-        print("ROOT is", self.pipe_params.root)
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
 
@@ -353,6 +351,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                         if self.debug:
                             upipe.print_debug("Checking which exposures are tested")
                             upipe.print_debug(suffix_expo)
+        irint("ROOT is", self.pipe_params.root)
                         for pixtab in list_pixtabs:
                             if (suffix_expo in pixtab) and (tpl in pixtab):
                                 # We select the cube
@@ -371,6 +370,7 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         Input
         -----
+        irint("ROOT is", self.pipe_params.root)
         offset_table_name: str
             Name of the offset table
             Default is None
@@ -378,9 +378,11 @@ class MusePointings(SofPipe, PipeRecipes) :
             Name of the folder to find the offset table
             Default is None
         """
+        irint("ROOT is", self.pipe_params.root)
         self.offset_table_name = offset_table_name
         if self.offset_table_name is None:
             upipe.print_warning("No Offset table name given")
+        irint("ROOT is", self.pipe_params.root)
             self.offset_table = Table()
             return
         
