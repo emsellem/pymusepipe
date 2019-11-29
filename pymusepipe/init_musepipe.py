@@ -13,6 +13,8 @@ __contact__   = " <eric.emsellem@eso.org>"
 import os
 from os.path import join as joinpath
 
+import re
+
 import copy
 
 from pymusepipe import util_pipe as upipe
