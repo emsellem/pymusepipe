@@ -122,9 +122,9 @@ class InitMuseParameters(object) :
         for line in lines :
             if line[0] in ["#", "%"] : continue 
 
-            sline = (re.split(r'(\s+)', line)).rstrip()
+            sline = re.split(r'(\s+)', line)
             keyword_name = sline[0]
-            keyword = "".join(sline[2:])
+            keyword = ("".join(sline[2:])).rstrip()
             print("Keyname=", keyword_name, " keyword=", keyword)
             if keyword_name in dic_param.keys() :
                 if self.verbose :
