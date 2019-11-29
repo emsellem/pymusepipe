@@ -489,6 +489,8 @@ class MusePointings(SofPipe, PipeRecipes) :
         self.paths = musepipe.PipeObject("All Paths useful for the pipeline")
         self.paths.root = self.pipe_params.root
         print("pipe_params.data {0}".format(self.pipe_params.data))
+        print("paths.root {0}".format(self.paths.root))
+        print("pipe_params.root {0}".format(self.pipe_params.root))
         self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
         self.paths.target = joinpath(self.paths.root, self.targetname)
 
