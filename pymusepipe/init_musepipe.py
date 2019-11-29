@@ -120,13 +120,15 @@ class InitMuseParameters(object) :
         for line in lines :
             if line[0] in ["#", "%"] : continue 
 
-            sline = line.split()
-            if sline[0] in dic_param.keys() :
+            sline = re.split(r'(\s+)', line)
+            keyword_name = sline[0]
+            keyword = "".join(sline[2:])
+            if keyword_name in dic_param.keys() :
                 if self.verbose :
-                    upipe.print_info("Initialisation of attribute {0}".format(sline[0]))
-                setattr(self, sline[0], sline[1]) 
+                    upipe.print_info("Initialisation of attribute {0}".format(keyword_name))
+                setattr(self, keyword_name, keyword) 
                 # Here we drop the item which was initialised
-                val = dummy_dic_param.pop(sline[0])
+                val = dummy_dic_param.pop(keyword_name)
             else :
                 continue
 

@@ -222,6 +222,8 @@ class MusePointings(SofPipe, PipeRecipes) :
         # Now the list of pointings
         if list_pointings is None:
             self.list_pointings = get_list_pointings(self.paths.target)
+        else :
+            self.list_pointing = list_pointings
 
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()

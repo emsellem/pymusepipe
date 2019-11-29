@@ -970,6 +970,10 @@ class PipePrep(SofPipe) :
         [lambdamin, lambdamax] = lambdaminmax
         # Skymethod
         skymethod = kwargs.pop("skymethod", "model")
+
+        # Allow the use of None to work and be replaced by "none"
+        if skymethod is None:
+            skymethod = "none"
         # Save options
         if skymethod != "none":
             save = kwargs.pop("save", "cube,skymodel,individual")
