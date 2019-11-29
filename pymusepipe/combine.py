@@ -205,6 +205,7 @@ class MusePointings(SofPipe, PipeRecipes) :
                             cal_filename=cal_filename,
                             verbose=verbose)
 
+        print("ROOT is", self.pipe_params.root)
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
 
@@ -488,9 +489,6 @@ class MusePointings(SofPipe, PipeRecipes) :
         # initialisation of the full paths 
         self.paths = musepipe.PipeObject("All Paths useful for the pipeline")
         self.paths.root = self.pipe_params.root
-        print("pipe_params.data {0}".format(self.pipe_params.data))
-        print("paths.root {0}".format(self.paths.root))
-        print("pipe_params.root {0}".format(self.pipe_params.root))
         self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
         self.paths.target = joinpath(self.paths.root, self.targetname)
 
