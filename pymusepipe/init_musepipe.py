@@ -122,7 +122,7 @@ class InitMuseParameters(object) :
         for line in lines :
             if line[0] in ["#", "%"] : continue 
 
-            sline = re.split(r'(\s+)', line)
+            sline = (re.split(r'(\s+)', line)).rstrip()
             keyword_name = sline[0]
             keyword = "".join(sline[2:])
             print("Keyname=", keyword_name, " keyword=", keyword)
