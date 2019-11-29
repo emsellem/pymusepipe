@@ -351,7 +351,6 @@ class MusePointings(SofPipe, PipeRecipes) :
                         if self.debug:
                             upipe.print_debug("Checking which exposures are tested")
                             upipe.print_debug(suffix_expo)
-        irint("ROOT is", self.pipe_params.root)
                         for pixtab in list_pixtabs:
                             if (suffix_expo in pixtab) and (tpl in pixtab):
                                 # We select the cube
@@ -370,7 +369,6 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         Input
         -----
-        irint("ROOT is", self.pipe_params.root)
         offset_table_name: str
             Name of the offset table
             Default is None
