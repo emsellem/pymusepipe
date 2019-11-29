@@ -378,11 +378,9 @@ class MusePointings(SofPipe, PipeRecipes) :
             Name of the folder to find the offset table
             Default is None
         """
-        irint("ROOT is", self.pipe_params.root)
         self.offset_table_name = offset_table_name
         if self.offset_table_name is None:
             upipe.print_warning("No Offset table name given")
-        irint("ROOT is", self.pipe_params.root)
             self.offset_table = Table()
             return
         
