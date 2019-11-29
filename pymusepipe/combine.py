@@ -207,7 +207,9 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
+        print(self.pipe_params.data)
 
+        print(dic_combined_folders)
         self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
 
