@@ -488,8 +488,8 @@ class MusePointings(SofPipe, PipeRecipes) :
         # initialisation of the full paths 
         self.paths = musepipe.PipeObject("All Paths useful for the pipeline")
         self.paths.root = self.pipe_params.root
+        print("pipe_params.data {0}".format(self.pipe_params.data))
         self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
-        print(self.paths.data)
         self.paths.target = joinpath(self.paths.root, self.targetname)
 
         self._dic_paths = {"combined": self.paths}
