@@ -147,7 +147,7 @@ class MusePointings(SofPipe, PipeRecipes) :
         rc_filename: str
             filename to initialise folders
         cal_filename: str
-            filename to initiale FIXED calibration MUSE files
+            filename to initial FIXED calibration MUSE files
         verbose: bool 
             Give more information as output (default is True)
         debug: bool

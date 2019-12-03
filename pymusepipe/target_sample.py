@@ -435,17 +435,30 @@ class MusePipeSample(object):
                 self.pipes[targetname][pointing].run_all_recipes()
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
-    def combine_target(self, targetname=None, list_pointings="all", 
-            offset_table_name=None, **kwargs):
-        """Combine the target pointings
+    def init_combine(self, targetname=None, list_pointings="all",
+                     offset_table_name=None, **kwargs):
+        """Prepare the combination of targets
+
+        Input
+        -----
+        targetname: str [None]
+            Name of target
+        list_pointings: list [or "all"=default]
+            List of pointings (e.g., [1,2,3])
+        offset_table_name: str
+            Name of Offset table
         """
         log_filename = kwargs.pop("log_filename", "{0}_combine_{1}.log".format(targetname, version_pack))
         self.combine[targetname] = combine.MusePointings(targetname=targetname,
-                list_pointings=list_pointings, 
-                rc_filename=self.targets[targetname].rc_filename,
-                cal_filename=self.targets[targetname].cal_filename,
-                folder_config=self.targets[targetname].folder_config,
-                offset_table_name=offset_table_name,
-                log_filename=log_filename,
-                **kwargs)
+                                                         list_pointings=list_pointings,
+                                                         rc_filename=self.targets[targetname].rc_filename,
+                                                         cal_filename=self.targets[targetname].cal_filename,
+                                                         folder_config=self.targets[targetname].folder_config,
+                                                         offset_table_name=offset_table_name,
+                                                         log_filename=log_filename, **kwargs)
+
+    def combine_target(self, targetname=None, **kwargs):
+        """Run the combine recipe. Shortcut for combine[targetname].run_combine()
+        """
+        self.init_combine(targetname=targetname, **kwargs)
         self.combine[targetname].run_combine()
