@@ -3,7 +3,7 @@
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2019, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # This module uses some mpdaf routines and pypher to 

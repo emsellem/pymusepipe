@@ -35,7 +35,7 @@ from pymusepipe.create_sof import SofPipe
 from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe 
-from pymusepipe.config_pipe import default_filter_list, dic_combined_folders
+from pymusepipe.config_pipe import default_filter_list, default_PHANGS_filter_list, dic_combined_folders
 from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask
 from pymusepipe.mpdaf_pipe import MuseCube
 
@@ -177,7 +177,11 @@ class MusePointings(SofPipe, PipeRecipes) :
 
         # Setting the default attibutes #####################
         self.targetname = targetname
-        self.filter_list = kwargs.pop("filter_list", default_filter_list)
+        self._phangs = kwargs.pop("PHANGS", False)
+        if self._phangs:
+            self.filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
+        else:
+            self.filter_list = kwargs.pop("filter_list", default_filter_list)
 
         self.combined_folder_name = combined_folder_name
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))

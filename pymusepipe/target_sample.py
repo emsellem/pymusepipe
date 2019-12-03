@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT style license - see LICENSE.rst
 
 """MUSE-PHANGS target sample module
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # Standard modules
@@ -249,7 +249,7 @@ class MusePipeSample(object):
             self.targets[targetname].folder_config = folder_config
 
             if self.init_pipes:
-                self.set_pipe_target[targename]
+                self.set_pipe_target[targetname]
 
     def _check_pointings(self, targetname, list_pointings):
         """Check if pointing is in the list of pointings

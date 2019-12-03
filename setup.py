@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Licensed under a 3-clause BSD style license - see LICENSE
+# Licensed under a MIT style license - see LICENSE.txt
 #
 from __future__ import absolute_import, division, print_function
 #
@@ -17,7 +17,7 @@ with open("pymusepipe/version.py") as fp:
 with open('README.md', 'r') as f:
     readme = f.read()
 
-with open('LICENSE') as f:
+with open('LICENSE.txt') as f:
     license = f.read()
 
 setup(name='pymusepipe',
@@ -29,14 +29,14 @@ setup(name='pymusepipe',
       url="https://github.com/emsellem/pipemusepipe",
       author='Eric Emsellem',
       author_email='eric.emsellem@eso.org',
-      license="BSD License",
+      license="MIT License",
       packages=find_packages(exclude=('tests', 'docs')),
       install_requires=['mpdaf'],
       include_package_data=True,
       zip_safe=False,
       classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
        ],
 )
