@@ -273,6 +273,13 @@ class MusePipeSample(object):
             self.targets[targetname].cal_filename = cal_filename
             self.targets[targetname].folder_config = folder_config
 
+            init_params_target = InitMuseParameters(rc_filename=rc_filename,
+                                                    cal_filename=cal_filename,
+                                                    folder_config=folder_config,
+                                                    verbose=False)
+            self.targets[targetname].root_path = init_params_target.root
+            self.pipes[targetname].root_path = init_params_target.root
+
             if self.init_pipes:
                 self.set_pipe_target(targetname)
 
@@ -380,10 +387,6 @@ class MusePipeSample(object):
         cal_filename = self.targets[targetname].cal_filename
         folder_config = self.targets[targetname].folder_config
 
-        init_params_target = InitMuseParameters(rc_filename=rc_filename,
-                                                cal_filename=cal_filename,
-                                                folder_config=folder_config)
-        self.targets[targetname].root_path = init_params_target.root
         # Loop on the pointings
         for pointing in list_pointings:
             # New log file name with pointing included
