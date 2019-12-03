@@ -18,6 +18,7 @@ from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
 from pymusepipe.config_pipe import dic_user_folders
 from pymusepipe.config_pipe import PHANGS_reduc_config, PHANGS_combine_config
+from pymusepipe.init_musepipe import InitMuseParameters
 from .version import __version__ as version_pack
 
 # ----------------- Galaxies and Pointings ----------------#
