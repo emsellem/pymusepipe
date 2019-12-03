@@ -229,7 +229,7 @@ class MusePipeSample(object):
             name_rc = self.rc_filename
             name_cal = self.cal_filename
         else:
-            name_rc =insert_suffix(self.rc_filename, self.targets[targetname].subfolder)
+            name_rc = insert_suffix(self.rc_filename, self.targets[targetname].subfolder)
             name_cal = insert_suffix(self.cal_filename, self.targets[targetname].subfolder)
 
         # Checking the folders
@@ -379,6 +379,11 @@ class MusePipeSample(object):
         rc_filename = self.targets[targetname].rc_filename
         cal_filename = self.targets[targetname].cal_filename
         folder_config = self.targets[targetname].folder_config
+
+        init_params_target = InitMuseParameters(rc_filename=rc_filename,
+                                                cal_filename=cal_filename,
+                                                folder_config=folder_config)
+        self.targets[targetname].root_path = init_params_target.root
         # Loop on the pointings
         for pointing in list_pointings:
             # New log file name with pointing included
