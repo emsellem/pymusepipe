@@ -249,7 +249,7 @@ class MusePipeSample(object):
             self.targets[targetname].folder_config = folder_config
 
             if self.init_pipes:
-                self.set_pipe_target[targetname]
+                self.set_pipe_target(targetname)
 
     def _check_pointings(self, targetname, list_pointings):
         """Check if pointing is in the list of pointings
