@@ -44,25 +44,35 @@ def insert_suffix(filename, suffix=""):
     return "{0}_{1}{2}".format(sfilename, suffix, extension)
 
 # Update the rc file with a subfolder name
-def update_calib_file(filename, subfolder=""):
+def update_calib_file(filename, subfolder="", folder_config=""):
     """Update the rcfile with a new root
+
+    Input
+    -----
+    filename: str
+        Name of the input filename
+    folder_config: str
+        Default is "". Name of folder for filename
+    subfolder: str
+        Name of subfolder to add in the path
     """
-    if filename is None:
+    full_filename = joinpath(folder_config, filename)
+    if full_filename is None:
         upipe.print_error("ERROR: input filename is None")
         return ""
 
     # Testing existence of filename
-    if not os.path.isfile(filename) :
+    if not os.path.isfile(full_filename) :
         upipe.print_error("ERROR: input filename {inputname} cannot be found. ".format(
-                            inputname=filename))
+                            inputname=full_filename))
         return ""
 
     # If it exists, open and read it
-    old_rc = open(filename)
+    old_rc = open(full_filename)
     lines = old_rc.readlines()
 
     # Create new file
-    new_filename = insert_suffix(filename, subfolder)
+    new_filename = insert_suffix(full_filename, subfolder)
     new_rc = open(new_filename, 'w')
 
     # loop on lines
@@ -186,13 +196,21 @@ class MusePipeSample(object):
         """Initialise the calibration files with the new
         name using the subfolders
         """
-        self._subfolders = np.unique([self.sample[targetname][0] 
+        # Getting the right input for rc and cal names
+        folder_config, rc_filename, cal_filename = self._get_calib_filenames()
+        # First read the root folder
+        init_cal_params = InitMuseParameters(folder_config=folder_config,
+                                             rc_filename=rc_filename,
+                                             cal_filename=cal_filename,
+                                             verbose=False)
+        self.root_path = init_cal_params.root
+        self._subfolders = np.unique([self.sample[targetname][0]
                                 for targetname in self.targetnames])
         for subfolder in self._subfolders:
-            update_calib_file(self.rc_filename, subfolder)
-            update_calib_file(self.cal_filename, subfolder)
+            update_calib_file(self.rc_filename, subfolder, folder_config=folder_config)
+            update_calib_file(self.cal_filename, subfolder, folder_config=folder_config)
 
-    def _get_calib_filenames(self, targetname):
+    def _get_calib_filenames(self, targetname=None):
         """Get calibration file names
 
         Input
@@ -205,11 +223,17 @@ class MusePipeSample(object):
         rcname: str
         calname: str
         """
+        # using targetname or not
+        if targetname is None:
+            name_rc = self.rc_filename
+            name_cal = self.cal_filename
+        else:
+            name_rc =insert_suffix(self.rc_filename, self.targets[targetname].subfolder)
+            name_cal = insert_suffix(self.cal_filename, self.targets[targetname].subfolder)
+
         # Checking the folders
-        folder_rc, rc_filename_target = os.path.split(insert_suffix(self.rc_filename, 
-                                    self.targets[targetname].subfolder))
-        folder_cal, cal_filename_target = os.path.split(insert_suffix(self.cal_filename, 
-                                     self.targets[targetname].subfolder))
+        folder_rc, rc_filename_target = os.path.split(name_rc)
+        folder_cal, cal_filename_target = os.path.split(name_cal)
 
         if rc_filename_target=="" or cal_filename_target=="":
             upipe.print_error()
