@@ -141,7 +141,9 @@ class PipeDict(dict) :
 # Defining classes to get samples and objects
 ####################################################
 class MusePipeTarget(object):
-    def __init__(self, subfolder='P100', list_pointings=None):
+    def __init__(self, targetname="",
+                 subfolder='P100', list_pointings=None):
+        self.targetname = targetname
         self.subfolder = subfolder
         self.list_pointings = list_pointings
         self.pipes = PipeDict()
@@ -263,7 +265,8 @@ class MusePipeSample(object):
                 if lpoints[lp] == 1:
                     list_pointings.append(lp)
             # Defining the MusePipe for that target
-            self.targets[targetname] = MusePipeTarget(subfolder=subfolder, 
+            self.targets[targetname] = MusePipeTarget(targetname=targetname,
+                                                      subfolder=subfolder,
                                                       list_pointings=list_pointings)
             # Shortcut to call the musepipe instance
             self.pipes[targetname] = self.targets[targetname].pipes
@@ -278,7 +281,9 @@ class MusePipeSample(object):
                                                     folder_config=folder_config,
                                                     verbose=False)
             self.targets[targetname].root_path = init_params_target.root
+            self.targets[targetname].data_path = joinpath(init_params_target.root, targetname)
             self.pipes[targetname].root_path = init_params_target.root
+            self.pipes[targetname].data_path = joinpath(init_params_target.root, targetname)
 
             if self.init_pipes:
                 self.set_pipe_target(targetname)
