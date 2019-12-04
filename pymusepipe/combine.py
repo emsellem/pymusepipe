@@ -306,7 +306,8 @@ class MusePointings(SofPipe, PipeRecipes):
                                               verbose=verbose)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
-        self.pipe_params.data = "{0}/{1}/".format(self.targetname, self.combined_folder_name)
+        self.pipe_params.data = "{0}/{1}/".format(self.targetname,
+                                                  self.combined_folder_name)
 
         self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
@@ -315,18 +316,20 @@ class MusePointings(SofPipe, PipeRecipes):
         self.use_fixed_pixtables = use_fixed_pixtables
         self.suffix_fixed_pixtables = suffix_fixed_pixtables
 
+        # Now the list of pointings
+        joinpath(self.paths.root, self.targetname)
+        if (list_pointings is None) or (list_pointings.lower() == "all"):
+            self.list_pointings = get_list_pointings(joinpath(self.pipe_params.root,
+                                                              self.targetname))
+        else:
+            self.list_pointings = list_pointings
+
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
 
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
-
-        # Now the list of pointings
-        if (list_pointings is None) or (list_pointings.lower() == "all"):
-            self.list_pointings = get_list_pointings(self.paths.target)
-        else:
-            self.list_pointings = list_pointings
 
         # END Set up params =======================================
 
