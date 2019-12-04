@@ -257,6 +257,7 @@ class MusePipeSample(object):
         """
         self.targets = {}
         self.pipes = {}
+        self.pipes_combine = {}
         for targetname in self.targetnames:
             subfolder = self.sample[targetname][0]
             lpoints = self.sample[targetname][1]
@@ -502,7 +503,7 @@ class MusePipeSample(object):
             Name of Offset table
         """
         log_filename = kwargs.pop("log_filename", "{0}_combine_{1}.log".format(targetname, version_pack))
-        self.combine[targetname] = MusePointings(targetname=targetname,
+        self.pipes_combine[targetname] = MusePointings(targetname=targetname,
                                                  list_pointings=list_pointings,
                                                  rc_filename=self.targets[targetname].rc_filename,
                                                  cal_filename=self.targets[targetname].cal_filename,
@@ -514,4 +515,4 @@ class MusePipeSample(object):
         """Run the combine recipe. Shortcut for combine[targetname].run_combine()
         """
         self.init_combine(targetname=targetname, **kwargs)
-        self.combine[targetname].run_combine()
+        self.pipes_combine[targetname].run_combine()
