@@ -137,7 +137,7 @@ def get_list_exposures(pointing_path=""):
             list_expos.append(np.int(lint[-1]))
 
     # Making it unique and sort
-    list_expos = np.unique(list_expo)
+    list_expos = np.unique(list_expos)
     list_expos.sort()
     upipe.print_info("Exposures list: {0}".format(str(list_expos)))
     return list_expos
