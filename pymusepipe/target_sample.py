@@ -150,7 +150,7 @@ class MusePipeTarget(object):
 
 class MusePipeSample(object):
     def __init__(self, TargetDic, rc_filename=None, cal_filename=None, 
-            start_recipe='all', **kwargs) :
+            folder_calib="", start_recipe='all', **kwargs) :
         """Using a given dictionary to initialise the sample
         That dictionary should include the names of the targets
         as keys and the subfolder plus pointings to consider
@@ -187,6 +187,7 @@ class MusePipeSample(object):
             return
         self.cal_filename = cal_filename
         self.rc_filename = rc_filename
+        self.folder_config = folder_config
 
         # Initialisation of rc and cal files
         self._init_calib_files()
@@ -210,8 +211,8 @@ class MusePipeSample(object):
         self._subfolders = np.unique([self.sample[targetname][0]
                                 for targetname in self.targetnames])
         for subfolder in self._subfolders:
-            update_calib_file(self.rc_filename, subfolder, folder_config=folder_config)
-            update_calib_file(self.cal_filename, subfolder, folder_config=folder_config)
+            update_calib_file(rc_filename, subfolder, folder_config=folder_config)
+            update_calib_file(cal_filename, subfolder, folder_config=folder_config)
 
     def _get_calib_filenames(self, targetname=None):
         """Get calibration file names
@@ -234,12 +235,14 @@ class MusePipeSample(object):
             name_rc = insert_suffix(self.rc_filename, self.targets[targetname].subfolder)
             name_cal = insert_suffix(self.cal_filename, self.targets[targetname].subfolder)
 
+        folder_config = self.folder_config
+
         # Checking the folders
-        folder_rc, rc_filename_target = os.path.split(name_rc)
-        folder_cal, cal_filename_target = os.path.split(name_cal)
+        folder_rc, rc_filename_target = os.path.split(joinpath(folder_config, name_rc))
+        folder_cal, cal_filename_target = os.path.split(joinpath(folder_config, name_cal))
 
         if rc_filename_target=="" or cal_filename_target=="":
-            upipe.print_error()
+            upipe.print_error("Missing a calibration name file")
             return
 
         if folder_rc == folder_cal:
