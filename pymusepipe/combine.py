@@ -129,10 +129,10 @@ def get_list_exposures(pointing_path=""):
     list_expos: list of int
     """
     # Done by scanning the target path
-    list_folders = glob.glob(pointing_path + "Object/DATACUBE_FINAL*_?????.fits")
+    list_files = glob.glob(pointing_path + "/Object/DATACUBE_FINAL*_????.fits")
     list_expos = []
-    for folder in list_folders:
-        lint = re.findall(r'(\d{5})', folder)
+    for name in list_files:
+        lint = re.findall(r'(\d{5})', name)
         if len(lint) > 0:
             list_expos.append(np.int(lint[-1]))
 
