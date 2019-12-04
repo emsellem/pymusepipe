@@ -93,6 +93,26 @@ def get_list_targets(period_path=""):
     upipe.print_info("Potential Targets -- list: {0}".format(str(list_targets)))
     return list_targets
 
+def build_dic_exposures(target_path=""):
+    """
+
+    Parameters
+    ----------
+    target_path
+
+    Returns
+    -------
+    dic_expo: dict
+        Dictionary of exposures in each pointing
+
+    """
+    list_pointings = get_list_pointings(target_path)
+    dic_expo = {}
+    for pointing in list_pointings:
+        list_exposures = get_list_exposures(pointing)
+        dic_expo[pointing] = [('P{0:2d}'.format(pointing), list_exposures)]
+
+    return dic_expo
 
 def get_list_pointings(target_path=""):
     """Getting a list of existing pointings
