@@ -109,8 +109,8 @@ def build_dic_exposures(target_path=""):
     list_pointings = get_list_pointings(target_path)
     dic_expo = {}
     for pointing in list_pointings:
-        name_pointing = "P{:02d}".format(joinpath(target_path, pointing))
-        list_exposures = get_list_exposures(name_pointing)
+        name_pointing = "P{:02d}".format(pointing)
+        list_exposures = get_list_exposures(joinpath(target_path, name_pointing))
         dic_expo[pointing] = [(name_pointing, list_exposures)]
 
     return dic_expo
