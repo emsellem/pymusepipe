@@ -603,7 +603,6 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Creating the filenames for Master files
         self.dic_name_pointings = {}
-        print(self.list_pointings)
         for pointing in self.list_pointings:
             name_pointing = "P{0:02d}".format(np.int(pointing))
             self.dic_name_pointings[pointing] = name_pointing
