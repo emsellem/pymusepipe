@@ -16,8 +16,7 @@ import numpy as np
 
 from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
-from pymusepipe.config_pipe import dic_user_folders
-from pymusepipe.config_pipe import PHANGS_reduc_config, PHANGS_combine_config
+from pymusepipe.config_pipe import PHANGS_reduc_config
 from pymusepipe.init_musepipe import InitMuseParameters
 from .version import __version__ as version_pack
 
@@ -40,11 +39,11 @@ def insert_suffix(filename, suffix=""):
     filename: str
     suffix: str
     """
-    # Create new file
+    # Create new name
     sfilename, extension = os.path.splitext(filename)
     return "{0}_{1}{2}".format(sfilename, suffix, extension)
 
-# Update the rc file with a subfolder name
+
 def update_calib_file(filename, subfolder="", folder_config=""):
     """Update the rcfile with a new root
 
@@ -425,6 +424,21 @@ class MusePipeSample(object):
                 start_recipe = "all"
 
         self.pipes[targetname]._initialised = True
+
+    def  _get_dic_expo(self, targetname, pointing):
+        """Get the dictionary for all exposures of a certain pointing
+        Parameters
+        ----------
+        targetname: str
+            Name of the target
+        pointing: int
+            Number for the pointing
+
+        Returns
+        -------
+
+        """
+        path_data = self.pipes[targetname][pointing].paths.data
 
     def reduce_all_targets(self, start_recipe='all', **kwargs):
         """Reduce all targets already initialised
