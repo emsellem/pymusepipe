@@ -150,7 +150,7 @@ class MusePipeTarget(object):
 
 class MusePipeSample(object):
     def __init__(self, TargetDic, rc_filename=None, cal_filename=None, 
-            folder_calib="", start_recipe='all', **kwargs) :
+            folder_config="", start_recipe='all', **kwargs) :
         """Using a given dictionary to initialise the sample
         That dictionary should include the names of the targets
         as keys and the subfolder plus pointings to consider
