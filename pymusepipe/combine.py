@@ -316,7 +316,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.suffix_fixed_pixtables = suffix_fixed_pixtables
 
         # Now the list of pointings
-        if list_pointings is None:
+        if (list_pointings is None) or (list_pointings.lower() == "all"):
             self.list_pointings = get_list_pointings(self.paths.target)
         else:
             self.list_pointings = list_pointings
