@@ -18,6 +18,7 @@ from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
 from pymusepipe.config_pipe import PHANGS_reduc_config
 from pymusepipe.init_musepipe import InitMuseParameters
+from pymusepipe.combine import MusePointings
 from .version import __version__ as version_pack
 
 # ----------------- Galaxies and Pointings ----------------#
@@ -501,13 +502,13 @@ class MusePipeSample(object):
             Name of Offset table
         """
         log_filename = kwargs.pop("log_filename", "{0}_combine_{1}.log".format(targetname, version_pack))
-        self.combine[targetname] = combine.MusePointings(targetname=targetname,
-                                                         list_pointings=list_pointings,
-                                                         rc_filename=self.targets[targetname].rc_filename,
-                                                         cal_filename=self.targets[targetname].cal_filename,
-                                                         folder_config=self.targets[targetname].folder_config,
-                                                         offset_table_name=offset_table_name,
-                                                         log_filename=log_filename, **kwargs)
+        self.combine[targetname] = MusePointings(targetname=targetname,
+                                                 list_pointings=list_pointings,
+                                                 rc_filename=self.targets[targetname].rc_filename,
+                                                 cal_filename=self.targets[targetname].cal_filename,
+                                                 folder_config=self.targets[targetname].folder_config,
+                                                 offset_table_name=offset_table_name,
+                                                 log_filename=log_filename, **kwargs)
 
     def combine_target(self, targetname=None, **kwargs):
         """Run the combine recipe. Shortcut for combine[targetname].run_combine()
