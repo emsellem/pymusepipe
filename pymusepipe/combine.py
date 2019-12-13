@@ -174,7 +174,7 @@ def get_list_exposures(pointing_path=""):
     # Finding the full list of tpl
     upipe.print_info("Exposures list:")
     for tpl in dic_expo.keys():
-        upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dic_expo[tpl])
+        upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dic_expo[tpl]))
 
     return dic_expos
 
