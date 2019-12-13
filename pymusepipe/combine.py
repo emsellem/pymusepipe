@@ -167,14 +167,14 @@ def get_list_exposures(pointing_path=""):
     for l in sorted_list:
         tpl = l[0]
         if tpl in dic_expos.keys():
-            dic_expo[tpl].append(l[1])
+            dic_expos[tpl].append(l[1])
         else:
-            dic_expo[tpl] = [l[1]]
+            dic_expos[tpl] = [l[1]]
 
     # Finding the full list of tpl
     upipe.print_info("Exposures list:")
-    for tpl in dic_expo.keys():
-        upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dic_expo[tpl]))
+    for tpl in dic_expos.keys():
+        upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dic_expos[tpl]))
 
     return dic_expos
 
