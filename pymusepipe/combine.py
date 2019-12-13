@@ -107,13 +107,13 @@ def build_dic_exposures(target_path=""):
 
     """
     list_pointings = get_list_pointings(target_path)
-    dic_expo = {}
+    dic_expos = {}
     for pointing in list_pointings:
         name_pointing = "P{:02d}".format(pointing)
         dic_p = get_list_exposures(joinpath(target_path, name_pointing))
-        dic_exposures[pointing] = [(tpl, dic_p[tpl]) for tpl in dic_p.keys()]
+        dic_expos[pointing] = [(tpl, dic_p[tpl]) for tpl in dic_p.keys()]
 
-    return dic_expo
+    return dic_expos
 
 def get_list_pointings(target_path=""):
     """Getting a list of existing pointings
