@@ -110,6 +110,7 @@ def build_dic_exposures(target_path=""):
     dic_expos = {}
     for pointing in list_pointings:
         name_pointing = "P{:02d}".format(pointing)
+        upipe.print_info("For pointing {0}".format(name_pointing))
         dic_p = get_list_exposures(joinpath(target_path, name_pointing))
         dic_expos[pointing] = [(tpl, dic_p[tpl]) for tpl in dic_p.keys()]
 
