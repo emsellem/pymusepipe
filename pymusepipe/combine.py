@@ -110,8 +110,8 @@ def build_dic_exposures(target_path=""):
     dic_expo = {}
     for pointing in list_pointings:
         name_pointing = "P{:02d}".format(pointing)
-        list_exposures = get_list_exposures(joinpath(target_path, name_pointing))
-        dic_expo[pointing] = [(name_pointing, list_exposures)]
+        dic_p = get_list_exposures(joinpath(target_path, name_pointing))
+        dic_exposures[pointing] = [(tpl, dic_p[tpl]) for tpl in dic_p.keys()]
 
     return dic_expo
 
@@ -153,16 +153,30 @@ def get_list_exposures(pointing_path=""):
     list_files = glob.glob(pointing_path + "/Object/DATACUBE_FINAL*_????.fits")
     list_expos = []
     for name in list_files:
-        lint = re.findall(r'(\d{4})', name)
+        [(tpl, lint)] = re.findall(r'\_(\S{19})\_(\d{4}).fits', name)
         if len(lint) > 0:
-            list_expos.append(np.int(lint[-1]))
+            list_expos.append((tpl, np.int(lint)))
 
     # Making it unique and sort
-    list_expos = np.unique(list_expos)
-    list_expos.sort()
-    upipe.print_info("Exposures list: {0}".format(str(list_expos)))
-    return list_expos
+    list_expos = np.unique(list_expos, axis=0)
+    # Sorting by tpl and expo number
+    sorted_list = sorted(list_expos, key=lambda e: (e[0], e[1]))
 
+    # Building the final list
+    dic_expos = {}
+    for l in sorted_list:
+        tpl = l[0]
+        if tpl in dic_expos.keys():
+            dic_expo[tpl].append(l[1])
+        else:
+            dic_expo[tpl] = [l[1]]
+
+    # Finding the full list of tpl
+    upipe.print_info("Exposures list:")
+    for tpl in dic_expo.keys():
+        upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dic_expo[tpl])
+
+    return dic_expos
 
 def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
     """Provide a list of reduced pixtables
