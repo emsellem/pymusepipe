@@ -479,7 +479,7 @@ class MusePipeSample(object):
                             targetname))
 
         # Initialise the pipe if needed
-        if not self.pipes[targetname]._initialise:
+        if not self.pipes[targetname]._initialised:
             self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
 
         # Loop on the pointings
