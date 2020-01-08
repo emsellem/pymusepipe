@@ -490,7 +490,9 @@ class MusePipeSample(object):
         # Loop on the pointings
         for pointing in list_pointings:
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
-            self.pipes[targetname][pointing]._init_tables()
+            # Initialise raw tables if not already done (takes some time)
+            if not self.pipes[targetname][pointing]._raw_table_initialised:
+                self.pipes[targetname][pointing].init_raw_table()
             if self.__phangs:
                 self.pipes[targetname][pointing].run_all_phangs_recipes()
             else:

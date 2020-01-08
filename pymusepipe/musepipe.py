@@ -272,6 +272,9 @@ class MusePipe(PipePrep, PipeRecipes):
 
         if init_raw_table:
             self.init_raw_table()
+            self._raw_table_initialised = True
+        else:
+            self._raw_table_initialised = False
         self.read_all_astro_tables()
 
     def _init_geoastro_dates(self):
