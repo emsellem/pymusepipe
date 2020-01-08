@@ -482,6 +482,11 @@ class MusePipeSample(object):
         if not self.pipes[targetname]._initialised:
             self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
 
+        # Check if pointings are valid
+        list_pointings = self._check_pointings(targetname, list_pointings)
+        if len(list_pointings) == 0:
+            return
+
         # Loop on the pointings
         for pointing in list_pointings:
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
