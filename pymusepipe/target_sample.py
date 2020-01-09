@@ -382,8 +382,8 @@ class MusePipeSample(object):
         else:
             config_args = kwargs.pop("config_args", None)
 
-        self.first_recipe = kwargs.pop("first_recipe", 1)
-        self.last_recipe = kwargs.pop("last_recipe", None)
+        first_recipe = kwargs.pop("first_recipe", 1)
+        last_recipe = kwargs.pop("last_recipe", None)
 
         # Over-writing the arguments in kwargs from config dictionary
         if config_args is not None:
@@ -418,8 +418,8 @@ class MusePipeSample(object):
             self.pipes[targetname][pointing] = MusePipe(targetname=targetname, 
                             pointing=pointing, folder_config=folder_config, rc_filename=rc_filename, 
                             cal_filename=cal_filename, log_filename=log_filename_pointing, 
-                            first_recipe=first_recipe, init_raw_table=False,
-                            verbose=verbose, **kwargs)
+                            first_recipe=first_recipe, last_recipe=last_recipe,
+                            init_raw_table=False, verbose=verbose, **kwargs)
 
             # Saving the command
             self.pipes[targetname][pointing].history = python_command
