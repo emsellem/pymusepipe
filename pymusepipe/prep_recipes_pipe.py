@@ -132,7 +132,7 @@ class PipePrep(SofPipe) :
         self.list_recipes = deepcopy(list_recipes)
         self.first_recipe = first_recipe
         if last_recipe is None:
-            self.last_recipe = np.max(list(dic_recipes_per_num.keys())))
+            self.last_recipe = np.max(list(dic_recipes_per_num.keys()))
         else:
             self.last_recipe = last_recipe
 
