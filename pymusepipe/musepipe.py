@@ -458,7 +458,7 @@ class MusePipe(PipePrep, PipeRecipes):
         name_table = self._get_fitstablename_expo('RAWFILES', "raw")
 
         # ---- File exists - we READ it ------------------- #
-        overwrite = kwargs.pop("overwrite", self_overwrite_astropy_table)
+        overwrite = kwargs.pop("overwrite", self._overwrite_astropy_table)
         if os.path.isfile(name_table) :
             if overwrite:
                 upipe.print_warning("The raw-files table will be overwritten", 
