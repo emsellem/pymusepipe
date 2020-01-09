@@ -222,7 +222,7 @@ class PipePrep(SofPipe) :
                             first_recipe, last_recipe))
 
         # Now doing the recipes one by one in order
-        from ind in range(ind_start, ind_end+1):
+        for ind in range(ind_start, ind_end+1):
             recipe = dic_recipes_per_num[ind]
             name_recipe = "run_{}".format(recipe)
             # Including the kwargs for each recipe
