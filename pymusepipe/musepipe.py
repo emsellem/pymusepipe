@@ -524,7 +524,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
             # Writing up the table
             self.Tables.Rawfiles.write(name_table, format="fits", 
-                    overwrite=self._overwrite_astropy_table)
+                    overwrite=overwrite)
 
             if len(self.Tables.Rawfiles) == 0:
                 upipe.print_warning("Raw Files Table is empty: please check your 'Raw' folder")
