@@ -248,7 +248,7 @@ class PipePrep(SofPipe) :
         skymethod: str
             Default is "model".
         """
-        self.run_recipes(self, fraction=fraction, skymethod=skymethod, illum=illum, **kwargs):
+        self.run_recipes(self, fraction=fraction, skymethod=skymethod, illum=illum, **kwargs)
 
     @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
