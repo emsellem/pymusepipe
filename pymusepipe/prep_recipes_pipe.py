@@ -201,6 +201,7 @@ class PipePrep(SofPipe) :
         first_recipe = kwargs.pop("first_recipe", 1)
         last_recipe = kwargs.pop("last_recipe", 
                 np.max(list(dic_recipes_per_num.keys())))
+        if last_recipe is None: last_recipe = np.max(list(dic_recipes_per_num.keys()))
 
         # Transforming first and last if they are strings and not numbers
         if isinstance(first_recipe, str):

@@ -201,11 +201,12 @@ class MusePipe(PipePrep, PipeRecipes):
         # End of parameter settings #########################
 
         # Extra parameters for the initialisation and starting of recipes
-        start_recipe = kwargs.pop("start_recipe", "all")
+        first_recipe = kwargs.pop("first_recipe", 1)
+        last_recipe = kwargs.pop("first_recipe", "all")
         init_raw_table = kwargs.pop("init_raw_table", True)
 
         # Init of the subclasses
-        PipePrep.__init__(self, start_recipe=start_recipe)
+        PipePrep.__init__(self, first_recipe=first_recipe)
         PipeRecipes.__init__(self, **kwargs)
 
         # =========================================================== #

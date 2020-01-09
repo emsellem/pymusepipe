@@ -150,7 +150,7 @@ class MusePipeTarget(object):
 
 class MusePipeSample(object):
     def __init__(self, TargetDic, rc_filename=None, cal_filename=None, 
-            folder_config="", start_recipe='all', **kwargs) :
+            folder_config="", first_recipe=1, **kwargs) :
         """Using a given dictionary to initialise the sample
         That dictionary should include the names of the targets
         as keys and the subfolder plus pointings to consider
@@ -177,7 +177,7 @@ class MusePipeSample(object):
         self.sample = TargetDic
         self.targetnames = list(TargetDic.keys())
 
-        self.start_recipe = start_recipe
+        self.first_recipe = first_recipe
 
         self.__phangs = kwargs.pop("PHANGS", False)
 
@@ -380,7 +380,7 @@ class MusePipeSample(object):
         else:
             config_args = kwargs.pop("config_args", None)
 
-        start_recipe = kwargs.pop("start_recipe", "all")
+        first_recipe = kwargs.pop("first_recipe", 1)
         reset_start = kwargs.pop("reset_start", False)
 
         # Over-writing the arguments in kwargs from config dictionary
@@ -416,7 +416,7 @@ class MusePipeSample(object):
             self.pipes[targetname][pointing] = MusePipe(targetname=targetname, 
                             pointing=pointing, folder_config=folder_config, rc_filename=rc_filename, 
                             cal_filename=cal_filename, log_filename=log_filename_pointing, 
-                            start_recipe=start_recipe, init_raw_table=False,
+                            first_recipe=first_recipe, init_raw_table=False,
                             verbose=verbose, **kwargs)
 
             # Saving the command
@@ -424,9 +424,9 @@ class MusePipeSample(object):
             # Setting back verbose to True to make sure we have a full account
             self.pipes[targetname][pointing].verbose = True
 
-            # If reset start we reset start_recipe after the first pointing
+            # If reset start we reset first_recipe after the first pointing
             if reset_start:
-                start_recipe = "all"
+                first_recipe = 1
 
         self.pipes[targetname]._initialised = True
 
@@ -445,17 +445,17 @@ class MusePipeSample(object):
         """
         path_data = self.pipes[targetname][pointing].paths.data
 
-    def reduce_all_targets(self, start_recipe='all', **kwargs):
+    def reduce_all_targets(self, first_recipe=1, **kwargs):
         """Reduce all targets already initialised
 
         Input
         -----
-        start_recipe: str
+        first_recipe: str
             One of the recipe to start with
         """
         for target in self.targets.keys():
             upipe.print_info("=== Start Reduction of Target {name} ===".format(target))
-            self.reduce_target(targetname=target, start_recipe=start_recipe, **kwargs)
+            self.reduce_target(targetname=target, first_recipe=first_recipe, **kwargs)
             upipe.print_info("===  End  Reduction of Target {name} ===".format(target))
 
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
