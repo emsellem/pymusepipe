@@ -1060,7 +1060,8 @@ class PipePrep(SofPipe) :
             self._sofdict[pixtable_name] = []
             for iexpo in list_group_expo:
                self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                   '{0}_{1}_{2:04d}-{3:02d}.fits'.format(pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
+                   '{0}_{1}_{2:04d}-{3:02d}.fits'.format(
+                       pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
 
             # Adding the suffix_iexpo to the end of the name if needed
             # This is the expo number if only 1 exposure is present in the list
@@ -1076,7 +1077,7 @@ class PipePrep(SofPipe) :
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
                     filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
                     skymethod=skymethod, filter_for_alignment=filter_for_alignment,
-                    **kwargs)
+                    list_expo=list_group_expo, **kwargs)
 
             # Write the MASTER files Table and save it
             if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])

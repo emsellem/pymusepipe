@@ -21,6 +21,8 @@ from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.combine import MusePointings
 from .version import __version__ as version_pack
 
+from astropy.table import Table
+
 # ----------------- Galaxies and Pointings ----------------#
 # Sample of galaxies
 # For each galaxy, we provide the pointings numbers and the run attached to that pointing
@@ -380,8 +382,8 @@ class MusePipeSample(object):
         else:
             config_args = kwargs.pop("config_args", None)
 
-        first_recipe = kwargs.pop("first_recipe", 1)
-        reset_start = kwargs.pop("reset_start", False)
+        self.first_recipe = kwargs.pop("first_recipe", 1)
+        self.last_recipe = kwargs.pop("last_recipe", None)
 
         # Over-writing the arguments in kwargs from config dictionary
         if config_args is not None:
@@ -424,14 +426,10 @@ class MusePipeSample(object):
             # Setting back verbose to True to make sure we have a full account
             self.pipes[targetname][pointing].verbose = True
 
-            # If reset start we reset first_recipe after the first pointing
-            if reset_start:
-                first_recipe = 1
-
         self.pipes[targetname]._initialised = True
 
-    def  _get_dic_expo(self, targetname, pointing):
-        """Get the dictionary for all exposures of a certain pointing
+    def  _get_path_data(self, targetname, pointing):
+        """Get the path for the data
         Parameters
         ----------
         targetname: str
@@ -441,9 +439,26 @@ class MusePipeSample(object):
 
         Returns
         -------
+        path_data
 
         """
-        path_data = self.pipes[targetname][pointing].paths.data
+        return self.pipes[targetname][pointing].paths.data
+
+    def  _get_path_files(self, targetname, pointing, expotype="OBJECT"):
+        """Get the path for the files of a certain expotype
+        Parameters
+        ----------
+        targetname: str
+            Name of the target
+        pointing: int
+            Number for the pointing
+
+        Returns
+        -------
+        path_files
+
+        """
+        return self.pipes[targetname][pointing]._get_path_files(expotype)
 
     def reduce_all_targets(self, first_recipe=1, **kwargs):
         """Reduce all targets already initialised
@@ -498,6 +513,38 @@ class MusePipeSample(object):
             else:
                 self.pipes[targetname][pointing].run_recipes()
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
+
+    def rotate_pixtables_target(self, targetname=None, list_pointings="all",
+                     offset_table_name=None, fakemode=False, **kwargs):
+        """Rotate all pixel table of a certain targetname and pointings
+        """
+        # General print out
+        upipe.print_info("---- Starting the PIXTABLE ROTATION for Target={0} ----".format(
+                            targetname))
+
+        # Initialise the pipe if needed
+        if not self.pipes[targetname]._initialised:
+            self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
+
+        # Check if pointings are valid
+        list_pointings = self._check_pointings(targetname, list_pointings)
+        if len(list_pointings) == 0:
+            return
+
+        offset_table = Table.read(offset_table_name)
+        offset_table.sort(["POINTING_OBS", "IEXPO_OBS"])
+        # Loop on the pointings
+        for row in offset_table:
+            iexpo = row['IEXPO_OBS']
+            pointing = row['POINTING_OBS']
+            tpls = row['TPL_START']
+            angle = row['ROTANGLE']
+            upipe.print_info("Rotation ={0} Deg for Pointing={1:02d}, TPLS={2} - Expo {3:02d}".format(
+                                angle, pointing, tpls, iexpo))
+            folder_expos = self._get_path_files()
+            name_suffix = "{0}_{1:04d}".format(tpls, iexpo)
+            rotate_pixtables(folder=folder_expos, name_suffix=name_suffix, list_ifu=None,
+                     angle=angle, fakemode=fakemode, **kwargs)
 
     def init_combine(self, targetname=None, list_pointings="all",
                      offset_table_name=None, **kwargs):

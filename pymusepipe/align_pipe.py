@@ -45,6 +45,7 @@ def is_sequence(arg):
 # Import needed modules from pymusepipe
 import pymusepipe.util_pipe as upipe
 from pymusepipe.config_pipe import mjd_names, date_names, tpl_names
+from pymusepipe.config_pipe import pointing_names, iexpo_names
 from pymusepipe.config_pipe import default_offset_table
 
 # ================== Default units ======================== #
@@ -91,7 +92,7 @@ def create_offset_table(image_names=[], table_folder="",
         return
 
     # Gather the values of DATE and MJD from the images
-    date, mjd, tpls = [], [], []
+    date, mjd, tpls, iexpo, pointing = [], [], [], [], []
     for ima in image_names:
         if not os.path.isfile(ima):
             upipe.print_warning("[create_offset] Image {0} does not exists".format(ima))
@@ -101,6 +102,8 @@ def create_offset_table(image_names=[], table_folder="",
         date.append(head[date_names['image']])
         mjd.append(head[mjd_names['image']])
         tpls.append(head[tpl_names['image']])
+        iexpo.append(head[iexpo_names['image']])
+        pointing.append(head[pointing_names['image']])
 
     nlines = len(date)
 
@@ -114,6 +117,8 @@ def create_offset_table(image_names=[], table_folder="",
     offset_table[date_names['table']] = date
     offset_table[mjd_names['table']] = mjd
     offset_table[tpl_names['table']] = tpls
+    offset_table[iexpo_names['table']] = iexpo
+    offset_table[pointing_names['table']] = pointing
 
     # Write the table
     offset_table.write(table_fullname, overwrite=overwrite)
@@ -638,6 +643,8 @@ class AlignMusePointing(object):
         self.ima_dateobs = [None] * self.nimages
         self.ima_mjdobs = [None] * self.nimages
         self.ima_tplstart = [None] * self.nimages
+        self.ima_iexpo = [None] * self.nimages
+        self.ima_pointing = [None] * self.nimages
 
         # Which extension to be used for the ref and muse images
         self.hdu_ext = hdu_ext
@@ -907,9 +914,11 @@ class AlignMusePointing(object):
         exist_ra_offset =  ('RA_OFFSET' in fits_table.columns)
 
         # First save the DATA and MJD references
-        fits_table['DATE_OBS'] = self.ima_dateobs
-        fits_table['MJD_OBS'] = self.ima_mjdobs
-        fits_table['TPL_START'] = self.ima_tplstart
+        fits_table[date_names['table']] = self.ima_dateobs
+        fits_table[mjd_names['table']] = self.ima_mjdobs
+        fits_table[tpl_names['table']] = self.ima_tplstart
+        fits_table[iexpo_names['table']] = self.ima_iexpo
+        fits_table[pointing_names['table']] = self.ima_pointing
 
         # Saving the final values
         fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600. \
@@ -1096,6 +1105,15 @@ class AlignMusePointing(object):
                 self.ima_tplstart[nima] = None
             else :
                 self.ima_tplstart[nima] = hdu[0].header[tpl_names['image']]
+            if iexpo_names['image'] not in hdu[0].header:
+                self.ima_iexpo[nima] = None
+            else :
+                self.ima_iexpo[nima] = hdu[0].header[iexpo_names['image']]
+            if pointing_names['image'] not in hdu[0].header:
+                self.ima_pointing[nima] = None
+            else :
+                self.ima_pointing[nima] = hdu[0].header[pointing_names['image']]
+
 
             if self.list_muse_hdu[nima].data is None:
                 return 0
