@@ -255,9 +255,11 @@ dic_geo_astrowcs_table = {
 #======================================================================#
 mjd_names = {'table': "MJD_OBS", 'image': "MJD-OBS"}
 date_names = {'table': "DATE_OBS", 'image': "DATE-OBS"}
+tpl_names = {'table': "TPL_START", 'image': "HIERARCH ESO TPL START"}
 
 default_offset_table = {'date': [date_names['table'], 'S23', ""],
                         'mjd' : [mjd_names['table'], 'f8', 0.0],
+                        'tpls' : [tpl_names['table'], 'S19', ""],
                         'ora':["RA_OFFSET", 'f8', 0.0],
                         'odec':["DEC_OFFSET", 'f8', 0.0],
                         'scale':["FLUX_SCALE", 'f8', 1.0]}
@@ -272,3 +274,17 @@ default_wave_wcs = 6500.0
 default_prefix_mask = "mask_"
 
 AO_mask_lambda = [5800, 5970]
+
+#===========================================
+# Recipes for data reduction
+dic_recipes_per_num = {1:'bias', 2:'flat', 3:'wave', 
+               4: 'lsf', 5:'twilight', 
+               6:'scibasic_all', 7:'standard',
+               8:'sky', 9:'prep_align', 10:'align_pointing', 
+               11:'align_group', 12:'scipost_perexpo',
+               13:'scipost_sky', 14:'combine'}
+
+# and creating the inverse dictionary
+dic_recipes_per_name = {}
+for key in dic_recipes_per_num.keys():
+    dic_recipes_per_name[dic_recipes_per_num[key]] = key

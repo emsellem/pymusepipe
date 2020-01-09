@@ -177,32 +177,20 @@ class PipePrep(SofPipe) :
     @print_my_function_name
     def run_recipes(self, fraction=0.8, skymethod="model", illum=True, **kwargs):
         """Running all recipes in one shot
-
-        Input
-        -----
-        fraction: float
-            Fraction of sky to consider in sky frames for the sky spectrum
-            Default is 0.8.
-        illum: bool
-            Default is True (use illumination during twilight calibration)
-        skymethod: str
-            Default is "model".
         """
         # Dictionary of arguments for each recipe
-        default_dic_kwargs_recipes = {'twilight': {'illum': illum},
+        dic_kwargs_recipe = {'twilight': {'illum': illum},
                              'scibasic_all': {'illum': illum},
                              'sky': {'fraction': fraction},
                              'prep_align': {'skymethod': skymethod},
                              'scipost_per_expo': {'skymethod': skymethod}
                              }
-        dic_kwargs_recipes = kwargs.pop("param_recipes", default_dic_kwargs_recipes)
 
         # First and last recipe to be used
         first_recipe = kwargs.pop("first_recipe", 1)
         last_recipe = kwargs.pop("last_recipe", 
                 np.max(list(dic_recipes_per_num.keys())))
 
-        # Transforming first and last if they are strings and not numbers
         if isinstance(first_recipe, str):
             if first_recipe not in dic_recipes_per_name.keys():
                 upipe.print_error("First recipe {} not in list of recipes".format(first_recipe))
@@ -214,29 +202,57 @@ class PipePrep(SofPipe) :
                 return
             last_recipe = dic_recipes_per_name[last_recipe]
 
-        # Printing the info about which recipes will be used
         upip.print_info("Data reduction from recipe {0} to {1}".format(
                             dic_recipes_per_num[first_recipe],
-                            dic_recipes_per_num[last_recipe]))
+                            dic_recipes_per_num[last_recipe])
         upip.print_info("               [steps {0} - {1}".format(
-                            first_recipe], last_recipe))
+                            first_recipe], last_recipe])
 
-        # Now doing the recipes one by one in order
-        from ind in range(ind_start, ind_end+1):
-            recipe = dic_recipes_per_num[ind]
+        # for recipe in self.list_recipes:
+        ind_start = dic_recipes[first_recipe.lower()]
+        ind_end = dic_recipes[last_recipe.lower()]
+        from ind in range(ind_start, ind_end):
+            recipe = dic_recipes[ind]
             name_recipe = "run_{}".format(recipe)
-            # Including the kwargs for each recipe
-            if recipe in dic_kwargs_recipes.keys():
-                kdic = dic_kwargs_recipes[recipe]
+            if recipe in dic_kwargs_recipe.keys():
+                kdic = dic_kwargs_recipe[recipe]
             else:
                 kdic = {}
             getattr(self, name_recipe)(**kdic)
+
+        if ind_start < 2 and ind_end > 0:
+            self.run_bias()
+        if ind_start < 3 and ind_end > 1:
+            self.run_flat()
+        if ind_start < 4 and ind_end > 2:
+            self.run_wave()
+        if ind_start < 5 and ind_end > 3:
+            self.run_lsf()
+        if ind_start < 6 and ind_end > 4:
+            self.run_twilight(illum=illum)
+        if ind_start < 7 and ind_end > 5:
+            self.run_scibasic_all(illum=illum)
+        if ind_start < 8 and ind_end > 6:
+            self.run_standard()
+        if ind_start < 9 and ind_end > 7:
+            self.run_sky(fraction=fraction)
+        if ind_start < 10 and ind_end > 8:
+            self.run_prep_align(skymethod=skymethod)
+        if ind_start < 11 and ind_end > 9:
+            self.run_align_bypointing()
+        if ind_start < 12 and ind_end > 10:
+            self.run_align_bygroup()
+        if ind_start < 13 and ind_end > 11:
+            self.run_scipost_perexpo(skymethod=skymethod)
+        if ind_start < 14 and ind_end > 12:
+            self.run_scipost_sky()
+        if ind_start < 15 and ind_end > 13:
+            self.run_combine_pointing()
 
     @print_my_function_name
     def run_phangs_recipes(self, fraction=0.8, illum=True, skymethod="model",
                                 **kwargs):
         """Running all PHANGS recipes in one shot
-        Using the basic set up for the general list of recipes
 
         Input
         -----
@@ -248,7 +264,37 @@ class PipePrep(SofPipe) :
         skymethod: str
             Default is "model".
         """
-        self.run_recipes(self, fraction=fraction, skymethod=skymethod, illum=illum, **kwargs):
+        first_recipe = kwargs.pop("first_recipe", self.first_recipe)
+        ind_start = dic_recipes[first_recipe.lower()]
+
+        if ind_start < 2:
+            self.run_bias()
+        if ind_start < 3:
+            self.run_flat()
+        if ind_start < 4:
+            self.run_wave()
+        if ind_start < 5:
+            self.run_lsf()
+        if ind_start < 6:
+            self.run_twilight(illum=illum)
+        if ind_start < 7:
+            self.run_scibasic_all(illum=illum)
+        if ind_start < 8:
+            self.run_standard()
+        if ind_start < 9:
+            self.run_sky(fraction=fraction)
+        if ind_start < 10:
+            self.run_prep_align(skymethod=skymethod)
+        if ind_start < 11:
+            self.run_align_bypointing()
+        if ind_start < 12:
+            self.run_align_bygroup()
+        if ind_start < 13:
+            self.run_scipost_perexpo(skymethod=skymethod)
+        if ind_start < 14:
+            self.run_scipost_sky()
+        if ind_start < 15:
+            self.run_combine_pointing()
 
     @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
