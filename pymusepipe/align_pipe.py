@@ -44,7 +44,7 @@ def is_sequence(arg):
 
 # Import needed modules from pymusepipe
 import pymusepipe.util_pipe as upipe
-from pymusepipe.config_pipe import mjd_names, date_names, tpl_names,
+from pymusepipe.config_pipe import mjd_names, date_names, tpl_names
 from pymusepipe.config_pipe import default_offset_table
 
 # ================== Default units ======================== #
