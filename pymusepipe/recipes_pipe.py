@@ -249,7 +249,8 @@ class PipeRecipes(object) :
                                name_imain=self.joinprod(name_prod+suff_prod), 
                                fitsname=fitsname_out))
             # Adding pointing and expo numbers as keywords
-            upipe.add_key_pointing_expo(fitsname_out, iexpo, self.pointing)
+            if filter_for_alignment in fitsname_out:
+                upipe.add_key_pointing_expo(fitsname_out, iexpo, self.pointing)
 
             # Now if in need of an alignment image and it is the filter image
             # Copying it in the Alignment folder or write it 
