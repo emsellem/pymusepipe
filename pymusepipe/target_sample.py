@@ -460,17 +460,20 @@ class MusePipeSample(object):
         """
         return self.pipes[targetname][pointing]._get_path_files(expotype)
 
-    def reduce_all_targets(self, first_recipe=1, **kwargs):
+    def reduce_all_targets(self, first_recipe=1, last_recipe=None, **kwargs):
         """Reduce all targets already initialised
 
         Input
         -----
-        first_recipe: str
+        first_recipe: int
             One of the recipe to start with
+        last_recipe: int
+            One of the recipe to end with
         """
         for target in self.targets.keys():
             upipe.print_info("=== Start Reduction of Target {name} ===".format(target))
-            self.reduce_target(targetname=target, first_recipe=first_recipe, **kwargs)
+            self.reduce_target(targetname=target, first_recipe=first_recipe, last_recipe=last_recipe,
+                    **kwargs)
             upipe.print_info("===  End  Reduction of Target {name} ===".format(target))
 
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
@@ -494,7 +497,8 @@ class MusePipeSample(object):
                             targetname))
 
         # Initialise the pipe if needed
-        if not self.pipes[targetname]._initialised:
+        if not self.pipes[targetname]._initialised  \
+            or "first_recipe" in **kwargs or "last_recipe" in **kwargs:
             self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
 
         # Check if pointings are valid
