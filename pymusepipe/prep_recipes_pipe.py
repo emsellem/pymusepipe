@@ -25,6 +25,7 @@ from pymusepipe.align_pipe import create_offset_table
 from pymusepipe import musepipe
 from pymusepipe.mpdaf_pipe import MuseSkyContinuum,MuseFilter
 from pymusepipe.config_pipe import mjd_names,get_suffix_product
+from pymusepipe.config_pipe import dic_recipes_per_num, dic_recipes_per_name
 
 try :
     import astropy as apy
