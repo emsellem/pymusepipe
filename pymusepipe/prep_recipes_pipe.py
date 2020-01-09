@@ -249,6 +249,7 @@ class PipePrep(SofPipe) :
         skymethod: str
             Default is "model".
         """
+        print(kwargs)
         self.run_recipes(self, fraction=fraction, skymethod=skymethod, illum=illum, **kwargs)
 
     @print_my_function_name
