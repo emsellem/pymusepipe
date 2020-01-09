@@ -16,6 +16,7 @@ import time
 import numpy as np
 
 from astropy import constants as const
+from astropy.io import fits as pyfits
 
 # Import package modules
 from pymusepipe.emission_lines import list_emission_lines
