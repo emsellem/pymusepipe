@@ -494,9 +494,9 @@ class MusePipeSample(object):
             if not self.pipes[targetname][pointing]._raw_table_initialised:
                 self.pipes[targetname][pointing].init_raw_table(overwrite=True)
             if self.__phangs:
-                self.pipes[targetname][pointing].run_all_phangs_recipes()
+                self.pipes[targetname][pointing].run_phangs_recipes()
             else:
-                self.pipes[targetname][pointing].run_all_recipes()
+                self.pipes[targetname][pointing].run_recipes()
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def init_combine(self, targetname=None, list_pointings="all",
