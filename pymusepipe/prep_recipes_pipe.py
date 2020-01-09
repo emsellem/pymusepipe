@@ -217,10 +217,10 @@ class PipePrep(SofPipe) :
             last_recipe = dic_recipes_per_name[last_recipe]
 
         # Printing the info about which recipes will be used
-        upip.print_info("Data reduction from recipe {0} to {1}".format(
+        upipe.print_info("Data reduction from recipe {0} to {1}".format(
                             dic_recipes_per_num[first_recipe],
                             dic_recipes_per_num[last_recipe]))
-        upip.print_info("               [steps {0} - {1}]".format(
+        upipe.print_info("               [steps {0} - {1}]".format(
                             first_recipe, last_recipe))
 
         # Now doing the recipes one by one in order
