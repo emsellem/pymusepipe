@@ -492,7 +492,7 @@ class MusePipeSample(object):
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
             # Initialise raw tables if not already done (takes some time)
             if not self.pipes[targetname][pointing]._raw_table_initialised:
-                self.pipes[targetname][pointing].init_raw_table()
+                self.pipes[targetname][pointing].init_raw_table(overwrite=True)
             if self.__phangs:
                 self.pipes[targetname][pointing].run_all_phangs_recipes()
             else:

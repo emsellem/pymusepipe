@@ -439,7 +439,7 @@ class MusePipe(PipePrep, PipeRecipes):
                 upipe.print_info("Reading Astropy fits Table {0}".format(name_table))
             return Table.read(name_table, format="fits")
         
-    def init_raw_table(self, reset=False):
+    def init_raw_table(self, reset=False, **kwargs):
         """ Create a fits table with all the information from
         the Raw files. Also create an astropy table with the same info
 
@@ -458,9 +458,9 @@ class MusePipe(PipePrep, PipeRecipes):
         name_table = self._get_fitstablename_expo('RAWFILES', "raw")
 
         # ---- File exists - we READ it ------------------- #
-        overwrite = True
+        overwrite = kwargs.pop("overwrite", self_overwrite_astropy_table)
         if os.path.isfile(name_table) :
-            if self._overwrite_astropy_table :
+            if overwrite:
                 upipe.print_warning("The raw-files table will be overwritten", 
                         pipe=self)
             else :
@@ -472,7 +472,6 @@ class MusePipe(PipePrep, PipeRecipes):
                 upipe.print_warning("In the meantime, the existing table will be read and used", 
                         pipe=self)
                 self.Tables.Rawfiles = self.read_astropy_table('RAWFILES', "raw")
-                overwrite = False
 
         # ---- File does not exist - we create it ---------- #
         if overwrite:
