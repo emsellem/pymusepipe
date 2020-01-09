@@ -357,3 +357,20 @@ def reconstruct_filter_images(cubename, filter_list=default_filter_list,
                   filter_list, cubename, filter_fits_file)
     os.command(command)
 
+#=========================================
+# Image descriptor function
+def add_key_pointing_expo(name_image, iexpo, pointing):
+    """Add pointing and expo number to image
+
+    Input
+    -----
+    name_image: str
+    iexpo: int
+    pointing: int
+    """
+    # Writing the pointing and iexpo in the IMAGE_FOV
+    this_image = pyfits.open(name_image, mode='update')
+    this_image[0].header['MUSEPIPE_POINTING'] = (pointing, "Pointing number")
+    this_image[0].header['MUSEPIPE_IEXPO'] = (iexpo, "Exposure number")
+    this_image.flush()
+

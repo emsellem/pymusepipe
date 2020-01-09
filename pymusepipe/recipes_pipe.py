@@ -248,6 +248,8 @@ class PipeRecipes(object) :
                                nocache=self.nocache, 
                                name_imain=self.joinprod(name_prod+suff_prod), 
                                fitsname=fitsname_out))
+            # Adding pointing and expo numbers as keywords
+            upipe.add_key_pointing_expo(fitsname_out, iexpo, self.pointing)
 
             # Now if in need of an alignment image and it is the filter image
             # Copying it in the Alignment folder or write it 
@@ -261,11 +263,8 @@ class PipeRecipes(object) :
                 self.run_oscommand("{nocache} cp {fitsname} {nameima_out}".format(
                                    nocache=self.nocache, fitsname=fitsname_out,
                                    nameima_out=name_imageout_align))
-                # Writing the pointing and iexpo in the IMAGE_FOV
-                this_image = pyfits.open(name_imageout_align, mode='update')
-                this_image[0].header['MUSEPIPE_POINTING'] = (self.pointing, "Pointing number")
-                this_image[0].header['MUSEPIPE_IEXPO'] = (iexpo, "Exposure number")
-                this_image.flush()
+                # Adding pointing and expo numbers as keywords
+                upipe.add_key_pointing_expo(name_imageout_align, iexpo, self.pointing)
 
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
