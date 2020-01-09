@@ -375,5 +375,5 @@ def add_key_pointing_expo(name_image, iexpo, pointing):
     this_image[0].header['MUSEPIPE_IEXPO'] = (iexpo, "Exposure number")
     this_image.flush()
     print_info("Keyworks MUSEPIPE_POINTING/EXPO updated for image {}".format(
-        name_image)
+        name_image))
 
