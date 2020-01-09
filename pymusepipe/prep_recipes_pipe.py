@@ -131,7 +131,10 @@ class PipePrep(SofPipe) :
 #        super(PipePrep, self).__init__()
         self.list_recipes = deepcopy(list_recipes)
         self.first_recipe = first_recipe
-        self.last_recipe = last_recipe
+        if last_recipe is None:
+            self.last_recipe = np.max(list(dic_recipes_per_num.keys())))
+        else:
+            self.last_recipe = last_recipe
 
     def _get_tpl_meanmjd(self, gtable):
         """Get tpl of the group and mean mjd of the group
@@ -199,9 +202,8 @@ class PipePrep(SofPipe) :
         dic_kwargs_recipes = kwargs.pop("param_recipes", default_dic_kwargs_recipes)
 
         # First and last recipe to be used
-        first_recipe = kwargs.pop("first_recipe", 1)
-        last_recipe = kwargs.pop("last_recipe", 
-                np.max(list(dic_recipes_per_num.keys())))
+        first_recipe = kwargs.pop("first_recipe", self.first_recipe)
+        last_recipe = kwargs.pop("last_recipe", self.last_recipe)
         if last_recipe is None: last_recipe = np.max(list(dic_recipes_per_num.keys()))
 
         # Transforming first and last if they are strings and not numbers
