@@ -606,6 +606,9 @@ class AlignMusePointing(object):
 
         # Initialise the parameters for the first guess
         self.firstguess = kwargs.pop("firstguess", "crosscorr")
+        self.folder_offset_table = kwargs.pop("folder_offset_table", None)
+        if self.folder_offset_table:
+            self.folder_offset_table = self.folder_muse_images
         self.name_offset_table = kwargs.pop("name_offset_table", None)
         self.minflux_crosscorr = kwargs.pop("minflux_crosscorr", 0.)
 
@@ -721,7 +724,7 @@ class AlignMusePointing(object):
             self.init_off_pixel = self.cross_off_pixel * 1.0
         elif firstguess == "fits":
             exist_table, self.offset_table = self.open_offset_table(
-                    self.folder_muse_images + self.name_offset_table)
+                    joinpath(self.folder_offset_table, self.name_offset_table))
             if exist_table is not True :
                 upipe.print_warning("Fits initialisation table not found, "
                                     "setting init value to 0")
@@ -861,13 +864,18 @@ class AlignMusePointing(object):
                     self.total_off_pixel[nima][1]))
 
     def save_fits_offset_table(self, name_output_table=None, 
+            folder_output_table=None,
             overwrite=False, suffix="", save_flux_scale=True,
             save_other_params=True):
         """Save the Offsets into a fits Table
          
         Input
         -----
-        name_outpout_table: str
+        folder_output_table: str [None]
+            Folder of the output table. If None (default) the folder
+            for the input offset table will be used or alternatively
+            the folder of the MUSE images.
+        name_output_table: str [None]
             Name of the output fits table. If None (default) it will
             use the one given in self.name_output_table
         overwrite: bool [False]
@@ -896,8 +904,12 @@ class AlignMusePointing(object):
         self.name_output_table = name_output_table.replace(".fits", 
                 "{0}.fits".format(self.suffix))
 
+        if folder_output_table is None:
+            self.folder_output_table = self.folder_offset_table
+        else:
+            self.folder_output_table = folder_output_table
         exist_table, fits_table = self.open_offset_table(
-                self.name_output_table)
+               joinpath(self.folder_output_table, self.name_output_table))
         if exist_table is None:
             upipe.print_error("Save is aborted")
             return
@@ -946,7 +958,8 @@ class AlignMusePointing(object):
         fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:,1] / 3600.
 
         # Writing up
-        fits_table.write(self.name_output_table, overwrite=overwrite)
+        fits_table.write(joinpath(self.folder_output_table, self.name_output_table), 
+                         overwrite=overwrite)
         self.name_output_table = name_output_table
 
     def run(self, nima=0, **kwargs):
