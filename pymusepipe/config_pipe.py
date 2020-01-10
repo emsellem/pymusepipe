@@ -262,8 +262,8 @@ pointing_names = {'table': "POINTING_OBS", 'image': "MUSEPIPE_POINTING"}
 default_offset_table = {'date': [date_names['table'], 'S23', ""],
                         'mjd' : [mjd_names['table'], 'f8', 0.0],
                         'tpls' : [tpl_names['table'], 'S19', ""],
-                        'iexpo' : [iexpo_names['table'], 'i4', ""],
-                        'pointing' : [iexpo_names['table'], 'i4', ""],
+                        'iexpo' : [iexpo_names['table'], 'i4', 0],
+                        'pointing' : [iexpo_names['table'], 'i4', 0],
                         'ora':["RA_OFFSET", 'f8', 0.0],
                         'odec':["DEC_OFFSET", 'f8', 0.0],
                         'scale':["FLUX_SCALE", 'f8', 1.0]}
