@@ -237,7 +237,7 @@ class PipeRecipes(object) :
 
         if self._debug:
             upipe.print_debug("Product names:")
-            upipe.print_debug(name_prod)
+            upipe.print_debug(name_products)
 
         for name_prod, suff_prod, suff_pre, suff_post, iexpo in zip(name_products, suffix_products, 
                 suffix_prefinalnames, suffix_postfinalnames, list_expo) :
