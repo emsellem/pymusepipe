@@ -763,6 +763,7 @@ class PipePrep(SofPipe) :
         suffix_products = []
         suffix_prefinalnames = []
         suffix_postfinalnames = []
+        extlist_expo = []
         list_options = save.split(',')
         if filter_list is None: filter_list = self.filter_list
         if self.verbose:
@@ -779,6 +780,7 @@ class PipePrep(SofPipe) :
                             suffix_postfinalnames.append("_{0:04d}".format(list_expo[0]))
                         else :
                             suffix_postfinalnames.append("")
+                        extlist_expo.append(list_expo[0])
 
                 elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY', 'AUTOCAL']):
                     for i in range(len(list_expo)):
@@ -786,12 +788,14 @@ class PipePrep(SofPipe) :
                         suffix_products.append("_{0:04d}".format(i+1))
                         suffix_prefinalnames.append("")
                         suffix_postfinalnames.append("_{0:04d}".format(list_expo[i]))
+                        extlist_expo.append(i+1)
                 else :
                     if "DATACUBE" in prod:
                         if len(list_expo) == 1 :
                             suffix_postfinalnames.append("_{0:04d}".format(list_expo[0]))
                         else :
                             suffix_postfinalnames.append("")
+                    extlist_expo.append(list_expo[0])
                     name_products.append(prod)
                     suffix_products.append("")
                     suffix_prefinalnames.append("")
@@ -801,10 +805,12 @@ class PipePrep(SofPipe) :
                     "Name_products: [{0}] \n"
                     "suffix_products: [{1}] \n"
                     "suffix_pre: [{2}] \n"
-                    "suffix_post: [{3}]".format(
+                    "suffix_post: [{3}] \n"
+                    "Expo number: [{4}]".format(
                         name_products, suffix_products,
-                        suffix_prefinalnames, suffix_postfinalnames))
-        return name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames
+                        suffix_prefinalnames, suffix_postfinalnames, extlist_expo))
+        return name_products, suffix_products, suffix_prefinalnames, 
+                   suffix_postfinalnames, extlist_expo
 
     def _select_list_expo(self, expotype, tpl, stage, list_expo=[]):
         """Select the expo numbers which exists for a certain expotype
@@ -1071,7 +1077,7 @@ class PipePrep(SofPipe) :
                 suffix, tpl, suffix_iexpo), new=True)
             # products
             dir_products = self._get_fullpath_expo(expotype, "processed")
-            name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames = \
+            name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames, fl_expo = \
                 self._get_scipost_products(save, list_group_expo, filter_list)
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
                     name_products, suffix_products, suffix_prefinalnames, 
@@ -1079,7 +1085,7 @@ class PipePrep(SofPipe) :
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
                     filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
                     skymethod=skymethod, filter_for_alignment=filter_for_alignment,
-                    list_expo=list_group_expo, **kwargs)
+                    list_expo=fl_expo, **kwargs)
 
             # Write the MASTER files Table and save it
             if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])

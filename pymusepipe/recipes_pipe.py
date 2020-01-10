@@ -240,8 +240,8 @@ class PipeRecipes(object) :
             for prod in name_products:
                 upipe.print_debug(prod)
 
-        for name_prod, suff_prod, suff_pre, suff_post, iexpo in zip(name_products, suffix_products, 
-                suffix_prefinalnames, suffix_postfinalnames, list_expo) :
+        for name_prod, suff_prod, suff_pre, suff_post in zip(name_products, suffix_products, 
+                suffix_prefinalnames, suffix_postfinalnames) :
 
             # In any case move the file from Pipe_products to the right folder
             fitsname_out = "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(
