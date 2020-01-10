@@ -461,14 +461,14 @@ class MusePipeSample(object):
         """
         return self.pipes[targetname][pointing]._get_path_files(expotype)
 
-    def reduce_all_targets(self, first_recipe=1, last_recipe=None, **kwargs):
+    def reduce_all_targets(self, **kwargs):
         """Reduce all targets already initialised
 
         Input
         -----
-        first_recipe: int
+        first_recipe: int or str
             One of the recipe to start with
-        last_recipe: int
+        last_recipe: int or str
             One of the recipe to end with
         """
         for target in self.targets.keys():
@@ -476,6 +476,34 @@ class MusePipeSample(object):
             self.reduce_target(targetname=target, first_recipe=first_recipe, last_recipe=last_recipe,
                     **kwargs)
             upipe.print_info("===  End  Reduction of Target {name} ===".format(target))
+
+    def reduce_target_prealign(self, targetname=None, list_pointings=None, **kwargs):
+        """Reduce target for all steps before pre-alignment (included)
+
+        Input
+        -----
+        targetname: str
+            Name of the target
+        list_pointings: list
+            Pointing numbers. Default is None (meaning all pointings
+            indicated in the dictonary will be reduced)
+        """
+        reduce_target(self, targetname=None, list_pointings=None, first_recipe=1,
+                last_recipe="prep_align", **kwargs)
+
+    def reduce_target_postalign(self, targetname=None, list_pointings=None, **kwargs):
+        """Reduce target for all steps after pre-alignment
+
+        Input
+        -----
+        targetname: str
+            Name of the target
+        list_pointings: list
+            Pointing numbers. Default is None (meaning all pointings
+            indicated in the dictonary will be reduced)
+        """
+        reduce_target(self, targetname=None, list_pointings=None, first_recipe=1,
+                first_recipe="align_bypointing", **kwargs)
 
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
         """Reduce one target for a list of pointings
@@ -487,11 +515,9 @@ class MusePipeSample(object):
         list_pointings: list
             Pointing numbers. Default is None (meaning all pointings
             indicated in the dictonary will be reduced)
-        config_args: dic
-            Dictionary including extra configuration parameters to pass
-            to MusePipe. This allows to define a global configuration.
-            If self.__phangs is set to True, this is overwritten with the default
-            PHANGS configuration parameters as provided in config_pipe.py.
+        first_recipe: str or int [1]
+        last_recipe: str or int [max of all recipes]
+            Name or number of the first and last recipes to process
         """
         # General print out
         upipe.print_info("---- Starting the Data Reduction for Target={0} ----".format(
