@@ -809,7 +809,7 @@ class PipePrep(SofPipe) :
                     "Expo number: [{4}]".format(
                         name_products, suffix_products,
                         suffix_prefinalnames, suffix_postfinalnames, extlist_expo))
-        return name_products, suffix_products, suffix_prefinalnames, 
+        return name_products, suffix_products, suffix_prefinalnames, \
                    suffix_postfinalnames, extlist_expo
 
     def _select_list_expo(self, expotype, tpl, stage, list_expo=[]):
