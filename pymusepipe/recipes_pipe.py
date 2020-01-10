@@ -235,6 +235,10 @@ class PipeRecipes(object) :
         # Creating the images for the alignment, outside of scipost
         # The filter can be a private one
 
+        if self._debug:
+            upipe.print_debug("Product names:")
+            upipe.print_debug(name_prod)
+
         for name_prod, suff_prod, suff_pre, suff_post, iexpo in zip(name_products, suffix_products, 
                 suffix_prefinalnames, suffix_postfinalnames, list_expo) :
 

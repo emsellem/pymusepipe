@@ -562,7 +562,7 @@ class AlignMusePointing(object):
         self.folder_reference = folder_reference
 
         # Debug option
-        self.debug = kwargs.pop("debug", False)
+        self._debug = kwargs.pop("debug", False)
 
         # Check if folder reference exists
         if not os.path.isdir(self.folder_reference):
@@ -1196,13 +1196,13 @@ class AlignMusePointing(object):
         ima_muse = prepare_image(muse_hdu.data, self.border, 
                 self.dynamic_range, self.median_window,
                 minflux=minflux)
-        if self.debug:
+        if self._debug:
             self._temp_input_origmuse_cc = muse_hdu.data * 1.0
             self._temp_input_origref_cc = proj_ref_hdu.data * 1.0
 
         # Cross-correlate the images
         ccor = correlate(ima_ref, ima_muse, mode='full', method='auto')
-        if self.debug:
+        if self._debug:
             self._temp_ima_muse_tocc = ima_muse * 1.0
             self._temp_ima_ref_tocc = ima_ref * 1.0
             self._temp_cc = ccor * 1.0
@@ -1554,7 +1554,7 @@ class AlignMusePointing(object):
                     "{0:8.4e} {1:8.4e}".format(lowlevel_ref, highlevel_ref))
 
         # Save the frames if in debug mode
-        if self.debug:
+        if self._debug:
             self._temp_refdata = refdata
             self._temp_musedata = musedata
 
