@@ -388,7 +388,8 @@ class MusePipeSample(object):
         # Over-writing the arguments in kwargs from config dictionary
         if config_args is not None:
             for attr in config_args.keys():
-                kwargs[attr] = config_args[attr]
+                if attr not in kwargs:
+                    kwargs[attr] = config_args[attr]
 
         # extracting the kwargs
         list_kwargs = ', '.join(['{}={!r}'.format(k, v) for k, v in kwargs.items()])
