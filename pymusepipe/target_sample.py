@@ -488,7 +488,7 @@ class MusePipeSample(object):
             Pointing numbers. Default is None (meaning all pointings
             indicated in the dictonary will be reduced)
         """
-        reduce_target(self, targetname=None, list_pointings=None, first_recipe=1,
+        reduce_target(self, targetname=targetname, list_pointings=list_pointings,
                 last_recipe="prep_align", **kwargs)
 
     def reduce_target_postalign(self, targetname=None, list_pointings=None, **kwargs):
@@ -502,7 +502,7 @@ class MusePipeSample(object):
             Pointing numbers. Default is None (meaning all pointings
             indicated in the dictonary will be reduced)
         """
-        reduce_target(self, targetname=None, list_pointings=None, first_recipe=1,
+        reduce_target(self, targetname=targetname, list_pointings=list_pointings, 
                 first_recipe="align_bypointing", **kwargs)
 
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
