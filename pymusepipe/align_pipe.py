@@ -535,12 +535,16 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     # Reading the result and printing
     upipe.print_warning("=== PIXTABLE: {} ===".format(name_pixtable))
     if not angle_orig_keyword in hd:
-        upipe.print_warning("Rotation angle not yet updated [no {} keyword]".format(angle_orig_keyword))
+        upipe.print_warning("Rotation angle has not been changed [no {} keyword]".format(angle_orig_keyword))
+        upipe.print_info("Present Angle (deg): {}".format(hd[angle_keyword]))
     else:
-        upipe.print_info("Original Angle (deg): {}".format(hd[angle_orig_keyword]))
-    upipe.print_info("Present Angle (deg): {}".format(hd[angle_keyword]))
-    upipe.print_info("Rotation = {} degrees".format(
-                    np.float(hd[angle_keyword]) - np.float(hd[angle_orig_keyword])))
+        orig = hd[angle_orig_keyword]
+        upipe.print_info("Original Angle (deg):         {}".format(
+                         hd[angle_orig_keyword]))
+        upipe.print_info("New (present) Angle (deg):    {}".format(
+                         hd[angle_keyword]))
+        upipe.print_info("Rotation (new-orig) (deg_ = {}".format(
+                         np.float(hd[angle_keyword]) - hd[angle_orig_keyword])))
 
 #################################################################
 # ================== END Useful functions ===================== #
