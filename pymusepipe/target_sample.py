@@ -579,7 +579,7 @@ class MusePipeSample(object):
             angle = row['ROTANGLE']
             upipe.print_info("Rotation ={0} Deg for Pointing={1:02d}, TPLS={2} - Expo {3:02d}".format(
                                 angle, pointing, tpls, iexpo))
-            folder_expos = self._get_path_files()
+            folder_expos = self._get_path_files(targetname, pointing)
             name_suffix = "{0}_{1:04d}".format(tpls, iexpo)
             rotate_pixtables(folder=folder_expos, name_suffix=name_suffix, list_ifu=None,
                      angle=angle, fakemode=fakemode, **kwargs)
