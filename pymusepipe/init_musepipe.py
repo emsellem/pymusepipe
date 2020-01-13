@@ -99,8 +99,7 @@ class InitMuseParameters(object) :
         Hardcoded in init_musepipe.py
         """
         for key in dic_param.keys() :
-            if self.verbose :
-                upipe.print_info("Default initialisation of attribute {0}".format(key))
+            upipe.print_info("Default initialisation of attribute {0}".format(key), pipe=self)
             setattr(self, key, dic_param[key])
 
     def read_param_file(self, filename, dic_param) :
@@ -108,7 +107,7 @@ class InitMuseParameters(object) :
         """
         # Testing existence of filename
         if not os.path.isfile(filename) :
-            upipe.print_info(("ERROR: input parameter {inputname} cannot be found. "
+            upipe.print_error(("Input parameter {inputname} cannot be found. "
                     "We will use the default hardcoded in the "
                     "init_musepipe.py module").format(inputname=filename))
             return
@@ -126,8 +125,7 @@ class InitMuseParameters(object) :
             keyword_name = sline[0]
             keyword = ("".join(sline[2:])).rstrip()
             if keyword_name in dic_param.keys() :
-                if self.verbose :
-                    upipe.print_info("Initialisation of attribute {0}".format(keyword_name))
+                upipe.print_info("Initialisation of attribute {0}".format(keyword_name), pipe)
                 setattr(self, keyword_name, keyword) 
                 # Here we drop the item which was initialised
                 val = dummy_dic_param.pop(keyword_name)
@@ -138,7 +136,7 @@ class InitMuseParameters(object) :
         not_initialised_param = dummy_dic_param.keys()
         # Listing them as warning and using the hardcoded default
         for key in not_initialised_param :
-            upipe.print_info(("WARNING: parameter {param} not initialised "
+            upipe.print_warning(("Parameter {param} not initialised "
                    "We will use the default hardcoded value from "
                    "init_musepipe.py").format(param=key))
             setattr(self, key, dic_param[key])

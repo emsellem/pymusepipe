@@ -499,7 +499,7 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         self.offset_table_name = offset_table_name
         if self.offset_table_name is None:
-            upipe.print_warning("No Offset table name given")
+            upipe.print_warning("No Offset table name given", pipe=self)
             self.offset_table = Table()
             return
 
@@ -513,7 +513,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                           self.offset_table_name)
         if not os.path.isfile(full_offset_table_name):
             upipe.print_error("Offset table [{0}] not found".format(
-                full_offset_table_name))
+                full_offset_table_name), pipe=self)
             self.offset_table = Table()
             return
 
@@ -576,13 +576,15 @@ class MusePointings(SofPipe, PipeRecipes):
     def goto_origfolder(self, addtolog=False):
         """Go back to original folder
         """
-        upipe.print_info("Going back to the original folder {0}".format(self.paths.orig))
+        upipe.print_info("Going back to the original folder {0}".format(self.paths.orig),
+                             pipe=self)
         self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
 
     def goto_prevfolder(self, addtolog=False):
         """Go back to previous folder
         """
-        upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder))
+        upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder),
+                             pipe=self)
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
 
     def goto_folder(self, newpath, addtolog=False, verbose=True):
@@ -592,8 +594,7 @@ class MusePointings(SofPipe, PipeRecipes):
             prev_folder = os.getcwd()
             newpath = os.path.normpath(newpath)
             os.chdir(newpath)
-            if verbose:
-                upipe.print_info("Going to folder {0}".format(newpath))
+            upipe.print_info("Going to folder {0}".format(newpath), pipe=self)
             if addtolog:
                 upipe.append_file(self.paths.log_filename, "cd {0}\n".format(newpath))
             self.paths._prev_folder = prev_folder
@@ -894,10 +895,9 @@ class MusePointings(SofPipe, PipeRecipes):
         nexpo_tocombine = sum(len(self.dic_pixtabs_in_pointings[pointing])
                               for pointing in list_pointings)
         if nexpo_tocombine <= 1:
-            if self.verbose:
-                upipe.print_warning("All considered pointings only "
-                                    "have one exposure: process aborted",
-                                    pipe=self)
+            upipe.print_warning("All considered pointings only "
+                                "have one exposure: process aborted",
+                                pipe=self)
             return
 
         # Now creating the SOF file, first reseting it

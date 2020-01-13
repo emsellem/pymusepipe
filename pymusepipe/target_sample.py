@@ -182,6 +182,7 @@ class MusePipeSample(object):
         self.first_recipe = first_recipe
 
         self.__phangs = kwargs.pop("PHANGS", False)
+        self.verbose = kwargs.pop("verbose", False)
 
         # Reading configuration filenames
         if rc_filename is None or cal_filename is None:
@@ -208,7 +209,7 @@ class MusePipeSample(object):
         init_cal_params = InitMuseParameters(folder_config=folder_config,
                                              rc_filename=rc_filename,
                                              cal_filename=cal_filename,
-                                             verbose=False)
+                                             verbose=self.verbose)
         self.root_path = init_cal_params.root
         self._subfolders = np.unique([self.sample[targetname][0]
                                 for targetname in self.targetnames])
@@ -273,7 +274,8 @@ class MusePipeSample(object):
             # Defining the MusePipe for that target
             self.targets[targetname] = MusePipeTarget(targetname=targetname,
                                                       subfolder=subfolder,
-                                                      list_pointings=list_pointings)
+                                                      list_pointings=list_pointings,
+                                                      verbose=self.verbose)
             # Shortcut to call the musepipe instance
             self.pipes[targetname] = self.targets[targetname].pipes
 
@@ -285,7 +287,7 @@ class MusePipeSample(object):
             init_params_target = InitMuseParameters(rc_filename=rc_filename,
                                                     cal_filename=cal_filename,
                                                     folder_config=folder_config,
-                                                    verbose=False)
+                                                    verbose=self.verbose)
             self.targets[targetname].root_path = init_params_target.root
             self.targets[targetname].data_path = joinpath(init_params_target.root, targetname)
             self.pipes[targetname].root_path = init_params_target.root
@@ -341,7 +343,7 @@ class MusePipeSample(object):
         else:
             return True
 
-    def set_pipe_target(self, targetname=None, list_pointings=None, verbose=False, 
+    def set_pipe_target(self, targetname=None, list_pointings=None, 
                         **kwargs):
         """Create the musepipe instance for that target and list of pointings
 
@@ -358,6 +360,7 @@ class MusePipeSample(object):
             If self.__phangs is set to True, this is overwritten with the default
             PHANGS configuration parameters as provided in config_pipe.py.
         """
+        verbose = kwargs.pop("verbose", self.verbose)
         # Check if targetname is valid
         if not self._check_targetname(targetname):
             return

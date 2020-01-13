@@ -45,11 +45,11 @@ def print_warning(text, **kwargs):
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-        silent = mypipe._silent_print
+        verbose = mypipe.verbose
     except:
-        silent = kwargs.pop("silent", False)
-
-    if not silent:
+        verbose = kwargs.pop("verbose", True)
+    
+    if verbose:
         print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
 
 def print_info(text, **kwargs):
@@ -69,9 +69,11 @@ def print_info(text, **kwargs):
         mypipe.write_logfile(toprint)
         silent = mypipe._silent_print
     except:
-        silent = kwargs.pop("silent", False)
+        verbose = mypipe.verbose
+    except:
+        verbose = kwargs.pop("verbose", True)
     
-    if not silent:
+    if verbose:
         print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
 def print_debug(text, **kwargs) :
@@ -88,11 +90,11 @@ def print_debug(text, **kwargs) :
     toprint = "# DebugInfo " + text
     mypipe = kwargs.pop("pipe", None)
     try:
-        silent = mypipe._silent_print
+        verbose = mypipe.verbose
     except:
-        silent = kwargs.pop("silent", False)
+        verbose = kwargs.pop("verbose", True)
     
-    if not silent:   
+    if verbose:
         print(DEBUG + "# DebugInfo " + ENDC + text, **kwargs)
 
 def print_error(text, **kwargs):
@@ -110,11 +112,11 @@ def print_error(text, **kwargs):
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-        silent = mypipe._silent_print
+        verbose = mypipe.verbose
     except:
-        silent = kwargs.pop("silent", False)
+        verbose = kwargs.pop("verbose", True)
     
-    if not silent:
+    if verbose:
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
 #-----------  END PRINTING FUNCTIONS -----------------------

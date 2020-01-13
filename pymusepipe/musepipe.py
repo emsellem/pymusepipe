@@ -187,8 +187,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # Setting other default attributes
         if log_filename is None : 
             log_filename = "log_{timestamp}.txt".format(timestamp=upipe.create_time_name())
-            if self.verbose:
-                upipe.print_info("The Log file will be {log}".format(log=log_filename))
+            upipe.print_info("The Log file will be {log}".format(log=log_filename), pipe=self)
         self.log_filename = log_filename
 
         # Further reduction options =====================================
@@ -215,7 +214,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # or a default rc_file or harcoded defaults.
         self.pipe_params = InitMuseParameters(folder_config=folder_config,
                             rc_filename=rc_filename, 
-                            cal_filename=cal_filename, verbose=self.verbose)
+                            cal_filename=cal_filename, verbose=verbose)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/P{1:02d}/".format(self.targetname, self.pointing)
@@ -229,8 +228,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self.paths.orig = os.getcwd()
 
         # Making the output folders in a safe mode
-        if self.verbose:
-            upipe.print_info("Creating directory structure")
+        upipe.print_info("Creating directory structure", pipe=self)
         self.goto_folder(self.paths.data)
 
         # ==============================================
@@ -247,12 +245,12 @@ class MusePipe(PipePrep, PipeRecipes):
         # Init the Master exposure flag dictionary
         self.Master = {}
         for mastertype in dic_listMaster.keys() :
-            upipe.safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=self.verbose)
+            upipe.safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=verbose)
             self.Master[mastertype] = False
 
         # Init the Object folder
         for objecttype in dic_listObject.keys() :
-            upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=self.verbose)
+            upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=verbose)
 
         self._dic_listMasterObject = dic_listMasterObject
 
@@ -331,8 +329,8 @@ class MusePipe(PipePrep, PipeRecipes):
     def goto_origfolder(self, addtolog=False) :
         """Go back to original folder
         """
-        if self.verbose:
-            upipe.print_info("Going back to the original folder {0}".format(self.paths.orig))
+        upipe.print_info("Going back to the original folder {0}".format(
+                             self.paths.orig), pipe=self)
         self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
             
     def goto_prevfolder(self, addtolog=False) :
@@ -343,8 +341,8 @@ class MusePipe(PipePrep, PipeRecipes):
         addtolog: bool [False]
             Adding the folder move to the log file
         """
-        if self.verbose:
-            upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder))
+        upipe.print_info("Going back to the previous folder {0}".format(
+                             self.paths._prev_folder), pipe=self)
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
             
     def goto_folder(self, newpath, addtolog=False, **kwargs) :
@@ -360,8 +358,7 @@ class MusePipe(PipePrep, PipeRecipes):
             prev_folder = os.getcwd()
             newpath = os.path.normpath(newpath)
             os.chdir(newpath)
-            if verbose:
-                upipe.print_info("Going to folder {0}".format(newpath))
+            upipe.print_info("Going to folder {0}".format(newpath), pipe=self)
             if addtolog :
                 upipe.append_file(self.paths.log_filename, "cd {0}\n".format(newpath))
             self.paths._prev_folder = prev_folder 
@@ -436,8 +433,8 @@ class MusePipe(PipePrep, PipeRecipes):
                                 " empty one".format(name_table), pipe=self)
             return Table([[],[],[]], names=['tpls','mjd', 'tplnexp'])
         else :
-            if self.verbose : 
-                upipe.print_info("Reading Astropy fits Table {0}".format(name_table))
+            upipe.print_info("Reading Astropy fits Table {0}".format(name_table),
+                                 pipe=self)
             return Table.read(name_table, format="fits")
         
     def init_raw_table(self, reset=False, **kwargs):
@@ -449,8 +446,7 @@ class MusePipe(PipePrep, PipeRecipes):
         reset: bool [False]
             Resetting the raw astropy table if True
         """
-        if self.verbose :
-            upipe.print_info("Creating the astropy fits raw data table")
+        upipe.print_info("Creating the astropy fits raw data table", pipe=self)
 
         if reset or not hasattr(self, "Tables"):
             self._reset_tables()
