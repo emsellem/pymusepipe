@@ -403,8 +403,8 @@ class MusePipeSample(object):
 
         # Loop on the pointings
         for pointing in list_pointings:
-            upipe.print_info("Initialise Pipe for Target = {0:10s} / Pointing {1:02d}".format(
-                                 targetname, pointing)
+            print("Initialise Pipe for Target = {0:10s} / Pointing {1:02d} ".format(
+                                 targetname, pointing), end="")
             # New log file name with pointing included
             log_filename_pointing = "{0}_P{1:02d}{2}".format(
                                     log_filename, pointing, log_fileext)
@@ -417,8 +417,6 @@ class MusePipeSample(object):
                                   rc_filename, cal_filename, log_filename_pointing, 
                                   verbose, list_kwargs))
 
-            upipe.print_info(python_command, pipe=self)
-
             # Creating the musepipe instance, using the shortcut
             self.pipes[targetname][pointing] = MusePipe(targetname=targetname, 
                             pointing=pointing, folder_config=folder_config, rc_filename=rc_filename, 
@@ -430,6 +428,8 @@ class MusePipeSample(object):
             self.pipes[targetname][pointing].history = python_command
             # Setting back verbose to True to make sure we have a full account
             self.pipes[targetname][pointing].verbose = True
+            print("... Done")
+            upipe.print_info(python_command, pipe=self)
 
         self.pipes[targetname]._initialised = True
 
