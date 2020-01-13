@@ -274,8 +274,7 @@ class MusePipeSample(object):
             # Defining the MusePipe for that target
             self.targets[targetname] = MusePipeTarget(targetname=targetname,
                                                       subfolder=subfolder,
-                                                      list_pointings=list_pointings,
-                                                      verbose=self.verbose)
+                                                      list_pointings=list_pointings)
             # Shortcut to call the musepipe instance
             self.pipes[targetname] = self.targets[targetname].pipes
 
