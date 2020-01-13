@@ -546,7 +546,7 @@ class MusePipeSample(object):
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def rotate_pixtables_target(self, targetname=None, list_pointings=None,
-                     offset_table_name=None, fakemode=False, **kwargs):
+                     folder_offset_table=None, offset_table_name=None, fakemode=False, **kwargs):
         """Rotate all pixel table of a certain targetname and pointings
         """
         # General print out
@@ -563,7 +563,7 @@ class MusePipeSample(object):
         if len(list_pointings) == 0:
             return
 
-        offset_table = Table.read(offset_table_name)
+        offset_table = Table.read(joinpath(folder_offset_table, offset_table_name))
         offset_table.sort(["POINTING_OBS", "IEXPO_OBS"])
         # Loop on the pointings
         for row in offset_table:
@@ -579,7 +579,7 @@ class MusePipeSample(object):
                      angle=angle, fakemode=fakemode, **kwargs)
 
     def init_combine(self, targetname=None, list_pointings="all",
-                     offset_table_name=None, **kwargs):
+                     folder_offset_table=None, offset_table_name=None, **kwargs):
         """Prepare the combination of targets
 
         Input
@@ -598,6 +598,7 @@ class MusePipeSample(object):
                                                  cal_filename=self.targets[targetname].cal_filename,
                                                  folder_config=self.targets[targetname].folder_config,
                                                  offset_table_name=offset_table_name,
+                                                 folder_offset_table=folder_offset_table,
                                                  log_filename=log_filename, **kwargs)
 
     def combine_target(self, targetname=None, **kwargs):
