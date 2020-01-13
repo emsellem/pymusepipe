@@ -125,7 +125,8 @@ class InitMuseParameters(object) :
             keyword_name = sline[0]
             keyword = ("".join(sline[2:])).rstrip()
             if keyword_name in dic_param.keys() :
-                upipe.print_info("Initialisation of attribute {0}".format(keyword_name), pipe)
+                upipe.print_info("Initialisation of attribute {0}".format(keyword_name), 
+                                 pipe=self)
                 setattr(self, keyword_name, keyword) 
                 # Here we drop the item which was initialised
                 val = dummy_dic_param.pop(keyword_name)
