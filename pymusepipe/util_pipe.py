@@ -44,8 +44,8 @@ def print_warning(text, **kwargs):
     toprint = "# MusePipeWarning " + text
     mypipe = kwargs.pop("pipe", None)
     try:
-        mypipe.write_logfile(toprint)
         verbose = mypipe.verbose
+        mypipe.write_logfile(toprint)
     except:
         verbose = kwargs.pop("verbose", True)
     
@@ -64,8 +64,8 @@ def print_info(text, **kwargs):
     toprint = "# MusePipeInfo " + text
     mypipe = kwargs.pop("pipe", None)
     try:
-        mypipe.write_logfile(toprint)
         verbose = mypipe.verbose
+        mypipe.write_logfile(toprint)
     except:
         verbose = kwargs.pop("verbose", True)
     
@@ -103,8 +103,8 @@ def print_error(text, **kwargs):
     toprint = "# MusePipeError " + text
     mypipe = kwargs.pop("pipe", None)
     try:
-        mypipe.write_logfile(toprint)
         verbose = mypipe.verbose
+        mypipe.write_logfile(toprint)
     except:
         verbose = kwargs.pop("verbose", True)
     
