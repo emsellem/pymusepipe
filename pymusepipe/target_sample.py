@@ -19,6 +19,7 @@ from pymusepipe.musepipe import MusePipe
 from pymusepipe.config_pipe import PHANGS_reduc_config
 from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.combine import MusePointings
+from pymusepipe.align_pipe import rotate_pixtables
 from .version import __version__ as version_pack
 
 from astropy.table import Table
