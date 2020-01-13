@@ -544,7 +544,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
         upipe.print_info("New (present) Angle (deg):    {}".format(
                          hd[angle_keyword]))
         upipe.print_info("Rotation (new-orig) (deg_ = {}".format(
-                         np.float(hd[angle_keyword]) - hd[angle_orig_keyword])))
+                         np.float(hd[angle_keyword]) - hd[angle_orig_keyword]))
 
 #################################################################
 # ================== END Useful functions ===================== #
