@@ -525,7 +525,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     # Continue with updating the table
     mypix = pyfits.open(fullname_pixtable, mode='update')
     hd = mypix[0].header
-    if not fakemode:
+    if not fakemode and angle != 0.0:
         if not angle_orig_keyword in hd:
             hd[angle_orig_keyword] = hd[angle_keyword]
         hd[angle_keyword] = hd[angle_orig_keyword] + angle
@@ -533,17 +533,13 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
         mypix.flush()
 
     # Reading the result and printing
-    upipe.print_warning("=== PIXTABLE: {} ===".format(name_pixtable))
+    print("=== {} ===".format(name_pixtable), end="")
     if not angle_orig_keyword in hd:
-        upipe.print_warning("Rotation angle has not been changed [no {} keyword]".format(angle_orig_keyword))
-        upipe.print_info("Present Angle (deg): {}".format(hd[angle_keyword]))
+        print("Present Angle [No Change] (deg): {}".format(hd[angle_keyword]))
     else:
-        orig = hd[angle_orig_keyword]
-        upipe.print_info("Original Angle (deg):         {}".format(
-                         hd[angle_orig_keyword]))
-        upipe.print_info("New (present) Angle (deg):    {}".format(
-                         hd[angle_keyword]))
-        upipe.print_info("Rotation (new-orig) (deg_ = {}".format(
+        print("Orig / New / Rotation Angle (deg): {0} / {1} / {2}".format(
+                         hd[angle_orig_keyword],
+                         hd[angle_keyword],
                          np.float(hd[angle_keyword]) - hd[angle_orig_keyword]))
 
 #################################################################
