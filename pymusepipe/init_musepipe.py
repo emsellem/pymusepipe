@@ -54,7 +54,6 @@ class InitMuseParameters(object) :
         verbose: bool [True]
         """
         self.verbose = verbose
-        print("Verbose for IMP is {}".format(self.verbose))
         # Will first test if there is an rc_file provided
         # If not, it will look for a default rc_filename, the name of which is provided
         # above. If not, the hardcoded default will be used.
