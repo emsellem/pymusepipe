@@ -410,7 +410,7 @@ class MusePipeSample(object):
             python_command = ("mypipe = musepipe.MusePipe(targetname='{0}', "
                               "pointing={1}, folder_config='{2}', " 
                               "rc_filename='{3}', " "cal_filename='{4}', "
-                              "log_filename='{5}', verbose='{6}', "
+                              "log_filename='{5}', verbose={6}, "
                               "{7})".format(targetname, pointing, folder_config, 
                                   rc_filename, cal_filename, log_filename_pointing, 
                                   verbose, list_kwargs))
