@@ -157,7 +157,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self._debug = kwargs.pop("debug", False)
 
         self._suffix_prealign = kwargs.pop("suffix_prealign", suffix_prealign)
-        self._check_align = kwargs.pop("suffix_checkalign", suffix_checkalign)
+        self._suffix_checkalign = kwargs.pop("suffix_checkalign", suffix_checkalign)
 
         # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')
