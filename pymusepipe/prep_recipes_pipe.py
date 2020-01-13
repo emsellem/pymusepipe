@@ -768,7 +768,7 @@ class PipePrep(SofPipe) :
                     tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=True, filter_list=filter_for_alignment,
-                    offset_table_name=offset_table_table,
+                    offset_table_name=offset_table_name,
                     folder_offset_table=folder_offset_table,
                     **extra_kwargs)
 

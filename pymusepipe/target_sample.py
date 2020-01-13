@@ -510,6 +510,44 @@ class MusePipeSample(object):
         self.reduce_target(targetname=targetname, list_pointings=list_pointings, 
                 first_recipe="align_bypointing", **kwargs)
 
+    def run_target_recipe(self, recipe_name, targetname=None, list_pointings=None, **kwargs):
+        """Run just one recipe on target
+
+        Input
+        -----
+        recipe_name: str
+        targetname: str
+            Name of the target
+        list_pointings: list
+            Pointing numbers. Default is None (meaning all pointings
+            indicated in the dictonary will be reduced)
+        """
+        # General print out
+        upipe.print_info("---- Starting the Data Reduction for Target={0} ----".format(
+                            targetname))
+
+        # Initialise the pipe if needed
+        if not self.pipes[targetname]._initialised  \
+            or "first_recipe" in kwargs or "last_recipe" in kwargs:
+            self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
+
+        # Check if pointings are valid
+        list_pointings = self._check_pointings(targetname, list_pointings)
+        if len(list_pointings) == 0:
+            return
+
+        # Loop on the pointings
+        for pointing in list_pointings:
+            upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
+            # Initialise raw tables if not already done (takes some time)
+            if not self.pipes[targetname][pointing]._raw_table_initialised:
+                self.pipes[targetname][pointing].init_raw_table(overwrite=True)
+            if self.__phangs:
+                self.pipes[targetname][pointing].run_phangs_recipes()
+            else:
+                self.pipes[targetname][pointing].run_recipes()
+            upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
+
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
         """Reduce one target for a list of pointings
 
