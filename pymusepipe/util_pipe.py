@@ -45,35 +45,77 @@ def print_warning(text, **kwargs):
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
+        silent = mypipe._silent_print
     except:
-        pass
+        silent = kwargs.pop("silent", False)
 
-    print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
+    if not silent:
+        print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
 
 def print_info(text, **kwargs):
+    """Print processing information
+
+    Input
+    -----
+    text: str
+    pipe: musepipe [None]
+        If provided, will print the text in the logfile
+    silent: Bool [False]
+        If True, will not print it on standard output
+    """
     toprint = "# MusePipeInfo " + text
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
+        silent = mypipe._silent_print
     except:
-        pass
+        silent = kwargs.pop("silent", False)
     
-    print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
+    if not silent:
+        print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
 def print_debug(text, **kwargs) :
+    """Print debugging information
+
+    Input
+    -----
+    text: str
+    pipe: musepipe [None]
+        If provided, will print the text in the logfile
+    silent: Bool [False]
+        If True, will not print it on standard output
+    """
     toprint = "# DebugInfo " + text
     mypipe = kwargs.pop("pipe", None)
-    print(DEBUG + "# DebugInfo " + ENDC + text, **kwargs)
+    try:
+        silent = mypipe._silent_print
+    except:
+        silent = kwargs.pop("silent", False)
+    
+    if not silent:   
+        print(DEBUG + "# DebugInfo " + ENDC + text, **kwargs)
 
 def print_error(text, **kwargs):
+    """Print error information
+
+    Input
+    -----
+    text: str
+    pipe: musepipe [None]
+        If provided, will print the text in the logfile
+    silent: Bool [False]
+        If True, will not print it on standard output
+    """
     toprint = "# MusePipeError " + text
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
+        silent = mypipe._silent_print
     except:
-        pass
-
-    print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
+        silent = kwargs.pop("silent", False)
+    
+    if not silent:
+        print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
 #-----------  END PRINTING FUNCTIONS -----------------------
 
