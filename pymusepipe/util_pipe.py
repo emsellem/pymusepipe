@@ -60,15 +60,11 @@ def print_info(text, **kwargs):
     text: str
     pipe: musepipe [None]
         If provided, will print the text in the logfile
-    silent: Bool [False]
-        If True, will not print it on standard output
     """
     toprint = "# MusePipeInfo " + text
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-        silent = mypipe._silent_print
-    except:
         verbose = mypipe.verbose
     except:
         verbose = kwargs.pop("verbose", True)
@@ -84,8 +80,6 @@ def print_debug(text, **kwargs) :
     text: str
     pipe: musepipe [None]
         If provided, will print the text in the logfile
-    silent: Bool [False]
-        If True, will not print it on standard output
     """
     toprint = "# DebugInfo " + text
     mypipe = kwargs.pop("pipe", None)
@@ -105,8 +99,6 @@ def print_error(text, **kwargs):
     text: str
     pipe: musepipe [None]
         If provided, will print the text in the logfile
-    silent: Bool [False]
-        If True, will not print it on standard output
     """
     toprint = "# MusePipeError " + text
     mypipe = kwargs.pop("pipe", None)
