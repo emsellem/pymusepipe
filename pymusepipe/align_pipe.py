@@ -516,30 +516,31 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     fullname_pixtable = joinpath(folder, name_pixtable)
     fakemode = kwargs.pop("fakemode", False)
 
-    if not fakemode:
-        if os.path.isfile(fullname_pixtable):
-            mypix = pyfits.open(fullname_pixtable, mode='update')
-            if not angle_orig_keyword in mypix[0].header:
-                mypix[0].header[angle_orig_keyword] = mypix[0].header[angle_keyword]
-            mypix[0].header[angle_keyword] = mypix[0].header[angle_orig_keyword] + angle
-            upipe.print_info("Updating INS DROT POSANG for {0}".format(name_pixtable))
-            mypix.flush()
+    # Check if table is there
+    if not os.path.isfile(fullname_pixtable):
+        upipe.print_error("Input Pixtable {0} does not exist - Aborting".format(
+            fullname_pixtable))
+        return
 
-        else:
-            upipe.print_error("Input Pixtable {0} does not exist - Aborting".format(
-                fullname_pixtable))
+    # Continue with updating the table
+    mypix = pyfits.open(fullname_pixtable, mode='update')
+    hd = mypix[0].header
+    if not fakemode:
+        if not angle_orig_keyword in hd:
+            hd[angle_orig_keyword] = hd[angle_keyword]
+        hd[angle_keyword] = hd[angle_orig_keyword] + angle
+        upipe.print_info("Updating INS DROT POSANG for {0}".format(name_pixtable))
+        mypix.flush()
 
     # Reading the result and printing
-    if os.path.isfile(fullname_pixtable):
-        upipe.print_warning("=== PIXTABLE: {} ===".format(name_pixtable))
-        hd = pyfits.getheader(fullname_pixtable)
-        if not angle_orig_keyword in mypix[0].header:
-            upipe.print_warning("Rotation angle not yet updated [no {} keyword]".format(angle_orig_keyword))
-        else:
-            upipe.print_info("Original Angle (deg): {}".format(hd[angle_orig_keyword]))
-        upipe.print_info("Present Angle (deg): {}".format(hd[angle_keyword]))
-        upipe.print_info("Rotation = {} degrees".format(
-                        np.float(hd[angle_keyword]) - np.float(hd[angle_orig_keyword])))
+    upipe.print_warning("=== PIXTABLE: {} ===".format(name_pixtable))
+    if not angle_orig_keyword in hd:
+        upipe.print_warning("Rotation angle not yet updated [no {} keyword]".format(angle_orig_keyword))
+    else:
+        upipe.print_info("Original Angle (deg): {}".format(hd[angle_orig_keyword]))
+    upipe.print_info("Present Angle (deg): {}".format(hd[angle_keyword]))
+    upipe.print_info("Rotation = {} degrees".format(
+                    np.float(hd[angle_keyword]) - np.float(hd[angle_orig_keyword])))
 
 #################################################################
 # ================== END Useful functions ===================== #
