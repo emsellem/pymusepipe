@@ -38,7 +38,7 @@ from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe
 from pymusepipe.config_pipe import default_filter_list, default_PHANGS_filter_list, dic_combined_folders
-from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask
+from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask, dic_listObject
 from pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -934,7 +934,7 @@ class MusePointings(SofPipe, PipeRecipes):
             self._sofdict['OFFSET_LIST'] = [joinpath(self.folder_offset_table,
                                                      self.offset_table_name)]
 
-        pixtable_name = musepipe.dic_listObject[expotype]
+        pixtable_name = dic_listObject[expotype]
         self._sofdict[pixtable_name] = []
         for pointing in list_pointings:
             self._sofdict[pixtable_name] += self.dic_pixtabs_in_pointings[pointing]

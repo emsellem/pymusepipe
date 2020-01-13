@@ -46,7 +46,7 @@ def is_sequence(arg):
 import pymusepipe.util_pipe as upipe
 from pymusepipe.config_pipe import mjd_names, date_names, tpl_names
 from pymusepipe.config_pipe import pointing_names, iexpo_names
-from pymusepipe.config_pipe import default_offset_table
+from pymusepipe.config_pipe import default_offset_table, dic_listObject
 
 # ================== Default units ======================== #
 # Define useful units
@@ -510,7 +510,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     angle_orig_keyword = "{0} ORIG".format(angle_keyword)
 
     pixtable_basename = kwargs.pop("pixtable_basename",
-                                   musepipe.dic_listObject['OBJECT'])
+                                   dic_listObject['OBJECT'])
     name_pixtable = "{0}_{1}-{2:02d}.fits".format(pixtable_basename,
                                                   name_suffix, np.int(nifu))
     fullname_pixtable = joinpath(folder, name_pixtable)
