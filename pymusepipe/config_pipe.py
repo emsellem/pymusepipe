@@ -67,8 +67,9 @@ listexpo_files = {
 
 exclude_list_checkmode = ['BIAS', 'DARK']
 
-# Suffix for the pre-alignment files. Will be part of the output names
+# Suffix for the pre/post-alignment files. Will be part of the output names
 suffix_prealign = "_prealign"
+suffix_checkalign = "_checkalign"
 
 # List of suffix you wish to have scanned
 suffix_rawfiles = ['fits.fz']

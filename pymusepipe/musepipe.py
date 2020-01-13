@@ -59,7 +59,8 @@ from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.recipes_pipe import PipeRecipes
 from pymusepipe.prep_recipes_pipe import PipePrep
 import pymusepipe.util_pipe as upipe
-from pymusepipe.config_pipe import (suffix_rawfiles,suffix_prealign,
+from pymusepipe.config_pipe import (
+        suffix_rawfiles,suffix_prealign,suffix_checkalign,
         listexpo_files,dic_listObject,dic_listMaster,dic_listMasterObject,
         listexpo_types,dic_geo_astrowcs_table)
 
