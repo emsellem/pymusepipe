@@ -567,6 +567,8 @@ class MusePipeSample(object):
         if len(list_pointings) == 0:
             return
 
+        if folder_offset_table is None:
+            folder_offset_table = self.pipes[targetname][list_pointings[0]].paths.alignment
         offset_table = Table.read(joinpath(folder_offset_table, offset_table_name))
         offset_table.sort(["POINTING_OBS", "IEXPO_OBS"])
         # Loop on the pointings
