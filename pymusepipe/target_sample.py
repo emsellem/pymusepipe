@@ -545,7 +545,7 @@ class MusePipeSample(object):
                 self.pipes[targetname][pointing].run_recipes()
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
-    def rotate_pixtables_target(self, targetname=None, list_pointings="all",
+    def rotate_pixtables_target(self, targetname=None, list_pointings=None,
                      offset_table_name=None, fakemode=False, **kwargs):
         """Rotate all pixel table of a certain targetname and pointings
         """

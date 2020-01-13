@@ -256,7 +256,7 @@ dic_geo_astrowcs_table = {
 mjd_names = {'table': "MJD_OBS", 'image': "MJD-OBS"}
 date_names = {'table': "DATE_OBS", 'image': "DATE-OBS"}
 tpl_names = {'table': "TPL_START", 'image': "HIERARCH ESO TPL START"}
-iexpo_names = {'table': "EXPO_OBS", 'image': "MUSEPIPE_IEXPO"}
+iexpo_names = {'table': "IEXPO_OBS", 'image': "MUSEPIPE_IEXPO"}
 pointing_names = {'table': "POINTING_OBS", 'image': "MUSEPIPE_POINTING"}
 
 default_offset_table = {'date': [date_names['table'], 'S23', ""],
