@@ -730,6 +730,49 @@ class PipePrep(SofPipe) :
                     **extra_kwargs)
 
     @print_my_function_name
+    def run_check_align(self, offset_table_name, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
+            line=None, suffix="", folder_offset_table=None, **extra_kwargs):
+        """Launch the scipost command to get individual exposures in a narrow
+        band filter to check if the alignments are ok (after rotation 
+        and using a given offset_table)
+        """
+        # First selecting the files via the grouped table
+        object_table = self._get_table_expo("OBJECT", "processed")
+
+        # Filter used for the alignment
+        filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        if self.verbose:
+            upipe.print_info("Filter for alignment is {0}".format(
+                filter_for_alignment), pipe=self)
+
+        # Getting the band corresponding to the line
+        lambda_window = extra_kwargs.pop("lambda_window", 10.0)
+        [lmin, lmax] = upipe.get_emissionline_band(line=line, 
+                                                   velocity=self.vsystemic, 
+                                                   lambda_window=lambda_window)
+
+        # Tag the suffix with the prealign suffix
+        suffix = "{0}{1}".format(suffix, self._suffix_checkalign)
+
+        if line is not None: 
+            suffix = "{0}_{1}".format(suffix, line)
+
+        # Processing individual exposures to get the full cube and image
+        for i in range(len(object_table)):
+            iexpo = np.int(object_table['iexpo'][i])
+            mytpl = object_table['tpls'][i]
+            if tpl != "ALL" and tpl != mytpl :
+                continue
+            # Running scipost now on the individual exposure
+            self.run_scipost(sof_filename=sof_filename, expotype=expotype,
+                    tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
+                    lambdaminmax=[lmin, lmax], save='cube', 
+                    offset_list=True, filter_list=filter_for_alignment,
+                    offset_table_name=offset_table_table,
+                    folder_offset_table=folder_offset_table,
+                    **extra_kwargs)
+
+    @print_my_function_name
     def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT", 
                             tpl="ALL", stage="processed", 
                             suffix="", offset_list=False, **kwargs):

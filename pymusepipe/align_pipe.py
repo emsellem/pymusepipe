@@ -533,11 +533,11 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
         mypix.flush()
 
     # Reading the result and printing
-    print("=== {} ===".format(name_pixtable), end="")
+    print("=== {} === ".format(name_pixtable), end="")
     if not angle_orig_keyword in hd:
         print("Present Angle [No Change] (deg): {}".format(hd[angle_keyword]))
     else:
-        print("Orig / New / Rotation Angle (deg): {0} / {1} / {2}".format(
+        print("Orig / New / Rotation Angle (deg): {0:8.4f} / {1:8.4f} / {2:8.4f}".format(
                          hd[angle_orig_keyword],
                          hd[angle_keyword],
                          np.float(hd[angle_keyword]) - hd[angle_orig_keyword]))
