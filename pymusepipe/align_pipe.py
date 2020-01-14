@@ -1247,6 +1247,7 @@ class AlignMusePointing(object):
             minimum flux to be used in the cross-correlation
             Flux below that value will be set to 0.
         """
+        upipe.print_info("Starting the cross-correlation for all images")
         if list_nima is None:
             list_nima = range(self.nimages)
 

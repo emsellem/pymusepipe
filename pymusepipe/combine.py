@@ -304,6 +304,7 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info("The Log file will be {0}".format(log_filename))
         self.log_filename = log_filename
         self.suffix = suffix
+        folder_offset_table = kwargs.pop("folder_offset_table", self.paths.alignment)
 
         # End of parameter settings #########################
 
@@ -363,7 +364,6 @@ class MusePointings(SofPipe, PipeRecipes):
         self._check_pointings(dic_exposures_in_pointings)
 
         # Checking input offset table and corresponding pixtables
-        folder_offset_table = kwargs.pop("folder_offset_table", self.paths.alignment)
         self._check_offset_table(offset_table_name, folder_offset_table)
         # END CHECK UP ============================================
 
