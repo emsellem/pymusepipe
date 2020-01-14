@@ -790,6 +790,12 @@ class AlignMusePointing(object):
         """
         # Implement the guess
         self.firstguess = firstguess
+        if firstguess is None:
+            upipe.print_info("No initial guess shift: all set to 0")
+            self.init_off_arcsec = self.cross_off_arcsec * 0.0
+            self.init_off_pixel = self.cross_off_pixel * 0.0
+            return
+
         if firstguess not in ["crosscorr", "fits"]:
             firstguess = "crosscorr"
             upipe.print_warning("Keyword 'firstguess' not recognised")
