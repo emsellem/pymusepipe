@@ -511,7 +511,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
 
     pixtable_basename = kwargs.pop("pixtable_basename",
                                    dic_listObject['OBJECT'])
-    name_pixtable = "{0}_{1}-{2:02d}.fits".format(pixtable_basename,
+    name_pixtable = "{0}_{1}-{2:03d}.fits".format(pixtable_basename,
                                                   name_suffix, np.int(nifu))
     fullname_pixtable = joinpath(folder, name_pixtable)
     fakemode = kwargs.pop("fakemode", False)
@@ -759,7 +759,7 @@ class AlignMusePointing(object):
         print("Normalisation factors")
         print("Image # : InitFluxScale     SlopeFit       NormFactor       Background")
         for nima in range(self.nimages):
-            print("Image {0:02d}:  {1:10.6e}   {2:10.6e}     {3:10.6e}     {4:10.6e}".format(
+            print("Image {0:03d}:  {1:10.6e}   {2:10.6e}     {3:10.6e}     {4:10.6e}".format(
                     nima,
                     self.init_flux_scale[nima], 
                     self.ima_polypar[nima].beta[1],
@@ -773,7 +773,7 @@ class AlignMusePointing(object):
         print("Normalisation factors")
         print("Image # : BackGround        Slope")
         for nima in self.nimages:
-            print("Image {0:02d}:  {1:10.6e}   {2:10.6e}".format(
+            print("Image {0:03d}:  {1:10.6e}   {2:10.6e}".format(
                     nima,
                     self.ima_polypar[nima].beta[0], 
                     self.ima_polypar[nima].beta[1]))
@@ -920,8 +920,8 @@ class AlignMusePointing(object):
         upipe.print_info("Offset recorded in OFFSET_LIST Table")
         upipe.print_info("Total in ARCSEC")
         for nima in range(self.nimages):
-            upipe.print_info("Image {0}: {1:8.4f} {2:8.4f}".format(
-                    nima,
+            upipe.print_info("Image {0:03d} - {1}".format(nima, self.list_muse_images[nima]))
+            upipe.print_info("          - {0:8.4f} {1:8.4f}".format(
                     fits_table['RA_OFFSET'][nima]*3600 \
                             * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                     fits_table['DEC_OFFSET'][nima]*3600.))
@@ -932,13 +932,14 @@ class AlignMusePointing(object):
         upipe.print_info("#---- Offset recorded so far ----#")
         upipe.print_info("Total in ARCSEC")
         for nima in range(self.nimages):
-            upipe.print_info("    Image {0:02d}: {1:8.4f} {2:8.4f}".format(
-                    nima, self.total_off_arcsec[nima][0],
+            upipe.print_info("Image {0:03d} - {1}".format(nima, self.list_muse_images[nima]))
+            upipe.print_info("              {0:8.4f} {1:8.4f}".format(
+                    self.total_off_arcsec[nima][0],
                     self.total_off_arcsec[nima][1]))
         upipe.print_info("Total in PIXEL")
         for nima in range(self.nimages):
-            upipe.print_info("    Image {0:02d}: {1:8.4f} {2:8.4f}".format(
-                    nima, self.total_off_pixel[nima][0],
+            upipe.print_info("              {0:8.4f} {1:8.4f}".format(
+                    self.total_off_pixel[nima][0],
                     self.total_off_pixel[nima][1]))
 
     def save_fits_offset_table(self, name_output_table=None, 
@@ -1163,9 +1164,9 @@ class AlignMusePointing(object):
     def _open_muse_nhdu(self):
         """Open the MUSE images hdu
         """
-        self.list_name_musehdr = ["{0}{1:02d}.hdr".format(
+        self.list_name_musehdr = ["{0}{1:03d}.hdr".format(
                 self.name_musehdr, i+1) for i in range(self.nimages)]
-        self.list_name_offmusehdr = ["{0}{1:02d}.hdr".format(
+        self.list_name_offmusehdr = ["{0}{1:03d}.hdr".format(
                 self.name_offmusehdr, i+1) for i in range(self.nimages)]
         self.list_hdulist_muse = [pyfits.open(
                 self.folder_muse_images + self.list_muse_images[i]) 
@@ -1473,14 +1474,15 @@ class AlignMusePointing(object):
 
         # Shift the HDU in X and Y
         if self.verbose:
-            print("Image {0:03d} - Shifting CRPIX1 by {1:8.4f} pixels "
-                  "/ {2:8.4f} arcsec".format(nima, 
+            print("Image {0:03d} - {1}".format(nima, self.list_muse_images[nima]))
+            print("Shifting CRPIX1 by {0:8.4f} pixels "
+                  "/ {1:8.4f} arcsec".format(
                       self.total_off_pixel[nima][0], 
                       self.total_off_arcsec[nima][0]))
         newhdr['CRPIX1'] = newhdr['CRPIX1'] + self.total_off_pixel[nima][0]
         if self.verbose:
-            print("Image {0:03d} - Shifting CRPIX2 by {1:8.4f} pixels "
-                  "/ {2:8.4f} arcsec".format(nima, 
+            print("         CRPIX2 by {0:8.4f} pixels "
+                  "/ {1:8.4f} arcsec".format(
                       self.total_off_pixel[nima][1], 
                       self.total_off_arcsec[nima][1]))
         newhdr['CRPIX2'] = newhdr['CRPIX2'] + self.total_off_pixel[nima][1]
@@ -1713,7 +1715,7 @@ class AlignMusePointing(object):
             h2,_ = crefset.legend_elements()
             ax.legend([h1[0], h2[0]], ['MUSE', 'REF'])
             if nima is not None:
-                plt.title("Image #{0:02d}".format(nima))
+                plt.title("Image #{0:03d}".format(nima))
 
             self.list_figures.append(current_fig)
             current_fig += 1
