@@ -304,7 +304,7 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info("The Log file will be {0}".format(log_filename))
         self.log_filename = log_filename
         self.suffix = suffix
-        folder_offset_table = kwargs.pop("folder_offset_table", self.paths.alignment)
+        folder_offset_table = kwargs.pop("folder_offset_table", None)
 
         # End of parameter settings #########################
 
