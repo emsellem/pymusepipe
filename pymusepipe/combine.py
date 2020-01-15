@@ -905,8 +905,8 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_all = self._add_targetname(prefix_all)
 
         if "offset_table_name" in kwargs:
-            offset_table_name = kwargs.get("offset_table_name", None)
-            folder_offset_table = kwargs.get("folder_offset_table", self.folder_offset_table)
+            offset_table_name = kwargs.pop("offset_table_name", None)
+            folder_offset_table = kwargs.pop("folder_offset_table", self.folder_offset_table)
             self._check_offset_table(offset_table_name, folder_offset_table)
 
         # Go to the data folder
