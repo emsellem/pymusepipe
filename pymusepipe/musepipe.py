@@ -278,22 +278,6 @@ class MusePipe(PipePrep, PipeRecipes):
             self._raw_table_initialised = False
         self.read_all_astro_tables()
 
-    def _add_targetname(self, name):
-        """Add targetname to input name and return it
-        
-        Input
-        -----
-        name: str
-
-        Returns
-        -------
-        new name including targetname
-        """
-        if self.add_targetname:
-            return "{0}_{1}".format(self.targetname, name)
-        else:
-            return name
-
     def _init_geoastro_dates(self):
         """Initialise the dictionary for the geo and astrometry files
         Transforms the dates into datetimes

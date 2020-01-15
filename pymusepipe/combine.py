@@ -374,6 +374,22 @@ class MusePointings(SofPipe, PipeRecipes):
         # Going back to initial working directory
         self.goto_origfolder()
 
+    def _add_targetname(self, name):
+        """Add targetname to input name and return it
+        
+        Input
+        -----
+        name: str
+
+        Returns
+        -------
+        new name including targetname
+        """
+        if self.add_targetname:
+            return "{0}_{1}".format(self.targetname, name)
+        else:
+            return name
+
     def run_all_single_combine_withmasks(self, combine=True, masks=True, individual=True,
             **kwargs):
         """Run all combine recipes including WCS and masks
