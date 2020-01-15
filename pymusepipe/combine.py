@@ -902,7 +902,6 @@ class MusePointings(SofPipe, PipeRecipes):
         self.add_targetname = kwargs.pop("add_targetname", True)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         prefix_all = kwargs.pop("prefix_all", "")
-        prefix_all = self._add_targetname(prefix_all)
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.pop("offset_table_name", None)
