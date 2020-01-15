@@ -826,9 +826,14 @@ class MusePointings(SofPipe, PipeRecipes):
             Add the name of the target to the name of the output
             WCS reference cube. Default is True.
         """
+        # Adding targetname in names or not
+        add_targetname = kwargs.pop("add_targetname", True)
+
         if name_cube is None:
             # getting the name of the final datacube (mosaic)
             cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            if add_targetname:
+                cube_suffix = "{0}_{1}".format(self.targetname, cube_suffix)
             name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
 
         # test if cube exists
@@ -841,7 +846,6 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Creating the new cube
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
-        add_targetname = kwargs.pop("add_targetname", True)
         if add_targetname:
             prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
         upipe.print_info("Now creating the Reference WCS cube using prefix '{0}'".format(
