@@ -392,10 +392,11 @@ class MusePointings(SofPipe, PipeRecipes):
             self.run_combine()
 
         if masks:
-            upipe.print_info("Running the WCS and Masks routine")
             # Creating the full mosaic WCS first
+            upipe.print_info("Start creating the global WCS and Masks")
             self.create_combined_wcs()
             # Then creating the mask WCS for each pointing
+            upipe.print_info("Start creating the individual WCS Masks")
             self.create_all_pointings_mask_wcs(**kwargs)
 
         if individual:
