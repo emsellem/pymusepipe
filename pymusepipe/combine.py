@@ -706,9 +706,9 @@ class MusePointings(SofPipe, PipeRecipes):
                 upipe.print_warning("wcs_from_mosaic is set to True. "
                                     "Hence will overwrite ref_wcs given input")
             prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
-            add_targetname = kwargs.pop("add_targetname", True)
-            if add_targetname:
-                prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
+            self.add_targetname = kwargs.pop("add_targetname", True)
+            prefix_wcs = self._add_targetname(prefix_wcs)
+
             ref_wcs = "{0}P{1:02d}.fits".format(prefix_wcs,
                                                 np.int(pointing))
 
@@ -753,21 +753,19 @@ class MusePointings(SofPipe, PipeRecipes):
         """
 
         # Adding target name as prefix or not
-        add_targetname = kwargs.pop("add_targetname", True)
+        self.add_targetname = kwargs.pop("add_targetname", True)
         prefix_mask = kwargs.pop("prefix_mask", default_prefix_mask)
+        prefix_mask = self._add_targetname(prefix_mask)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
 
         # Running combine with the ref WCS with only 2 spectral pixels
         self.run_combine_single_pointing(pointing=pointing,
                                          filter_list=filter_list,
                                          sof_filename="pointing_mask",
-                                         add_targetname=True,
+                                         add_targetname=self.add_targetname,
                                          prefix_all=prefix_mask,
                                          wcs_auto=True, **kwargs)
 
-        if add_targetname:
-            prefix_mask = "{0}_{1}".format(self.targetname, prefix_mask)
-            prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
 
         # Now creating the mask with 0's and 1's
         dir_mask = upipe.normpath(self.paths.cubes)
@@ -827,13 +825,12 @@ class MusePointings(SofPipe, PipeRecipes):
             WCS reference cube. Default is True.
         """
         # Adding targetname in names or not
-        add_targetname = kwargs.pop("add_targetname", True)
+        self.add_targetname = kwargs.pop("add_targetname", True)
 
         if name_cube is None:
             # getting the name of the final datacube (mosaic)
             cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
-            if add_targetname:
-                cube_suffix = "{0}_{1}".format(self.targetname, cube_suffix)
+            cube_suffix = self._add_targetname(cube_suffix)
             name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
 
         # test if cube exists
@@ -846,8 +843,6 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Creating the new cube
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
-        if add_targetname:
-            prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
         upipe.print_info("Now creating the Reference WCS cube using prefix '{0}'".format(
             prefix_wcs))
         cfolder, cname = refcube.create_onespectral_cube(prefix=prefix_wcs, **kwargs)
@@ -888,12 +883,10 @@ class MusePointings(SofPipe, PipeRecipes):
         expotype = kwargs.pop("expotype", 'REDUCED')
 
         # Adding target name as prefix or not
-        add_targetname = kwargs.pop("add_targetname", True)
+        self.add_targetname = kwargs.pop("add_targetname", True)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         prefix_all = kwargs.pop("prefix_all", "")
-        if add_targetname:
-            prefix_wcs = "{0}_{1}".format(self.targetname, prefix_wcs)
-            prefix_all = "{0}_{1}".format(self.targetname, prefix_all)
+        prefix_all = self._add_targetname(prefix_all)
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.get("offset_table_name", None)
@@ -929,6 +922,7 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_warning("wcs_auto is True, hence overwriting ref_wcs name")
             # getting the name of the final datacube (mosaic)
             cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            cube_suffix = self._add_targetname(cube_suffix)
             ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
             upipe.print_warning("ref_wcs used is {0}".format(ref_wcs))
 
