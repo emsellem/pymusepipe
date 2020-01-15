@@ -243,7 +243,6 @@ class MusePointings(SofPipe, PipeRecipes):
     def __init__(self, targetname=None, list_pointings=None,
                  dic_exposures_in_pointings=None,
                  suffix_fixed_pixtables="tmask",
-                 use_fixed_pixtables=False,
                  folder_config="",
                  rc_filename=None, cal_filename=None,
                  combined_folder_name="Combined", suffix="",
@@ -329,7 +328,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self._dic_combined_folders = dic_combined_folders
 
         # Including or not the fixed Pixtables in place of the original ones
-        self.use_fixed_pixtables = use_fixed_pixtables
+        self.use_fixed_pixtables = kwargs.pop("use_fixed_pixtables", False)
         self.suffix_fixed_pixtables = suffix_fixed_pixtables
 
         # Now the list of pointings
@@ -894,6 +893,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Filters
         filter_list = kwargs.pop("filter_list", self.filter_list)
+        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
 
         # Expotype
         expotype = kwargs.pop("expotype", 'REDUCED')
@@ -981,8 +981,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                       suffix_prefinalnames=suffix_prefinalnames,
                                       prefix_products=prefix_products,
                                       save=save, suffix=suffix, filter_list=filter_list,
-                                      lambdamin=lambdamin, lambdamax=lambdamax,
-                                      **kwargs)
+                                      lambdamin=lambdamin, lambdamax=lambdamax)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)

@@ -292,10 +292,9 @@ class PipeRecipes(object) :
             suffix_products=[""], suffix_prefinalnames=[""], 
             save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white',
-            lambdamin=4000., lambdamax=10000., **kwargs):
+            lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for one single pointing
         """
-        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         self.run_oscommand("{esorex}  --log-file=exp_combine_cube_{expotype}_{tpl}.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                "--format={form} --filter={filt} "
