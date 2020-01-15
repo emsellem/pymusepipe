@@ -297,6 +297,10 @@ class MusePointings(SofPipe, PipeRecipes):
         self.combined_folder_name = combined_folder_name
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
+        # Including or not the fixed Pixtables in place of the original ones
+        self.use_fixed_pixtables = kwargs.pop("use_fixed_pixtables", False)
+        self.suffix_fixed_pixtables = suffix_fixed_pixtables
+
         # Setting other default attributes
         if log_filename is None:
             log_filename = "log_{timestamp}.txt".format(timestamp=upipe.create_time_name())
@@ -327,9 +331,6 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
 
-        # Including or not the fixed Pixtables in place of the original ones
-        self.use_fixed_pixtables = kwargs.pop("use_fixed_pixtables", False)
-        self.suffix_fixed_pixtables = suffix_fixed_pixtables
 
         # Now the list of pointings
         if (list_pointings is None) or (list_pointings.lower() == "all"):
