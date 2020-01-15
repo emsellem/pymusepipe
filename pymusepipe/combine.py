@@ -894,7 +894,6 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Filters
         filter_list = kwargs.pop("filter_list", self.filter_list)
-        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
 
         # Expotype
         expotype = kwargs.pop("expotype", 'REDUCED')
