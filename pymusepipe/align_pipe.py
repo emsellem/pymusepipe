@@ -667,7 +667,7 @@ class AlignMusePointing(object):
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
         self.name_refhdr = kwargs.pop("name_refhdr", "reference.hdr")
         self.suffix_images = kwargs.pop("suffix_muse_images", "IMAGE_FOV")
-        self.name_filter = kwargs.pop("name_filter", "WFI_ESO844")
+        self.name_filter = kwargs.pop("name_filter", "WFI_BB")
 
         # Use polynorm or not
         self.use_polynorm = kwargs.pop("use_polynorm", True)

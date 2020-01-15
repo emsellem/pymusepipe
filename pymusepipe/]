@@ -374,8 +374,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Going back to initial working directory
         self.goto_origfolder()
 
-    def run_all_single_combine_withmasks(self, combine=True, masks=True, individual=True,
-            **kwargs):
+    def run_all_combine_recipes(self, combine=True, masks=True, individual=True):
         """Run all combine recipes including WCS and masks
 
         combine: bool [True]
@@ -401,7 +400,7 @@ class MusePointings(SofPipe, PipeRecipes):
         if individual:
             upipe.print_info("Running the Individual Pointing combine")
             # Then merging each single pointing using the masks
-            self.run_combine_all_single_pointings(**kwargs)
+            self.run_combine_all_single_pointings()
 
     def _check_pointings(self, dic_exposures_in_pointings=None):
         """Check if pointings and dictionary are compatible
@@ -807,28 +806,24 @@ class MusePointings(SofPipe, PipeRecipes):
             joinpath(dir_mask, finalname_wcs)))
         subhdu.writeto(joinpath(dir_mask, finalname_wcs), overwrite=True)
 
-    def create_combined_wcs(self, name_cube=None, **kwargs):
+    def create_combined_wcs(self, **kwargs):
         """Create the reference WCS from the full mosaic.
 
         Input
         -----
-        name_cube: str
-            Name of the cube. Can be None, and then the final
-            datacube from the combine folder will be used.
         wave1: float - optional
             Wavelength taken for the extraction. Should only
             be present in all spaxels you wish to get.
         prefix_wcs: str - optional
             Prefix to be added to the name of the input cube.
             By default, will use "refwcs".
-        add_targetname: bool [True]
+        add_targetname: bool
             Add the name of the target to the name of the output
             WCS reference cube. Default is True.
         """
-        if name_cube is None:
-            # getting the name of the final datacube (mosaic)
-            cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
-            name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
+        # getting the name of the final datacube (mosaic)
+        cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+        name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
 
         # test if cube exists
         if not os.path.isfile(name_cube):
@@ -892,7 +887,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.get("offset_table_name", None)
-            folder_offset_table = kwargs.get("folder_offset_table", self.folder_offset_table)
+            folder_offset_table = kwargs.get("offset_table_name", self.folder_offset_table)
             self._check_offset_table(offset_table_name, folder_offset_table)
 
         # Go to the data folder
