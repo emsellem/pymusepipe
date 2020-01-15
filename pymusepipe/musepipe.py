@@ -289,7 +289,7 @@ class MusePipe(PipePrep, PipeRecipes):
         -------
         new name including targetname
         """
-        if if self.add_targetname:
+        if self.add_targetname:
             return "{0}_{1}".format(self.targetname, name)
         else:
             return name
