@@ -62,7 +62,7 @@ import pymusepipe.util_pipe as upipe
 from pymusepipe.config_pipe import (
         suffix_rawfiles,suffix_prealign,suffix_checkalign,
         listexpo_files,dic_listObject,dic_listMaster,dic_listMasterObject,
-        listexpo_types,dic_geo_astrowcs_table)
+        listexpo_types,dic_geo_astrowcs_table, exclude_list_checkmode)
 
 __version__ = '2.0.2 (25/09/2019)'
 #       Cleaning and adding comments
