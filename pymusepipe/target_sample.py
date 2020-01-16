@@ -526,6 +526,11 @@ class MusePipeSample(object):
         upipe.print_info("---- Starting the Data Reduction for Target={0} ----".format(
                             targetname))
 
+        kwargs_recipe = {}
+        for key, default in zip(['fraction', 'skymethod', 'illum'], [0.8, "model", True]):
+            item = kwargs.pop(key, default)
+            kwargs_recipe[key] = default
+
         # Initialise the pipe if needed
         if not self.pipes[targetname]._initialised  \
             or "first_recipe" in kwargs or "last_recipe" in kwargs:
@@ -535,7 +540,6 @@ class MusePipeSample(object):
         list_pointings = self._check_pointings(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
-
         # Loop on the pointings
         for pointing in list_pointings:
             upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
@@ -543,9 +547,9 @@ class MusePipeSample(object):
             if not self.pipes[targetname][pointing]._raw_table_initialised:
                 self.pipes[targetname][pointing].init_raw_table(overwrite=True)
             if self.__phangs:
-                self.pipes[targetname][pointing].run_phangs_recipes()
+                self.pipes[targetname][pointing].run_phangs_recipes(**kwargs_recipe)
             else:
-                self.pipes[targetname][pointing].run_recipes()
+                self.pipes[targetname][pointing].run_recipes()**kwargs_recipe
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
@@ -566,6 +570,11 @@ class MusePipeSample(object):
         upipe.print_info("---- Starting the Data Reduction for Target={0} ----".format(
                             targetname))
 
+        kwargs_recipe = {}
+        for key, default in zip(['fraction', 'skymethod', 'illum'], [0.8, "model", True]):
+            item = kwargs.pop(key, default)
+            kwargs_recipe[key] = default
+
         # Initialise the pipe if needed
         if not self.pipes[targetname]._initialised  \
             or "first_recipe" in kwargs or "last_recipe" in kwargs:
@@ -583,9 +592,9 @@ class MusePipeSample(object):
             if not self.pipes[targetname][pointing]._raw_table_initialised:
                 self.pipes[targetname][pointing].init_raw_table(overwrite=True)
             if self.__phangs:
-                self.pipes[targetname][pointing].run_phangs_recipes()
+                self.pipes[targetname][pointing].run_phangs_recipes(**kwargs_recipe)
             else:
-                self.pipes[targetname][pointing].run_recipes()
+                self.pipes[targetname][pointing].run_recipes(**kwargs_recipe)
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def rotate_pixtables_target(self, targetname=None, list_pointings=None,
