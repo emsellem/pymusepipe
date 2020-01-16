@@ -39,7 +39,7 @@ import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe
 from pymusepipe.config_pipe import default_filter_list, default_PHANGS_filter_list, dic_combined_folders
 from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask, dic_listObject
-from pymusepipe.config_pipe import lambdaminmax_for_wcs, lambdaminmax_for_mosaic,
+from pymusepipe.config_pipe import lambdaminmax_for_wcs, lambdaminmax_for_mosaic
 from pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
