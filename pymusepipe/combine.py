@@ -773,6 +773,7 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_mask = kwargs.pop("prefix_mask", default_prefix_mask)
         prefix_mask = self._add_targetname(prefix_mask)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+        prefix_wcs = self._add_targetname(prefix_wcs)
 
         # Running combine with the ref WCS with only 2 spectral pixels
         self.run_combine_single_pointing(pointing=pointing,
