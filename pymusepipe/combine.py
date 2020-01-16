@@ -771,9 +771,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Adding target name as prefix or not
         self.add_targetname = kwargs.pop("add_targetname", True)
         prefix_mask = kwargs.pop("prefix_mask", default_prefix_mask)
-        prefix_mask = self._add_targetname(prefix_mask)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
-        prefix_wcs = self._add_targetname(prefix_wcs)
 
         # Running combine with the ref WCS with only 2 spectral pixels
         self.run_combine_single_pointing(pointing=pointing,
@@ -783,9 +781,13 @@ class MusePointings(SofPipe, PipeRecipes):
                                          prefix_all=prefix_mask,
                                          wcs_auto=True, **kwargs)
 
-
         # Now creating the mask with 0's and 1's
         dir_mask = upipe.normpath(self.paths.cubes)
+
+        # Adding targetname for the final names
+        prefix_mask = self._add_targetname(prefix_mask)
+        prefix_wcs = self._add_targetname(prefix_wcs)
+
         name_mask = "{0}IMAGE_FOV_P{1:02d}_white.fits".format(
             prefix_mask, np.int(pointing))
         finalname_mask = "{0}P{1:02d}.fits".format(prefix_mask,
@@ -903,6 +905,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.add_targetname = kwargs.pop("add_targetname", True)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         prefix_all = kwargs.pop("prefix_all", "")
+        prefix_all = self._add_targetname(prefix_all)
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.pop("offset_table_name", None)
