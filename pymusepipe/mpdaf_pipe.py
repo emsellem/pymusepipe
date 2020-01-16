@@ -170,7 +170,7 @@ class MuseCube(Cube):
         return cube_folder, outcube_name
 
     def create_reference_cube(self, lambdamin=4700, lambdamax=9400, 
-            step=1.25, outcube_name=None, filter_nan=False, **kwargs): 
+            step=1.25, outcube_name=None, filter_for_nan=False, **kwargs): 
         """Create a reference cube using an input one, and overiding
         the lambda part, to get a new WCS
         
@@ -195,7 +195,7 @@ class MuseCube(Cube):
         npix_spec = np.int(range_lambda // step + 1.0)
 
         # if filter_nan remove the Nan
-        if filter_nan:
+        if filter_for_nan:
             d = self.data
             ind = np.indices(d[0].shape)
             selgood = ~np.isnan(d[0])

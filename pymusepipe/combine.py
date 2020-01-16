@@ -806,7 +806,8 @@ class MusePointings(SofPipe, PipeRecipes):
                          "for pointing {0}".format(np.int(pointing)))
         cfolder, cname = mask_cube.create_reference_cube(
                 lambdamin=lambdaminmax_mosaic[0],
-                lambdamax=lambdaminmax_mosaic[1], prefix=prefix_wcs, 
+                lambdamax=lambdaminmax_mosaic[1], 
+                filter_for_nan=True, prefix=prefix_wcs, 
                 outcube_name=finalname_wcs, **kwargs)
 
         # Now transforming this into a bona fide 1 extension WCS file
