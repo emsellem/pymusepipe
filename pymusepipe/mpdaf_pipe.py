@@ -170,7 +170,7 @@ class MuseCube(Cube):
         return cube_folder, outcube_name
 
     def create_reference_cube(self, lambdamin=4700, lambdamax=9400, 
-            step=1.25, outcube_name=None, **kwargs): 
+            step=1.25, outcube_name=None, filter_nan=False, **kwargs): 
         """Create a reference cube using an input one, and overiding
         the lambda part, to get a new WCS
         
@@ -194,9 +194,19 @@ class MuseCube(Cube):
         range_lambda = lambdamax - lambdamin
         npix_spec = np.int(range_lambda // step + 1.0)
 
+        # if filter_nan remove the Nan
+        if filter_nan:
+            d = self.data
+            ind = np.indices(d[0].shape)
+            selgood = ~np.isnan(d[0])
+            subcube = self[:,np.min(ind[0][selgood]): np.max(ind[0][selgood]),
+                               np.min(ind[1][selgood]): np.max(ind[1][selgood])]
+        else:
+            subcube = self
+
         # Create the WCS which we need for the output cube
-        wcs_header = self.get_wcs_header()
-        wcs1 = self.wcs
+        wcs_header = subcube.get_wcs_header()
+        wcs1 = subcube.wcs
         wave1 = WaveCoord(cdelt=step, crval=lambdamin, 
                 ctype=wcs_header['CTYPE3'], crpix=1.0, shape=npix_spec)
         # Create a fake dataset with int to be faster

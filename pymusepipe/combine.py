@@ -796,13 +796,14 @@ class MusePointings(SofPipe, PipeRecipes):
                                                    np.int(pointing))
         finalname_wcs = "{0}P{1:02d}.fits".format(prefix_wcs,
                                                   np.int(pointing))
-        # Opening the cube via MuseCube
-        refcube = MuseCube(filename=name_mask)
+
+        # First create a subcube without all the Nan
+        mask_cube = MuseCube(joinpath(dir_mask, name_mask))
 
         # Creating the new cube
         upipe.print_info("Now creating the Reference WCS cube "
                          "for pointing {0}".format(np.int(pointing)))
-        cfolder, cname = refcube.create_reference_cube(lambdamin=lambdamin,
+        cfolder, cname = mask_cube.create_reference_cube(lambdamin=lambdamin,
                 lambdamax=lambdamax, prefix=prefix_wcs, 
                 outcube_name=finalname_wcs, **kwargs)
 
