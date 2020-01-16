@@ -799,7 +799,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                                   np.int(pointing))
 
         # First create a subcube without all the Nan
-        mask_cube = MuseCube(joinpath(dir_mask, name_mask))
+        mask_cube = MuseCube(filename=joinpath(dir_mask, name_mask))
 
         # Creating the new cube
         upipe.print_info("Now creating the Reference WCS cube "
@@ -898,8 +898,9 @@ class MusePointings(SofPipe, PipeRecipes):
         hdu.writeto(full_cname, overwrite=True)
         upipe.print_info("...Done")
 
-    def create_combined_wcs(self, name_cube=None, lambdamin=4700.0, 
-            lambdamax=9400.0, **kwargs):
+    def create_combined_wcs(self, name_cube=None, 
+            lambdaminmax_wcs=lambdaminmax_for_wcs,
+            **kwargs):
         """Create the reference WCS from the full mosaic
         with a given range of lambda.
 
@@ -939,8 +940,8 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         upipe.print_info("Now creating the Reference WCS cube using prefix '{0}'".format(
             prefix_wcs))
-        cfolder, cname = refcube.create_reference_cube(lambdamin=lambdamin,
-                lambdamax=lambdamax, prefix=prefix_wcs, **kwargs)
+        cfolder, cname = refcube.create_reference_cube(lambdamin=lambdaminmax_wcs[0],
+                lambdamax=lambdaminmax_wcs[1], prefix=prefix_wcs, **kwargs)
 
         # Now transforming this into a bona fide 1 extension WCS file
         full_cname = joinpath(cfolder, cname)
