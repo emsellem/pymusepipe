@@ -169,6 +169,44 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
+    def create_reference_cube(self, lambdamin=4700, lambdamax=9400, 
+            step=1.25, **kwargs): 
+        """Create a reference cube using an input one, and overiding
+        the lambda part, to get a new WCS
+        
+        Input
+        -----
+        lambdamin:
+        lambdamax:
+        step:
+        """
+
+        # Separate folder and name of file
+        cube_folder, cube_name = os.path.split(self.filename)
+
+        # Creating the outcube filename
+        if outcube_name is None:
+            prefix = kwargs.pop("prefix", "l{0:4d}l{1:4d}_".format(
+                np.int(lambdamin), np.int(lambdamax)))
+            outcube_name = "{0}{1}".format(prefix, cube_name)
+
+        # Range of lambd and number of spectral pixels
+        range_lambda = lambdamax - lambdamin
+        npix_spec = np.int(range_lambda // step + 1.0)
+
+        # Create the WCS which we need for the output cube
+        wcs_header = self.get_wcs_header()
+        wcs1 = self.wcs
+        wave1 = WaveCoord(cdelt=step, crval=lambdamin, 
+                ctype=wcs_header['CTYPE3'], crpix=1.0, shape=npix_spec)
+        # Create a fake dataset with int to be faster
+        cube_data = np.ones((npix_spec, wcs1.naxis2, wcs1.naxis1), type=np.int)
+        cube = Cube(data=cube_data, wcs=wcs1, wave=wave1)
+        # Write the output
+        cube.write(joinpath(cube_folder, outcube_name))
+        # just provide the output name by folder+name
+        return cube_folder, outcube_name
+
     def get_set_spectra(self) :
         """Get a set of standard spectra from the Cube
         """
