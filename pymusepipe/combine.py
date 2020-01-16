@@ -39,6 +39,7 @@ import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe
 from pymusepipe.config_pipe import default_filter_list, default_PHANGS_filter_list, dic_combined_folders
 from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask, dic_listObject
+from pymusepipe.config_pipe import lambdaminmax_for_wcs, lambdaminmax_for_mosaic,
 from pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -756,7 +757,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                           **kwargs)
 
     def create_pointing_mask_wcs(self, pointing, 
-            lambdamin=4700, lambdamax=9400, 
+            lambdaminmax_mosaic=lambdaminmax_for_mosaic,
             filter_list="white", **kwargs):
         """Create the mask of a given pointing
         And also a WCS file which can then be used to compute individual pointings
@@ -803,8 +804,9 @@ class MusePointings(SofPipe, PipeRecipes):
         # Creating the new cube
         upipe.print_info("Now creating the Reference WCS cube "
                          "for pointing {0}".format(np.int(pointing)))
-        cfolder, cname = mask_cube.create_reference_cube(lambdamin=lambdamin,
-                lambdamax=lambdamax, prefix=prefix_wcs, 
+        cfolder, cname = mask_cube.create_reference_cube(
+                lambdamin=lambdaminmax_mosaic[0],
+                lambdamax=lambdaminmax_mosaic[1], prefix=prefix_wcs, 
                 outcube_name=finalname_wcs, **kwargs)
 
         # Now transforming this into a bona fide 1 extension WCS file
