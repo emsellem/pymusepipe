@@ -133,7 +133,7 @@ class MuseCube(Cube):
         return MuseImage(source=self[central_lambda - lambda_halfwindow: 
             central_lambda + lambda_halfwindow + 1, :, :].sum(axis=0))
 
-    def create_onespectral_cube(self, wave1=default_wave_wcs, outcube_name=None, **kwargs) :
+    def extract_onespectral_cube(self, wave1=default_wave_wcs, outcube_name=None, **kwargs) :
         """Create a single pixel cube extracted from this one
 
         Input
@@ -169,7 +169,7 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
-    def create_reference_cube(self, lambdamin=4700, lambdamax=9400, 
+    def create_newreference_cube(self, lambdamin=4700, lambdamax=9400, 
             step=1.25, **kwargs): 
         """Create a reference cube using an input one, and overiding
         the lambda part, to get a new WCS

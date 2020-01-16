@@ -825,8 +825,9 @@ class MusePointings(SofPipe, PipeRecipes):
             joinpath(dir_mask, finalname_wcs)))
         subhdu.writeto(joinpath(dir_mask, finalname_wcs), overwrite=True)
 
-    def create_combined_wcs(self, name_cube=None, **kwargs):
-        """Create the reference WCS from the full mosaic.
+    def extract_combined_narrow_wcs(self, name_cube=None, **kwargs):
+        """Create the reference WCS from the full mosaic with
+        only 2 lambdas
 
         Input
         -----
@@ -864,7 +865,59 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         upipe.print_info("Now creating the Reference WCS cube using prefix '{0}'".format(
             prefix_wcs))
-        cfolder, cname = refcube.create_onespectral_cube(prefix=prefix_wcs, **kwargs)
+        cfolder, cname = refcube.extract_onespectral_cube(prefix=prefix_wcs, **kwargs)
+
+        # Now transforming this into a bona fide 1 extension WCS file
+        full_cname = joinpath(cfolder, cname)
+        d = pyfits.getdata(full_cname, ext=1)
+        h = pyfits.getheader(full_cname, ext=1)
+        hdu = pyfits.PrimaryHDU(data=d, header=h)
+        hdu.writeto(full_cname, overwrite=True)
+        upipe.print_info("...Done")
+
+    def create_combined_wcs(self, name_cube=None, lambdamin=4700.0, 
+            lambdamax=9400.0, **kwargs):
+        """Create the reference WCS from the full mosaic
+        with a given range of lambda.
+
+        Input
+        -----
+        name_cube: str
+            Name of the cube. Can be None, and then the final
+            datacube from the combine folder will be used.
+        wave1: float - optional
+            Wavelength taken for the extraction. Should only
+            be present in all spaxels you wish to get.
+        prefix_wcs: str - optional
+            Prefix to be added to the name of the input cube.
+            By default, will use "refwcs".
+        add_targetname: bool [True]
+            Add the name of the target to the name of the output
+            WCS reference cube. Default is True.
+        """
+        # Adding targetname in names or not
+        self.add_targetname = kwargs.pop("add_targetname", True)
+
+        if name_cube is None:
+            # getting the name of the final datacube (mosaic)
+            cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            cube_suffix = self._add_targetname(cube_suffix)
+            name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
+
+        # test if cube exists
+        if not os.path.isfile(name_cube):
+            upipe.print_error("File {0} does not exist. Aborting.".format(
+                name_cube))
+
+        # Opening the cube via MuseCube
+        refcube = MuseCube(filename=name_cube)
+
+        # Creating the new cube
+        prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+        upipe.print_info("Now creating the Reference WCS cube using prefix '{0}'".format(
+            prefix_wcs))
+        cfolder, cname = refcube.create_reference_cube(lambdamin=lambdamin,
+                lambdamax=lambdamax, prefix=prefix_wcs, **kwargs)
 
         # Now transforming this into a bona fide 1 extension WCS file
         full_cname = joinpath(cfolder, cname)
