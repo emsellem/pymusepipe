@@ -755,7 +755,9 @@ class MusePointings(SofPipe, PipeRecipes):
                                           filter_list=filter_list,
                                           **kwargs)
 
-    def create_pointing_mask_wcs(self, pointing, filter_list="white", **kwargs):
+    def create_pointing_mask_wcs(self, pointing, 
+            lambdamin=4700, lambdamax=9400, 
+            filter_list="white", **kwargs):
         """Create the mask of a given pointing
         And also a WCS file which can then be used to compute individual pointings
         with a fixed WCS.
@@ -788,42 +790,59 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_mask = self._add_targetname(prefix_mask)
         prefix_wcs = self._add_targetname(prefix_wcs)
 
-        name_mask = "{0}IMAGE_FOV_P{1:02d}_white.fits".format(
+        name_mask = "{0}DATACUBE_FINAL_P{1:02d}.fits".format(
             prefix_mask, np.int(pointing))
         finalname_mask = "{0}P{1:02d}.fits".format(prefix_mask,
                                                    np.int(pointing))
         finalname_wcs = "{0}P{1:02d}.fits".format(prefix_wcs,
                                                   np.int(pointing))
+        # Opening the cube via MuseCube
+        refcube = MuseCube(filename=name_mask)
 
-        # Opening the data and header
-        d = pyfits.getdata(joinpath(dir_mask, name_mask))
-        h = pyfits.getheader(joinpath(dir_mask, name_mask), extname='DATA')
+        # Creating the new cube
+        upipe.print_info("Now creating the Reference WCS cube "
+                         "for pointing {0}".format(np.int(pointing)))
+        cfolder, cname = refcube.create_reference_cube(lambdamin=lambdamin,
+                lambdamax=lambdamax, prefix=prefix_wcs, 
+                outcube_name=finalname_wcs, **kwargs)
 
-        # Changing to 0's and 1's
-        d_int = np.zeros_like(d, dtype=np.int)
-        d_int[np.isnan(d)] = np.int(0)
-        d_int[~np.isnan(d)] = np.int(1)
+        # Now transforming this into a bona fide 1 extension WCS file
+        full_cname = joinpath(cfolder, cname)
+        d = pyfits.getdata(full_cname, ext=1)
+        h = pyfits.getheader(full_cname, ext=1)
+        hdu = pyfits.PrimaryHDU(data=d, header=h)
+        hdu.writeto(full_cname, overwrite=True)
+        upipe.print_info("...Done")
 
-        # Writing it out in the final mask 
-        upipe.print_info("Writing the output mask {0}".format(
-            joinpath(dir_mask, finalname_mask)))
-        hdu = pyfits.PrimaryHDU(data=d_int, header=h)
-        hdu.writeto(joinpath(dir_mask, finalname_mask), overwrite=True)
-
-        # Now also creating a version of this without the full mosaic
-        # To be used as WCS for that pointing
-        ind = np.indices(d_int.shape)
-        sel_1 = (d_int > 0)
-        subd_int = d[np.min(ind[0][sel_1]): np.max(ind[0][sel_1]),
-                   np.min(ind[1][sel_1]): np.max(ind[1][sel_1])]
-        h['CRPIX1'] -= np.min(ind[1][sel_1])
-        h['CRPIX2'] -= np.min(ind[0][sel_1])
-        subhdu = pyfits.PrimaryHDU(data=subd_int, header=h)
-
-        # Writing the output to get a wcs reference for this pointing
-        upipe.print_info("Writing the output mask {0}".format(
-            joinpath(dir_mask, finalname_wcs)))
-        subhdu.writeto(joinpath(dir_mask, finalname_wcs), overwrite=True)
+#         # Opening the data and header
+#         d = pyfits.getdata(joinpath(dir_mask, name_mask))
+#         h = pyfits.getheader(joinpath(dir_mask, name_mask), extname='DATA')
+# 
+#         # Changing to 0's and 1's
+#         d_int = np.zeros_like(d, dtype=np.int)
+#         d_int[np.isnan(d)] = np.int(0)
+#         d_int[~np.isnan(d)] = np.int(1)
+# 
+#         # Writing it out in the final mask 
+#         upipe.print_info("Writing the output mask {0}".format(
+#             joinpath(dir_mask, finalname_mask)))
+#         hdu = pyfits.PrimaryHDU(data=d_int, header=h)
+#         hdu.writeto(joinpath(dir_mask, finalname_mask), overwrite=True)
+# 
+#         # Now also creating a version of this without the full mosaic
+#         # To be used as WCS for that pointing
+#         ind = np.indices(d_int.shape)
+#         sel_1 = (d_int > 0)
+#         subd_int = d[np.min(ind[0][sel_1]): np.max(ind[0][sel_1]),
+#                    np.min(ind[1][sel_1]): np.max(ind[1][sel_1])]
+#         h['CRPIX1'] -= np.min(ind[1][sel_1])
+#         h['CRPIX2'] -= np.min(ind[0][sel_1])
+#         subhdu = pyfits.PrimaryHDU(data=subd_int, header=h)
+# 
+#         # Writing the output to get a wcs reference for this pointing
+#         upipe.print_info("Writing the output mask {0}".format(
+#             joinpath(dir_mask, finalname_wcs)))
+#         subhdu.writeto(joinpath(dir_mask, finalname_wcs), overwrite=True)
 
     def extract_combined_narrow_wcs(self, name_cube=None, **kwargs):
         """Create the reference WCS from the full mosaic with

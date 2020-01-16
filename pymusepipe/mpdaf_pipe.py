@@ -200,10 +200,11 @@ class MuseCube(Cube):
         wave1 = WaveCoord(cdelt=step, crval=lambdamin, 
                 ctype=wcs_header['CTYPE3'], crpix=1.0, shape=npix_spec)
         # Create a fake dataset with int to be faster
-        cube_data = np.ones((npix_spec, wcs1.naxis2, wcs1.naxis1), dtype=np.int)
+        cube_data = np.ones((npix_spec, wcs1.naxis2, wcs1.naxis1), dtype=np.uint8)
         cube = Cube(data=cube_data, wcs=wcs1, wave=wave1)
         # Write the output
         cube.write(joinpath(cube_folder, outcube_name))
+
         # just provide the output name by folder+name
         return cube_folder, outcube_name
 
