@@ -169,7 +169,7 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
-    def create_newreference_cube(self, lambdamin=4700, lambdamax=9400, 
+    def create_reference_cube(self, lambdamin=4700, lambdamax=9400, 
             step=1.25, **kwargs): 
         """Create a reference cube using an input one, and overiding
         the lambda part, to get a new WCS
