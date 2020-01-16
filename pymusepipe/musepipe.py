@@ -665,6 +665,10 @@ class MusePipe(PipePrep, PipeRecipes):
         If the attribute does not exist in Tables, it tries to read
         the table from the folder
         """
+        if len(group_table['mjd'] < 1) :
+            # Printing an error message and sending back a -1 for index
+            upipe.print_error("Group table is empty - Aborting")
+            return -1, None
         # Get the closest tpl
         index = np.argmin((mjdin - group_table['mjd'])**2)
         closest_tpl = group_table[index]['tpls']

@@ -891,6 +891,11 @@ class PipePrep(SofPipe) :
         # Finding the best tpl for this sky calib file type
         expo_table = self._get_table_expo(expotype, stage)
         index, this_tpl = self._select_closest_mjd(mjd_expo, expo_table) 
+        if index < 0:
+            upipe.print_info("[_normalise_skycontinum/scipost] Failed to find an "
+                             "exposure in the table - Aborting")
+            return
+
         dir_calib = self._get_fullpath_expo(expotype, stage)
 
         # Adding the expo number of the SKY continuum
