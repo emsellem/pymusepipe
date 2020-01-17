@@ -87,6 +87,8 @@ class SofPipe(object) :
         if reset: self._sofdict.clear()
         # Finding the best tpl for this master
         index, this_tpl = self._select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
+        if self._debug:
+            upipe.print_debug("Index = {0}, Tpl = {1}".format(index, this_tpl))
         if index >= 0:
             dir_master = self._get_fullpath_expo(expotype)
             self._sofdict[get_suffix_product(expotype)] = [upipe.normpath(joinpath(dir_master, 

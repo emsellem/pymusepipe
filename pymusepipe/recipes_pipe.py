@@ -32,7 +32,7 @@ class PipeRecipes(object) :
     """PipeRecipes class containing all the esorex recipes for MUSE data reduction
     """
     def __init__(self, nifu=-1, first_cpu=0, ncpu=24, list_cpu=[], likwid=default_likwid,
-            fakemode=True, domerge=True, nocache=False, nochecksum=True) :
+            fakemode=False, domerge=True, nocache=False, nochecksum=True) :
         """Initialisation of PipeRecipes
         """
         # Fake mode
@@ -104,6 +104,9 @@ class PipeRecipes(object) :
         """Running an os.system shell command
         Fake mode will just spit out the command but not actually do it.
         """
+        if self.fakemode:
+            upipe.print_warning("Running in Fakemode - Only printing/logging the command")
+
         if self.verbose : 
             print(command)
     

@@ -280,7 +280,7 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         # Verbose option
         self.verbose = verbose
-        self.debug = debug
+        self._debug = debug
 
         # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')
@@ -491,7 +491,7 @@ class MusePointings(SofPipe, PipeRecipes):
                         for expo in nexpo:
                             # Check whether this exists in the our cube list
                             suffix_expo = "_{0:04d}".format(np.int(expo))
-                            if self.debug:
+                            if self._debug:
                                 upipe.print_debug("Checking which exposures are tested")
                                 upipe.print_debug(suffix_expo)
                             for pixtab in list_pixtabs:
