@@ -523,8 +523,8 @@ class MusePipeSample(object):
             indicated in the dictonary will be reduced)
         """
         # General print out
-        upipe.print_info("---- Starting the Data Reduction for Target={0} ----".format(
-                            targetname))
+        upipe.print_info("---- Starting the Recipe {0} for Target={1} ----".format(
+                            recipe_name, targetname))
 
         kwargs_recipe = {}
         for key, default in zip(['fraction', 'skymethod', 'illum'], [0.8, "model", True]):
@@ -532,9 +532,8 @@ class MusePipeSample(object):
             kwargs_recipe[key] = default
 
         # Initialise the pipe if needed
-        if not self.pipes[targetname]._initialised  \
-            or "first_recipe" in kwargs or "last_recipe" in kwargs:
-            self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
+        self.set_pipe_target(targetname=targetname, list_pointings=list_pointings,
+                first_recipe=recipe_name, last_recipe=recipe_name, **kwargs)
 
         # Check if pointings are valid
         list_pointings = self._check_pointings(targetname, list_pointings)
