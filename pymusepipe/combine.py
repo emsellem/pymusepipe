@@ -281,7 +281,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Verbose option
         self.verbose = verbose
         self._debug = debug
-        if self_debug:
+        if self._debug:
             upipe.print_info("In DEBUG Mode [more printing]")
 
         # Warnings for astropy
