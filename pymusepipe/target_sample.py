@@ -405,7 +405,7 @@ class MusePipeSample(object):
         # Loop on the pointings
         for pointing in list_pointings:
             upipe.print_info("Initialise Pipe for Target = {0:10s} / Pointing {1:02d} ".format(
-                                 targetname, pointing), end="")
+                                 targetname, pointing))
             # New log file name with pointing included
             log_filename_pointing = "{0}_P{1:02d}{2}".format(
                                     log_filename, pointing, log_fileext)

@@ -157,7 +157,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self.verbose = verbose
         self._debug = kwargs.pop("debug", False)
         if self._debug:
-            upipe.print_info("In DEBUG Mode [more printing]")
+            upipe.print_warning("In DEBUG Mode [more printing]")
 
         self._suffix_prealign = kwargs.pop("suffix_prealign", suffix_prealign)
         self._suffix_checkalign = kwargs.pop("suffix_checkalign", suffix_checkalign)
@@ -667,7 +667,7 @@ class MusePipe(PipePrep, PipeRecipes):
         If the attribute does not exist in Tables, it tries to read
         the table from the folder
         """
-        if len(group_table['mjd'] < 1) :
+        if len(group_table['mjd']) < 1 :
             # Printing an error message and sending back a -1 for index
             upipe.print_error("[musepipe/_select_closest_mjd] Group table is empty - Aborting")
             return -1, None
