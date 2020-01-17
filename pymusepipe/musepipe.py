@@ -669,7 +669,7 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         if len(group_table['mjd'] < 1) :
             # Printing an error message and sending back a -1 for index
-            upipe.print_error("Group table is empty - Aborting")
+            upipe.print_error("[musepipe/_select_closest_mjd] Group table is empty - Aborting")
             return -1, None
         # Get the closest tpl
         index = np.argmin((mjdin - group_table['mjd'])**2)

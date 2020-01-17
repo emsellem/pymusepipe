@@ -404,7 +404,7 @@ class MusePipeSample(object):
 
         # Loop on the pointings
         for pointing in list_pointings:
-            print("Initialise Pipe for Target = {0:10s} / Pointing {1:02d} ".format(
+            upipe.print_info("Initialise Pipe for Target = {0:10s} / Pointing {1:02d} ".format(
                                  targetname, pointing), end="")
             # New log file name with pointing included
             log_filename_pointing = "{0}_P{1:02d}{2}".format(
@@ -429,9 +429,9 @@ class MusePipeSample(object):
             self.pipes[targetname][pointing].history = python_command
             # Setting back verbose to True to make sure we have a full account
             self.pipes[targetname][pointing].verbose = True
-            print("... Done")
             upipe.print_info(python_command, pipe=self)
 
+        upipe.print_info("End of Pipe initialisation")
         self.pipes[targetname]._initialised = True
 
     def  _get_path_data(self, targetname, pointing):

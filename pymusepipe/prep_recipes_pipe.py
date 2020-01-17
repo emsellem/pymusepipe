@@ -270,9 +270,10 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='BIAS', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No BIAS recovered from the astropy Table - Aborting",
+                upipe.print_error("[run_bias] No BIAS recovered from the astropy Table - Aborting",
                         pipe=self)
-                return
+            return
+
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
 
@@ -316,9 +317,9 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='FLAT', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No FLAT recovered from the astropy Table - Aborting",
+                upipe.print_error("[run_flat] No FLAT recovered from the astropy Table - Aborting",
                         pipe=self)
-                return
+            return
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -368,9 +369,9 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No WAVE recovered from the astropy file Table - Aborting", 
+                upipe.print_error("[run_wave] No WAVE recovered from the astropy file Table - Aborting", 
                         pipe=self)
-                return
+            return
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -418,9 +419,9 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No WAVE recovered from the astropy file Table - Aborting", 
+                upipe.print_error("[run_lsf] No WAVE recovered from the astropy file Table - Aborting", 
                         pipe=self)
-                return
+            return
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -468,9 +469,9 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype='TWILIGHT', tpl=tpl)
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No TWILIGHT recovered from the astropy file Table - Aborting", 
+                upipe.print_error("[run_twilight] No TWILIGHT recovered from the astropy file Table - Aborting", 
                         pipe=self)
-                return
+            return
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -528,9 +529,9 @@ class PipePrep(SofPipe) :
         tpl_gtable = self.select_tpl_files(expotype=expotype, tpl=tpl, stage="raw")
         if len(tpl_gtable) == 0:
             if self.verbose :
-                upipe.print_warning("No {0} recovered from the astropy file Table - Aborting".format(expotype), 
+                upipe.print_error("[run_scibasic] No {0} recovered from the astropy file Table - Aborting".format(expotype), 
                         pipe=self)
-                return
+            return
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -591,9 +592,9 @@ class PipePrep(SofPipe) :
         std_table = self.select_tpl_files("STD", tpl=tpl, stage="processed")
         if len(std_table) == 0:
             if self.verbose :
-                upipe.print_warning("No processed STD recovered from the astropy file Table - Aborting",
+                upipe.print_error("[run_standard] No processed STD recovered from the astropy file Table - Aborting",
                         pipe=self)
-                return
+            return
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -636,9 +637,9 @@ class PipePrep(SofPipe) :
         sky_table = self._get_table_expo("SKY", "processed")
         if len(sky_table) == 0:
             if self.verbose :
-                upipe.print_warning("No SKY recovered from the astropy file Table - Aborting",
+                upipe.print_warning("[run_sky] No SKY recovered from the astropy file Table - Aborting",
                         pipe=self)
-                return
+            return
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -877,7 +878,7 @@ class PipePrep(SofPipe) :
         if len(group_table) == 0:
             found_expo = False
             if self.verbose :
-                upipe.print_warning("No {0} recovered from the {1} astropy file "
+                upipe.print_warning("[prep_recipes/_select_list_expo] No {0} recovered from the {1} astropy file "
                     "Table - Aborting".format(expotype, stage), pipe=self)
 
         return found_expo, list_expo, group_list_expo, group_table
@@ -892,7 +893,7 @@ class PipePrep(SofPipe) :
         expo_table = self._get_table_expo(expotype, stage)
         index, this_tpl = self._select_closest_mjd(mjd_expo, expo_table) 
         if index < 0:
-            upipe.print_info("[_normalise_skycontinum/scipost] Failed to find an "
+            upipe.print_info("[prep_recipes/_normalise_skycontinum/scipost] Failed to find an "
                              "exposure in the table - Aborting")
             return
 

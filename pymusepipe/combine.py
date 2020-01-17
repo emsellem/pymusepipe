@@ -880,8 +880,9 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # test if cube exists
         if not os.path.isfile(name_cube):
-            upipe.print_error("File {0} does not exist. Aborting.".format(
-                name_cube))
+            upipe.print_error("[combine/extract_combined_narrow_wcs] File {0} "
+                              "does not exist. Aborting.".format(name_cube))
+            return
 
         # Opening the cube via MuseCube
         refcube = MuseCube(filename=name_cube)
@@ -932,8 +933,9 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # test if cube exists
         if not os.path.isfile(name_cube):
-            upipe.print_error("File {0} does not exist. Aborting.".format(
-                name_cube))
+            upipe.print_error("[combine/create_combined_wcs] File {0} does not exist "
+                              "- Aborting.".format(name_cube))
+            return
 
         # Opening the cube via MuseCube
         refcube = MuseCube(filename=name_cube)

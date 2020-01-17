@@ -279,15 +279,14 @@ class MuseCube(Cube):
                 if filter_name in dic_extra_filters.keys():
                     filter_file = dic_extra_filters[filter_name]
                 else:
-                    upipe.print_error("Filter name not in private dictionary"
-                            "[get_filter_image in mpdaf_pipe]")
-                    upipe.print_error("Aborting")
+                    upipe.print_error("[mpdaf_pipe / get_filter_image] "
+                                      "Filter name not in private dictionary - Aborting")
                     return
             else:
                 if own_filter_file is None:
-                    upipe.print_error("No extra filter dictionary and...")
-                    upipe.print_error("the private filter file is not set")
-                    upipe.print_error("Aborting")
+                    upipe.print_error("[mpdaf_pipe / get_filter_image] "
+                                      "No extra filter dictionary and "
+                                      "the private filter file is not set - Aborting")
                     return
                 else:
                     filter_file = own_filter_file
@@ -399,8 +398,9 @@ class MuseSkyContinuum(object):
             Default is False.
         """
         if prefix == "":
-            upipe.print_error("The new and old sky continuum fits files will share")
-            upipe.print_error("the same name. This is not recommended. Aborting")
+            upipe.print_error("[mpdaf_pipe / save_normalised] The new and old sky "
+                              "continuum fits files will share the same name")
+            upipe.print_error("This is not recommended - Aborting")
             return
     
         folder_spec, filename = os.path.split(self.filename)
