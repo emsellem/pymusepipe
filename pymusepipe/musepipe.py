@@ -156,6 +156,8 @@ class MusePipe(PipePrep, PipeRecipes):
         # Verbose option
         self.verbose = verbose
         self._debug = kwargs.pop("debug", False)
+        if self_debug:
+            upipe.print_info("In DEBUG Mode [more printing]")
 
         self._suffix_prealign = kwargs.pop("suffix_prealign", suffix_prealign)
         self._suffix_checkalign = kwargs.pop("suffix_checkalign", suffix_checkalign)

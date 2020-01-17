@@ -641,6 +641,8 @@ class AlignMusePointing(object):
 
         # Debug option
         self._debug = kwargs.pop("debug", False)
+        if self_debug:
+            upipe.print_info("In DEBUG Mode [more printing]")
 
         # Check if folder reference exists
         if not os.path.isdir(self.folder_reference):
