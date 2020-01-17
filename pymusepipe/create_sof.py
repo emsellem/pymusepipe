@@ -92,7 +92,7 @@ class SofPipe(object) :
             self._sofdict[get_suffix_product(expotype)] = [upipe.normpath(joinpath(dir_master, 
                 get_suffix_product(expotype) + "_" + this_tpl + ".fits"))]
         else:
-            upipe.print_error("Failed to find a master exposure of type {}"
+            upipe.print_error("Failed to find a master exposure of type {} "
                               "in this table".format(expotype))
 
     def _add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):

@@ -548,7 +548,7 @@ class MusePipeSample(object):
             if self.__phangs:
                 self.pipes[targetname][pointing].run_phangs_recipes(**kwargs_recipe)
             else:
-                self.pipes[targetname][pointing].run_recipes()**kwargs_recipe
+                self.pipes[targetname][pointing].run_recipes(**kwargs_recipe)
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
