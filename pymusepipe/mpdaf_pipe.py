@@ -109,6 +109,7 @@ class MuseCube(Cube):
             Cube.__init__(self, **kwargs)
  
         self.verbose = verbose
+        self._debug = kwargs.pop("debug", False)
 
     def get_spectrum_from_cube(self, nx=None, ny=None, pixel_window=0, title="Spectrum") :
         """Get a spectrum from the cube with centre defined in pixels
