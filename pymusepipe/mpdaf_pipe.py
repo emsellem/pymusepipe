@@ -200,6 +200,9 @@ class MuseCube(Cube):
             d = self.data
             ind = np.indices(d[0].shape)
             selgood = ~np.isnan(d[0])
+            upipe.print_debug("Xmin={0} Xmax={1} / Ymin={2} Ymax={3}".format(
+                              np.min(ind[0][selgood]), np.max(ind[0][selgood]),
+                              np.min(ind[1][selgood]), np.max(ind[1][selgood])))
             if self._debug:
                 upipe.print_debug("Xmin={0} Xmax={1} / Ymin={2} Ymax={3}".format(
                                   np.min(ind[0][selgood]), np.max(ind[0][selgood]),
