@@ -779,11 +779,13 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
 
         # Running combine with the ref WCS with only 2 spectral pixels
+        # Limit the maximum lambda to the wcs ones
         self.run_combine_single_pointing(pointing=pointing,
                                          filter_list=filter_list,
                                          sof_filename="pointing_mask",
                                          add_targetname=self.add_targetname,
                                          prefix_all=prefix_mask,
+                                         lambdaminmax=lambdaminmax_for_wcs,
                                          wcs_auto=True, **kwargs)
 
         # Now creating the mask with 0's and 1's

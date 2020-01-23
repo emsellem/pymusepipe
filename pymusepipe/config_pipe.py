@@ -279,7 +279,7 @@ default_wave_wcs = 6500.0
 default_prefix_mask = "mask_"
 
 AO_mask_lambda = [5800, 5970]
-lambdaminmax_for_wcs = [6800, 6803]
+lambdaminmax_for_wcs = [6800, 6805]
 lambdaminmax_for_mosaic = [4700, 9400]
 
 #===========================================
