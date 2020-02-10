@@ -393,7 +393,7 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             return name
 
-    def run_all_single_combine_withmasks(self, combine=True, masks=True, individual=True,
+    def run_combine_all_single_pointings_withmasks(self, combine=True, masks=True, individual=True,
             **kwargs):
         """Run all combine recipes including WCS and masks
 

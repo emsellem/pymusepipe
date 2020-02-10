@@ -145,7 +145,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         Other possible entries
         ----------------------
-        overwrite_astropy_table: bool [False]
+        overwrite_astropy_table: bool [True]
             Overwrite the astropy table even when it exists.
         warnings: str ['ignore']
             If set to 'ignore', will ignore the Astropy Warnings.
@@ -168,7 +168,7 @@ class MusePipe(PipePrep, PipeRecipes):
            warnings.simplefilter('ignore', category=AstropyWarning)
 
         # Overwriting option for the astropy table
-        self._overwrite_astropy_table = kwargs.pop("overwrite_astropy_table", False)
+        self._overwrite_astropy_table = kwargs.pop("overwrite_astropy_table", True)
         # Updating the astropy table
         self._update_astropy_table = kwargs.pop("update_astropy_table", False)
 

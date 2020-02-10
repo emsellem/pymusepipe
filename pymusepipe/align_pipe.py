@@ -574,6 +574,11 @@ class AlignMusePointing(object):
             Folder name for the input images to compare
         name_muse_images: str or list
             List of names for the MUSE images (or str if only 1 image)
+        suffix_muse_images: str
+            Suffix to be used for muse image names 
+            if only a subset should be selected.
+        name_filter: str
+            Name of filter to consider when filtering the muse image names
         firstguess: str
             If "crosscorr", will use cross-correlation to guess
             the alignment offsets.
@@ -1585,6 +1590,7 @@ class AlignMusePointing(object):
             normalise=True, median_filter=True, 
             ncuts=5, percentage=5.,
             rotation=0.0,
+            samecontour=True,
             threshold_muse=None):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
@@ -1696,29 +1702,31 @@ class AlignMusePointing(object):
         if showcontours:
             np.seterr(divide = 'ignore', invalid='ignore') 
             fig, ax = open_new_wcs_figure(current_fig, plotwcs)
+
+            # Defining the levels for MUSE
             if levels is not None:
-                mylevels = levels
-                samecontour = True
+                levels_muse = levels
             else :
-                # First contours - MUSE
                 levels_muse = np.linspace(np.log10(lowlevel_muse),
-                        np.log10(highlevel_muse), nlevels)
+                                          np.log10(highlevel_muse), 
+                                          nlevels)
+            # Plot contours for MUSE
+            cmuseset = ax.contour(np.log10(musedata), 
+                                  levels_muse, colors='k', 
+                                  origin='lower', linestyles='solid')
+
+            # now define Ref levels if not samecontour
+            if samecontour: 
+                levels_ref = cmuseset.levels
+            else: 
                 levels_ref = np.linspace(np.log10(lowlevel_ref),
-                        np.log10(highlevel_ref), nlevels)
-                mylevels = levels_muse
-                samecontour = False
-            cmuseset = ax.contour(np.log10(musedata), mylevels, colors='k',
-                    origin='lower', linestyles='solid')
-            # Second contours - Ref
-            if samecontour:
-                crefset = ax.contour(np.log10(refdata), 
-                                     levels=cmuseset.levels, 
-                                     colors='r', origin='lower', 
-                                     alpha=0.5, linestyles='solid')
-            else :
-                crefset = ax.contour(np.log10(refdata), levels=levels_ref,
-                        colors='r', origin='lower', alpha=0.5,
-                        linestyles='solid')
+                                         np.log10(highlevel_ref), 
+                                         nlevels)
+            # Plot contours for Ref
+            crefset = ax.contour(np.log10(refdata), levels=levels_ref,
+                                 colors='r', origin='lower', alpha=0.5, 
+                                 linestyles='solid')
+
             ax.set_aspect('equal')
             h1,_ = cmuseset.legend_elements()
             h2,_ = crefset.legend_elements()
