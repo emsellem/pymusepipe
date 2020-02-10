@@ -1590,7 +1590,6 @@ class AlignMusePointing(object):
             normalise=True, median_filter=True, 
             ncuts=5, percentage=5.,
             rotation=0.0,
-            samecontour=True,
             threshold_muse=None):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
