@@ -1099,7 +1099,9 @@ class PipePrep(SofPipe) :
                                         "normalised according to the first exposure")
                 prefix_skycontinuum = self._normalise_skycontinuum(mjd_expo=mean_mjd, 
                         tpl_expo=tpl, iexpo=list_group_expo[0], 
-                        suffix=suffix_skycontinuum, offset_table_name=offset_table_name)
+                        suffix=suffix_skycontinuum, 
+                        folder_offset_table=folder_offset_table,
+                        offset_table_name=offset_table_name)
             else:
                 prefix_skycontinuum = ""
             if skymethod != "none" :
