@@ -929,6 +929,8 @@ class PipePrep(SofPipe) :
 
             if status < 0:
                 dic_err = {-1: "MJD", -2: "BACKGROUND"}
+                upipe.print_error("Table {0} - {1}".format(folder_offset_table,
+                                  offset_table_name))
                 upipe.print_error("Could not find {0} value in offset table".format(
                                     dic_err[status]))
                 upipe.print_warning("A background of 0 will be assumed, and")
