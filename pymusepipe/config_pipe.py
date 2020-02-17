@@ -108,9 +108,9 @@ dic_extra_filters = {
         # Narrow band filter 
         "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
         # Broad band filter
-        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt"
+        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt",
         # DuPont r filter
-	"DuPont_r":"Filter/LCO_SITe3_r.txt"
+	"DuPont_r": "Filter/LCO_SITe3_r.txt"
         }
 
 # Default hard-coded fits files - Calibration Tables
