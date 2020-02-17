@@ -19,7 +19,7 @@ import numpy as np
 default_filter_list = ("white,Johnson_B,Johnson_V,Cousins_R,"
                        "SDSS_g,SDSS_r,SDSS_i")
 default_PHANGS_filter_list = ("white,Johnson_B,Johnson_V,Cousins_R,"
-                       "SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB")
+                       "SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB,DuPont_r")
 
 #-- END ---------------------------------------------------------------#
 
@@ -99,7 +99,7 @@ dic_user_folders = {
 default_rc_filename = "~/.musepiperc"
 
 PHANGS_reduc_config = {'fakemode':False, 'nocache':False, 'checkmode':False, 
-                 'overwrite_astropy_table':True, 'filter_list':"white,WFI_BB", 
+                 'overwrite_astropy_table':True, 'filter_list':"white,WFI_BB,DuPont_r", 
                  'filter_for_alignment':"WFI_BB"}
 PHANGS_combine_config = {'fakemode':False, 'nocache':False}
 
@@ -109,6 +109,8 @@ dic_extra_filters = {
         "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
         # Broad band filter
         "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt"
+        # DuPont r filter
+	"DuPont_r":"Filter/LCO_SITe3_r.txt"
         }
 
 # Default hard-coded fits files - Calibration Tables

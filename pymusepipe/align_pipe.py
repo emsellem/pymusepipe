@@ -53,6 +53,9 @@ from pymusepipe.config_pipe import default_offset_table, dic_listObject
 default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
 default_reference_unit = u.microJansky
 
+dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
+                   "DuPont_r": u.spectral_density(6483.58 * u.AA)}
+
 # ================== Useful function ====================== #
 def create_offset_table(image_names=[], table_folder="", 
         table_name="dummy_offset_table.fits",
@@ -264,8 +267,7 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.]):
     result = ODR(mydata, linear, beta0=beta0)
     return result.run()
 
-def get_conversion_factor(input_unit, output_unit, 
-                          equivalencies=u.spectral_density(6483.58 * u.AA)):
+def get_conversion_factor(input_unit, output_unit, filter_name="WFI"):
     """ Conversion of units from an input one
     to an output one
      
@@ -284,6 +286,7 @@ def get_conversion_factor(input_unit, output_unit,
     conversion: astropy unit conversion
     """
 
+    equivalencies = dict_equivalencies[filter_name]
     # First testing if the quantities are Quantity
     # If not, transform them 
     if not isinstance(input_unit, u.quantity.Quantity):
@@ -577,7 +580,7 @@ class AlignMusePointing(object):
         suffix_muse_images: str
             Suffix to be used for muse image names 
             if only a subset should be selected.
-        name_filter: str
+        filter_name: str
             Name of filter to consider when filtering the muse image names
         firstguess: str
             If "crosscorr", will use cross-correlation to guess
@@ -674,7 +677,7 @@ class AlignMusePointing(object):
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
         self.name_refhdr = kwargs.pop("name_refhdr", "reference.hdr")
         self.suffix_images = kwargs.pop("suffix_muse_images", "IMAGE_FOV")
-        self.name_filter = kwargs.pop("name_filter", "WFI_BB")
+        self.filter_name = kwargs.pop("filter_name", "WFI_BB")
 
         # Use polynorm or not
         self.use_polynorm = kwargs.pop("use_polynorm", True)
@@ -685,7 +688,8 @@ class AlignMusePointing(object):
             self.ref_unit = kwargs.pop("ref_unit", default_reference_unit)
             self.muse_unit = kwargs.pop("muse_unit", default_muse_unit)
             self.conversion_factor = get_conversion_factor(self.ref_unit, 
-                                                           self.muse_unit)
+                                                           self.muse_unit,
+                                                           self.filter_name)
         else :
             self.conversion_factor = 1.0
 
@@ -1129,7 +1133,7 @@ class AlignMusePointing(object):
         if self.name_muse_images is None:
             set_of_paths = glob.glob("{0}{1}*{2}*".format(
                     self.folder_muse_images,
-                    self.suffix_images, self.name_filter))
+                    self.suffix_images, self.filter_name))
             self.list_muse_images = [Path(muse_path).name 
                                      for muse_path in set_of_paths]
             # Sort alphabetically

@@ -393,8 +393,8 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             return name
 
-    def run_combine_all_single_pointings_withmasks(self, combine=True, masks=True, individual=True,
-            **kwargs):
+    def run_combine_all_single_pointings_withmasks(self, combine=True, masks=True, 
+            individual=True, **kwargs):
         """Run all combine recipes including WCS and masks
 
         combine: bool [True]
@@ -406,9 +406,15 @@ class MusePointings(SofPipe, PipeRecipes):
         individual: bool [True]
             Will run individual pointings using the WCS.
         """
+        lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
         if combine:
             upipe.print_info("Running the mosaic combine")
-            self.run_combine()
+            if "offset_table_name" in kwargs:
+                offset_table_name = kwargs.get("offset_table_name")
+                folder_offset_table = kwargs.get("folder_offset_table", self.folder_offset_table)
+                self._check_offset_table(offset_table_name, folder_offset_table)
+            self.run_combine(lambdaminmax=lambdaminmax, offset_table_name=offset_table_name,
+                             folder_offset_table=folde_offset_table)
 
         if masks:
             # Creating the full mosaic WCS first
@@ -416,7 +422,8 @@ class MusePointings(SofPipe, PipeRecipes):
             self.create_combined_wcs()
             # Then creating the mask WCS for each pointing
             upipe.print_info("Start creating the individual WCS Masks")
-            self.create_all_pointings_mask_wcs(**kwargs)
+            self.create_all_pointings_mask_wcs(lambdaminmax_mosaic=lambdaminmax, 
+                                               **kwargs)
 
         if individual:
             upipe.print_info("Running the Individual Pointing combine")
