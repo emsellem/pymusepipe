@@ -414,7 +414,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 folder_offset_table = kwargs.get("folder_offset_table", self.folder_offset_table)
                 self._check_offset_table(offset_table_name, folder_offset_table)
             self.run_combine(lambdaminmax=lambdaminmax, offset_table_name=offset_table_name,
-                             folder_offset_table=folde_offset_table)
+                             folder_offset_table=folder_offset_table)
 
         if masks:
             # Creating the full mosaic WCS first
