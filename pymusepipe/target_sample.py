@@ -661,11 +661,13 @@ class MusePipeSample(object):
         self.pipes_combine[targetname].run_combine()
 
     def combine_target_pointings_withmasks(self, targetname=None, 
-            combine=True, masks=True, individual=True, **kwargs):
+            combine=True, masks=True, individual=True, mosaic_wcs=True, 
+            **kwargs):
         """Run the combine for individual exposures first building up
         a mask.
         """
         self.init_combine(targetname=targetname, **kwargs)
         self.pipes_combine[targetname].run_combine_all_single_pointings_withmasks(
-                combine=combine, masks=masks, individual=individual, **kwargs)
+                combine=combine, masks=masks, individual=individual, mosaic_wcs=mosaic_wsc,
+                **kwargs)
 
