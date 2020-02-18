@@ -38,8 +38,8 @@ from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe
 from pymusepipe.config_pipe import default_filter_list, default_PHANGS_filter_list, dic_combined_folders
-from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask, dic_listObject
-from pymusepipe.config_pipe import lambdaminmax_for_wcs, lambdaminmax_for_mosaic
+from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask, default_prefix_wcs_mosaic,
+from pymusepipe.config_pipe import dic_listObject, lambdaminmax_for_wcs, lambdaminmax_for_mosaic
 from pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -394,7 +394,7 @@ class MusePointings(SofPipe, PipeRecipes):
             return name
 
     def run_combine_all_single_pointings_withmasks(self, combine=True, masks=True, 
-            individual=True, **kwargs):
+            mosaic_wcs=True, individual=True, **kwargs):
         """Run all combine recipes including WCS and masks
 
         combine: bool [True]
@@ -418,13 +418,20 @@ class MusePointings(SofPipe, PipeRecipes):
 
         if masks:
             # Creating the full mosaic WCS first
-            upipe.print_info("Start creating the global WCS and Masks")
+            upipe.print_info("Start creating the narrow-lambda WCS and Masks")
             self.create_combined_wcs()
             # Then creating the mask WCS for each pointing
-            upipe.print_info("Start creating the individual WCS Masks")
+            upipe.print_info("Start creating the individual Pointings Masks")
             self.create_all_pointings_mask_wcs(lambdaminmax_mosaic=lambdaminmax, 
                                                **kwargs)
 
+        if mosaic_wcs:
+            # Creating a reference WCS for the Full Mosaic with the right 
+            # Spectral coverage
+            upipe.print_info("Start creating the full-lambda WCS")
+            self.create_combined_wcs(prefix_wcs=default_prefix_wcs_mosaic, 
+                                     lambdaminmax_wcs=lambdaminmax_for_mosaic)
+            
         if individual:
             upipe.print_info("Running the Individual Pointing combine")
             # Then merging each single pointing using the masks
