@@ -668,6 +668,6 @@ class MusePipeSample(object):
         """
         self.init_combine(targetname=targetname, **kwargs)
         self.pipes_combine[targetname].run_combine_all_single_pointings_withmasks(
-                combine=combine, masks=masks, individual=individual, mosaic_wcs=mosaic_wsc,
+                combine=combine, masks=masks, individual=individual, mosaic_wcs=mosaic_wcs,
                 **kwargs)
 
