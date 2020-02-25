@@ -390,7 +390,8 @@ class MusePipe(PipePrep, PipeRecipes):
             setattr(self.paths.Master, self._get_attr_expo(expotype), 
                     joinpath(self.paths.data, self._get_path_expo(expotype, "master")))
 
-        self._dic_paths = {"master": self.paths.Master, "processed": self.paths}
+            self._dic_paths = {"master": self.paths.Master, "processed": self.paths, 
+                               "raw": self.paths.rawfiles}
 
         # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
         for name in list(self.pipe_params._dic_folders_target.keys()):

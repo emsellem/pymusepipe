@@ -141,7 +141,7 @@ class SofPipe(object) :
         calibfile = getattr(self.pipe_params, calibtype.lower())
         return joinpath(self.pipe_params.musecalib, calibfile)    
 
-    def _add_geometry_to_sofdict(self, tpls):
+    def _add_geometry_to_sofdict(self, tpls, mean_mjd):
         """Extract the geometry table and add it to the dictionary
         for the SOF file
         """
@@ -149,12 +149,18 @@ class SofPipe(object) :
             calfolder = self.pipe_params.musecalib_time
             geofile = self.retrieve_geoastro_name(tpls, filetype='geo')
         else:
-            calfolder = self.pipe_params.musecalib
-            geofile = self.pipe_params.geo_table
+            expo_table = self._get_table_expo("GEOMETRY", "raw")
+            if len(expo_table) > 0:
+                index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
+                calfolder = self._get_fullpath_expo("GEOMETRY", "raw")
+                geofile = expo_table['filename'][index]
+            else:
+                calfolder = self.pipe_params.musecalib
+                geofile = self.pipe_params.geo_table
 
         self._sofdict['GEOMETRY_TABLE']=["{folder}{geo}".format(folder=calfolder, geo=geofile)]
 
-    def _add_astrometry_to_sofdict(self, tpls):
+    def _add_astrometry_to_sofdict(self, tpls, mean_mjd):
         """Extract the astrometry table and add it to the dictionary
         for the SOF file
         """
@@ -162,8 +168,14 @@ class SofPipe(object) :
             calfolder = self.pipe_params.musecalib_time
             astrofile = self.retrieve_geoastro_name(tpls, filetype='astro')
         else :
-            calfolder = self.pipe_params.musecalib
-            astrofile = self.pipe_params.astro_table
+            expo_table = self._get_table_expo("ASTROMETRY", "raw")
+            if len(expo_table) > 0:
+                index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
+                calfolder = self._get_fullpath_expo("ASTROMETRY", "raw")
+                geofile = expo_table['filename'][index]
+            else:
+                calfolder = self.pipe_params.musecalib
+                astrofile = self.pipe_params.astro_table
 
         self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]
 

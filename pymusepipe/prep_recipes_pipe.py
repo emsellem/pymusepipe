@@ -483,7 +483,7 @@ class PipePrep(SofPipe) :
         for gtable in tpl_gtable.groups:
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
-            self._add_geometry_to_sofdict(tpl)
+            self._add_geometry_to_sofdict(tpl, mean_mjd)
             # Provide the list of files to the dictionary
             self._sofdict['SKYFLAT'] = add_listpath(self.paths.rawfiles,
                     list(gtable['filename']))
@@ -543,7 +543,7 @@ class PipePrep(SofPipe) :
             self._add_calib_to_sofdict("LINE_CATALOG")
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
-            self._add_geometry_to_sofdict(tpl)
+            self._add_geometry_to_sofdict(tpl, mean_mjd)
             # Provide the list of files to the dictionary
             self._sofdict[expotype] = add_listpath(self.paths.rawfiles,
                     list(gtable['filename']))
@@ -1069,7 +1069,7 @@ class PipePrep(SofPipe) :
             if autocalib == "user":
                 self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY', 
                         "processed", suffix=AC_suffix)
-            self._add_astrometry_to_sofdict(tpl)
+            self._add_astrometry_to_sofdict(tpl, mean_mjd)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
 
