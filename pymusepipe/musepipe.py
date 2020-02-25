@@ -174,7 +174,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self._update_astropy_table = kwargs.pop("update_astropy_table", False)
 
         # Use time dependent geo_table
-        self._time_astrometry = kwargs.pop("time_astrometry", True)
+        self._time_astrometry = kwargs.pop("time_astrometry", False)
 
         # Set alignment saving option
         self._save_alignment_images = kwargs.pop("save_alignment_images", True)
@@ -390,8 +390,7 @@ class MusePipe(PipePrep, PipeRecipes):
             setattr(self.paths.Master, self._get_attr_expo(expotype), 
                     joinpath(self.paths.data, self._get_path_expo(expotype, "master")))
 
-            self._dic_paths = {"master": self.paths.Master, "processed": self.paths, 
-                               "raw": self.paths.rawfiles}
+            self._dic_paths = {"master": self.paths.Master, "processed": self.paths}
 
         # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
         for name in list(self.pipe_params._dic_folders_target.keys()):

@@ -152,7 +152,7 @@ class SofPipe(object) :
             expo_table = self._get_table_expo("GEOMETRY", "raw")
             if len(expo_table) > 0:
                 index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-                calfolder = self._get_fullpath_expo("GEOMETRY", "raw")
+                calfolder = self.paths.rawfiles
                 geofile = expo_table['filename'][index]
             else:
                 calfolder = self.pipe_params.musecalib
@@ -171,7 +171,7 @@ class SofPipe(object) :
             expo_table = self._get_table_expo("ASTROMETRY", "raw")
             if len(expo_table) > 0:
                 index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-                calfolder = self._get_fullpath_expo("ASTROMETRY", "raw")
+                calfolder = self.paths.rawfiles
                 geofile = expo_table['filename'][index]
             else:
                 calfolder = self.pipe_params.musecalib
