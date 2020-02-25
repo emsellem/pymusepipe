@@ -499,7 +499,7 @@ class MusePipe(PipePrep, PipeRecipes):
                         header = pyfits.getheader(f, 0)
                         for k in listexpo_files.keys() :
                             [namecol, keyword, func, form] = listexpo_files[k]
-                            if keyword=='TYPE' and keyword not in header:
+                            if k=='TYPE' and keyword not in header:
                                 if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
                                     MUSE_infodic[k].append('ASTROMETRY')
                                 elif header['OBJECT'] == 'WAVE,MASK':
