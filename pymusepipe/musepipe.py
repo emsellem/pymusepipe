@@ -501,14 +501,18 @@ class MusePipe(PipePrep, PipeRecipes):
                             [namecol, keyword, func, form] = listexpo_files[k]
                             if keyword not in header:
                                 if k=='TYPE':
-                                    if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
-                                        upipe.print_info("Found one Astrometric file {}".format(
-                                                        f))
-                                        MUSE_infodic[k].append('ASTROMETRY')
-                                    elif header['OBJECT'] == 'WAVE,MASK':
-                                        upipe.print_info("Found one Geometric file {}".format(
-                                                        f))
-                                        MUSE_infodic[k].append('GEOMETRY')
+                                    if 'OBJECT' not in header:
+                                        upipe.print_warning("No OBJECT found here - DUMMY")
+                                        MUSE_infodic[k].append("DUMMY")
+                                    else:
+                                        if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
+                                            upipe.print_info("Found one Astrometric file {}".format(
+                                                             f))
+                                            MUSE_infodic[k].append('ASTROMETRY')
+                                        elif header['OBJECT'] == 'WAVE,MASK':
+                                            upipe.print_info("Found one Geometric file {}".format(
+                                                             f))
+                                            MUSE_infodic[k].append('GEOMETRY')
                                 else:
                                     MUSE_infodic[k].append(None)
                             else:
