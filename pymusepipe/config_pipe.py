@@ -32,7 +32,9 @@ default_PHANGS_filter_list = ("white,Johnson_B,Johnson_V,Cousins_R,"
 listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
         'ILLUM': 'FLAT,LAMP,ILLUM', 'TWILIGHT': 'FLAT,SKY', 
         'WAVE': 'WAVE', 'STD': 'STD', 'AST': 'AST',
-        'OBJECT': 'OBJECT', 'SKY': 'SKY'
+        'OBJECT': 'OBJECT', 'SKY': 'SKY',
+        'Astrometric calibration (ASTROMETRY)': 'ASTROMETRY',
+        'WAVE,MASK': 'GEOMETRY'
         }
 
 # This dictionary contains the types
@@ -72,7 +74,7 @@ suffix_prealign = "_prealign"
 suffix_checkalign = "_checkalign"
 
 # List of suffix you wish to have scanned
-suffix_rawfiles = ['fits.fz']
+suffix_rawfiles = ['fits.fz', 'fits']
 
 #-- END ---------------------------------------------------------------#
 #======================================================================#

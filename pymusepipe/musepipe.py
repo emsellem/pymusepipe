@@ -499,7 +499,13 @@ class MusePipe(PipePrep, PipeRecipes):
                         header = pyfits.getheader(f, 0)
                         for k in listexpo_files.keys() :
                             [namecol, keyword, func, form] = listexpo_files[k]
-                            MUSE_infodic[k].append(func(header[keyword]))
+                            if keyword=='TYPE' and keyword not in header:
+                                if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
+                                    MUSE_infodic[k].append('ASTROMETRY')
+                                elif header['OBJECT'] == 'WAVE,MASK':
+                                    MUSE_infodic[k].append('GEOMETRY')
+                            else:
+                                MUSE_infodic[k].append(func(header[keyword]))
                     elif any([suffix in f for suffix in suffix_rawfiles]):
                         upipe.print_warning("File {0} will be ignored "
                                             "from the Raw files "
