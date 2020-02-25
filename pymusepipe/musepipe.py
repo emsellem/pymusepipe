@@ -509,7 +509,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                 new_infodic[k] = func(header[keyword])
                             elif k=='TYPE':
                                 for astrogeo_key in dic_astrogeo.keys():
-                                    if header['OBJECT'] == dic_astrogeo[astrogeo_key]
+                                    if header['OBJECT'] == dic_astrogeo[astrogeo_key]:
                                         upipe.print_info("Found one {0} file {1}".format(
                                                           astrogeo_key, f))
                                         new_infodic[k] = astrogeo_key
