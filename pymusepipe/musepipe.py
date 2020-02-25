@@ -522,7 +522,7 @@ class MusePipe(PipePrep, PipeRecipes):
                         if good_file:
                             MUSE_infodic['FILENAME'].append(f)
                             for k in new_infodic.keys():
-                                MUSE_infodic[k] = new_infodic[k]
+                                MUSE_infodic[k].append(new_infodic[k])
 
                     elif any([suffix in f for suffix in suffix_rawfiles]):
                         upipe.print_warning("File {0} will be ignored "
