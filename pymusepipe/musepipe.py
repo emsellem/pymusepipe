@@ -150,7 +150,7 @@ class MusePipe(PipePrep, PipeRecipes):
             Overwrite the astropy table even when it exists.
         warnings: str ['ignore']
             If set to 'ignore', will ignore the Astropy Warnings.
-        time_astrometry: bool [True]
+        time_astrometry: bool [False]
             Use the time dependent geo_table and astrometry_wcs files
             following on the date of the input exposures (MJD)
         """
