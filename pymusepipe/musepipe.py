@@ -500,22 +500,30 @@ class MusePipe(PipePrep, PipeRecipes):
                         # Short circuit in case 'OBJECT' is not found in header
                         if 'OBJECT' not in header:
                             continue
+                        new_infodic = {}
+                        good_file = True
                         for k in listexpo_files.keys() :
                             [namecol, keyword, func, form] = listexpo_files[k]
-                            if keyword not in header:
-                                if k=='TYPE':
-                                    if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
-                                        upipe.print_info("Found one Astrometric file {}".format(
-                                                         f))
-                                        MUSE_infodic[k].append('ASTROMETRY')
-                                    elif header['OBJECT'] == 'WAVE,MASK':
-                                        upipe.print_info("Found one Geometric file {}".format(
-                                                         f))
-                                        MUSE_infodic[k].append('GEOMETRY')
+                            if keyword in header:
+                                MUSE_infodic[k] = func(header[keyword])
+                            elif k=='TYPE':
+                                if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
+                                    upipe.print_info("Found one Astrometric file {}".format(
+                                                     f))
+                                    new_infodic[k] = 'ASTROMETRY'
+                                elif header['OBJECT'] == 'WAVE,MASK':
+                                    upipe.print_info("Found one Geometric file {}".format(
+                                                     f))
+                                    new_infodic[k] = 'GEOMETRY'
                                 else:
-                                    MUSE_infodic[k].append(None)
+                                    good_file = False
                             else:
-                                MUSE_infodic[k].append(func(header[keyword]))
+                                good_file = False
+                        # Transferring the information now if complete
+                        if good_file:
+                            for k in new_infodic.keys():
+                                MUSE_infodic[k] = new_infodic[k]
+
                     elif any([suffix in f for suffix in suffix_rawfiles]):
                         upipe.print_warning("File {0} will be ignored "
                                             "from the Raw files "
