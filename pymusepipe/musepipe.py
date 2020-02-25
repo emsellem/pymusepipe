@@ -499,11 +499,18 @@ class MusePipe(PipePrep, PipeRecipes):
                         header = pyfits.getheader(f, 0)
                         for k in listexpo_files.keys() :
                             [namecol, keyword, func, form] = listexpo_files[k]
-                            if k=='TYPE' and keyword not in header:
-                                if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
-                                    MUSE_infodic[k].append('ASTROMETRY')
-                                elif header['OBJECT'] == 'WAVE,MASK':
-                                    MUSE_infodic[k].append('GEOMETRY')
+                            if keyword not in header:
+                                if k=='TYPE':
+                                    if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
+                                        upipe.print_info("Found one Astrometric file {}".format(
+                                                        f))
+                                        MUSE_infodic[k].append('ASTROMETRY')
+                                    elif header['OBJECT'] == 'WAVE,MASK':
+                                        upipe.print_info("Found one Geometric file {}".format(
+                                                        f))
+                                        MUSE_infodic[k].append('GEOMETRY')
+                                else:
+                                    MUSE_infodic[k].append(None)
                             else:
                                 MUSE_infodic[k].append(func(header[keyword]))
                     elif any([suffix in f for suffix in suffix_rawfiles]):
