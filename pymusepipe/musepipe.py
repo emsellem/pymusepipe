@@ -507,17 +507,17 @@ class MusePipe(PipePrep, PipeRecipes):
                             [namecol, keyword, func, form] = listexpo_files[k]
                             if keyword in header:
                                 new_infodic[k] = func(header[keyword])
-                            elif k=='TYPE':
-                                for astrogeo_key in dic_astrogeo.keys():
-                                    if header['OBJECT'] == dic_astrogeo[astrogeo_key]:
-                                        upipe.print_info("Found one {0} file {1}".format(
-                                                          astrogeo_key, f))
-                                        new_infodic[k] = astrogeo_key
-                                        object_file = astrogeo_key
+                            else:
+                                if k=='TYPE':
+                                    for astrogeo_key in dic_astrogeo.keys():
+                                        if header['OBJECT'] == dic_astrogeo[astrogeo_key]:
+                                            upipe.print_info("Found one {0} file {1}".format(
+                                                              astrogeo_key, f))
+                                            new_infodic[k] = astrogeo_key
+                                            object_file = astrogeo_key
+                                            break
                                 else:
                                     good_file = False
-                            else:
-                                good_file = False
                         # Transferring the information now if complete
                         if object_file is not None:
                             new_infodic['OBJECT'] = object_file
