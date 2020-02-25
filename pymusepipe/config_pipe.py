@@ -37,6 +37,10 @@ listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
         'WAVE,MASK': 'GEOMETRY'
         }
 
+dic_astrogeo = {'ASTROMETRY': 'Astrometric calibration (ASTROMETRY)',
+                'GEOMETRY': 'WAVE,MASK'
+                }
+
 # This dictionary contains the types
 dic_listMaster = {'DARK': 'MASTER_DARK', 
         'BIAS': 'MASTER_BIAS', 

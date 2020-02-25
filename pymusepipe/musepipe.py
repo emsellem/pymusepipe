@@ -62,7 +62,8 @@ import pymusepipe.util_pipe as upipe
 from pymusepipe.config_pipe import (
         suffix_rawfiles,suffix_prealign,suffix_checkalign,
         listexpo_files,dic_listObject,dic_listMaster,dic_listMasterObject,
-        listexpo_types,dic_geo_astrowcs_table, exclude_list_checkmode)
+        listexpo_types,dic_geo_astrowcs_table, exclude_list_checkmode,
+        dic_astrogeo)
 
 __version__ = '2.0.2 (25/09/2019)'
 #       Cleaning and adding comments
@@ -501,24 +502,25 @@ class MusePipe(PipePrep, PipeRecipes):
                             continue
                         new_infodic = {}
                         good_file = True
+                        object_file = None
                         for k in listexpo_files.keys() :
                             [namecol, keyword, func, form] = listexpo_files[k]
                             if keyword in header:
                                 new_infodic[k] = func(header[keyword])
                             elif k=='TYPE':
-                                if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
-                                    upipe.print_info("Found one Astrometric file {}".format(
-                                                     f))
-                                    new_infodic[k] = 'ASTROMETRY'
-                                elif header['OBJECT'] == 'WAVE,MASK':
-                                    upipe.print_info("Found one Geometric file {}".format(
-                                                     f))
-                                    new_infodic[k] = 'GEOMETRY'
+                                for astrogeo_key in dic_astrogeo.keys():
+                                    if header['OBJECT'] == dic_astrogeo[astrogeo_key]
+                                        upipe.print_info("Found one {0} file {1}".format(
+                                                          astrogeo_key, f))
+                                        new_infodic[k] = astrogeo_key
+                                        object_file = astrogeo_key
                                 else:
                                     good_file = False
                             else:
                                 good_file = False
                         # Transferring the information now if complete
+                        if object_file is not None:
+                            new_infodic['OBJECT'] = object_file
                         if good_file:
                             MUSE_infodic['FILENAME'].append(f)
                             for k in new_infodic.keys():
