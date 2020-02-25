@@ -524,6 +524,7 @@ class MusePipe(PipePrep, PipeRecipes):
                         # Transferring the information now if complete
                         if object_file is not None:
                             new_infodic['OBJECT'] = object_file
+                        print(f, good_file, object_file)
                         if good_file:
                             MUSE_infodic['FILENAME'].append(f)
                             for k in new_infodic.keys():
