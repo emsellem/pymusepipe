@@ -504,7 +504,7 @@ class MusePipe(PipePrep, PipeRecipes):
                         for k in listexpo_files.keys() :
                             [namecol, keyword, func, form] = listexpo_files[k]
                             if keyword in header:
-                                MUSE_infodic[k] = func(header[keyword])
+                                new_infodic[k] = func(header[keyword])
                             elif k=='TYPE':
                                 if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
                                     upipe.print_info("Found one Astrometric file {}".format(
