@@ -516,6 +516,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                             new_infodic[k] = astrogeo_key
                                             object_file = astrogeo_key
                                             break
+                                        good_file = False
                                 else:
                                     good_file = False
                         # Transferring the information now if complete
