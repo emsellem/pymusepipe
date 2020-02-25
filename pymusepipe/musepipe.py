@@ -495,7 +495,6 @@ class MusePipe(PipePrep, PipeRecipes):
                 # Excluding the files without MUSE and fits.fz
                 if ('MUSE' in f):
                     if any([f.endswith(suffix) for suffix in suffix_rawfiles]):
-                        MUSE_infodic['FILENAME'].append(f)
                         header = pyfits.getheader(f, 0)
                         # Short circuit in case 'OBJECT' is not found in header
                         if 'OBJECT' not in header:
@@ -521,6 +520,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                 good_file = False
                         # Transferring the information now if complete
                         if good_file:
+                            MUSE_infodic['FILENAME'].append(f)
                             for k in new_infodic.keys():
                                 MUSE_infodic[k] = new_infodic[k]
 
