@@ -507,18 +507,20 @@ class MusePipe(PipePrep, PipeRecipes):
                             [namecol, keyword, func, form] = listexpo_files[k]
                             if keyword in header:
                                 new_infodic[k] = func(header[keyword])
-                            else:
-                                if k=='TYPE':
-                                    for astrogeo_key in dic_astrogeo.keys():
-                                        if header['OBJECT'] == dic_astrogeo[astrogeo_key]:
-                                            upipe.print_info("Found one {0} file {1}".format(
-                                                              astrogeo_key, f))
-                                            new_infodic[k] = astrogeo_key
-                                            object_file = astrogeo_key
-                                            break
-                                        good_file = False
-                                else:
+                            elif k=='TYPE':
+                                # Find the key which is right
+                                astrogeo_keys = [tk for tk, tv in dic_astrogeo.items() if tv==header['OBJECT']]
+                                # Nothing found?
+                                if len(astrogeo_keys) == 0:
                                     good_file = False
+                                # If found, print info and save value
+                                else:
+                                    upipe.print_info("Found one {0} file {1}".format(
+                                                      astrogeo_keys[0], f))
+                                    new_infodic[k] = astrogeo_keys[0]
+                                    object_file = astrogeo_keys[0]
+                            else:
+                                good_file = False
                         # Transferring the information now if complete
                         if object_file is not None:
                             new_infodic['OBJECT'] = object_file
