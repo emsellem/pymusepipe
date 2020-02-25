@@ -497,22 +497,21 @@ class MusePipe(PipePrep, PipeRecipes):
                     if any([f.endswith(suffix) for suffix in suffix_rawfiles]):
                         MUSE_infodic['FILENAME'].append(f)
                         header = pyfits.getheader(f, 0)
+                        # Short circuit in case 'OBJECT' is not found in header
+                        if 'OBJECT' not in header:
+                            continue
                         for k in listexpo_files.keys() :
                             [namecol, keyword, func, form] = listexpo_files[k]
                             if keyword not in header:
                                 if k=='TYPE':
-                                    if 'OBJECT' not in header:
-                                        upipe.print_warning("No OBJECT found here - DUMMY")
-                                        MUSE_infodic[k].append("DUMMY")
-                                    else:
-                                        if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
-                                            upipe.print_info("Found one Astrometric file {}".format(
-                                                             f))
-                                            MUSE_infodic[k].append('ASTROMETRY')
-                                        elif header['OBJECT'] == 'WAVE,MASK':
-                                            upipe.print_info("Found one Geometric file {}".format(
-                                                             f))
-                                            MUSE_infodic[k].append('GEOMETRY')
+                                    if header['OBJECT'] == 'Astrometric calibration (ASTROMETRY)':
+                                        upipe.print_info("Found one Astrometric file {}".format(
+                                                         f))
+                                        MUSE_infodic[k].append('ASTROMETRY')
+                                    elif header['OBJECT'] == 'WAVE,MASK':
+                                        upipe.print_info("Found one Geometric file {}".format(
+                                                         f))
+                                        MUSE_infodic[k].append('GEOMETRY')
                                 else:
                                     MUSE_infodic[k].append(None)
                             else:
