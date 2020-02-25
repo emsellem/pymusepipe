@@ -33,8 +33,8 @@ listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
         'ILLUM': 'FLAT,LAMP,ILLUM', 'TWILIGHT': 'FLAT,SKY', 
         'WAVE': 'WAVE', 'STD': 'STD', 'AST': 'AST',
         'OBJECT': 'OBJECT', 'SKY': 'SKY',
-        'Astrometric calibration (ASTROMETRY)': 'ASTROMETRY',
-        'WAVE,MASK': 'GEOMETRY'
+        'ASTROMETRY': 'ASTROMETRY',
+        'GEOMETRY': 'GEOMETRY'
         }
 
 dic_astrogeo = {'ASTROMETRY': 'Astrometric calibration (ASTROMETRY)',
