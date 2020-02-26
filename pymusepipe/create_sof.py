@@ -172,7 +172,7 @@ class SofPipe(object) :
             if len(expo_table) > 0:
                 index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
                 calfolder = self.paths.rawfiles
-                geofile = expo_table['filename'][index]
+                astrofile = expo_table['filename'][index]
             else:
                 calfolder = self.pipe_params.musecalib
                 astrofile = self.pipe_params.astro_table
