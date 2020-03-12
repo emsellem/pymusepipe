@@ -25,9 +25,6 @@ try :
 except ImportError :
     print("IMPORT ERROR: mpdaf is needed for cube_convolve")
 
-
-dict_kernel = {'gaussian': gaussian_kernel, 'moffat': moffat_kernel}
-
 def pypher_script(psf_source, psf_target, pixscale_source=0.2,
                   pixscale_target=0.2, angle_source=0., angle_target=0.,
                   reg_fact=1e-4, verbose=False):
@@ -204,6 +201,7 @@ def psf3d(wave, size, fwhm0, lambda0=6483.58, b=-3e-5, scale=0.2, nmoffat=None,
             Datacube containing MUSE PSF as a function of wavelength.
 
     """
+    dict_kernel = {'gaussian': gaussian_kernel, 'moffat': moffat_kernel}
 
     if np.isscalar(size):
         size = np.repeat(size, 2)
@@ -257,6 +255,7 @@ def psf2d(size, fwhm, function='gaussian', nmoffat=None, scale=0.2):
         target: np.ndarray
             a 2D array with the model of the target PSF.
     """
+    dict_kernel = {'gaussian': gaussian_kernel, 'moffat': moffat_kernel}
 
     if np.isscalar(size):
         size = np.repeat(size, 2)
