@@ -16,10 +16,12 @@ import numpy as np
 
 from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
-from pymusepipe.config_pipe import PHANGS_reduc_config
+from pymusepipe.config_pipe import (PHANGS_reduc_config, default_prefix_wcs,
+                                    lambdaminmax_for_mosaic)
 from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.combine import MusePointings
 from pymusepipe.align_pipe import rotate_pixtables
+from .prep_recipes_pipe import dic_products_scipost
 from .version import __version__ as version_pack
 
 from astropy.table import Table
@@ -419,11 +421,12 @@ class MusePipeSample(object):
                                   verbose, list_kwargs))
 
             # Creating the musepipe instance, using the shortcut
-            self.pipes[targetname][pointing] = MusePipe(targetname=targetname, 
-                            pointing=pointing, folder_config=folder_config, rc_filename=rc_filename, 
-                            cal_filename=cal_filename, log_filename=log_filename_pointing, 
-                            first_recipe=first_recipe, last_recipe=last_recipe,
-                            init_raw_table=False, verbose=verbose, **kwargs)
+            self.pipes[targetname][pointing] = MusePipe(
+                targetname=targetname, pointing=pointing,
+                folder_config=folder_config, rc_filename=rc_filename,
+                cal_filename=cal_filename, log_filename=log_filename_pointing,
+                first_recipe=first_recipe, last_recipe=last_recipe,
+                init_raw_table=False, verbose=verbose, **kwargs)
 
             # Saving the command
             self.pipes[targetname][pointing].history = python_command
@@ -510,7 +513,59 @@ class MusePipeSample(object):
         self.reduce_target(targetname=targetname, list_pointings=list_pointings, 
                 first_recipe="align_bypointing", **kwargs)
 
-    def run_target_recipe(self, recipe_name, targetname=None, list_pointings=None, **kwargs):
+    def run_target_wcscube_perexpo(self, targetname=None, list_pointings=None,
+                                    **kwargs):
+        """Build the cube per exposure using a given WCS
+
+        Args:
+            targetname:
+            list_pointings:
+            **kwargs:
+
+        Returns:
+
+        """
+        # Check if pointings are valid
+        list_pointings = self._check_pointings(targetname, list_pointings)
+        if len(list_pointings) == 0:
+            return
+
+        # WCS imposed by setting the reference
+        ref_wcs = kwargs.pop("ref_wcs", None)
+        if ref_wcs is None:
+            prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+            self.add_targetname = kwargs.pop("add_targetname", True)
+            prefix_wcs = self._add_targetname(prefix_wcs)
+        else:
+            name_wcs = ref_wcs
+
+        # Fetch the default folder for the WCS files which is the folder
+        # of the Combined cubes
+        self.init_combine(targetname=targetname)
+        default_comb_folder = upipe.normpath(self.pipes_combine[targetname].paths.cubes)
+        # Now fetch the value set by the user
+        folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
+
+        for pointing in list_pointings:
+            if ref_wcs is None:
+                cube_suffix = dic_products_scipost['cube'][0]
+                cube_suffix = self._add_targetname(cube_suffix)
+                name_wcs = "{0}_P{1:02d}.fits".format(cube_suffix,
+                                                    np.int(pointing))
+            suffix = "WCS_P{0:02d}".format(np.int(pointing))
+            kwargs_per_pointing[pointing] = {'ref_wcs': name_wcs,
+                                             'folder_ref_wcs': folder_ref_wcs,
+                                             'suffix': suffix,
+                                             'sof_filename': 'scipost_wcs',
+                                             'dir_products': default_comb_folder}
+
+        self.run_target_recipe("scipost_perexpo", targetname=targetname,
+                               list_pointings=list_pointings,
+                               kwargs_per_pointing=kwargs_per_pointing,
+                               **kwargs)
+
+    def run_target_recipe(self, recipe_name, targetname=None,
+                          list_pointings=None, **kwargs):
         """Run just one recipe on target
 
         Input
@@ -523,13 +578,17 @@ class MusePipeSample(object):
             indicated in the dictonary will be reduced)
         """
         # General print out
-        upipe.print_info("---- Starting the Recipe {0} for Target={1} ----".format(
-                            recipe_name, targetname))
+        upipe.print_info("---- Starting the Recipe {0} for Target={1} "
+                         "----".format(recipe_name, targetname))
 
         kwargs_recipe = {}
-        for key, default in zip(['fraction', 'skymethod', 'illum'], [0.8, "model", True]):
-            item = kwargs.pop(key, default)
+        for key, default in zip(['fraction', 'skymethod', 'illum'],
+                                [0.8, "model", True]):
+            _ = kwargs.pop(key, default)
             kwargs_recipe[key] = default
+
+        # some parameters which depend on the pointings for this recipe
+        kwargs_per_pointing = kwargs.pop("kwargs_per_pointing", {})
 
         # Initialise the pipe if needed
         self.set_pipe_target(targetname=targetname, list_pointings=list_pointings,
@@ -539,16 +598,24 @@ class MusePipeSample(object):
         list_pointings = self._check_pointings(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
+
         # Loop on the pointings
         for pointing in list_pointings:
-            upipe.print_info("====== START - POINTING {0:2d} ======".format(pointing))
+            upipe.print_info("====== START - POINTING {0:2d} "
+                             "======".format(pointing))
+            param_recipes = {}
+            if pointing in kwargs_per_pointing.keys():
+                param_recipes[recipe_name] = kwargs_per_pointing[pointing]
+
             # Initialise raw tables if not already done (takes some time)
             if not self.pipes[targetname][pointing]._raw_table_initialised:
                 self.pipes[targetname][pointing].init_raw_table(overwrite=True)
             if self.__phangs:
-                self.pipes[targetname][pointing].run_phangs_recipes(**kwargs_recipe)
+                self.pipes[targetname][pointing].run_phangs_recipes(param_recipes=param_recipes,
+                                                                    **kwargs_recipe)
             else:
-                self.pipes[targetname][pointing].run_recipes(**kwargs_recipe)
+                self.pipes[targetname][pointing].run_recipes(param_recipes=param_recipes,
+                                                             **kwargs_recipe)
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def reduce_target(self, targetname=None, list_pointings=None, **kwargs):
@@ -670,4 +737,3 @@ class MusePipeSample(object):
         self.pipes_combine[targetname].run_combine_all_single_pointings_withmasks(
                 combine=combine, masks=masks, individual=individual, mosaic_wcs=mosaic_wcs,
                 **kwargs)
-

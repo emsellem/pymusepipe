@@ -12,7 +12,6 @@ __contact__   = " <eric.emsellem@eso.org>"
 import os
 from os.path import join as joinpath
 
-import copy
 from copy import deepcopy
 
 # Numpy
@@ -199,7 +198,13 @@ class PipePrep(SofPipe) :
                              'prep_align': {'skymethod': skymethod},
                              'scipost_per_expo': {'skymethod': skymethod}
                              }
-        dic_kwargs_recipes = kwargs.pop("param_recipes", default_dic_kwargs_recipes)
+
+        dic_kwargs_recipes = kwargs.pop("param_recipes", {})
+        for key in default_dic_kwargs_recipes.keys():
+            if key in dic_kwargs_recipes:
+                dic_kwargs_recipes[key].update(default_dic_kwargs_recipes[key])
+            else:
+                dic_kwargs_recipes[key] = default_dic_kwargs_recipes[key]
 
         # First and last recipe to be used
         first_recipe = kwargs.pop("first_recipe", self.first_recipe)
@@ -535,6 +540,7 @@ class PipePrep(SofPipe) :
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
+        dir_products = self._get_fullpath_expo(expotype, "processed")
 
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
@@ -552,16 +558,17 @@ class PipePrep(SofPipe) :
             if self.verbose:
                 upipe.print_info("Number of expo is {Nexpo} for {expotype}".format(
                                  Nexpo=Nexpo, expotype=expotype), pipe=self)
+
             # Finding the best tpl for BIAS
             if illum:
                 self._add_tplraw_to_sofdict(mean_mjd, "ILLUM") 
             self._add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 
                 'TRACE', 'WAVE', 'TWILIGHT'])
+
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
-            # Run the recipe to reduce the standard (muse_scibasic)
 
-            dir_products = self._get_fullpath_expo(expotype, "processed")
+            # Run the recipe to reduce the standard (muse_scibasic)
             suffix = get_suffix_product(expotype)
             name_products = []
             list_expo = np.arange(Nexpo).astype(np.int) + 1
@@ -1027,21 +1034,32 @@ class PipePrep(SofPipe) :
         # Filters
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
+
+        # Offsets
         offset_list = kwargs.pop("offset_list", False)
         offset_table_name = kwargs.pop("offset_table_name", None)
         folder_offset_table = kwargs.pop("folder_offset_table", None)
 
+        # Misc parameters - autocalib, barycentric correction, AC
         autocalib = kwargs.pop("autocalib", "none")
         rvcorr = kwargs.pop("rvcorr", "bary")
-        AC_suffix = kwargs.pop("AC_suffix", "_AC")
-        default_suffix_skycontinuum = ""
-        suffix_skycontinuum = kwargs.pop("suffix_skycont", default_suffix_skycontinuum)
         if rvcorr != "bary":
             upipe.print_warning("Scipost will use '{0}' as barycentric "
-                    "correction [Options are bary, helio, geo, none]".format(rvcorr), 
-                    pipe=self)
+                                "correction [Options are bary, helio, geo, none]".format(rvcorr),
+                                pipe=self)
+        AC_suffix = kwargs.pop("AC_suffix", "_AC")
 
-        if skymethod != "none" :
+        # WCS
+        ref_wcs = kwargs.pop("ref_wcs", None)
+        if ref_wcs is not None:
+            folder_ref_wcs = kwargs.pop("folder_ref_wcs", "")
+        dir_products = kwargs.pop("dir_products",
+                                  self._get_fullpath_expo(expotype, "processed"))
+
+        # Continuum correction
+        default_suffix_skycontinuum = ""
+        suffix_skycontinuum = kwargs.pop("suffix_skycont", default_suffix_skycontinuum)
+        if skymethod != "none":
             if suffix_skycontinuum != default_suffix_skycontinuum:
                 upipe.print_warning("Scipost will use '{0}' as suffix "
                         "for the SKY_CONTINUUM files".format(suffix_skycontinuum),
@@ -1072,15 +1090,9 @@ class PipePrep(SofPipe) :
             self._add_astrometry_to_sofdict(tpl, mean_mjd)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
+            if ref_wcs is not None:
+                self._sofdict['OUTPUT_WCS'] = [joinpath(folder_ref_wcs, ref_wcs)]
 
-#            # If less than 1 expo, don't load the OFFSET_LIST
-#            if len(list_group_expo) <= 1:
-#                upipe.print_info("Only one exposure in this group, "
-#                                 "hence no filter list to be loaded", pipe=self)
-#            else:
-            # Eric E - 23/09/2019 --------------------------------------------
-            # We Commented out the previous test, as we wish to be able to also 
-            # load an OFFSET table even if just one exposure is provided
             if offset_table_name is None:
                 folder_offset_table = self._get_fullpath_expo(expotype, "processed")
                 offset_table_name = '{0}{1}_{2}_{3}.fits'.format(
@@ -1129,7 +1141,6 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename="{0}_{1}{2}_{3}{4}".format(sof_filename, expotype, 
                 suffix, tpl, suffix_iexpo), new=True)
             # products
-            dir_products = self._get_fullpath_expo(expotype, "processed")
             name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames, fl_expo = \
                 self._get_scipost_products(save, list_group_expo, filter_list)
             self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
@@ -1466,7 +1477,8 @@ class PipePrep(SofPipe) :
             long_suffix, tpl), new=True)
 
         # Product names
-        dir_products = self._get_fullpath_expo(expotype, stage)
+        dir_products = kwargs.pop("dir_products",
+                                  self._get_fullpath_expo(expotype, stage))
         name_products, suffix_products, suffix_prefinalnames, prefix_products = \
                 _get_combine_products(filter_list, prefix_all=prefix_all) 
 

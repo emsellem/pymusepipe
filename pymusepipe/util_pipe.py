@@ -23,7 +23,6 @@ from pymusepipe.emission_lines import list_emission_lines
 from pymusepipe.emission_lines import full_muse_wavelength_range
 from pymusepipe.config_pipe import default_filter_list
 
-import collections
 from collections import OrderedDict
 
 ############    PRINTING FUNCTIONS #########################
@@ -87,7 +86,6 @@ def print_debug(text, **kwargs) :
     pipe: musepipe [None]
         If provided, will print the text in the logfile
     """
-    toprint = "# DebugInfo " + text
     mypipe = kwargs.pop("pipe", None)
     try:
         verbose = mypipe.verbose
@@ -152,7 +150,7 @@ class TimeStampDict(OrderedDict):
     def delete_timestamp(self, tstamp=None):
         """Delete a key in the dictionary
         """
-        outkey = self.pop(tstamp)
+        _ = self.pop(tstamp)
 
 def create_time_name() :
     """Create a time-link name for file saving purposes
@@ -165,11 +163,6 @@ def formatted_time() :
     """ Return: a string including the formatted time
     """
     return str(time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()))
-
-# def get_date_inD(indate) :
-#     """Transform date in Y-M-D
-#     """
-#     return np.datetime64(indate).astype('datetime64[D]')
 
 def safely_create_folder(path, verbose=True):
     """Create a folder given by the input path
@@ -189,7 +182,6 @@ def safely_create_folder(path, verbose=True):
     except OSError:
         if not os.path.isdir(path):
             print_error("Failed to create folder! Please check the path")
-            raise
             return
         if os.path.isdir(path):
             if verbose:
@@ -205,12 +197,6 @@ def normpath(path) :
     """Normalise the path to get it short
     """
     return os.path.relpath(os.path.realpath(path))
-
-# def overwrite_file(filename, content):
-#     """Overwite in ascii file
-#     """
-#     with open(filename, "w+") as myfile:
-#         myfile.write(content)
 
 def doppler_shift(wavelength, velocity=0.):
     """Return the redshifted wavelength
@@ -259,12 +245,6 @@ def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', l
         return [red_wavel - lambda_window/2., red_wavel + lambda_window/2.]
 
     
-####################################################################
-# Function to select (Mask) good values from a map
-# Using both Rectangle and Circular Zones from the Selection_Zone class
-#
-# Input is name of galaxy, and coordinates
-####################################################################
 def select_spaxels(maskDic, maskName, X, Y) :
     """Selecting spaxels defined by their coordinates
     using the masks defined by Circle or Rectangle Zones
@@ -287,10 +267,8 @@ def select_spaxels(maskDic, maskName, X, Y) :
             selgood = selgood & region.select(X, Y)
 
     return selgood
-#=================================================================
-####################################################################
-# Parent class for the various types of Zones
-####################################################################
+
+
 class Selection_Zone :
     """
     Parent class for Rectangle_Zone and Circle_Zone
@@ -306,8 +284,7 @@ class Selection_Zone :
             print_error("Error: {0} Zone needs {1} input parameters - {2} given".format(
                             self.type, self.nparams, len(params)))
 
-#=================================================================
-####################################################################
+
 class Rectangle_Zone(Selection_Zone) :
     """Define a rectangular zone, given by 
     a center, a length, a width and an angle
@@ -335,8 +312,7 @@ class Rectangle_Zone(Selection_Zone) :
         ny = - dx * np.sin(thetarad) + dy * np.cos(thetarad)
         selgood = (np.abs(ny) > width / 2.) | (np.abs(nx) > length / 2.)
         return selgood
-#=================================================================
-####################################################################
+
 class Circle_Zone(Selection_Zone) :
     """Define a Circular zone, defined by 
     a center and a radius
@@ -359,10 +335,9 @@ class Circle_Zone(Selection_Zone) :
         [x0, y0, radius] = self.params
         selgood = (np.sqrt((xin - x0)**2 + (yin - y0)**2) > radius)
         return selgood
-#=================================================================
-####################################################################
+
 class Trail_Zone(Selection_Zone) :
-    """Define a Trail zone, defined by 
+    """Define a Trail zone, defined by
     two points and a width
     """
     def __init__(self):
@@ -384,8 +359,8 @@ class Trail_Zone(Selection_Zone) :
         [x0, y0, radius] = self.params
         selgood = (np.sqrt((xin - x0)**2 + (yin - y0)**2) > radius)
         return selgood
-#=================================================================
-def reconstruct_filter_images(cubename, filter_list=default_filter_list, 
+
+def reconstruct_filter_images(cubename, filter_list=default_filter_list,
         filter_fits_file="filter_list.fits"):
     """ Reconstruct all images in a list of Filters
     cubename: str
@@ -401,10 +376,8 @@ def reconstruct_filter_images(cubename, filter_list=default_filter_list,
     
     command = "muse_cube_filter -f {0} {1} {2}".format(
                   filter_list, cubename, filter_fits_file)
-    os.command(command)
+    os.system(command)
 
-#=========================================
-# Image descriptor function
 def add_key_pointing_expo(name_image, iexpo, pointing):
     """Add pointing and expo number to image
 

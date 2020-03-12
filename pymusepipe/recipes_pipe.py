@@ -19,11 +19,7 @@ from os.path import join as joinpath
 
 # pymusepipe modules
 from pymusepipe import util_pipe as upipe
-from pymusepipe.mpdaf_pipe import MuseCube
 from .version import __version__ as pipeversion
-
-# Pyfits
-from astropy.io import fits as pyfits
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"
@@ -56,6 +52,7 @@ class PipeRecipes(object) :
             self._set_cpu(first_cpu, ncpu, list_cpu)
         self.nifu = nifu
         self._domerge = domerge
+        self._copy_products_folder = copy_products_folder
 
         self.nochecksum = nochecksum
 

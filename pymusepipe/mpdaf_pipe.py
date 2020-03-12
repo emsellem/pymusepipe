@@ -14,10 +14,6 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Importing modules
 import numpy as np
 
-# Import scipy
-import scipy
-from scipy.integrate import simps
-
 # Standard modules
 import os
 from os.path import join as joinpath
@@ -38,15 +34,11 @@ from astropy.io import fits as pyfits
 from astropy import units as units
 
 from pymusepipe import util_pipe as upipe
-from pymusepipe.config_pipe import default_wave_wcs, AO_mask_lambda
+from .config_pipe import default_wave_wcs, AO_mask_lambda
 
-# Versioning
-__version__ = '0.2.0 (9 Sep 2019)' # Adding PixTableToMask
-#__version__ = '0.1.0 (31 May 2019)'
+from .cube_convolve import cube_kernel
 
-#========================================================================
-# A few useful routines
-# =====================
+########### Few useful functions ###############################################
 def get_sky_spectrum(specname) :
     """Read sky spectrum from MUSE data reduction
     """
@@ -60,7 +52,7 @@ def get_sky_spectrum(specname) :
     wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=units.angstrom)
     spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
     return spec
-#== ------------------------------------
+
 def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
     """Integrate a spectrum using a certain Muse Filter file.
 
@@ -89,12 +81,7 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
         flux_cont = 0.0
 
     return flux_cont
-#== ------------------------------------
-#------------------------------------------------------------------------
-#########################################################################
-# Main class
-#                           check_musepipe
-#########################################################################
+
 
 class MuseCube(Cube): 
     """Wrapper around the mpdaf Cube functionalities
@@ -110,6 +97,13 @@ class MuseCube(Cube):
  
         self.verbose = verbose
         self._debug = kwargs.pop("debug", False)
+
+        # PSF for that Cube
+        self.psf_function = kwargs("psf_function", "moffat")
+        self.psf_fwhm0 = kwargs("psf_fwhm0", 0.)
+        self.psf_l0 = kwargs("psf_l0", 6483.58)
+        self.psf_nmoffat = kwargs("psf_nmoffat", None)
+        self.psf_b = kwargs("psf_b", -3.0e-5)
 
     def get_spectrum_from_cube(self, nx=None, ny=None, pixel_window=0, title="Spectrum") :
         """Get a spectrum from the cube with centre defined in pixels
@@ -170,16 +164,72 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
-    def create_reference_cube(self, lambdamin=4700, lambdamax=9400, 
-            step=1.25, outcube_name=None, filter_for_nan=False, **kwargs): 
+    def convolve_cube(self, target_fwhm, target_nmoffat=None,
+                      input_function='moffat', target_function="gaussian",
+                      outcube_name=None,
+                      factor_fwhm=6, fft=False):
+        """Convolve the cube for a target function 'gaussian' or 'moffat'
+
+        Args:
+            target_fwhm (float): target FWHM in arcsecond
+            target_nmoffat: target n if Moffat function
+            input_function (str): 'gaussian' or 'moffat' ['moffat']
+            target_function (str): 'gaussian' or 'moffat' ['gaussian']
+            factor_fwhm (float): number of FWHM for size of Kernel
+            fft (bool): use FFT to convolve or not [False]
+
+        Creates:
+            Convolved cube
+        """
+        # Separate folder and name of file
+        cube_folder, cube_name = os.path.split(self.filename)
+
+        # Creating the outcube filename
+        if outcube_name is None:
+            outcube_name = "conv{0}_{1:.2f}{2}".format(function.lower()[0],
+                                                        fwhm0, cube_name)
+
+        # Getting the shape of the Kernel
+        scale_spaxel = self.get_step(u.arcsec)[1]
+        nspaxel = np.int(factor_fwhm * fwhm0 / scale_spaxel)
+        # Make nspaxel odd to have a PSF centred at the centre of the frame
+        if nspaxel % 2 == 0: nspaxel += 1
+        shape = [self.shape[0], nspaxel, nspaxel]
+
+        # Computing the kernel
+        kernel3d = cube_kernel(shape, self.wave.coord(), self.psf_fwhm0,
+                               target_fwhm, input_function, target_function,
+                               lambda0=self.psf_l0,
+                               input_nmoffat=self.psf_nmoffat,
+                               target_nmoffat=target_nmoffat, b=self.psf_b,
+                               scale=scale_spaxel, compute_kernel='pypher')
+
+        if fft:
+           conv_cube = self.fftconvolve(other=kernel3d)
+        else:
+            conv_cube = self.convolve(other=kernel3d)
+
+        # Write the output
+        conv_cube.write(joinpath(cube_folder, outcube_name))
+
+        # just provide the output name by folder+name
+        return cube_folder, outcube_name
+
+    def create_reference_cube(self, lambdamin=4700, lambdamax=9400,
+            step=1.25, outcube_name=None, filter_for_nan=False, **kwargs):
         """Create a reference cube using an input one, and overiding
         the lambda part, to get a new WCS
-        
-        Input
-        -----
-        lambdamin:
-        lambdamax:
-        step:
+
+        Args:
+            lambdamin:
+            lambdamax:
+            step:
+            outcube_name:
+            filter_for_nan:
+            **kwargs:
+
+        Returns:
+
         """
 
         # Separate folder and name of file
@@ -304,8 +354,7 @@ class MuseCube(Cube):
             add_mpdaf_method_keywords(refimage.primary_header, 
                     "cube.bandpass_image", ['name'], 
                     [filter_name], ['filter name used'])
-#        # Only selecting the primary + data HDU (removing DQ, STAT)
-#        data_refimage = pyfits.HDUList([refimage[0], refimage[1]])
+
         return refimage
 
 class MuseSkyContinuum(object):
@@ -347,7 +396,7 @@ class MuseSkyContinuum(object):
         setattr(self, muse_filter.filter_name, muse_filter)
 
     def get_normfactor(self, background, filter_name="Cousins_R"):
-        """Get the normalisation factor given a backgroun value
+        """Get the normalisation factor given a background value
         Takes the background value and the sky continuuum spectrum
         and convert this to the scaling Ks needed for this sky continuum
         The principle relies on having the background measured as:
