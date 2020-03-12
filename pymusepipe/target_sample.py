@@ -541,7 +541,7 @@ class MusePipeSample(object):
         # of the Combined cubes
         self.init_combine(targetname=targetname, folder_offset_table=folder_offset_table,
                           offset_table_name=offset_table_name)
-        default_comb_folder = upipe.normpath(self.pipes_combine[targetname].paths.cubes)
+        default_comb_folder = self.pipes_combine[targetname].paths.cubes
         # Now fetch the value set by the user
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
 
@@ -563,7 +563,6 @@ class MusePipeSample(object):
                                'folder_offset_table': folder_offset_table,
                                'offset_list': True}
             kwargs.update(kwargs_pointing)
-            print(kwargs)
             self.pipes[targetname][pointing].run_scipost_perexpo(**kwargs)
 
     def run_target_recipe(self, recipe_name, targetname=None,
