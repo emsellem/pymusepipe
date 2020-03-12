@@ -52,8 +52,6 @@ class PipeRecipes(object) :
             self._set_cpu(first_cpu, ncpu, list_cpu)
         self.nifu = nifu
         self._domerge = domerge
-        self._copy_products_folder = copy_products_folder
-
         self.nochecksum = nochecksum
 
     @property
