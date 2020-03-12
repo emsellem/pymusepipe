@@ -17,23 +17,14 @@ import numpy as np
 try:
     import pypher.pypher as py
 except ImportError:
-    raise Exception("Pypher is needed for the PSF determination")
-
-# Standard modules
-import os
-from os.path import join as joinpath
+    print("IMPORT ERROR: pypher is needed for cube_convolve")
 
 # Importing mpdaf
 try :
     import mpdaf
 except ImportError :
-    raise Exception("mpdaf is required for this - MUSE related - module")
+    print("IMPORT ERROR: mpdaf is needed for cube_convolve")
 
-from mpdaf.obj import Cube, Image
-from mpdaf.obj import Spectrum, WaveCoord
-
-# Astropy
-from astropy.io import fits as pyfits
 
 dict_kernel = {'gaussian': gaussian_kernel, 'moffat': moffat_kernel}
 
