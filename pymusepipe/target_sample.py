@@ -514,7 +514,8 @@ class MusePipeSample(object):
                 first_recipe="align_bypointing", **kwargs)
 
     def run_target_scipost_perexpo(self, targetname=None, list_pointings=None,
-                                    **kwargs):
+                                   folder_offset_table=None, offset_table_name=None,
+                                   **kwargs):
         """Build the cube per exposure using a given WCS
 
         Args:
@@ -538,7 +539,8 @@ class MusePipeSample(object):
 
         # Fetch the default folder for the WCS files which is the folder
         # of the Combined cubes
-        self.init_combine(targetname=targetname)
+        self.init_combine(targetname=targetname, folder_offset_table=folder_offset_table,
+                          offset_table_name=offset_table_name)
         default_comb_folder = upipe.normpath(self.pipes_combine[targetname].paths.cubes)
         # Now fetch the value set by the user
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
@@ -555,7 +557,9 @@ class MusePipeSample(object):
                                'suffix': suffix,
                                'folder_ref_wcs': folder_ref_wcs,
                                'sof_filename': 'scipost_wcs',
-                               'dir_products': default_comb_folder}
+                               'dir_products': default_comb_folder,
+                               'offset_table_name': offset_table_name,
+                               'folder_offset_table': folder_offset_table}
             kwargs.update(kwargs_pointing)
             self.pipes[galaxy][pointing].run_scipost_perexpo(**kwargs)
 
