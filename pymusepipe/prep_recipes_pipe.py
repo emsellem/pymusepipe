@@ -1154,7 +1154,7 @@ class PipePrep(SofPipe) :
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
                     filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
                     skymethod=skymethod, filter_for_alignment=filter_for_alignment,
-                    list_expo=fl_expo, prefix_all=predix_all,
+                    list_expo=fl_expo, prefix_all=prefix_all,
                     **kwargs)
 
             # Write the MASTER files Table and save it
