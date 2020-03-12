@@ -562,7 +562,7 @@ class MusePipeSample(object):
                                'offset_table_name': offset_table_name,
                                'folder_offset_table': folder_offset_table}
             kwargs.update(kwargs_pointing)
-            self.pipes[galaxy][pointing].run_scipost_perexpo(**kwargs)
+            self.pipes[targetname][pointing].run_scipost_perexpo(**kwargs)
 
     def run_target_recipe(self, recipe_name, targetname=None,
                           list_pointings=None, **kwargs):
