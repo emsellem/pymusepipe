@@ -534,10 +534,11 @@ class MusePipeSample(object):
 
         # WCS imposed by setting the reference
         add_targetname = kwargs.pop("add_targetname", True)
+        prefix_all = kwargs.pop("prefix_all", "")
         if add_targetname:
-            prefix_all = "{}_".format(targetname)
-        else:
-            prefix_all = ""
+            prefix_all = "{0}_{1}".format(targetname, prefix_all)
+        save = kwargs.pop("save", 'cube')
+
         wcs_auto = kwargs.pop("wcs_auto", True)
         if not wcs_auto:
             name_wcs = kwargs.pop("name_wcs", None)
@@ -572,7 +573,8 @@ class MusePipeSample(object):
                                'folder_offset_table': folder_offset_table,
                                'offset_list': True,
                                'filter_list': filter_list,
-                               'prefix_all': prefix_all}
+                               'prefix_all': prefix_all,
+                               'save': save}
             kwargs.update(kwargs_pointing)
             self.pipes[targetname][pointing].run_scipost_perexpo(**kwargs)
 
