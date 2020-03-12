@@ -366,7 +366,7 @@ def cube_convolve(data, variance, kernel):
     convolved = np.zeros_like(data, dtype=np.float32)
     convolved_var = np.zeros_like(variance, dtype=np.float32)
 
-    norm_kernel = np.divide(kernel.T, kernel.sum(axis=(1, 2)).T
+    norm_kernel = np.divide(kernel.T, kernel.sum(axis=(1, 2)).T)
     var_kernel = norm_kernel**2
     for i in range(data.shape[0]):
         # Signal
@@ -381,7 +381,7 @@ def cube_convolve(data, variance, kernel):
 
         # Variance
         try:
-            convolved[i, :, :] = convolve_fft(data[i, :, :], var_kernel[i, :, :],
+            convolved_var[i, :, :] = convolve_fft(data[i, :, :], var_kernel[i, :, :],
                                               allow_huge=True, psf_pad=True,
                                               fft_pad=False, boundary='fill',
                                               fill_value=0,
