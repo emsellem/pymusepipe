@@ -574,8 +574,8 @@ class MusePointings(SofPipe, PipeRecipes):
                                 folder_offset_table=folder_offset_table)
 
         # getting the MJD and DATE from the OFFSET table
-        if not set(self.offset_table.columns.keys())
-            & {mjd_names['table'],date_names['table']}:
+        if not set(self.offset_table.columns.keys()) \
+            & {mjd_names['table'], date_names['table']}:
             upipe.print_warning("Could not find some keywords in offset table")
             return
 
