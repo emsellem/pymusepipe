@@ -513,7 +513,7 @@ class MusePipeSample(object):
         self.reduce_target(targetname=targetname, list_pointings=list_pointings, 
                 first_recipe="align_bypointing", **kwargs)
 
-    def run_target_wcscube_perexpo(self, targetname=None, list_pointings=None,
+    def run_target_scipost_perexpo(self, targetname=None, list_pointings=None,
                                     **kwargs):
         """Build the cube per exposure using a given WCS
 
@@ -531,13 +531,10 @@ class MusePipeSample(object):
             return
 
         # WCS imposed by setting the reference
-        ref_wcs = kwargs.pop("ref_wcs", None)
-        if ref_wcs is None:
-            prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
-            self.add_targetname = kwargs.pop("add_targetname", True)
-            prefix_wcs = self._add_targetname(prefix_wcs)
-        else:
-            name_wcs = ref_wcs
+        self.add_targetname = kwargs.pop("add_targetname", True)
+        wcs_auto = kwargs.pop("wcs_auto", True)
+        if not wcs_auto:
+            name_wcs = kwargs.pop("name_wcs", None)
 
         # Fetch the default folder for the WCS files which is the folder
         # of the Combined cubes
@@ -546,23 +543,21 @@ class MusePipeSample(object):
         # Now fetch the value set by the user
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
 
+        # Running the scipost_perexpo for all pointings individually
         for pointing in list_pointings:
-            if ref_wcs is None:
+            if wcs_auto:
                 cube_suffix = dic_products_scipost['cube'][0]
                 cube_suffix = self._add_targetname(cube_suffix)
                 name_wcs = "{0}_P{1:02d}.fits".format(cube_suffix,
-                                                    np.int(pointing))
+                                                      np.int(pointing))
             suffix = "WCS_P{0:02d}".format(np.int(pointing))
-            kwargs_per_pointing[pointing] = {'ref_wcs': name_wcs,
-                                             'folder_ref_wcs': folder_ref_wcs,
-                                             'suffix': suffix,
-                                             'sof_filename': 'scipost_wcs',
-                                             'dir_products': default_comb_folder}
-
-        self.run_target_recipe("scipost_perexpo", targetname=targetname,
-                               list_pointings=list_pointings,
-                               kwargs_per_pointing=kwargs_per_pointing,
-                               **kwargs)
+            kwargs_pointing = {'ref_wcs': name_wcs,
+                               'suffix': suffix,
+                               'folder_ref_wcs': folder_ref_wcs,
+                               'sof_filename': 'scipost_wcs',
+                               'dir_products': default_comb_folder}
+            kwargs.update(kwargs_pointing)
+            self.pipes[galaxy][pointing].run_scipost_perexpo(**kwargs)
 
     def run_target_recipe(self, recipe_name, targetname=None,
                           list_pointings=None, **kwargs):
