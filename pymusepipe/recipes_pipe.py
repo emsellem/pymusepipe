@@ -219,6 +219,7 @@ class PipeRecipes(object) :
         """Running the esorex muse_scipost recipe
         """
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        prefix_all = kwargs.pop("prefix_all", "")
         self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
                 "--astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
@@ -243,7 +244,7 @@ class PipeRecipes(object) :
 
             # In any case move the file from Pipe_products to the right folder
             fitsname_out = "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(
-                            name_imaout=joinpath(dir_products, name_prod), 
+                            name_imaout=joinpath(dir_products, prefix_all+name_prod),
                             suff_pre=suff_pre, suff_post=suff_post, 
                             tpl=tpl, suffix=suffix)
 
@@ -261,7 +262,8 @@ class PipeRecipes(object) :
                 and self._suffix_prealign in fitsname_out:
                 name_imageout_align = ("{name_imaout}{suffix}_P{pointing:02d}_{myfilter}"
                                       "_{tpl}{suff_post}.fits".format(
-                                      name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
+                                      name_imaout=joinpath(self.paths.alignment,
+                                                           prefix_all+"IMAGE_FOV"),
                                       myfilter=filter_for_alignment, suff_post=suff_post, 
                                       tpl=tpl, suffix=suffix, pointing=self.pointing))
                 self.run_oscommand("{nocache} cp {fitsname} {nameima_out}".format(

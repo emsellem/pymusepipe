@@ -16,8 +16,9 @@ import numpy as np
 
 from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
-from pymusepipe.config_pipe import (PHANGS_reduc_config, default_prefix_wcs,
-                                    lambdaminmax_for_mosaic)
+from pymusepipe.config_pipe import (PHANGS_reduc_config,
+                                    default_PHANGS_filter_list,
+                                    default_filter_list)
 from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.combine import MusePointings
 from pymusepipe.align_pipe import rotate_pixtables
@@ -533,6 +534,10 @@ class MusePipeSample(object):
 
         # WCS imposed by setting the reference
         add_targetname = kwargs.pop("add_targetname", True)
+        if add_targetname:
+            prefix_all = "{}_".format(targetname)
+        else:
+            prefix_all = ""
         wcs_auto = kwargs.pop("wcs_auto", True)
         if not wcs_auto:
             name_wcs = kwargs.pop("name_wcs", None)
@@ -544,6 +549,10 @@ class MusePipeSample(object):
         default_comb_folder = self.pipes_combine[targetname].paths.cubes
         # Now fetch the value set by the user
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
+        if self.__phangs:
+            filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
+        else:
+            filter_list = kwargs.pop("filter_list", default_filter_list)
 
         # Running the scipost_perexpo for all pointings individually
         for pointing in list_pointings:
@@ -553,7 +562,7 @@ class MusePipeSample(object):
                      cube_suffix = "{0}_{1}".format(targetname, cube_suffix)
                 name_wcs = "{0}_P{1:02d}.fits".format(cube_suffix,
                                                       np.int(pointing))
-            suffix = "WCS_P{0:02d}".format(np.int(pointing))
+            suffix = "_WCS_P{0:02d}".format(np.int(pointing))
             kwargs_pointing = {'ref_wcs': name_wcs,
                                'suffix': suffix,
                                'folder_ref_wcs': folder_ref_wcs,
@@ -561,7 +570,9 @@ class MusePipeSample(object):
                                'dir_products': default_comb_folder,
                                'offset_table_name': offset_table_name,
                                'folder_offset_table': folder_offset_table,
-                               'offset_list': True}
+                               'offset_list': True,
+                               'filter_list': filter_list,
+                               'prefix_all': prefix_all}
             kwargs.update(kwargs_pointing)
             self.pipes[targetname][pointing].run_scipost_perexpo(**kwargs)
 

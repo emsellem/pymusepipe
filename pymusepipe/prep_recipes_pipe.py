@@ -167,10 +167,11 @@ class PipePrep(SofPipe) :
         else :
             return group_table.groups[group_table.groups.keys['tpls'] == tpl]
         
-    def print_recipes(self):
+    @staticmethod
+    def print_recipes():
         """Printing the list of recipes
         """
-        #for recipe in self.list_recipes:
+        # for recipe in self.list_recipes:
         upipe.print_info("=============================================")
         upipe.print_info("The dictionary of recipes which can be run is")
         for key in dic_recipes_num.keys():
@@ -1058,6 +1059,7 @@ class PipePrep(SofPipe) :
             folder_ref_wcs = kwargs.pop("folder_ref_wcs", "")
         dir_products = kwargs.pop("dir_products",
                                   self._get_fullpath_expo(expotype, "processed"))
+        prefix_all = kwargs.pop("prefix_all", "")
 
         # Continuum correction
         default_suffix_skycontinuum = ""
@@ -1152,7 +1154,8 @@ class PipePrep(SofPipe) :
                     lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
                     filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
                     skymethod=skymethod, filter_for_alignment=filter_for_alignment,
-                    list_expo=fl_expo, **kwargs)
+                    list_expo=fl_expo, prefix_all=predix_all,
+                    **kwargs)
 
             # Write the MASTER files Table and save it
             if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])

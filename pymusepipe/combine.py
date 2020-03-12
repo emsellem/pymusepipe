@@ -291,8 +291,8 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Setting the default attibutes #####################
         self.targetname = targetname
-        self._phangs = kwargs.pop("PHANGS", False)
-        if self._phangs:
+        self.__phangs = kwargs.pop("PHANGS", False)
+        if self.__phangs:
             self.filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
         else:
             self.filter_list = kwargs.pop("filter_list", default_filter_list)
