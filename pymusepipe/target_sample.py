@@ -532,7 +532,7 @@ class MusePipeSample(object):
             return
 
         # WCS imposed by setting the reference
-        self.add_targetname = kwargs.pop("add_targetname", True)
+        add_targetname = kwargs.pop("add_targetname", True)
         wcs_auto = kwargs.pop("wcs_auto", True)
         if not wcs_auto:
             name_wcs = kwargs.pop("name_wcs", None)
@@ -549,7 +549,8 @@ class MusePipeSample(object):
         for pointing in list_pointings:
             if wcs_auto:
                 cube_suffix = dic_products_scipost['cube'][0]
-                cube_suffix = self._add_targetname(cube_suffix)
+                if add_targetname:
+                     cube_suffix = "{0}_{1}".format(targetname, cube_suffix)
                 name_wcs = "{0}_P{1:02d}.fits".format(cube_suffix,
                                                       np.int(pointing))
             suffix = "WCS_P{0:02d}".format(np.int(pointing))
