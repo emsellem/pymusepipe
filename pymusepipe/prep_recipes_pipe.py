@@ -1039,6 +1039,9 @@ class PipePrep(SofPipe) :
         offset_list = kwargs.pop("offset_list", False)
         offset_table_name = kwargs.pop("offset_table_name", None)
         folder_offset_table = kwargs.pop("folder_offset_table", None)
+        if offset_list:
+            upipe.print_info("Will use offset table: {0} in {1}".format(
+                offset_table_name, folder_offset_table))
 
         # Misc parameters - autocalib, barycentric correction, AC
         autocalib = kwargs.pop("autocalib", "none")

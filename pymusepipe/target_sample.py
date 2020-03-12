@@ -560,8 +560,10 @@ class MusePipeSample(object):
                                'sof_filename': 'scipost_wcs',
                                'dir_products': default_comb_folder,
                                'offset_table_name': offset_table_name,
-                               'folder_offset_table': folder_offset_table}
+                               'folder_offset_table': folder_offset_table,
+                               'offset_list': True}
             kwargs.update(kwargs_pointing)
+            print(kwargs)
             self.pipes[targetname][pointing].run_scipost_perexpo(**kwargs)
 
     def run_target_recipe(self, recipe_name, targetname=None,
