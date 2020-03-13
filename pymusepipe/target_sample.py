@@ -17,8 +17,8 @@ import numpy as np
 from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
 from pymusepipe.config_pipe import (PHANGS_reduc_config,
-                                    default_PHANGS_filter_list,
-                                    default_filter_list)
+                                    default_short_PHANGS_filter_list,
+                                    default_short_filter_list)
 from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.combine import MusePointings
 from pymusepipe.align_pipe import rotate_pixtables
@@ -551,9 +551,9 @@ class MusePipeSample(object):
         # Now fetch the value set by the user
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
         if self.__phangs:
-            filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
+            filter_list = kwargs.pop("filter_list", default_short_PHANGS_filter_list)
         else:
-            filter_list = kwargs.pop("filter_list", default_filter_list)
+            filter_list = kwargs.pop("filter_list", default_short_filter_list)
 
         # Running the scipost_perexpo for all pointings individually
         for pointing in list_pointings:

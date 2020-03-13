@@ -18,8 +18,10 @@ import numpy as np
 
 default_filter_list = ("white,Johnson_B,Johnson_V,Cousins_R,"
                        "SDSS_g,SDSS_r,SDSS_i")
+default_short_filter_list = ("white,Cousins_R")
 default_PHANGS_filter_list = ("white,Johnson_B,Johnson_V,Cousins_R,"
                        "SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB,DuPont_r")
+default_short_PHANGS_filter_list = ("white,WFI_BB,DuPont_r")
 
 #-- END ---------------------------------------------------------------#
 
