@@ -201,6 +201,7 @@ class MusePipeSample(object):
 
         # Initialisation of targets
         self.init_pipes = kwargs.pop("init_pipes", True)
+        self. add_targetname = kwargs.pop("add_targetname", True)
         self._init_targets()
 
     def _init_calib_files(self):
@@ -533,7 +534,7 @@ class MusePipeSample(object):
             return
 
         # WCS imposed by setting the reference
-        add_targetname = kwargs.pop("add_targetname", True)
+        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         prefix_all = kwargs.pop("prefix_all", "")
         if add_targetname:
             prefix_all = "{0}_{1}".format(targetname, prefix_all)
@@ -678,39 +679,48 @@ class MusePipeSample(object):
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def rotate_pixtables_target(self, targetname=None, list_pointings=None,
-                     folder_offset_table=None, offset_table_name=None, fakemode=False, **kwargs):
+                                folder_offset_table=None, offset_table_name=None,
+                                fakemode=False, **kwargs):
         """Rotate all pixel table of a certain targetname and pointings
         """
         # General print out
-        upipe.print_info("---- Starting the PIXTABLE ROTATION for Target={0} ----".format(
-                            targetname))
+        upipe.print_info("---- Starting the PIXTABLE ROTATION "
+                         "for Target={0} ----".format(targetname))
 
         # Initialise the pipe if needed
         if not self.pipes[targetname]._initialised \
             or "first_recipe" in kwargs or "last_recipe" in kwargs:
-            self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
+            self.set_pipe_target(targetname=targetname,
+                                 list_pointings=list_pointings, **kwargs)
 
         # Check if pointings are valid
         list_pointings = self._check_pointings(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
+        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        prefix = kwargs.pop("prefix", "")
+        if add_targetname:
+            prefix = "{}_{}".format(targetname, prefix)
         if folder_offset_table is None:
             folder_offset_table = self.pipes[targetname][list_pointings[0]].paths.alignment
         offset_table = Table.read(joinpath(folder_offset_table, offset_table_name))
         offset_table.sort(["POINTING_OBS", "IEXPO_OBS"])
         # Loop on the pointings
+
         for row in offset_table:
             iexpo = row['IEXPO_OBS']
             pointing = row['POINTING_OBS']
             tpls = row['TPL_START']
             angle = row['ROTANGLE']
-            upipe.print_info("Rotation ={0} Deg for Pointing={1:02d}, TPLS={2} - Expo {3:02d}".format(
+            upipe.print_info("Rotation ={0} Deg for Pointing={1:02d}, "
+                             "TPLS={2} - Expo {3:02d}".format(
                                 angle, pointing, tpls, iexpo))
             folder_expos = self._get_path_files(targetname, pointing)
             name_suffix = "{0}_{1:04d}".format(tpls, iexpo)
-            rotate_pixtables(folder=folder_expos, name_suffix=name_suffix, list_ifu=None,
-                     angle=angle, fakemode=fakemode, **kwargs)
+            rotate_pixtables(folder=folder_expos, name_suffix=name_suffix,
+                             list_ifu=None, angle=angle, fakemode=fakemode,
+                             prefix=prefix, **kwargs)
 
     def init_combine(self, targetname=None, list_pointings="all",
                      folder_offset_table=None, offset_table_name=None, **kwargs):

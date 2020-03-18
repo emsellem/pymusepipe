@@ -1,15 +1,14 @@
 """ Copyright (C) 2017 ESO/Centre de Recherche Astronomique de Lyon (CRAL)
-    print pygme.__LICENSE__  for the terms of use
+    print pymusepipe.__LICENSE__  for the terms of use
 
     This package is a wrapper around MUSE pipeline commands to reduce
-    muse dataframes.
+    muse raw data frames. It includes modules for aligning and convolving the frames.
+    It also has some basic routines wrapped around mpdaf.
 """
 from .version import __date__, __version__
 
-from pymusepipe import (init_musepipe, musepipe, target_sample, graph_pipe, mpdaf_pipe,
-        check_pipe, emission_lines, prep_recipes_pipe, recipes_pipe, create_sof, util_pipe,
-        align_pipe, combine, config_pipe, cube_convolve)
-
-#__all__ = ['init_musepipe', 'musepipe', 'graph_pipe', 'mpdaf_pipe', 'check_pipe',
-#       'emission_lines', 'prep_recipes_pipe', 'recipes_pipe', 'create_sof']
+from pymusepipe import (align_pipe, check_pipe, combine, config_pipe, create_sof,
+                        cube_convolve, emission_lines, graph_pipe, init_musepipe,
+                        mpdaf_pipe, musepipe, prep_recipes_pipe, recipes_pipe,
+                        target_sample, util_pipe)
 

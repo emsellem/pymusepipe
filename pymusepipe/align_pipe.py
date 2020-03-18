@@ -514,7 +514,8 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
 
     pixtable_basename = kwargs.pop("pixtable_basename",
                                    dic_listObject['OBJECT'])
-    name_pixtable = "{0}_{1}-{2:03d}.fits".format(pixtable_basename,
+    prefix = kwargs.pop("prefix", "")
+    name_pixtable = "{0}{1}_{2}-{3:03d}.fits".format(prefix, pixtable_basename,
                                                   name_suffix, np.int(nifu))
     fullname_pixtable = joinpath(folder, name_pixtable)
     fakemode = kwargs.pop("fakemode", False)
