@@ -534,10 +534,10 @@ class MusePipeSample(object):
             return
 
         # WCS imposed by setting the reference
-        # add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         prefix_all = kwargs.pop("prefix_all", "")
-        # if add_targetname:
-        #    prefix_all = "{0}_{1}".format(targetname, prefix_all)
+        if add_targetname:
+            prefix_all = "{0}_{1}".format(targetname, prefix_all)
         save = kwargs.pop("save", 'cube')
 
         wcs_auto = kwargs.pop("wcs_auto", True)
@@ -698,10 +698,10 @@ class MusePipeSample(object):
         if len(list_pointings) == 0:
             return
 
-        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        # add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         prefix = kwargs.pop("prefix", "")
-        if add_targetname:
-            prefix = "{}_{}".format(targetname, prefix)
+        # if add_targetname:
+        #     prefix = "{}_{}".format(targetname, prefix)
         if folder_offset_table is None:
             folder_offset_table = self.pipes[targetname][list_pointings[0]].paths.alignment
         offset_table = Table.read(joinpath(folder_offset_table, offset_table_name))
