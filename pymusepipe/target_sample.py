@@ -534,10 +534,10 @@ class MusePipeSample(object):
             return
 
         # WCS imposed by setting the reference
-        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        # add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         prefix_all = kwargs.pop("prefix_all", "")
-        if add_targetname:
-            prefix_all = "{0}_{1}".format(targetname, prefix_all)
+        # if add_targetname:
+        #    prefix_all = "{0}_{1}".format(targetname, prefix_all)
         save = kwargs.pop("save", 'cube')
 
         wcs_auto = kwargs.pop("wcs_auto", True)
