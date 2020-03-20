@@ -20,8 +20,8 @@ default_filter_list = ("white,Johnson_B,Johnson_V,Cousins_R,"
                        "SDSS_g,SDSS_r,SDSS_i")
 default_short_filter_list = ("white,Cousins_R")
 default_PHANGS_filter_list = ("white,Johnson_B,Johnson_V,Cousins_R,"
-                       "SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB,DuPont_r")
-default_short_PHANGS_filter_list = ("white,WFI_BB,DuPont_r")
+                       "SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB,DUPONT_R")
+default_short_PHANGS_filter_list = ("white,WFI_BB,DUPONT_R")
 
 #-- END ---------------------------------------------------------------#
 
@@ -107,7 +107,7 @@ dic_user_folders = {
 default_rc_filename = "~/.musepiperc"
 
 PHANGS_reduc_config = {'fakemode':False, 'nocache':False, 'checkmode':False, 
-                 'overwrite_astropy_table':True, 'filter_list':"white,WFI_BB,DuPont_r", 
+                 'overwrite_astropy_table':True, 'filter_list':"white,WFI_BB,DUPONT_R",
                  'filter_for_alignment':"WFI_BB"}
 PHANGS_combine_config = {'fakemode':False, 'nocache':False}
 
@@ -117,8 +117,8 @@ dic_extra_filters = {
         "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
         # Broad band filter
         "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt",
-        # DuPont r filter
-	"DuPont_r": "Filter/LCO_SITe3_r.txt"
+        # DUPONT R filter
+	"DUPONT_R": "Filter/LCO_SITe3_r.txt"
         }
 
 # Default hard-coded fits files - Calibration Tables

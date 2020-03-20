@@ -54,7 +54,7 @@ default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
 default_reference_unit = u.microJansky
 
 dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
-                   "DuPont_r": u.spectral_density(6483.58 * u.AA)}
+                   "DUPONT_R": u.spectral_density(6483.58 * u.AA)}
 
 # ================== Useful function ====================== #
 def create_offset_table(image_names=[], table_folder="", 
