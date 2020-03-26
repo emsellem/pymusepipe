@@ -746,8 +746,8 @@ class MusePipeSample(object):
             return
 
         # Make a list for the masking of the cubes to take into account
-        list_pointing_names = ["P{0:02d}".format(np.int(pointing)
-                                                 for pointing in list_pointings]
+        list_pointing_names = ["P{0:02d}".format(np.int(pointing))
+                               for pointing in list_pointings]
 
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", comb_folder)
         self.pipes_mosaic[targetname] = MuseCubeMosaic(output_wcs=...,
