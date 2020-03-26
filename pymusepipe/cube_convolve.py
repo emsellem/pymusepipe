@@ -13,9 +13,13 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Importing modules
 import numpy as np
 
+# Astropy
+from astropy.convolution import Moffat2DKernel, Gaussian2DKernel
+from astropy.stats import gaussian_fwhm_to_sigma
+
 # pypher
 try:
-    import pypher.pypher as py
+    import pypher.pypher as ph
 except ImportError:
     print("IMPORT WARNING: pypher is needed for cube_convolve")
 
@@ -219,7 +223,7 @@ def psf3d(wave, size, fwhm0, lambda0=6483.58, b=-3e-5, scale=0.2, nmoffat=None,
 
     # creating the 3D PSF.
     psf_cube = np.zeros((len(wave), *size))
-    if function in dict_kernel.keys():
+    if function in dict_kernel:
         function_kernel = dict_kernel[function]
         for i, fwhm in enumerate(fwhm_wave):
             kernel = function_kernel(fwhm, size, scale=scale, n=nmoffat)
@@ -264,7 +268,7 @@ def psf2d(size, fwhm, function='gaussian', nmoffat=None, scale=0.2):
         print('size must have at most two elements.')
         return None
 
-    if function in dict_kernel.keys():
+    if function in dict_kernel:
         function_kernel = dict_kernel[function]
         kernel = function_kernel(fwhm, size, scale=scale, n=nmoffat)
         return kernel
@@ -290,7 +294,7 @@ def convolution_kernel(input_psf, target_psf, scale=0.2):
 
     assert len(target_psf.shape) == 2, 'the target_psf must be a 2d array'
 
-    n_lam = orig_psf.shape[0]
+    n_lam = input_psf.shape[0]
 
     conv_kernel = np.zeros_like(input_psf, dtype=np.float32)
 
@@ -381,7 +385,6 @@ def cube_convolve(data, variance, kernel):
 
     return convolved
 
-
 def cube_kernel(shape, wave, input_fwhm,  target_fwhm,
                 input_function, target_function, lambda0=6483.58,
                 input_nmoffat=None, target_nmoffat=None, b=-3e-5,
@@ -428,10 +431,10 @@ def cube_kernel(shape, wave, input_fwhm,  target_fwhm,
 
     print('Creating the convolution kernel')
     if compute_kernel == 'pypher':
-        print('Using pypher')
+        print('Building the convolution kernel via pypher')
         kernel = convolution_kernel(original_psf, target_psf, scale=0.2)
     elif compute_kernel == 'gaussian':
-        print('Gaussian Kernel')
+        print('Building Gaussian Kernel')
         kernel = convolution_kernel_gaussian(target_psf, target_fwhm,
                                              fwhm_wave, scale=0.2)
     else:

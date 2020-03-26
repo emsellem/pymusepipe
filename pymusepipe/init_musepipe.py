@@ -27,7 +27,7 @@ from pymusepipe.config_pipe import (dic_user_folders, default_rc_filename,
 ############################################################
 def add_suffix_tokeys(dic, suffix="_folder") :
     newdic = {}
-    for key in dic.keys() :
+    for key in dic:
         setattr(newdic, key + suffix, dic[key])
 
 ############################################################
@@ -98,7 +98,7 @@ class InitMuseParameters(object) :
         """Initialise the parameters as defined in the input dictionary
         Hardcoded in init_musepipe.py
         """
-        for key in dic_param.keys() :
+        for key in dic_param:
             upipe.print_info("Default initialisation of attribute {0}".format(key), pipe=self)
             setattr(self, key, dic_param[key])
 
@@ -117,26 +117,24 @@ class InitMuseParameters(object) :
         lines = f_param.readlines()
 
         # Dummy dictionary to see which items are not initialised
-        dummy_dic_param = copy.copy(dic_param)
+        noninit_dic_param = copy.copy(dic_param)
         for line in lines :
             if line[0] in ["#", "%"] : continue 
 
             sline = re.split(r'(\s+)', line)
             keyword_name = sline[0]
             keyword = ("".join(sline[2:])).rstrip()
-            if keyword_name in dic_param.keys() :
+            if keyword_name in dic_param:
                 upipe.print_info("Initialisation of attribute {0}".format(keyword_name), 
                                  pipe=self)
                 setattr(self, keyword_name, keyword) 
                 # Here we drop the item which was initialised
-                val = dummy_dic_param.pop(keyword_name)
+                val = noninit_dic_param.pop(keyword_name)
             else :
                 continue
 
-        # Set of non initialised folders
-        not_initialised_param = dummy_dic_param.keys()
         # Listing them as warning and using the hardcoded default
-        for key in not_initialised_param :
+        for key in noninit_dic_param:
             upipe.print_warning(("Parameter {param} not initialised "
                    "We will use the default hardcoded value from "
                    "init_musepipe.py").format(param=key))

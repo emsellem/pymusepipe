@@ -110,7 +110,7 @@ def create_offset_table(image_names=[], table_folder="",
 
     # Create and fill the table
     offset_table = Table()
-    for col in default_offset_table.keys():
+    for col in default_offset_table:
         [name, form, default] = default_offset_table[col]
         offset_table[name] = Column([default for i in range(nlines)], 
                                     dtype=form)

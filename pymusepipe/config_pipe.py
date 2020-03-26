@@ -31,7 +31,7 @@ default_short_PHANGS_filter_list = ("white,WFI_BB,DUPONT_R")
 #======================================================================#
 # For musepipe module
 
-listexpo_types = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
+dic_expotypes = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
         'ILLUM': 'FLAT,LAMP,ILLUM', 'TWILIGHT': 'FLAT,SKY', 
         'WAVE': 'WAVE', 'STD': 'STD', 'AST': 'AST',
         'OBJECT': 'OBJECT', 'SKY': 'SKY',
@@ -304,5 +304,5 @@ dic_recipes_per_num = {1:'bias', 2:'flat', 3:'wave',
 
 # and creating the inverse dictionary
 dic_recipes_per_name = {}
-for key in dic_recipes_per_num.keys():
+for key in dic_recipes_per_num:
     dic_recipes_per_name[dic_recipes_per_num[key]] = key

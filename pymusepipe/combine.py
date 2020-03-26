@@ -113,7 +113,7 @@ def build_dic_exposures(target_path=""):
         name_pointing = "P{:02d}".format(pointing)
         upipe.print_info("For pointing {0}".format(name_pointing))
         dic_p = get_list_exposures(joinpath(target_path, name_pointing))
-        dic_expos[pointing] = [(tpl, dic_p[tpl]) for tpl in dic_p.keys()]
+        dic_expos[pointing] = [(tpl, dic_p[tpl]) for tpl in dic_p]
 
     return dic_expos
 
@@ -168,14 +168,14 @@ def get_list_exposures(pointing_path=""):
     dic_expos = {}
     for l in sorted_list:
         tpl = l[0]
-        if tpl in dic_expos.keys():
+        if tpl in dic_expos:
             dic_expos[tpl].append(l[1])
         else:
             dic_expos[tpl] = [l[1]]
 
     # Finding the full list of tpl
     upipe.print_info("Exposures list:")
-    for tpl in dic_expos.keys():
+    for tpl in dic_expos:
         upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dic_expos[tpl]))
 
     return dic_expos
@@ -222,7 +222,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
             # Find the tpl
             tpl = sl[1].split("_" + expo)[0]
             # If not already there, add it
-            if tpl not in dic_tpl.keys():
+            if tpl not in dic_tpl:
                 dic_tpl[tpl] = [np.int(expo)]
             # if already accounted for, add the expo number
             else:
@@ -230,7 +230,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
 
         # Creating the full list for that pointing
         full_list = []
-        for tpl in dic_tpl.keys():
+        for tpl in dic_tpl:
             dic_tpl[tpl].sort()
             full_list.append((tpl, dic_tpl[tpl]))
 
@@ -360,7 +360,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.goto_folder(self.paths.data)
 
         # Now create full path folder 
-        for folder in self._dic_combined_folders.keys():
+        for folder in self._dic_combined_folders:
             upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
 
         # Checking input pointings and pixtables
@@ -667,7 +667,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         self._dic_paths = {"combined": self.paths}
 
-        for name in list(self._dic_combined_folders.keys()):
+        for name in self._dic_combined_folders:
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.pipe_params, name)))
 
         # Creating the filenames for Master files
@@ -680,7 +680,7 @@ class MusePointings(SofPipe, PipeRecipes):
                     joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.targetname, pointing)))
 
         # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
-        for name in list(self.pipe_params._dic_folders_target.keys()):
+        for name in self.pipe_params._dic_folders_target:
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
 
     def run_combine_all_single_pointings(self,

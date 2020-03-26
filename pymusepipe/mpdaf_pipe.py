@@ -199,9 +199,9 @@ class MuseCube(Cube):
 
         # PSF for that Cube
         self.psf_function = kwargs.pop("psf_function", "moffat")
-        self.psf_fwhm0 = kwargs.pop("psf_fwhm0", 0.)
+        self.psf_fwhm0 = kwargs.pop("psf_fwhm0", 0.5)
         self.psf_l0 = kwargs.pop("psf_l0", 6483.58)
-        self.psf_nmoffat = kwargs.pop("psf_nmoffat", None)
+        self.psf_nmoffat = kwargs.pop("psf_nmoffat", 2.8)
         self.psf_b = kwargs.pop("psf_b", -3.0e-5)
 
     def get_spectrum_from_cube(self, nx=None, ny=None, pixel_window=0, title="Spectrum"):
@@ -266,7 +266,7 @@ class MuseCube(Cube):
     def convolve_cube(self, target_fwhm, target_nmoffat=None,
                       input_function='moffat', target_function="gaussian",
                       outcube_name=None,
-                      factor_fwhm=6, fft=False):
+                      factor_fwhm=3, fft=True):
         """Convolve the cube for a target function 'gaussian' or 'moffat'
 
         Args:
@@ -287,9 +287,10 @@ class MuseCube(Cube):
         if outcube_name is None:
             outcube_name = "conv{0}_{1:.2f}{2}".format(target_function.lower()[0],
                                                        target_fwhm, cube_name)
+        upipe.print_info("The new cube will be named: {}".format(outcube_name))
 
         # Getting the shape of the Kernel
-        scale_spaxel = self.get_step(u.arcsec)[1]
+        scale_spaxel = self.get_step(unit_wcs=u.arcsec)[1]
         nspaxel = np.int(factor_fwhm * target_fwhm / scale_spaxel)
         # Make nspaxel odd to have a PSF centred at the centre of the frame
         if nspaxel % 2 == 0: nspaxel += 1
@@ -304,11 +305,14 @@ class MuseCube(Cube):
                                scale=scale_spaxel, compute_kernel='pypher')
 
         if fft:
-           conv_cube = self.fftconvolve(other=kernel3d)
+            upipe.print_info("Starting the FFT convolution")
+            conv_cube = self.fftconvolve(other=kernel3d)
         else:
+            upipe.print_info("Starting the convolution")
             conv_cube = self.convolve(other=kernel3d)
 
         # Write the output
+        upipe.print_info("Writing up the derived cube")
         conv_cube.write(joinpath(cube_folder, outcube_name))
 
         # just provide the output name by folder+name
@@ -429,7 +433,7 @@ class MuseCube(Cube):
             # initialise the filter file
             upipe.print_info("Reading private reference filter {0}".format(filter_name))
             if dic_extra_filters is not None:
-                if filter_name in dic_extra_filters.keys():
+                if filter_name in dic_extra_filters:
                     filter_file = dic_extra_filters[filter_name]
                 else:
                     upipe.print_error("[mpdaf_pipe / get_filter_image] "

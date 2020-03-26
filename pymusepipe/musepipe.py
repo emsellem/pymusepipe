@@ -67,7 +67,7 @@ import pymusepipe.util_pipe as upipe
 from pymusepipe.config_pipe import (
     suffix_rawfiles, suffix_prealign, suffix_checkalign,
     listexpo_files, dic_listObject, dic_listMaster, dic_listMasterObject,
-    listexpo_types, dic_geo_astrowcs_table, exclude_list_checkmode,
+    dic_expotypes, dic_geo_astrowcs_table, exclude_list_checkmode,
     dic_astrogeo, )
 
 __version__ = '2.0.2 (25/09/2019)'
@@ -434,7 +434,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self._dic_suffix_astro = {"raw": "RAW", "master": "MASTER",
                                   "processed": "PRO", "reduced": "RED"}
 
-        for expotype in listexpo_types:
+        for expotype in dic_expotypes:
             setattr(self.Tables.Raw, self._get_attr_expo(expotype), [])
 
     def read_all_astro_tables(self, reset=False):
@@ -653,9 +653,9 @@ class MusePipe(PipePrep, PipeRecipes):
             return
 
         # Sorting alphabetically (thus by date)
-        for expotype in listexpo_types:
+        for expotype in dic_expotypes:
             try:
-                mask = (self.Tables.Rawfiles['type'] == listexpo_types[expotype])
+                mask = (self.Tables.Rawfiles['type'] == dic_expotypes[expotype])
                 if self.checkmode:
                     maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
                     if (expotype.upper() not in exclude_list_checkmode) or self.strong_checkmode:

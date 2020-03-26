@@ -138,7 +138,7 @@ class PipeDict(dict) :
         """Runs the given function on all the keys
         """
         def _function(**kwargs):
-            for key in self.keys():
+            for key in self:
                 getattr(self[key], funcname)(**kwargs)
 
         return _function
@@ -274,7 +274,7 @@ class MusePipeSample(object):
             subfolder = self.sample[targetname][0]
             lpoints = self.sample[targetname][1]
             list_pointings = []
-            for lp in lpoints.keys():
+            for lp in lpoints:
                 if lpoints[lp] == 1:
                     list_pointings.append(lp)
             # Defining the MusePipe for that target
@@ -403,7 +403,7 @@ class MusePipeSample(object):
 
         # Over-writing the arguments in kwargs from config dictionary
         if config_args is not None:
-            for attr in config_args.keys():
+            for attr in config_args:
                 if attr not in kwargs:
                     kwargs[attr] = config_args[attr]
 
@@ -490,7 +490,7 @@ class MusePipeSample(object):
         last_recipe: int or str
             One of the recipe to end with
         """
-        for target in self.targets.keys():
+        for target in self.targets:
             upipe.print_info("=== Start Reduction of Target {name} ===".format(name=target))
             self.reduce_target(targetname=target, **kwargs)
             upipe.print_info("===  End  Reduction of Target {name} ===".format(name=target))
@@ -628,7 +628,7 @@ class MusePipeSample(object):
             upipe.print_info("====== START - POINTING {0:2d} "
                              "======".format(pointing))
             param_recipes = {}
-            if pointing in kwargs_per_pointing.keys():
+            if pointing in kwargs_per_pointing:
                 param_recipes[recipe_name] = kwargs_per_pointing[pointing]
 
             # Initialise raw tables if not already done (takes some time)

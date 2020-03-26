@@ -59,7 +59,7 @@ class SofPipe(object) :
                 upipe.print_info("Appending in file {0}".format(sof))
     
         # Use dictionary to write up the lines
-        for key in self._sofdict.keys() :
+        for key in self._sofdict:
             for item in self._sofdict[key] :
                 text_to_write = "{0} {1}\n".format(item, key)
                 sof_file.write(text_to_write)

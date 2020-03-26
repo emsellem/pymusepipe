@@ -215,12 +215,12 @@ def get_emissionline_wavelength(line="Ha", velocity=0., redshift=None, medium='a
 
     if line is None:
         return -1.
-    elif line not in list_emission_lines.keys() :
+    elif line not in list_emission_lines:
         upipe.print_error("Could not guess the emission line you wish to use")
         upipe.print_error("Please review the 'emission_line' dictionary")
         return -1.
 
-    if medium not in index_line.keys() :
+    if medium not in index_line:
         upipe.print_error("Please choose between one of these media: {0}".format(index_line.key()))
         return -1.
 
@@ -259,7 +259,7 @@ def select_spaxels(maskDic, maskName, X, Y) :
 
     ## We first check if the maskName is in the list of the defined Masks
     ## If the galaxy is not in the list, then the selection is all True
-    if (maskName in maskDic.keys()) :
+    if maskName in maskDic:
         ## The mask is defined, so Get the list of Regions
         ## From the defined dictionary
         listRegions = maskDic[maskName]

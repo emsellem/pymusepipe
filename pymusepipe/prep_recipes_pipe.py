@@ -147,7 +147,7 @@ class PipePrep(SofPipe) :
     def select_tpl_files(self, expotype=None, tpl="ALL", stage="raw"):
         """Selecting a subset of files from a certain type
         """
-        if expotype not in musepipe.listexpo_types.keys() :
+        if expotype not in musepipe.dic_expotypes:
             upipe.print_info("ERROR: input {0} is not in the list of possible values".format(expotype),
                     pipe=self)
             return 
@@ -174,7 +174,7 @@ class PipePrep(SofPipe) :
         # for recipe in self.list_recipes:
         upipe.print_info("=============================================")
         upipe.print_info("The dictionary of recipes which can be run is")
-        for key in dic_recipes_num.keys():
+        for key in dic_recipes_num:
             print("{0}: {1}".format(key, dic_recipes_num[key]))
         upipe.print_info("=============================================")
 
@@ -201,7 +201,7 @@ class PipePrep(SofPipe) :
                              }
 
         dic_kwargs_recipes = kwargs.pop("param_recipes", {})
-        for key in default_dic_kwargs_recipes.keys():
+        for key in default_dic_kwargs_recipes:
             if key in dic_kwargs_recipes:
                 dic_kwargs_recipes[key].update(default_dic_kwargs_recipes[key])
             else:
@@ -214,12 +214,12 @@ class PipePrep(SofPipe) :
 
         # Transforming first and last if they are strings and not numbers
         if isinstance(first_recipe, str):
-            if first_recipe not in dic_recipes_per_name.keys():
+            if first_recipe not in dic_recipes_per_name:
                 upipe.print_error("First recipe {} not in list of recipes".format(first_recipe))
                 return
             first_recipe = dic_recipes_per_name[first_recipe]
         if isinstance(last_recipe, str):
-            if last_recipe not in dic_recipes_per_name.keys():
+            if last_recipe not in dic_recipes_per_name:
                 upipe.print_error("Last recipe {} not in list of recipes".format(last_recipe))
                 return
             last_recipe = dic_recipes_per_name[last_recipe]
@@ -236,7 +236,7 @@ class PipePrep(SofPipe) :
             recipe = dic_recipes_per_num[ind]
             name_recipe = "run_{}".format(recipe)
             # Including the kwargs for each recipe
-            if recipe in dic_kwargs_recipes.keys():
+            if recipe in dic_kwargs_recipes:
                 kdic = dic_kwargs_recipes[recipe]
             else:
                 kdic = {}
