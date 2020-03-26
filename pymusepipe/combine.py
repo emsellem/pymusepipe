@@ -241,7 +241,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
 
 
 class MusePointings(SofPipe, PipeRecipes):
-    def __init__(self, targetname=None, list_pointings=None,
+    def __init__(self, targetname=None, list_pointings="all",
                  dic_exposures_in_pointings=None,
                  suffix_fixed_pixtables="tmask",
                  folder_config="",
@@ -334,11 +334,11 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
 
-
         # Now the list of pointings
-        if (list_pointings is None) or (list_pointings.lower() == "all"):
-            self.list_pointings = get_list_pointings(joinpath(self.pipe_params.root,
-                                                              self.targetname))
+        if isinstance(list_pointings, str):
+            if list_pointings.lower() == "all":
+                self.list_pointings = get_list_pointings(
+                    joinpath(self.pipe_params.root, self.targetname))
         else:
             self.list_pointings = list_pointings
 
