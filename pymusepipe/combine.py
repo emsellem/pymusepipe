@@ -576,7 +576,7 @@ class MusePointings(SofPipe, PipeRecipes):
             Name of the folder to find the offset table
             Default is None
         """
-        if ofset_table_name is None:
+        if offset_table_name is None:
             return
 
         self._read_offset_table(offset_table_name=offset_table_name,
