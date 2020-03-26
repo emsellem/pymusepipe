@@ -13,18 +13,13 @@ __contact__   = " <eric.emsellem@eso.org>"
 # and further rewritten by Mark van den Brok. 
 # Thanks to all !
 
-# Numpy
-import numpy as np
-
 # Standard modules
 import os
 from os.path import join as joinpath
 
-import collections
 from collections import OrderedDict
 
 from pymusepipe import util_pipe as upipe
-from pymusepipe import musepipe
 from pymusepipe.config_pipe import get_suffix_product
 
 class SofDict(OrderedDict) :
