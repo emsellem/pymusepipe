@@ -99,6 +99,9 @@ class PipeRecipes(object) :
     def write_logfile(self, text, addext=""):
         """Writing in log file
         """
+        if text == "":
+            # nothing to write
+            return
         fulltext = "# At : {0}{1} - pymusepipe version {2}\n{3}\n".format(
                 upipe.formatted_time(),
                 " FAKEMODE" if self.fakemode else "",
@@ -121,7 +124,9 @@ class PipeRecipes(object) :
                                     stderr=subprocess.PIPE)
             if log:
                 self.write_logfile(command)
+                self.write_outlogfile(command)
                 self.write_outlogfile(result.stdout.decode('utf-8'))
+                self.write_errlogfile(command)
                 self.write_errlogfile(result.stderr.decode('utf-8'))
 
     def joinprod(self, name):
