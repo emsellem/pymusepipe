@@ -178,7 +178,8 @@ def safely_create_folder(path, verbose=True):
         print_info("Trying to create {folder} folder".format(folder=path), end='')
     try: 
         os.makedirs(path)
-        print_endline("... Done", end='\n')
+        if verbose:
+            print_endline("... Done", end='\n')
     except OSError:
         if not os.path.isdir(path):
             print_error("Failed to create folder! Please check the path")
