@@ -299,10 +299,11 @@ class MusePipeSample(object):
             self.pipes[targetname].data_path = joinpath(init_params_target.root, targetname)
 
             init_comb_target = MusePointings(targetname=targetname,
-                                                 list_pointings=list_pointings,
-                                                 rc_filename=rc_filename,
-                                                 cal_filename=cal_filename,
-                                                 folder_config=folder_config)
+                                             list_pointings=list_pointings,
+                                             rc_filename=rc_filename,
+                                             cal_filename=cal_filename,
+                                             folder_config=folder_config,
+                                             verbose=self.verbose)
             self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
 
             if self.init_pipes:
