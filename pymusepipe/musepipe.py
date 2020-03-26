@@ -1,25 +1,31 @@
 # Licensed under a MIT style license - see LICENSE
 
-"""MUSE-PHANGS core module
+"""MUSE-PHANGS core module.
+This defines the main class (MusePipe) which can be used throughout this package.
+
+This module is a complete rewrite of a pipeline wrapper for the MUSE dataset.
+All classes and objects were refactored.
+
+However, the starting point of this package has been initially
+inspired by several pieces of python codes developed by various individiduals,
+including Kyriakos and Martina from the GTO MUSE MAD team and further
+rewritten by Mark van den Brok.
+Hence: a big Thanks to all three for this!
+
+Note that several python packages exist which would provide similar
+(or better) functionalities.
+
+Eric Emsellem adapted a version from early 2017, provided by Mark and adapted
+it for the needs of the PHANGS project (PI Schinnerer). It was further
+refactored starting from scratch but keeping a few initial ideas.
 """
 # For print - see compatibility with Python 3
 from __future__ import print_function
 
-__authors__   = "Eric Emsellem"
+__authors__ = 'Eric Emsellem'
 __copyright__ = "(c) 2017-2019, ESO + CRAL"
-__license__   = "MIT license"
-__contact__   = " <eric.emsellem@eso.org>"
-
-# This module has been initially inspired by pieces of python codes
-# developed by Kyriakos and Martina from the GTO MUSE MAD team
-# and further rewritten by Mark van den Brok. 
-# Thanks to all three for this!
-# Note that several python packages exist which would provide
-# similar functionalities. 
-#
-# Eric Emsellem adapted a version from early 2017, provided by Mark
-# and adapted it for the needs of the PHANGS project (PI Schinnerer)
-# Completely rewritten structure and standards
+__license__ = "MIT license"
+__contact__ = " <eric.emsellem@eso.org>"
 
 # Importing modules
 import numpy as np
@@ -31,27 +37,26 @@ from os.path import join as joinpath
 import copy
 
 # Pyfits from astropy
-try :
+try:
     import astropy as apy
     from astropy.io import fits as pyfits
-except ImportError :
+except ImportError:
     raise Exception("astropy is required for this module")
 
 # ascii reading
-try :
+try:
     from astropy.io import ascii
-except ImportError :
+except ImportError:
     raise Exception("astropy.io.ascii is required for this module")
 
-try :
+try:
     from astropy.table import Table, setdiff, vstack, TableMergeError
-except ImportError :
+except ImportError:
     raise Exception("astropy.table.Table is required for this module")
 
 import warnings
 from astropy.utils.exceptions import AstropyWarning
 
-import datetime
 from datetime import datetime as dt
 
 # Importing pymusepipe modules
@@ -60,72 +65,84 @@ from pymusepipe.recipes_pipe import PipeRecipes
 from pymusepipe.prep_recipes_pipe import PipePrep
 import pymusepipe.util_pipe as upipe
 from pymusepipe.config_pipe import (
-        suffix_rawfiles,suffix_prealign,suffix_checkalign,
-        listexpo_files,dic_listObject,dic_listMaster,dic_listMasterObject,
-        listexpo_types,dic_geo_astrowcs_table, exclude_list_checkmode,
-        dic_astrogeo)
+    suffix_rawfiles, suffix_prealign, suffix_checkalign,
+    listexpo_files, dic_listObject, dic_listMaster, dic_listMasterObject,
+    listexpo_types, dic_geo_astrowcs_table, exclude_list_checkmode,
+    dic_astrogeo, )
 
 __version__ = '2.0.2 (25/09/2019)'
-#       Cleaning and adding comments
-#__version__ = '2.0.0 (19 June 2019)'
-#       Included an astropy table
-#__version__ = '0.2.0 (22 May 2018)'
-#__version__ = '0.1.0 (03 April    2018)'
-#__version__ = '0.0.2 (08 March    2018)'
-#__version__ = '0.0.1 (21 November 2017)'
 
-# esorex_rc = "/home/soft/ESO/MUSE/muse-kit-2.2-5/esorex-3.12.3/etc/esorex.rc"
-   
-#########################################################################
-# Useful Classes for the Musepipe
-#########################################################################
-class MyDict(dict) :
-    """Dictionary with extra attributes
-    """
-    def __init__(self) :
-        dict.__init__(self)
 
-class PipeObject(object) :
-    """Class to store the tables
+# Cleaning and adding comments
+# _version__ = '2.0.0 (19 June 2019)' Included an astropy table
+# _version__ = '0.2.0 (22 May 2018)'
+# _version__ = '0.1.0 (03 April    2018)'
+# _version__ = '0.0.2 (08 March    2018)'
+# _version__ = '0.0.1 (21 November 2017)'
+
+
+class PipeObject(object):
+    """A very simple class used to store astropy tables.
     """
-    def __init__(self, info=None) :
-        """Initialise the nearly empty class
-        Add _info for a description if needed
+
+    def __init__(self, info=None):
+        """Initialise the nearly empty class Add _info for a description
+        if needed
+
+        Args:
+            info (str): information on this object to be recorded. It will be
+                saved in _info.
+
         """
         self._info = info
 
-def lower_rep(text) :
-    return text.replace("_","").lower()
 
-#########################################################################
-# Main class
-#                           MusePipe
-#########################################################################
+def lower_rep(text):
+    """Lower the text and return it after removing all underscores
+
+    Args:
+        text (str): text to treat
+
+    Returns:
+        updated text (with removed underscores and lower-cased)
+
+    """
+    return text.replace("_", "").lower()
+
+
 class MusePipe(PipePrep, PipeRecipes):
-    """Main Class to define and run the MUSE pipeline, given a certain galaxy name
-    This is the main class used throughout the running of the pipeline
+    """Main Class to define and run the MUSE pipeline, given a certain galaxy
+    name. This is the main class used throughout the running of the pipeline
     which contains functions and attributes all associated with the reduction
     of MUSE exposures.
+
+    It inherits from the PipePrep class, which prepares the recipes for the
+    running of the MUSE pipeline, and Piperecipes which has the recipes
+    described.
     """
 
     def __init__(self, targetname=None, pointing=0, folder_config="Config/",
-            rc_filename=None, cal_filename=None, log_filename="MusePipe.log", 
-            reset_log=False, verbose=True, musemode="WFM-NOAO-N", checkmode=True, 
-            strong_checkmode=False, **kwargs):
-        """Initialise the file parameters to be used during the run
-        Create the python structure which allows the pipeline to run 
-        either individual recipes or global ones
+                 rc_filename=None, cal_filename=None, log_filename="MusePipe.log",
+                 verbose=True, musemode="WFM-NOAO-N", checkmode=True,
+                 strong_checkmode=False, **kwargs):
+        """Initialise the file parameters to be used during the run Create the
+        python structure which allows the pipeline to run either individual
+        recipes or global ones
 
-        Parameters
-        ----------
-        targetname: str [None]
-            Name of the target (e.g., 'NGC1208').
-        pointing: int [0]
-            Number of the pointing to consider
-        folder_config: str
-            Folder name for the configuration files
-        rc_filename: str
-            Name of the input configuration file with the root folders
+        Args:
+            targetname (str): Name of the target (e.g., 'NGC1208').
+            pointing (int): Number of the pointing to consider
+            folder_config (str): Folder name for the configuration files
+            rc_filename (str): Name of the input configuration file with
+                the root folders
+            cal_filename (str):
+            log_filename (str):
+            verbose (bool):
+            musemode (str):
+            checkmode (str):
+            strong_checkmode (bool):
+            **kwargs:
+
         cal_filename: str
             Name of the input configuration file with calibration file names
         log_filename: str ['MusePipe.log']
@@ -166,7 +183,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')
         if self.warnings == 'ignore':
-           warnings.simplefilter('ignore', category=AstropyWarning)
+            warnings.simplefilter('ignore', category=AstropyWarning)
 
         # Overwriting option for the astropy table
         self._overwrite_astropy_table = kwargs.pop("overwrite_astropy_table", True)
@@ -179,7 +196,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # Set alignment saving option
         self._save_alignment_images = kwargs.pop("save_alignment_images", True)
 
-#        super(MusePipe, self).__init__(**kwargs)
+        #        super(MusePipe, self).__init__(**kwargs)
         # Filter for alignment
         self.filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
         self.filter_list = kwargs.pop("filter_list", "white")
@@ -190,7 +207,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
-        if log_filename is None : 
+        if log_filename is None:
             log_filename = "log_{timestamp}.txt".format(timestamp=upipe.create_time_name())
             upipe.print_info("The Log file will be {log}".format(log=log_filename), pipe=self)
         self.log_filename = log_filename
@@ -218,8 +235,8 @@ class MusePipe(PipePrep, PipeRecipes):
         # Can be initialised by either an rc_file, 
         # or a default rc_file or harcoded defaults.
         self.pipe_params = InitMuseParameters(folder_config=folder_config,
-                            rc_filename=rc_filename, 
-                            cal_filename=cal_filename, verbose=verbose)
+                                              rc_filename=rc_filename,
+                                              cal_filename=cal_filename, verbose=verbose)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/P{1:02d}/".format(self.targetname, self.pointing)
@@ -238,23 +255,23 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # ==============================================
         # Creating the extra pipeline folder structure
-        for folder in self.pipe_params._dic_input_folders.keys() :
+        for folder in self.pipe_params._dic_input_folders:
             upipe.safely_create_folder(self.pipe_params._dic_input_folders[folder], verbose=verbose)
 
         # ==============================================
         # Creating the folder structure itself if needed
-        for folder in self.pipe_params._dic_folders.keys() :
+        for folder in self.pipe_params._dic_folders:
             upipe.safely_create_folder(self.pipe_params._dic_folders[folder], verbose=verbose)
 
         # ==============================================
         # Init the Master exposure flag dictionary
         self.Master = {}
-        for mastertype in dic_listMaster.keys() :
+        for mastertype in dic_listMaster:
             upipe.safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=verbose)
             self.Master[mastertype] = False
 
         # Init the Object folder
-        for objecttype in dic_listObject.keys() :
+        for objecttype in dic_listObject:
             upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=verbose)
 
         self._dic_listMasterObject = dic_listMasterObject
@@ -262,7 +279,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # ==============================================
         # Creating the folders in the TARGET root folder 
         # e.g, for the alignment images
-        for name in list(self.pipe_params._dic_folders_target.keys()):
+        for name in self.pipe_params._dic_folders_target:
             upipe.safely_create_folder(getattr(self.paths, name), verbose=verbose)
 
         # ==============================================
@@ -287,9 +304,9 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         self._dic_geoastro = {}
         for name in dic_geo_astrowcs_table:
-            startd = dt.strptime(dic_geo_astrowcs_table[name][0], 
+            startd = dt.strptime(dic_geo_astrowcs_table[name][0],
                                  "%Y-%m-%d").date()
-            endd = dt.strptime(dic_geo_astrowcs_table[name][1], 
+            endd = dt.strptime(dic_geo_astrowcs_table[name][1],
                                "%Y-%m-%d").date()
             self._dic_geoastro[name] = [startd, endd]
 
@@ -305,19 +322,19 @@ class MusePipe(PipePrep, PipeRecipes):
         mode: str
             'wfm' or 'nfm' - MUSE mode
         """
-        dic_pre = {'geo': 'geometry_table', 
-                      'astro': 'astrometry_wcs'}
-        if filetype not in dic_pre.keys():
+        dic_pre = {'geo': 'geometry_table',
+                   'astro': 'astrometry_wcs'}
+        if filetype not in dic_pre:
             upipe.print_error("Could not decipher the filetype option "
                               "in retrieve_geoastro")
             return None
-    
+
         # Transform into a datetime date
         date_dt = dt.strptime(date_str, "%Y-%m-%dT%H:%M:%S").date()
         # get all the distance to the dates (start+end together)
-        near = {min(abs(date_dt - self._dic_geoastro[name][0]), 
-                         abs(date_dt - self._dic_geoastro[name][1])) : 
-                         name for name in self._dic_geoastro}
+        near = {min(abs(date_dt - self._dic_geoastro[name][0]),
+                    abs(date_dt - self._dic_geoastro[name][1])):
+                    name for name in self._dic_geoastro}
         # Find the minimum distance and get the name
         ga_suffix = near[min(near.keys())]
         # Build the name with the prefix, suffix and mode
@@ -331,14 +348,14 @@ class MusePipe(PipePrep, PipeRecipes):
         if overwrite is not None: self._overwrite_astropy_table = overwrite
         if update is not None: self._update_astropy_table = update
 
-    def goto_origfolder(self, addtolog=False) :
+    def goto_origfolder(self, addtolog=False):
         """Go back to original folder
         """
         upipe.print_info("Going back to the original folder {0}".format(
-                             self.paths.orig), pipe=self)
+            self.paths.orig), pipe=self)
         self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
-            
-    def goto_prevfolder(self, addtolog=False) :
+
+    def goto_prevfolder(self, addtolog=False):
         """Go back to previous folder
 
         Parameters
@@ -347,10 +364,10 @@ class MusePipe(PipePrep, PipeRecipes):
             Adding the folder move to the log file
         """
         upipe.print_info("Going back to the previous folder {0}".format(
-                             self.paths._prev_folder), pipe=self)
+            self.paths._prev_folder), pipe=self)
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
-            
-    def goto_folder(self, newpath, addtolog=False, **kwargs) :
+
+    def goto_folder(self, newpath, addtolog=False, **kwargs):
         """Changing directory and keeping memory of the old working one
 
         Parameters
@@ -359,19 +376,19 @@ class MusePipe(PipePrep, PipeRecipes):
             Adding the folder move to the log file
         """
         verbose = kwargs.pop("verbose", self.verbose)
-        try: 
+        try:
             prev_folder = os.getcwd()
             newpath = os.path.normpath(newpath)
             os.chdir(newpath)
             upipe.print_info("Going to folder {0}".format(newpath), pipe=self)
-            if addtolog :
+            if addtolog:
                 upipe.append_file(self.paths.log_filename, "cd {0}\n".format(newpath))
-            self.paths._prev_folder = prev_folder 
+            self.paths._prev_folder = prev_folder
         except OSError:
             if not os.path.isdir(newpath):
                 raise
-    
-    def set_fullpath_names(self) :
+
+    def set_fullpath_names(self):
         """Create full path names to be used
         """
         # initialisation of the full paths 
@@ -380,23 +397,29 @@ class MusePipe(PipePrep, PipeRecipes):
         self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
         self.paths.target = joinpath(self.paths.root, self.targetname)
 
-        for name in list(self.pipe_params._dic_folders.keys()) + list(self.pipe_params._dic_input_folders.keys()):
-            setattr(self.paths, name, joinpath(self.paths.data, getattr(self.pipe_params, name)))
+        for name in list(self.pipe_params._dic_folders.keys()) \
+                    + list(self.pipe_params._dic_input_folders.keys()):
+            setattr(self.paths, name, joinpath(self.paths.data,
+                                               getattr(self.pipe_params, name)))
 
         # Creating the filenames for Master files
-        self.paths.Master = PipeObject("All Paths for Master files useful for the pipeline")
-        for expotype in dic_listMaster.keys() :
+        self.paths.Master = PipeObject("All Paths for Master files "
+                                       "useful for the pipeline")
+        for expotype in dic_listMaster:
             # Adding the path of the folder
-            setattr(self.paths.Master, self._get_attr_expo(expotype), 
-                    joinpath(self.paths.data, self._get_path_expo(expotype, "master")))
+            setattr(self.paths.Master, self._get_attr_expo(expotype),
+                    joinpath(self.paths.data, self._get_path_expo(expotype,
+                                                                  "master")))
 
             self._dic_paths = {"master": self.paths.Master, "processed": self.paths}
 
-        # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
-        for name in list(self.pipe_params._dic_folders_target.keys()):
-            setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
+        # Creating the attributes for the folders needed in the TARGET
+        # root folder, e.g., for alignments
+        for name in self.pipe_params._dic_folders_target:
+            setattr(self.paths, name, joinpath(self.paths.target,
+                                               self.pipe_params._dic_folders_target[name]))
 
-    def _reset_tables(self) :
+    def _reset_tables(self):
         """Reseting the astropy Tables for expotypes
         """
         # Reseting the select_type item
@@ -407,26 +430,26 @@ class MusePipe(PipePrep, PipeRecipes):
         self.Tables.Processed = PipeObject("Astropy Tables for each processed type")
         self.Tables.Reduced = PipeObject("Astropy Tables for each reduced type")
         self._dic_tables = {"raw": self.Tables.Raw, "master": self.Tables.Master,
-                "processed": self.Tables.Processed, "reduced": self.Tables.Reduced}
-        self._dic_suffix_astro = {"raw": "RAW", "master": "MASTER", 
-                "processed": "PRO", "reduced": "RED"}
+                            "processed": self.Tables.Processed, "reduced": self.Tables.Reduced}
+        self._dic_suffix_astro = {"raw": "RAW", "master": "MASTER",
+                                  "processed": "PRO", "reduced": "RED"}
 
-        for expotype in listexpo_types.keys() :
+        for expotype in listexpo_types:
             setattr(self.Tables.Raw, self._get_attr_expo(expotype), [])
 
-    def read_all_astro_tables(self, reset=False) :
+    def read_all_astro_tables(self, reset=False):
         """Initialise all existing Astropy Tables
         """
         if reset or not hasattr(self, "Tables"):
             self._reset_tables()
 
-        for mastertype in dic_listMaster.keys():
+        for mastertype in dic_listMaster:
             setattr(self._dic_tables["master"], self._get_attr_expo(mastertype),
-                self.read_astropy_table(mastertype, stage="master"))
+                    self.read_astropy_table(mastertype, stage="master"))
 
-        for expotype in dic_listObject.keys():
+        for expotype in dic_listObject:
             setattr(self._dic_tables["processed"], self._get_attr_expo(expotype),
-                self.read_astropy_table(expotype, stage="processed"))
+                    self.read_astropy_table(expotype, stage="processed"))
 
     def read_astropy_table(self, expotype=None, stage="master"):
         """Read an existing Masterfile data table to start the pipeline
@@ -436,12 +459,12 @@ class MusePipe(PipePrep, PipeRecipes):
         if not os.path.isfile(name_table):
             upipe.print_warning("Astropy table {0} does not exist - setting up an "
                                 " empty one".format(name_table), pipe=self)
-            return Table([[],[],[]], names=['tpls','mjd', 'tplnexp'])
-        else :
+            return Table([[], [], []], names=['tpls', 'mjd', 'tplnexp'])
+        else:
             upipe.print_info("Reading Astropy fits Table {0}".format(name_table),
-                                 pipe=self)
+                             pipe=self)
             return Table.read(name_table, format="fits")
-        
+
     def init_raw_table(self, reset=False, **kwargs):
         """ Create a fits table with all the information from
         the Raw files. Also create an astropy table with the same info
@@ -461,18 +484,18 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # ---- File exists - we READ it ------------------- #
         overwrite = kwargs.pop("overwrite", self._overwrite_astropy_table)
-        if os.path.isfile(name_table) :
+        if os.path.isfile(name_table):
             if overwrite:
-                upipe.print_warning("The raw-files table will be overwritten", 
-                        pipe=self)
-            else :
-                upipe.print_warning("The raw files table already exists", 
-                        pipe=self)
+                upipe.print_warning("The raw-files table will be overwritten",
+                                    pipe=self)
+            else:
+                upipe.print_warning("The raw files table already exists",
+                                    pipe=self)
                 upipe.print_warning("If you wish to overwrite it, "
-                      " please turn on the 'overwrite_astropy_table' option to 'True'", 
-                      pipe=self)
-                upipe.print_warning("In the meantime, the existing table will be read and used", 
-                        pipe=self)
+                                    " please turn on the 'overwrite_astropy_table' option to 'True'",
+                                    pipe=self)
+                upipe.print_warning("In the meantime, the existing table will be read and used",
+                                    pipe=self)
                 self.Tables.Rawfiles = self.read_astropy_table('RAWFILES', "raw")
 
         # ---- File does not exist - we create it ---------- #
@@ -482,13 +505,13 @@ class MusePipe(PipePrep, PipeRecipes):
             # Get the list of files from the Raw data folder
             files = os.listdir(".")
 
-            smalldic = {"FILENAME" : ['filename', '', str, '100A']}
+            smalldic = {"FILENAME": ['filename', '', str, '100A']}
             fulldic = listexpo_files.copy()
             fulldic.update(smalldic)
 
             # Init the lists
             MUSE_infodic = {}
-            for key in fulldic.keys() :
+            for key in fulldic:
                 MUSE_infodic[key] = []
 
             # Looping over the files
@@ -503,20 +526,20 @@ class MusePipe(PipePrep, PipeRecipes):
                         new_infodic = {}
                         good_file = True
                         object_file = None
-                        for k in listexpo_files.keys() :
+                        for k in listexpo_files:
                             [namecol, keyword, func, form] = listexpo_files[k]
                             if keyword in header:
                                 new_infodic[k] = func(header[keyword])
-                            elif k=='TYPE':
+                            elif k == 'TYPE':
                                 # Find the key which is right
-                                astrogeo_keys = [tk for tk, tv in dic_astrogeo.items() if tv==header['OBJECT']]
+                                astrogeo_keys = [tk for tk, tv in dic_astrogeo.items() if tv == header['OBJECT']]
                                 # Nothing found?
                                 if len(astrogeo_keys) == 0:
                                     good_file = False
                                 # If found, print info and save value
                                 else:
                                     upipe.print_info("Found one {0} file {1}".format(
-                                                      astrogeo_keys[0], f))
+                                        astrogeo_keys[0], f))
                                     new_infodic[k] = astrogeo_keys[0]
                                     object_file = astrogeo_keys[0]
                             else:
@@ -526,7 +549,7 @@ class MusePipe(PipePrep, PipeRecipes):
                             new_infodic['OBJECT'] = object_file
                         if good_file:
                             MUSE_infodic['FILENAME'].append(f)
-                            for k in new_infodic.keys():
+                            for k in new_infodic:
                                 MUSE_infodic[k].append(new_infodic[k])
 
                     elif any([suffix in f for suffix in suffix_rawfiles]):
@@ -537,24 +560,24 @@ class MusePipe(PipePrep, PipeRecipes):
                                             pipe=self)
 
             # Transforming into numpy arrayimport pymusepipe
-            for k in fulldic.keys() :
+            for k in fulldic:
                 MUSE_infodic[k] = np.array(MUSE_infodic[k])
 
             # Getting a sorted array with indices
             idxsort = np.argsort(MUSE_infodic['FILENAME'])
 
             # Creating the astropy table
-            self.Tables.Rawfiles = Table([MUSE_infodic['FILENAME'][idxsort]], 
-                    names=['filename'], meta={'name': 'raw file table'})
+            self.Tables.Rawfiles = Table([MUSE_infodic['FILENAME'][idxsort]],
+                                         names=['filename'], meta={'name': 'raw file table'})
 
             # Creating the columns
-            for k in fulldic.keys() :
+            for k in fulldic:
                 [namecol, keyword, func, form] = fulldic[k]
                 self.Tables.Rawfiles[namecol] = MUSE_infodic[k][idxsort]
 
             # Writing up the table
-            self.Tables.Rawfiles.write(name_table, format="fits", 
-                    overwrite=overwrite)
+            self.Tables.Rawfiles.write(name_table, format="fits",
+                                       overwrite=overwrite)
 
             if len(self.Tables.Rawfiles) == 0:
                 upipe.print_warning("Raw Files Table is empty: please check your 'Raw' folder")
@@ -565,13 +588,13 @@ class MusePipe(PipePrep, PipeRecipes):
         # Sorting the types ====================================
         self.sort_raw_tables()
 
-    def save_expo_table(self, expotype, tpl_gtable, stage="master", 
-            fits_tablename=None, aggregate=True, suffix="", overwrite=None, update=None):
+    def save_expo_table(self, expotype, tpl_gtable, stage="master",
+                        fits_tablename=None, aggregate=True, suffix="", overwrite=None, update=None):
         """Save the Expo (Master or not) Table corresponding to the expotype
         """
         self._set_option_astropy_table(overwrite, update)
 
-        if fits_tablename is None :
+        if fits_tablename is None:
             fits_tablename = self._get_fitstablename_expo(expotype, stage, suffix)
 
         attr_expo = self._get_attr_expo(expotype)
@@ -579,7 +602,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         if aggregate:
             table_to_save = tpl_gtable.groups.aggregate(np.mean)['tpls', 'mjd', 'tplnexp']
-        else :
+        else:
             table_to_save = copy.copy(tpl_gtable)
 
         # If the file already exists
@@ -588,52 +611,56 @@ class MusePipe(PipePrep, PipeRecipes):
             if self._update_astropy_table:
                 # Reading the existing table
                 upipe.print_warning("Reading the existing Astropy table {0} "
-                                    "in folder {1}".format(fits_tablename, 
-                                    self.paths.astro_tables), pipe=self)
+                                    "in folder {1}".format(fits_tablename,
+                                                           self.paths.astro_tables), pipe=self)
                 existing_table = Table.read(full_tablename, format="fits")
                 # first try to see if they are compatible by using vstack
-                try: 
+                try:
                     stack_temptable = vstack([existing_table, table_to_save], join_type='exact')
-                    upipe.print_warning("Updating the existing Astropy table {0}".format(fits_tablename), 
-                            pipe=self)
+                    upipe.print_warning("Updating the existing Astropy table {0}".format(fits_tablename),
+                                        pipe=self)
                     table_to_save = apy.table.unique(stack_temptable, keep='first')
                 except TableMergeError:
-                    upipe.print_warning("Astropy Table cannot be joined to the existing one", 
-                            pipe=self)
+                    upipe.print_warning("Astropy Table cannot be joined to the existing one",
+                                        pipe=self)
                     return
 
             # Check if we want to overwrite or add the line in
             elif not self._overwrite_astropy_table:
                 upipe.print_warning("Astropy Table {0} already exists, "
-                    " use overwrite_astropy_table to overwrite it".format(fits_tablename), 
-                    pipe=self)
+                                    " use overwrite_astropy_table to overwrite it".format(fits_tablename),
+                                    pipe=self)
                 return
 
         table_to_save.write(full_tablename, format="fits", overwrite=True)
         setattr(self._dic_tables[stage], attr_expo, table_to_save)
 
-    def sort_raw_tables(self, checkmode=None, strong_checkmode=None) :
+    def sort_raw_tables(self, checkmode=None, strong_checkmode=None):
         """Provide lists of exposures with types defined in the dictionary
         """
-        if checkmode is not None : self.checkmode = checkmode
-        else : checkmode = self.checkmode
+        if checkmode is not None:
+            self.checkmode = checkmode
+        else:
+            checkmode = self.checkmode
 
-        if strong_checkmode is not None : self.strong_checkmode = strong_checkmode
-        else : strong_checkmode = self.strong_checkmode
+        if strong_checkmode is not None:
+            self.strong_checkmode = strong_checkmode
+        else:
+            strong_checkmode = self.strong_checkmode
 
         if len(self.Tables.Rawfiles) == 0:
             upipe.print_error("Raw files is empty, hence cannot be sorted")
             return
 
         # Sorting alphabetically (thus by date)
-        for expotype in listexpo_types.keys() :
-            try :
+        for expotype in listexpo_types:
+            try:
                 mask = (self.Tables.Rawfiles['type'] == listexpo_types[expotype])
-                if self.checkmode: 
+                if self.checkmode:
                     maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
                     if (expotype.upper() not in exclude_list_checkmode) or self.strong_checkmode:
                         mask = maskmode & mask
-                setattr(self.Tables.Raw, self._get_attr_expo(expotype), 
+                setattr(self.Tables.Raw, self._get_attr_expo(expotype),
                         self.Tables.Rawfiles[mask])
             except AttributeError:
                 pass
@@ -645,8 +672,8 @@ class MusePipe(PipePrep, PipeRecipes):
         """Get the name of the fits table covering
         a certain expotype
         """
-        fitstablename = "{0}_{1}_{2}list_table.fits".format(self._dic_suffix_astro[stage], 
-                expotype.lower(), suffix)
+        fitstablename = "{0}_{1}_{2}list_table.fits".format(self._dic_suffix_astro[stage],
+                                                            expotype.lower(), suffix)
         return joinpath(self.paths.astro_tables, fitstablename)
 
     def _get_table_expo(self, expotype, stage="master"):
@@ -673,7 +700,7 @@ class MusePipe(PipePrep, PipeRecipes):
             upipe.print_warning("No Offset table name given")
             self.offset_table = Table()
             return
-        
+
         # Using the given folder name, alignment one by default
         if folder_offset_table is None:
             self.folder_offset_table = self.paths.alignment
@@ -681,7 +708,7 @@ class MusePipe(PipePrep, PipeRecipes):
             self.folder_offset_table = folder_offset_table
 
         full_offset_table_name = joinpath(self.folder_offset_table,
-                                    self.offset_table_name)
+                                          self.offset_table_name)
         if not os.path.isfile(full_offset_table_name):
             upipe.print_error("Offset table [{0}] not found".format(
                 full_offset_table_name))
@@ -691,17 +718,17 @@ class MusePipe(PipePrep, PipeRecipes):
         # Opening the offset table
         self.offset_table = Table.read(full_offset_table_name)
 
-    def _select_closest_mjd(self, mjdin, group_table) :
+    def _select_closest_mjd(self, mjdin, group_table):
         """Get the closest frame within the expotype
         If the attribute does not exist in Tables, it tries to read
         the table from the folder
         """
-        if len(group_table['mjd']) < 1 :
+        if len(group_table['mjd']) < 1:
             # Printing an error message and sending back a -1 for index
             upipe.print_error("[musepipe/_select_closest_mjd] Group table is empty - Aborting")
             return -1, None
         # Get the closest tpl
-        index = np.argmin((mjdin - group_table['mjd'])**2)
+        index = np.argmin((mjdin - group_table['mjd']) ** 2)
         closest_tpl = group_table[index]['tpls']
         return index, closest_tpl
 
@@ -712,7 +739,10 @@ class MusePipe(PipePrep, PipeRecipes):
         return masterfolder
 
     def _get_fullpath_expo(self, expotype, stage="master"):
+        if stage not in self._dic_paths:
+            upipe.print_error("[_get_fullpath_expo] stage {} not "
+                              "in dic_paths dict".format(stage))
         return upipe.normpath(getattr(self._dic_paths[stage], self._get_attr_expo(expotype)))
 
-    def _get_path_files(self, expotype) :
+    def _get_path_files(self, expotype):
         return upipe.normpath(getattr(self.paths, expotype.lower()))

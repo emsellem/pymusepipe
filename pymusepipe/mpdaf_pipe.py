@@ -17,6 +17,7 @@ import numpy as np
 # Standard modules
 import os
 from os.path import join as joinpath
+import glob
 
 # Importing mpdaf
 try :
@@ -24,21 +25,20 @@ try :
 except ImportError :
     raise Exception("mpdaf is required for this - MUSE related - module")
 
-from mpdaf.obj import Cube, Image
+from mpdaf.obj import Cube, Image, CubeMosaic
 from mpdaf.obj import Spectrum, WaveCoord
 from mpdaf.tools import add_mpdaf_method_keywords
 from mpdaf.drs import PixTable
 
 # Astropy
 from astropy.io import fits as pyfits
-from astropy import units as units
+from astropy import units as u
 
 from pymusepipe import util_pipe as upipe
 from .config_pipe import default_wave_wcs, AO_mask_lambda
 
 from .cube_convolve import cube_kernel
 
-########### Few useful functions ###############################################
 def get_sky_spectrum(specname) :
     """Read sky spectrum from MUSE data reduction
     """
@@ -49,7 +49,7 @@ def get_sky_spectrum(specname) :
     sky = pyfits.getdata(specname)
     crval = sky['lambda'][0]
     cdelt = sky['lambda'][1] - crval
-    wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=units.angstrom)
+    wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=u.angstrom)
     spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
     return spec
 
@@ -82,8 +82,107 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
 
     return flux_cont
 
+class MuseCubeMosaic(CubeMosaic):
+    def __init__(self, output_wcs, folder_cubes="",
+                 prefix_cubes="DATACUBE_FINAL_WCS",
+                 list_suffix=[], verbose=False):
 
-class MuseCube(Cube): 
+        self.verbose = verbose
+        self.folder_cubes = folder_cubes
+        if not self._check_folder():
+            return
+
+        self.prefix_cubes = prefix_cubes
+        self.list_suffix = list_suffix
+
+        # Building the list of cubes
+        self.build_list()
+
+        # Initialise the super class
+        super(MuseCubeMosaic, self).__init__(self.list_cubes, output_wcs)
+
+    def _check_folder(self):
+        if not os.path.isdir(self.folder_cubes):
+            upipe.print_error("Cube Folder {} does not exists \n"
+                              "- Aborting".format(self.folder_cubes))
+            return False
+        return True
+
+    def build_list(self, folder_cubes=None, prefix_cubes=None, **kwargs):
+        """Building the list of cubes to process
+
+        Args:
+            folder_cubes (str): folder for the cubes
+            prefix_cubes (str): prefix to be used
+
+        """
+
+        self.list_suffix = kwargs.pop("list_suffix", self.list_suffix)
+        # Get the folder if needed
+        if folder_cubes is not None:
+            self.folder_cubes = folder_cubes
+            if not self._check_folder():
+                return
+
+        # get the prefix if provided
+        if prefix_cubes is not None:
+            self.prefix_cubes = prefix_cubes
+
+        # get the list of cubes and return if 0 found
+        list_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
+                                                     self.prefix_cubes))
+
+        # if the list of suffix is empty, just use all cubes
+        if len(self.list_suffix) == 0:
+            self.list_cubes = list_cubes
+        else:
+            # Filtering out the ones that don't have any of the suffixes
+            self.list_cubes = []
+            for l in list_cubes:
+                if any([suff in l for suff in self.list_suffix]):
+                    self.list_cubes.append(l)
+
+        if self.verbose:
+            for i, name in enumerate(self.list_cubes):
+                upipe.print_info("Cube {0:03d}: {1}".format(i+1, name))
+
+        self.ncubes = len(self.list_cubes)
+        if self.ncubes == 0:
+            upipe.print_error("Found 0 cubes in this folder with suffix"
+                              " {}: please change suffix".format(
+                                  self.prefix_cubes))
+        else:
+            upipe.print_info("Found {} cubes in this folder".format(
+                                 self.ncubes))
+
+    def madcombine(self, folder_cubes=None, outcube_name="dummy.fits", mad=True):
+        """Combine the CubeMosaic and write it out.
+
+        Args:
+            folder_cubes (str): name of the folder for the cube [None]
+            outcube_name (str): name of the outcube
+            mad (bool): using mad or not [True]
+
+        Creates:
+            A new cube, combination of all input cubes listes in CubeMosaic
+        """
+
+        # Combine
+        upipe.print_info("Starting the combine of "
+                         "all {} input cubes".format(self.ncubes))
+        cube, expmap, statpix, rejmap = self.pycombine(mad=mad)
+
+        # Saving
+        if folder_cubes is not None:
+            self.folder_cubes = folder_cubes
+            if not self._check_folder():
+                return
+
+        full_cube_name = joinpath(self.folder_cubes, outcube_name)
+        upipe.print_info("Writing the new Cube {}".format(full_cube_name))
+        cube.write(full_cube_name)
+
+class MuseCube(Cube):
     """Wrapper around the mpdaf Cube functionalities
     """
     
@@ -99,13 +198,13 @@ class MuseCube(Cube):
         self._debug = kwargs.pop("debug", False)
 
         # PSF for that Cube
-        self.psf_function = kwargs("psf_function", "moffat")
-        self.psf_fwhm0 = kwargs("psf_fwhm0", 0.)
-        self.psf_l0 = kwargs("psf_l0", 6483.58)
-        self.psf_nmoffat = kwargs("psf_nmoffat", None)
-        self.psf_b = kwargs("psf_b", -3.0e-5)
+        self.psf_function = kwargs.pop("psf_function", "moffat")
+        self.psf_fwhm0 = kwargs.pop("psf_fwhm0", 0.)
+        self.psf_l0 = kwargs.pop("psf_l0", 6483.58)
+        self.psf_nmoffat = kwargs.pop("psf_nmoffat", None)
+        self.psf_b = kwargs.pop("psf_b", -3.0e-5)
 
-    def get_spectrum_from_cube(self, nx=None, ny=None, pixel_window=0, title="Spectrum") :
+    def get_spectrum_from_cube(self, nx=None, ny=None, pixel_window=0, title="Spectrum"):
         """Get a spectrum from the cube with centre defined in pixels
         with nx, ny and a window of 'pixel_window'
         """
@@ -128,7 +227,7 @@ class MuseCube(Cube):
         return MuseImage(source=self[central_lambda - lambda_halfwindow: 
             central_lambda + lambda_halfwindow + 1, :, :].sum(axis=0))
 
-    def extract_onespectral_cube(self, wave1=default_wave_wcs, outcube_name=None, **kwargs) :
+    def extract_onespectral_cube(self, wave1=default_wave_wcs, outcube_name=None, **kwargs):
         """Create a single pixel cube extracted from this one
 
         Input
@@ -186,12 +285,12 @@ class MuseCube(Cube):
 
         # Creating the outcube filename
         if outcube_name is None:
-            outcube_name = "conv{0}_{1:.2f}{2}".format(function.lower()[0],
-                                                        fwhm0, cube_name)
+            outcube_name = "conv{0}_{1:.2f}{2}".format(target_function.lower()[0],
+                                                       target_fwhm, cube_name)
 
         # Getting the shape of the Kernel
         scale_spaxel = self.get_step(u.arcsec)[1]
-        nspaxel = np.int(factor_fwhm * fwhm0 / scale_spaxel)
+        nspaxel = np.int(factor_fwhm * target_fwhm / scale_spaxel)
         # Make nspaxel odd to have a PSF centred at the centre of the frame
         if nspaxel % 2 == 0: nspaxel += 1
         shape = [self.shape[0], nspaxel, nspaxel]
@@ -375,7 +474,7 @@ class MuseSkyContinuum(object):
             crval = sky['lambda'][0]
             cdelt = sky['lambda'][1] - crval
             data = sky['flux']
-        wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=units.angstrom)
+        wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=u.angstrom)
         self.spec = Spectrum(wave=wavein, data=data)
 
     def integrate(self, muse_filter, AO_mask=False):

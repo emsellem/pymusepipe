@@ -1,12 +1,6 @@
-#!/usr/bin/env python
 # Licensed under a MIT style license - see LICENSE.txt
-#
+
 from __future__ import absolute_import, division, print_function
-#
-# Standard imports
-#
-import sys
-import os
 
 from setuptools import setup, find_packages
 
@@ -24,14 +18,14 @@ setup(name='pymusepipe',
       version = version['__version__'],
       description='python module to reduce MUSE Raw data and combine them',
       long_description=readme,
-      long_description_content_type="text/markdown", 
+      long_description_content_type="text/markdown",
       keywords='MUSE, PHANGS',
       url="https://github.com/emsellem/pipemusepipe",
       author='Eric Emsellem',
       author_email='eric.emsellem@eso.org',
       license="MIT License",
       packages=find_packages(exclude=('tests', 'docs')),
-      install_requires=['mpdaf'],
+      install_requires=['mpdaf', 'astropy', 'numpy'],
       include_package_data=True,
       zip_safe=False,
       classifiers=[
@@ -39,4 +33,4 @@ setup(name='pymusepipe',
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
        ],
-)
+      )

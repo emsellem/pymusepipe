@@ -394,32 +394,37 @@ class MusePointings(SofPipe, PipeRecipes):
             return name
 
     def run_combine_all_single_pointings_withmasks(self, combine=True, masks=True, 
-            mosaic_wcs=True, individual=True, **kwargs):
+            mosaic_wcs=True, perpointing_combine=True, **kwargs):
         """Run all combine recipes including WCS and masks
 
         combine: bool [True]
             Default is True. Will run the combine for all pointings.
 
         masks: bool [True]
-            Will run the combined WCS and the individual ones (and masks).
+            Will run the combined WCS and the individual pointing ones
+            (and masks).
+
+        mosaic_wcs (bool): [True]. Reference WCS for the full mosaic
             
-        individual: bool [True]
+        perpointing_combine: bool [True]
             Will run individual pointings using the WCS.
         """
         lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
         if combine:
             upipe.print_info("Running the mosaic combine")
-            if "offset_table_name" in kwargs:
-                offset_table_name = kwargs.get("offset_table_name")
-                folder_offset_table = kwargs.get("folder_offset_table", self.folder_offset_table)
+            offset_table_name = kwargs.get("offset_table_name", None)
+            folder_offset_table = kwargs.get("folder_offset_table",
+                                             self.folder_offset_table)
+            if offset_table_name is not None:
                 self._check_offset_table(offset_table_name, folder_offset_table)
-            self.run_combine(lambdaminmax=lambdaminmax, offset_table_name=offset_table_name,
+            self.run_combine(lambdaminmax=lambdaminmax,
+                             offset_table_name=offset_table_name,
                              folder_offset_table=folder_offset_table)
 
         if masks:
-            # Creating the full mosaic WCS first
+            # Creating the full mosaic WCS first with a narrow lambda range
             upipe.print_info("Start creating the narrow-lambda WCS and Masks")
-            self.create_combined_wcs()
+            _ = self.create_combined_wcs()
             # Then creating the mask WCS for each pointing
             upipe.print_info("Start creating the individual Pointings Masks")
             self.create_all_pointings_mask_wcs(lambdaminmax_mosaic=lambdaminmax, 
@@ -427,12 +432,13 @@ class MusePointings(SofPipe, PipeRecipes):
 
         if mosaic_wcs:
             # Creating a reference WCS for the Full Mosaic with the right 
-            # Spectral coverage
+            # Spectral coverage for a full mosaic
             upipe.print_info("Start creating the full-lambda WCS")
-            self.create_combined_wcs(prefix_wcs=default_prefix_wcs_mosaic, 
-                                     lambdaminmax_wcs=lambdaminmax_for_mosaic)
-            
-        if individual:
+            self._combined_wcs_name = self.create_combined_wcs(
+                prefix_wcs=default_prefix_wcs_mosaic,
+                lambdaminmax_wcs=lambdaminmax_for_mosaic)
+
+        if perpointing_combine:
             upipe.print_info("Running the Individual Pointing combine")
             # Then merging each single pointing using the masks
             self.run_combine_all_single_pointings(**kwargs)
@@ -773,7 +779,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Making WCS Mask for pointing {0:02d}".format(pointing))
-            self.create_pointing_mask_wcs(pointing=pointing,
+            _ = self.create_pointing_mask_wcs(pointing=pointing,
                                           filter_list=filter_list,
                                           **kwargs)
 
@@ -789,7 +795,13 @@ class MusePointings(SofPipe, PipeRecipes):
         pointing: int
             Number of the pointing
         filter_list = list of str
-            List of filter names to be used.         
+            List of filter names to be used.
+
+        Creates:
+            Pointing mask WCS cube
+
+        Returns:
+            Name of the created WCS cube
         """
 
         # Adding target name as prefix or not
@@ -840,36 +852,7 @@ class MusePointings(SofPipe, PipeRecipes):
         hdu = pyfits.PrimaryHDU(data=d, header=h)
         hdu.writeto(full_cname, overwrite=True)
         upipe.print_info("...Done")
-
-#         # Opening the data and header
-#         d = pyfits.getdata(joinpath(dir_mask, name_mask))
-#         h = pyfits.getheader(joinpath(dir_mask, name_mask), extname='DATA')
-# 
-#         # Changing to 0's and 1's
-#         d_int = np.zeros_like(d, dtype=np.int)
-#         d_int[np.isnan(d)] = np.int(0)
-#         d_int[~np.isnan(d)] = np.int(1)
-# 
-#         # Writing it out in the final mask 
-#         upipe.print_info("Writing the output mask {0}".format(
-#             joinpath(dir_mask, finalname_mask)))
-#         hdu = pyfits.PrimaryHDU(data=d_int, header=h)
-#         hdu.writeto(joinpath(dir_mask, finalname_mask), overwrite=True)
-# 
-#         # Now also creating a version of this without the full mosaic
-#         # To be used as WCS for that pointing
-#         ind = np.indices(d_int.shape)
-#         sel_1 = (d_int > 0)
-#         subd_int = d[np.min(ind[0][sel_1]): np.max(ind[0][sel_1]),
-#                    np.min(ind[1][sel_1]): np.max(ind[1][sel_1])]
-#         h['CRPIX1'] -= np.min(ind[1][sel_1])
-#         h['CRPIX2'] -= np.min(ind[0][sel_1])
-#         subhdu = pyfits.PrimaryHDU(data=subd_int, header=h)
-# 
-#         # Writing the output to get a wcs reference for this pointing
-#         upipe.print_info("Writing the output mask {0}".format(
-#             joinpath(dir_mask, finalname_wcs)))
-#         subhdu.writeto(joinpath(dir_mask, finalname_wcs), overwrite=True)
+        return full_cname
 
     def extract_combined_narrow_wcs(self, name_cube=None, **kwargs):
         """Create the reference WCS from the full mosaic with
@@ -889,6 +872,12 @@ class MusePointings(SofPipe, PipeRecipes):
         add_targetname: bool [True]
             Add the name of the target to the name of the output
             WCS reference cube. Default is True.
+
+        Creates:
+            Combined narrow band WCS cube
+
+        Returns:
+            name of the created cube
         """
         # Adding targetname in names or not
         self.add_targetname = kwargs.pop("add_targetname", True)
@@ -921,6 +910,7 @@ class MusePointings(SofPipe, PipeRecipes):
         hdu = pyfits.PrimaryHDU(data=d, header=h)
         hdu.writeto(full_cname, overwrite=True)
         upipe.print_info("...Done")
+        return full_cname
 
     def create_combined_wcs(self, name_cube=None, 
             lambdaminmax_wcs=lambdaminmax_for_wcs,
@@ -969,12 +959,13 @@ class MusePointings(SofPipe, PipeRecipes):
                 lambdamax=lambdaminmax_wcs[1], prefix=prefix_wcs, **kwargs)
 
         # Now transforming this into a bona fide 1 extension WCS file
-        full_cname = joinpath(cfolder, cname)
+        combined_wcs_name = joinpath(cfolder, cname)
         d = pyfits.getdata(full_cname, ext=1)
         h = pyfits.getheader(full_cname, ext=1)
         hdu = pyfits.PrimaryHDU(data=d, header=h)
-        hdu.writeto(full_cname, overwrite=True)
+        hdu.writeto(combined_wcs_name, overwrite=True)
         upipe.print_info("...Done")
+        return combined_wcs_name
 
     def run_combine(self, sof_filename='pointings_combine',
                     lambdaminmax=[4000., 10000.],
@@ -1010,7 +1001,7 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_all = self._add_targetname(prefix_all)
 
         if "offset_table_name" in kwargs:
-            offset_table_name = kwargs.pop("offset_table_name", None)
+            offset_table_name = kwargs.pop("offset_table_name")
             folder_offset_table = kwargs.pop("folder_offset_table", self.folder_offset_table)
             self._check_offset_table(offset_table_name, folder_offset_table)
 

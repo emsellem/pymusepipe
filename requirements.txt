@@ -1,0 +1,4 @@
+astropy==4.0
+mpdaf==3.2
+numpy==1.18.1
+scipy==1.4.1

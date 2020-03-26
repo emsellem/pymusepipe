@@ -1,6 +1,11 @@
 # Licensed under a MIT license - see LICENSE
 
-"""MUSE-PHANGS alignement module
+"""MUSE-PHANGS alignement module. This module can be used to align MUSE
+reconstructed images either with each others or using a reference background
+image. It spits the results out in a Fits table which can then be used
+to process and mosaic Muse PIXTABLES. It includes a normalisation factor,
+an estimate of the background, as well as any potential rotation. Fine tuning
+can be done by hand by the user, using a set of reference plots.
 """
 
 __authors__   = "Eric Emsellem"
@@ -34,8 +39,7 @@ from astropy import units as u
 from astropy.convolution import Gaussian2DKernel, convolve
 
 # Import mpdaf
-import mpdaf
-from mpdaf.obj import Image, Cube, WCS
+from mpdaf.obj import Image, WCS
 
 def is_sequence(arg):
     return (not hasattr(arg, "strip") and
@@ -58,26 +62,20 @@ dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
 
 # ================== Useful function ====================== #
 def create_offset_table(image_names=[], table_folder="", 
-        table_name="dummy_offset_table.fits",
-        overwrite=False):
-    """Create an offet list table from a set of images. It will use
-    the MJD and DATE as read from the descriptors of the images.
-    The names for these keywords is stored in the dictionary
-    default_offset_table from align_pipe.py.
+        table_name="dummy_offset_table.fits", overwrite=False):
+    """Create an offset list table from a given set of images. It will use
+    the MJD and DATE as read from the descriptors of the images. The names for
+    these keywords is stored in the dictionary default_offset_table from
+    config_pipe.py
 
-    Input
-    -----
-    image_names: list of str
-        List of image names to be considered.
-    table_folder: str
-        Name of the folder where to create the fits table
-    table_name: str
-        Name of the table to spit out
-    overwrite: bool
-        If True, will overwrite any existing table
+    Args:
+        image_names (list of str): List of image names to be considered.
+        table_folder (str): folder of the table
+        table_name (str): name of the table to save ['dummy_offset_table.fits']
+        overwrite (bool): if the table exists, it will be overwritten if set
+            to True only. [False]
 
-    Creates
-    -------
+    Returns:
         A fits table with the output given name.
     """
 
@@ -126,23 +124,22 @@ def create_offset_table(image_names=[], table_folder="",
     # Write the table
     offset_table.write(table_fullname, overwrite=overwrite)
 
-# WCS plotting routine
-# This is a matplotlib feature, using the option of "projection"
-# for adding a subplot. This guarantees the right WCS
 def open_new_wcs_figure(nfig, mywcs=None):
-    """Open a new figure with wcs projection.
-    
-    Input
-    -----
-    mywcs : astropy.wcs.WCS
-         Input wcs to open a new figure
-         
-    Creates
-    -------
-    figure, subplots
-        Returns the figure itself and the subplot with the wcs projection
+    """Open a new figure (with number nfig) with given wcs.
+    If not WCS is provided, just opens a subplot in that figure.
+
+    Args:
+        nfig (int): number of the Figure to consider
+        mywcs (astropy.wcs.WCS): Input WCS to open a new figure
+
+    Returns:
+        fig, subplot: Figure itself with the subplots with the wcs projection
+
     """
+
+    # get the figure
     fig = plt.figure(nfig)
+    # Clean the figure
     plt.clf()
     # Adding axes with WCS
     if mywcs is None:
@@ -153,21 +150,18 @@ def open_new_wcs_figure(nfig, mywcs=None):
 def chunk_stats(list_data, chunk_size=15):
     """Cut the datasets in 2d chunks and take the median
     Return the set of medians for all chunks.
-    
-    Input
-    -----
-    list_data: list of numpy arrays
-        List of arrays with the same sizes/shapes.
-    chunk_size: int
-        Size of the chunk to be binned (pixels)
-    
-    Returns
-    -------
-    median, standard: 2 arrays of the medians and 
-        standard deviations for the given datasets analysed
-        in chunks.
-    
+
+    Args:
+        list_data (list of np.arrays): List of arrays with the same sizes/shapes
+        chunk_size (int): number of pixel (one D of a 2D chunk)
+           of the chunk to consider
+
+    Returns:
+        median, standard: 2 arrays of the medians and
+            standard deviations for the given datasets analysed in chunks.
+
     """
+
     ndatasets = len(list_data)
 
     nchunk_x = np.int(list_data[0].shape[0] // chunk_size - 1)
@@ -197,49 +191,48 @@ def chunk_stats(list_data, chunk_size=15):
     return med_data, std_data
 
 def my_linear_model(B, x):
-    """Linear function for the regression
+    """Linear function for the regression.
      
-    Input
-    -----
-    B: 1D array (length is 2)
-        Input 1D polynomial parameters (0=constant, 1=slope)
-    x: array
-        Array which will be multiplied by the polynomial
+    Args
+        B (1D array of 2): Input 1D polynomial parameters (0=constant, 1=slope)
+        x (array): Array which will be multiplied by the polynomial
     
     Returns
     -------
-    An array = B[1] * (x + B[0])
+        An array = B[1] * (x + B[0])
     """
     return B[1] * (x + B[0])
 
 def get_image_norm_poly(data1, data2, chunk_size=15, 
         threshold1=0., threshold2=0):
-    """Find the normalisation factor between two datasets
+    """Find the normalisation factor between two datasets.
+
     Including the background and slope. This uses the function
     regress_odr which is included in align_pipe.py and itself
     makes use of ODR in scipy.odr.ODR.
      
-    Input
-    -----
-    data1: array
-    data2: array
-        2 arrays (2D) of identical shapes
-    chunk_size: int
-        Size of the chunk to bin the images
-    threshold1: float
-    threshold2: float
-        2 floats defining the lower threshold for filtering
+    Args
+        data1 (array):
+        data2 (array): 2 arrays (2D) of identical shapes
+        chunk_size (int): Size of the chunk to bin the images
+        threshold1 (float):
+        threshold2 (float): 2 floats defining the lower threshold for filtering
     
     Returns
     -------
     result: python structure
         Result of the regression (ODR)
     """
+    # proceeds by splitting the data arrays in chunks of chunk_size
     med, std = chunk_stats([data1, data2], chunk_size=chunk_size)
+
+    # Selecting where data is supposed to be good
     pos = (med[0] > threshold1) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > threshold2)
+    # Guess the slope from this selection
     guess_slope = np.nanmedian(med[1][pos] / med[0][pos])
 
-    result = regress_odr(x=med[0][pos], y=med[1][pos], sx=std[0][pos], 
+    # Doing the regression itself
+    result = regress_odr(x=med[0][pos], y=med[1][pos], sx=std[0][pos],
                          sy=std[1][pos], beta0=[0., guess_slope])
     result.med = med
     result.std = std

@@ -14,8 +14,8 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Thanks to all !
 
 # Importing modules
-import os
 from os.path import join as joinpath
+import subprocess
 
 # pymusepipe modules
 from pymusepipe import util_pipe as upipe
@@ -86,30 +86,43 @@ class PipeRecipes(object) :
         if self.verbose:
             upipe.print_info("LIST_CPU: {0}".format(self.list_cpu))
 
-    def write_logfile(self, text):
+    def write_outlogfile(self, text):
+        """Writing in log file
+        """
+        self.write_logfile(text, addext=".out")
+
+    def write_errlogfile(self, text):
+        """Writing in log file
+        """
+        self.write_logfile(text, addext=".err")
+
+    def write_logfile(self, text, addext=""):
         """Writing in log file
         """
         fulltext = "# At : {0}{1} - pymusepipe version {2}\n{3}\n".format(
                 upipe.formatted_time(),
                 " FAKEMODE" if self.fakemode else "",
                 pipeversion, text) 
-        upipe.append_file(self.paths.log_filename, fulltext)
+        upipe.append_file(self.paths.log_filename+addext, fulltext)
 
     def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
         Fake mode will just spit out the command but not actually do it.
         """
         if self.fakemode:
-            upipe.print_warning("Running in Fakemode - Only printing/logging the command")
+            upipe.print_warning("Running in Fakemode - "
+                                "Only printing/logging the command")
 
-        if self.verbose : 
+        if self.verbose:
             print(command)
     
-        if log :
-            self.write_logfile(command)
-
         if not self.fakemode :
-            os.system(command)
+            result = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            if log:
+                self.write_logfile(command)
+                self.write_outlogfile(result.stdout.decode('utf-8'))
+                self.write_errlogfile(result.stderr.decode('utf-8'))
 
     def joinprod(self, name):
         return joinpath(self.paths.pipe_products, name)
@@ -210,7 +223,7 @@ class PipeRecipes(object) :
     #       suff_pre = filter name if IMAGE_FOV, otherwise ""
     #       tpl = tpls of the exposure
     #       suff_post = number of expo if relevant (2 integer)
-    def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[""], 
+    def recipe_scipost(self, sof, tpl, expotype, dir_products="", name_products=[""],
             suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
             list_expo=[], save='cube,skymodel', filter_list='white', 
             skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, 

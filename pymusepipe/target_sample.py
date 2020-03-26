@@ -269,6 +269,7 @@ class MusePipeSample(object):
         self.targets = {}
         self.pipes = {}
         self.pipes_combine = {}
+        self.pipes_mosaic = {}
         for targetname in self.targetnames:
             subfolder = self.sample[targetname][0]
             lpoints = self.sample[targetname][1]
@@ -296,6 +297,13 @@ class MusePipeSample(object):
             self.targets[targetname].data_path = joinpath(init_params_target.root, targetname)
             self.pipes[targetname].root_path = init_params_target.root
             self.pipes[targetname].data_path = joinpath(init_params_target.root, targetname)
+
+            init_comb_target = MusePointings(targetname=targetname,
+                                                 list_pointings=list_pointings,
+                                                 rc_filename=rc_filename,
+                                                 cal_filename=cal_filename,
+                                                 folder_config=folder_config)
+            self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
 
             if self.init_pipes:
                 self.set_pipe_target(targetname)
@@ -482,10 +490,9 @@ class MusePipeSample(object):
             One of the recipe to end with
         """
         for target in self.targets.keys():
-            upipe.print_info("=== Start Reduction of Target {name} ===".format(target))
-            self.reduce_target(targetname=target, first_recipe=first_recipe, last_recipe=last_recipe,
-                    **kwargs)
-            upipe.print_info("===  End  Reduction of Target {name} ===".format(target))
+            upipe.print_info("=== Start Reduction of Target {name} ===".format(name=target))
+            self.reduce_target(targetname=target, **kwargs)
+            upipe.print_info("===  End  Reduction of Target {name} ===".format(name=target))
 
     def reduce_target_prealign(self, targetname=None, list_pointings=None, **kwargs):
         """Reduce target for all steps before pre-alignment (included)
@@ -546,9 +553,10 @@ class MusePipeSample(object):
 
         # Fetch the default folder for the WCS files which is the folder
         # of the Combined cubes
-        self.init_combine(targetname=targetname, folder_offset_table=folder_offset_table,
-                          offset_table_name=offset_table_name)
-        default_comb_folder = self.pipes_combine[targetname].paths.cubes
+#        self.init_combine(targetname=targetname, folder_offset_table=folder_offset_table,
+#                          offset_table_name=offset_table_name)
+#        default_comb_folder = self.pipes_combine[targetname].paths.cubes
+        default_comb_folder = self.targets[targetname].combcubes_path
         # Now fetch the value set by the user
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
         if self.__phangs:
@@ -722,6 +730,44 @@ class MusePipeSample(object):
                              list_ifu=None, angle=angle, fakemode=fakemode,
                              prefix=prefix, **kwargs)
 
+    def init_mosaic(self, targetname=None, list_pointings="all", **kwargs):
+        """Prepare the combination of targets
+
+        Input
+        -----
+        targetname: str [None]
+            Name of target
+        list_pointings: list [or "all"=default]
+            List of pointings (e.g., [1,2,3])
+        """
+        # Check if pointings are valid
+        list_pointings = self._check_pointings(targetname, list_pointings)
+        if len(list_pointings) == 0:
+            return
+
+        # Make a list for the masking of the cubes to take into account
+        list_pointing_names = ["P{0:02d}".format(np.int(pointing)
+                                                 for pointing in list_pointings]
+
+        folder_ref_wcs = kwargs.pop("folder_ref_wcs", comb_folder)
+        self.pipes_mosaic[targetname] = MuseCubeMosaic(output_wcs=...,
+                                                       folder_cubes=...,
+                                                       prefix_cubes="DATACUBE_FINAL_WCS",
+                                                       list_suffix=list_pointing_names)
+
+    def mosaic(self, targetname=None, list_pointings="all", **kwargs):
+
+        self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
+                         **kwargs)
+
+        # Doing the mosaic with mad
+        self.pipes_mosaic[targetname].madcombine()
+        # Constructing the images for that mosaic
+        if self.__phangs:
+            filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
+        else:
+            filter_list = kwargs.pop("filter_list", default_filter_list)
+
     def init_combine(self, targetname=None, list_pointings="all",
                      folder_offset_table=None, offset_table_name=None, **kwargs):
         """Prepare the combination of targets
@@ -752,12 +798,12 @@ class MusePipeSample(object):
         self.pipes_combine[targetname].run_combine()
 
     def combine_target_pointings_withmasks(self, targetname=None, 
-            combine=True, masks=True, individual=True, mosaic_wcs=True, 
+            combine=True, masks=True, perpointing_combine=True, mosaic_wcs=True,
             **kwargs):
         """Run the combine for individual exposures first building up
         a mask.
         """
         self.init_combine(targetname=targetname, **kwargs)
         self.pipes_combine[targetname].run_combine_all_single_pointings_withmasks(
-                combine=combine, masks=masks, individual=individual, mosaic_wcs=mosaic_wcs,
-                **kwargs)
+            combine=combine, masks=masks, perpointing_combine=perpointing_combine,
+            mosaic_wcs=mosaic_wcs, **kwargs)
