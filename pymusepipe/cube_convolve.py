@@ -17,7 +17,7 @@ import numpy as np
 try:
     import pypher.pypher as py
 except ImportError:
-    print("IMPORT ERROR: pypher is needed for cube_convolve")
+    print("IMPORT WARNING: pypher is needed for cube_convolve")
 
 # Importing mpdaf
 try :
