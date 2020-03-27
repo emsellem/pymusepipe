@@ -362,50 +362,44 @@ def cube_convolve(data, kernel, variance=None, fft=True, perslice=True):
         print("Starting the linear convolution")
         conv_function = convolve
 
-    norm_kernel = np.divide(kernel.T, kernel.sum(axis=(1, 2)).T)
+    norm_kernel = np.divide(kernel.T, kernel.sum(axis=(1, 2)).T).T
     var_kernel = norm_kernel**2
 
     if perslice:
         print("Convolution using per slice-2D convolve in astropy")
         for i in range(data.shape[0]):
             # Signal
-            try:
-                data[i, :, :] = conv_function(data[i, :, :],
-                                              norm_kernel[i, :, :],
-                                              allow_huge=True,
-                                              psf_pad=True,
-                                              fft_pad=False,
-                                              boundary='fill',
-                                              fill_value=0,
-                                              normalise_kernel=False)
-            except Exception:
-                continue
+            data[i, :, :] = conv_function(data[i, :, :],
+                                          norm_kernel[i, :, :],
+                                          allow_huge=True,
+                                          psf_pad=True,
+                                          fft_pad=False,
+                                          boundary='fill',
+                                          fill_value=0,
+                                          normalize_kernel=False)
 
         if variance is not None:
             for i in range(variance.shape[0]):
                 # Variance
-                try:
-                    variance[i, :, :] = conv_function(variance[i, :, :],
-                                                      var_kernel[i, :, :],
-                                                      allow_huge=True,
-                                                      psf_pad=True,
-                                                      fft_pad=False,
-                                                      boundary='fill',
-                                                      fill_value=0,
-                                                      normalise_kernel=False)
-                except Exception:
-                    continue
+                variance[i, :, :] = conv_function(variance[i, :, :],
+                                                  var_kernel[i, :, :],
+                                                  allow_huge=True,
+                                                  psf_pad=True,
+                                                  fft_pad=False,
+                                                  boundary='fill',
+                                                  fill_value=0,
+                                                  normalize_kernel=False)
     else:
         print("Convolution using 3D convolve in astropy")
         data = conv_function(data, norm_kernel, allow_huge=True,
                              psf_pad=True, fft_pad=False,
                              boundary='fill', fill_value=0,
-                             normalise_kernel=False)
+                             normalize_kernel=False)
         if variance is not None:
             variance = conv_function(variance, var_kernel, allow_huge=True,
                                      psf_pad=True, fft_pad=False,
                                      boundary='fill', fill_value=0,
-                                     normalise_kernel=False)
+                                     normalize_kernel=False)
 
     return data, variance
 
