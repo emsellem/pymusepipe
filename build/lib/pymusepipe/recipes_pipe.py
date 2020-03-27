@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT style license - see LICENSE.rst
 
 """MUSE-PHANGS recipe module
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # This module has been largely inspired by work of
@@ -14,12 +14,11 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Thanks to all !
 
 # Importing modules
-import os
 from os.path import join as joinpath
+import subprocess
 
 # pymusepipe modules
 from pymusepipe import util_pipe as upipe
-from pymusepipe.mpdaf_pipe import MuseCube
 from .version import __version__ as pipeversion
 
 # Likwid command
@@ -29,7 +28,7 @@ class PipeRecipes(object) :
     """PipeRecipes class containing all the esorex recipes for MUSE data reduction
     """
     def __init__(self, nifu=-1, first_cpu=0, ncpu=24, list_cpu=[], likwid=default_likwid,
-            fakemode=True, domerge=True, nocache=True, nochecksum=True) :
+            fakemode=False, domerge=True, nocache=False, nochecksum=True) :
         """Initialisation of PipeRecipes
         """
         # Fake mode
@@ -53,7 +52,6 @@ class PipeRecipes(object) :
             self._set_cpu(first_cpu, ncpu, list_cpu)
         self.nifu = nifu
         self._domerge = domerge
-
         self.nochecksum = nochecksum
 
     @property
@@ -88,27 +86,48 @@ class PipeRecipes(object) :
         if self.verbose:
             upipe.print_info("LIST_CPU: {0}".format(self.list_cpu))
 
-    def write_logfile(self, text):
+    def write_outlogfile(self, text):
         """Writing in log file
         """
+        self.write_logfile(text, addext=".out")
+
+    def write_errlogfile(self, text):
+        """Writing in log file
+        """
+        self.write_logfile(text, addext=".err")
+
+    def write_logfile(self, text, addext=""):
+        """Writing in log file
+        """
+        if text == "":
+            # nothing to write
+            return
         fulltext = "# At : {0}{1} - pymusepipe version {2}\n{3}\n".format(
                 upipe.formatted_time(),
                 " FAKEMODE" if self.fakemode else "",
                 pipeversion, text) 
-        upipe.append_file(self.paths.logfile, fulltext)
+        upipe.append_file(self.paths.log_filename+addext, fulltext)
 
     def run_oscommand(self, command, log=True) :
         """Running an os.system shell command
         Fake mode will just spit out the command but not actually do it.
         """
-        if self.verbose : 
+        if self.fakemode:
+            upipe.print_warning("Running in Fakemode - "
+                                "Only printing/logging the command")
+
+        if self.verbose:
             print(command)
     
-        if log :
-            self.write_logfile(command)
-
         if not self.fakemode :
-            os.system(command)
+            result = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            if log:
+                self.write_logfile(command)
+                self.write_outlogfile(command)
+                self.write_outlogfile(result.stdout.decode('utf-8'))
+                self.write_errlogfile(command)
+                self.write_errlogfile(result.stderr.decode('utf-8'))
 
     def joinprod(self, name):
         return joinpath(self.paths.pipe_products, name)
@@ -209,15 +228,16 @@ class PipeRecipes(object) :
     #       suff_pre = filter name if IMAGE_FOV, otherwise ""
     #       tpl = tpls of the exposure
     #       suff_post = number of expo if relevant (2 integer)
-    def recipe_scipost(self, sof, tpl, expotype, dir_products=None, name_products=[""], 
+    def recipe_scipost(self, sof, tpl, expotype, dir_products="", name_products=[""],
             suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
-            save='cube,skymodel', filter_list='white', 
+            list_expo=[], save='cube,skymodel', filter_list='white', 
             skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, 
             astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="",
             autocalib='none', rvcorr='bary', **kwargs):
         """Running the esorex muse_scipost recipe
         """
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        prefix_all = kwargs.pop("prefix_all", "")
         self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
                 "--astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
@@ -232,12 +252,17 @@ class PipeRecipes(object) :
         # Creating the images for the alignment, outside of scipost
         # The filter can be a private one
 
-        for name_prod, suff_prod, suff_pre, suff_post in zip(name_products, suffix_products, 
-                suffix_prefinalnames, suffix_postfinalnames) :
+        if self._debug:
+            upipe.print_debug("Product names:")
+            for prod in name_products:
+                upipe.print_debug(prod)
+
+        for name_prod, suff_prod, suff_pre, suff_post, iexpo in zip(name_products, suffix_products, 
+                suffix_prefinalnames, suffix_postfinalnames, list_expo) :
 
             # In any case move the file from Pipe_products to the right folder
             fitsname_out = "{name_imaout}{suffix}{suff_pre}_{tpl}{suff_post}.fits".format(
-                            name_imaout=joinpath(dir_products, name_prod), 
+                            name_imaout=joinpath(dir_products, prefix_all+name_prod),
                             suff_pre=suff_pre, suff_post=suff_post, 
                             tpl=tpl, suffix=suffix)
 
@@ -245,6 +270,9 @@ class PipeRecipes(object) :
                                nocache=self.nocache, 
                                name_imain=self.joinprod(name_prod+suff_prod), 
                                fitsname=fitsname_out))
+            # Adding pointing and expo numbers as keywords
+            if filter_for_alignment in fitsname_out:
+                upipe.add_key_pointing_expo(fitsname_out, iexpo, self.pointing)
 
             # Now if in need of an alignment image and it is the filter image
             # Copying it in the Alignment folder or write it 
@@ -252,12 +280,15 @@ class PipeRecipes(object) :
                 and self._suffix_prealign in fitsname_out:
                 name_imageout_align = ("{name_imaout}{suffix}_P{pointing:02d}_{myfilter}"
                                       "_{tpl}{suff_post}.fits".format(
-                                      name_imaout=joinpath(self.paths.alignment, "IMAGE_FOV"), 
+                                      name_imaout=joinpath(self.paths.alignment,
+                                                           prefix_all+"IMAGE_FOV"),
                                       myfilter=filter_for_alignment, suff_post=suff_post, 
                                       tpl=tpl, suffix=suffix, pointing=self.pointing))
                 self.run_oscommand("{nocache} cp {fitsname} {nameima_out}".format(
                                    nocache=self.nocache, fitsname=fitsname_out,
                                    nameima_out=name_imageout_align))
+                # Adding pointing and expo numbers as keywords
+                upipe.add_key_pointing_expo(name_imageout_align, iexpo, self.pointing)
 
     def recipe_align(self, sof, dir_products, namein_products, nameout_products, tpl, group,
             threshold=10.0, srcmin=3, srcmax=80, fwhm=5.0):
@@ -279,10 +310,9 @@ class PipeRecipes(object) :
             suffix_products=[""], suffix_prefinalnames=[""], 
             save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white',
-            lambdamin=4000., lambdamax=10000., **kwargs):
+            lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for one single pointing
         """
-        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         self.run_oscommand("{esorex}  --log-file=exp_combine_cube_{expotype}_{tpl}.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                "--format={form} --filter={filt} "
@@ -303,12 +333,11 @@ class PipeRecipes(object) :
 
     def recipe_combine_pointings(self, sof, dir_products, name_products,
             suffix_products=[""], suffix_prefinalnames=[""], 
-            save='cube', pixfrac=0.6, suffix="", 
+            prefix_products=[""], save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white', 
             lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for pointings
         """
-        filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         self.run_oscommand("{esorex}  --log-file=exp_combine_pointings.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                "--format={form} --filter={filt} "
@@ -318,13 +347,13 @@ class PipeRecipes(object) :
                    filt=filter_list, sof=sof, 
                    lmin=lambdamin, lmax=lambdamax))
 
-        for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
-                suffix_prefinalnames):
+        for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products, 
+                suffix_prefinalnames, prefix_products):
 
             self.run_oscommand("{nocache} mv {name_imain}.fits "
                               "{name_imaout}{suffix}{suff_pre}.fits".format(
                                   nocache=self.nocache, 
                                   name_imain=self.joinprod(name_prod+suff_prod), 
-                                  name_imaout=joinpath(dir_products, name_prod),
+                                  name_imaout=joinpath(dir_products, pre_prod+name_prod),
                                   suff_pre=suff_pre, suffix=suffix))
 

@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT style license - see LICENSE.txt
 
 """MUSE-PHANGS check pipeline module
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 # This module will take a MusePipe object and do the plot check ups
 
@@ -31,6 +31,7 @@ ENDC = '\033[0m'
 
 def print_plot(text) :
     print(PLOT + "# CheckPipeInfo " + ENDC + text)
+
 
 class CheckPipe(MusePipe) :
     """Checking the outcome of the data reduction

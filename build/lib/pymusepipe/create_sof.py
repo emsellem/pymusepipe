@@ -1,11 +1,11 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Licensed under a MIT license - see LICENSE
 
 """MUSE-PHANGS creating sof file module
 """
 
 __authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "3-clause BSD License"
+__license__   = "MIT License"
 __contact__   = " <eric.emsellem@eso.org>"
 
 # This module has been largely inspired by work of
@@ -13,18 +13,14 @@ __contact__   = " <eric.emsellem@eso.org>"
 # and further rewritten by Mark van den Brok. 
 # Thanks to all !
 
-# Numpy
-import numpy as np
-
 # Standard modules
 import os
 from os.path import join as joinpath
 
-import collections
 from collections import OrderedDict
 
 from pymusepipe import util_pipe as upipe
-from pymusepipe import musepipe
+from pymusepipe.config_pipe import get_suffix_product
 
 class SofDict(OrderedDict) :
     """New Dictionary for the SOF writing
@@ -63,7 +59,7 @@ class SofPipe(object) :
                 upipe.print_info("Appending in file {0}".format(sof))
     
         # Use dictionary to write up the lines
-        for key in self._sofdict.keys() :
+        for key in self._sofdict:
             for item in self._sofdict[key] :
                 text_to_write = "{0} {1}\n".format(item, key)
                 sof_file.write(text_to_write)
@@ -74,16 +70,6 @@ class SofPipe(object) :
         # Returning the current sof as relative path
         self.current_sof = upipe.normpath(os.path.relpath(sof))
 
-    def _select_closest_mjd(self, mjdin, group_table) :
-        """Get the closest frame within the expotype
-        If the attribute does not exist in Tables, it tries to read
-        the table from the folder
-        """
-        # Get the closest tpl
-        index = np.argmin((mjdin - group_table['mjd'])**2)
-        closest_tpl = group_table[index]['tpls']
-        return index, closest_tpl
-    
     def _add_list_tplmaster_to_sofdict(self, mean_mjd, list_expotype):
         """Add a list of masterfiles to the SOF
         """
@@ -96,9 +82,15 @@ class SofPipe(object) :
         if reset: self._sofdict.clear()
         # Finding the best tpl for this master
         index, this_tpl = self._select_closest_mjd(mean_mjd, self._get_table_expo(expotype)) 
-        dir_master = self._get_fullpath_expo(expotype)
-        self._sofdict[self._get_suffix_product(expotype)] = [upipe.normpath(joinpath(dir_master, 
-            self._get_suffix_product(expotype) + "_" + this_tpl + ".fits"))]
+        if self._debug:
+            upipe.print_debug("Index = {0}, Tpl = {1}".format(index, this_tpl))
+        if index >= 0:
+            dir_master = self._get_fullpath_expo(expotype)
+            self._sofdict[get_suffix_product(expotype)] = [upipe.normpath(joinpath(dir_master, 
+                get_suffix_product(expotype) + "_" + this_tpl + ".fits"))]
+        else:
+            upipe.print_error("Failed to find a master exposure of type {} "
+                              "in this table".format(expotype))
 
     def _add_tplraw_to_sofdict(self, mean_mjd, expotype, reset=False):
         """ Add item to dictionary for the sof writing
@@ -107,11 +99,15 @@ class SofPipe(object) :
         # Finding the best tpl for this raw file type
         expo_table = self._get_table_expo(expotype, "raw")
         index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
-        self._sofdict[expotype] = [upipe.normpath(joinpath(self.paths.rawfiles, 
-            expo_table['filename'][index]))]
+        if index >= 0:
+            self._sofdict[expotype] = [upipe.normpath(joinpath(self.paths.rawfiles, 
+                expo_table['filename'][index]))]
+        else:
+            upipe.print_error("Failed to find a raw exposure of type {} "
+                              "in this table".format(expotype))
 
-    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", suffix="", 
-            perexpo=False, reset=False):
+    def _add_skycalib_to_sofdict(self, tag, mean_mjd, expotype, stage="master", 
+            suffix="", prefix="", reset=False, perexpo=False):
         """ Add item to dictionary for the sof writing
         """
         if reset: self._sofdict.clear()
@@ -122,16 +118,25 @@ class SofPipe(object) :
         if perexpo:
             iexpo = expo_table[index]['iexpo']
             suffix += "_{0:04d}".format(iexpo)
-        self._sofdict[tag] = [joinpath(dir_calib, "{0}_{1}{2}.fits".format(tag, this_tpl, suffix))]
+
+        # Name for the sky calibration file
+        name_skycalib = "{0}{1}_{2}{3}.fits".format(prefix, tag, this_tpl, suffix)
+
+        self._sofdict[tag] = [joinpath(dir_calib, name_skycalib)]
 
     def _add_calib_to_sofdict(self, calibtype, reset=False):
         """Adding a calibration file for the SOF 
         """
         if reset: self._sofdict.clear()
-        calibfile = getattr(self.pipe_params, calibtype.lower())
-        self._sofdict[calibtype] = [joinpath(self.pipe_params.musecalib, calibfile)]
+        self._sofdict[calibtype] = [self._get_name_calibfile(calibtype)]
 
-    def _add_geometry_to_sofdict(self, tpls):
+    def _get_name_calibfile(self, calibtype):
+        """Get the name of the calibration file
+        """
+        calibfile = getattr(self.pipe_params, calibtype.lower())
+        return joinpath(self.pipe_params.musecalib, calibfile)    
+
+    def _add_geometry_to_sofdict(self, tpls, mean_mjd):
         """Extract the geometry table and add it to the dictionary
         for the SOF file
         """
@@ -139,12 +144,18 @@ class SofPipe(object) :
             calfolder = self.pipe_params.musecalib_time
             geofile = self.retrieve_geoastro_name(tpls, filetype='geo')
         else:
-            calfolder = self.pipe_params.musecalib
-            geofile = self.pipe_params.geo_table
+            expo_table = self._get_table_expo("GEOMETRY", "raw")
+            if len(expo_table) > 0:
+                index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
+                calfolder = self.paths.rawfiles
+                geofile = expo_table['filename'][index]
+            else:
+                calfolder = self.pipe_params.musecalib
+                geofile = self.pipe_params.geo_table
 
         self._sofdict['GEOMETRY_TABLE']=["{folder}{geo}".format(folder=calfolder, geo=geofile)]
 
-    def _add_astrometry_to_sofdict(self, tpls):
+    def _add_astrometry_to_sofdict(self, tpls, mean_mjd):
         """Extract the astrometry table and add it to the dictionary
         for the SOF file
         """
@@ -152,8 +163,14 @@ class SofPipe(object) :
             calfolder = self.pipe_params.musecalib_time
             astrofile = self.retrieve_geoastro_name(tpls, filetype='astro')
         else :
-            calfolder = self.pipe_params.musecalib
-            astrofile = self.pipe_params.astro_table
+            expo_table = self._get_table_expo("ASTROMETRY", "raw")
+            if len(expo_table) > 0:
+                index, this_tpl = self._select_closest_mjd(mean_mjd, expo_table) 
+                calfolder = self.paths.rawfiles
+                astrofile = expo_table['filename'][index]
+            else:
+                calfolder = self.pipe_params.musecalib
+                astrofile = self.pipe_params.astro_table
 
         self._sofdict['ASTROMETRY_WCS']=["{folder}{astro}".format(folder=calfolder, astro=astrofile)]
 

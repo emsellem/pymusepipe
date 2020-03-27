@@ -1,4 +1,7 @@
 # pymusepipe
+
+WARNING: Doc need to be updated since many major changes. Coming asap.
+
 This is a Python wrapper for the MUSE/VLT pipeline recipes. This runs using the esorex command lines (in parallel, using by default likwid, although other options are available). This wrapper is meant to reduce MUSE OBs automatically, after dumping the fits files in a given folder.
 
 This package also includes an alignment module which may be useful, independently given a set of images to align and assuming a reference image is provided. It can spit out an "OFFSET_LIST" MUSE compatible fits table including the flux scaling factors.
