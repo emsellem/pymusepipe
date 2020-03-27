@@ -10,6 +10,8 @@ old_stuff/
 
 # Old files
 *.old
+# notes
+*.help
 
 # gvim swap
 *.py.swp

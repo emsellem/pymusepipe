@@ -14,7 +14,8 @@ __contact__   = " <eric.emsellem@eso.org>"
 import numpy as np
 
 # Astropy
-from astropy.convolution import Moffat2DKernel, Gaussian2DKernel
+from astropy.convolution import (Moffat2DKernel, Gaussian2DKernel, convolve,
+                                 convolve_fft)
 from astropy.stats import gaussian_fwhm_to_sigma
 
 # pypher
@@ -343,7 +344,7 @@ def convolution_kernel_gaussian(fwhm_wave, target_fwhm, target_psf,
 
     return conv_kernel
 
-def cube_convolve(data, variance, kernel):
+def cube_convolve(data, kernel, variance=None, fft=True, perslice=True):
     """Convolve a 3D datacube
 
     Args:
@@ -354,36 +355,59 @@ def cube_convolve(data, variance, kernel):
         the convolved 3D datacube
 
     """
-    if data.shape != kernel.shape:
-        raise ValueError('The 3Ddata and kernel must have the same shape')
-
-    convolved = np.zeros_like(data, dtype=np.float32)
-    convolved_var = np.zeros_like(variance, dtype=np.float32)
+    if fft:
+        print("Starting the convolution with fft")
+        conv_function = convolve_fft
+    else:
+        print("Starting the linear convolution")
+        conv_function = convolve
 
     norm_kernel = np.divide(kernel.T, kernel.sum(axis=(1, 2)).T)
     var_kernel = norm_kernel**2
-    for i in range(data.shape[0]):
-        # Signal
-        try:
-            convolved[i, :, :] = convolve_fft(data[i, :, :], norm_kernel[i, :, :],
-                                              allow_huge=True, psf_pad=True,
-                                              fft_pad=False, boundary='fill',
+
+    if perslice:
+        print("Convolution using per slice-2D convolve in astropy")
+        for i in range(data.shape[0]):
+            # Signal
+            try:
+                data[i, :, :] = conv_function(data[i, :, :],
+                                              norm_kernel[i, :, :],
+                                              allow_huge=True,
+                                              psf_pad=True,
+                                              fft_pad=False,
+                                              boundary='fill',
                                               fill_value=0,
                                               normalise_kernel=False)
-        except Exception:
-            continue
+            except Exception:
+                continue
 
-        # Variance
-        try:
-            convolved_var[i, :, :] = convolve_fft(data[i, :, :], var_kernel[i, :, :],
-                                              allow_huge=True, psf_pad=True,
-                                              fft_pad=False, boundary='fill',
-                                              fill_value=0,
-                                              normalise_kernel=False)
-        except Exception:
-            continue
+        if variance is not None:
+            for i in range(variance.shape[0]):
+                # Variance
+                try:
+                    variance[i, :, :] = conv_function(variance[i, :, :],
+                                                      var_kernel[i, :, :],
+                                                      allow_huge=True,
+                                                      psf_pad=True,
+                                                      fft_pad=False,
+                                                      boundary='fill',
+                                                      fill_value=0,
+                                                      normalise_kernel=False)
+                except Exception:
+                    continue
+    else:
+        print("Convolution using 3D convolve in astropy")
+        data = conv_function(data, norm_kernel, allow_huge=True,
+                             psf_pad=True, fft_pad=False,
+                             boundary='fill', fill_value=0,
+                             normalise_kernel=False)
+        if variance is not None:
+            variance = conv_function(variance, var_kernel, allow_huge=True,
+                                     psf_pad=True, fft_pad=False,
+                                     boundary='fill', fill_value=0,
+                                     normalise_kernel=False)
 
-    return convolved
+    return data, variance
 
 def cube_kernel(shape, wave, input_fwhm,  target_fwhm,
                 input_function, target_function, lambda0=6483.58,

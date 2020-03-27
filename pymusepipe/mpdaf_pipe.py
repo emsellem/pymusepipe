@@ -13,6 +13,7 @@ __contact__   = " <eric.emsellem@eso.org>"
 
 # Importing modules
 import numpy as np
+from numpy import ma
 
 # Standard modules
 import os
@@ -25,7 +26,7 @@ try :
 except ImportError :
     raise Exception("mpdaf is required for this - MUSE related - module")
 
-from mpdaf.obj import Cube, Image, CubeMosaic
+from mpdaf.obj import Cube, Image, CubeMosaic, DataArray
 from mpdaf.obj import Spectrum, WaveCoord
 from mpdaf.tools import add_mpdaf_method_keywords
 from mpdaf.drs import PixTable
@@ -37,7 +38,7 @@ from astropy import units as u
 from pymusepipe import util_pipe as upipe
 from .config_pipe import default_wave_wcs, AO_mask_lambda
 
-from .cube_convolve import cube_kernel
+from .cube_convolve import cube_kernel, cube_convolve
 
 def get_sky_spectrum(specname) :
     """Read sky spectrum from MUSE data reduction
@@ -263,10 +264,105 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
-    def convolve_cube(self, target_fwhm, target_nmoffat=None,
-                      input_function='moffat', target_function="gaussian",
-                      outcube_name=None,
-                      factor_fwhm=3, fft=True):
+    def astropy_convolve(self, other, fft=True, perslice=True, inplace=False):
+        """Convolve a DataArray with an array of the same number of dimensions
+        using a specified convolution function.
+
+        Copy of _convolve for a cube, but doing it per slice or not
+
+        Masked values in self.data and self.var are replaced with
+        zeros before the convolution is performed. However masked
+        pixels in the input data remain masked in the output.
+
+        Any variances in self.var are propagated correctly.
+
+        If self.var exists, the variances are propagated using the equation::
+
+            result.var = self.var (*) other**2
+
+        where (*) indicates convolution. This equation can be derived
+        by applying the usual rules of error-propagation to the
+        discrete convolution equation.
+
+        Uses `astropy.convolution.convolve_fft' or 'astropy.convolution.convolve'
+
+        Parameters
+        ----------
+        fn : callable
+            The convolution function to use, chosen from:
+
+            - `astropy.convolution.convolve_fft'
+            - `astropy.convolution.convolve'
+
+            In general convolve_fft() is faster than convolve() except when
+            other.data only contains a few pixels. However convolve_fft uses
+            a lot more memory than convolve(), so convolve() is sometimes the
+            only reasonable choice. In particular, convolve_fft allocates two
+            arrays whose dimensions are the sum of self.shape and other.shape,
+            rounded up to a power of two. These arrays can be impractically
+            large for some input data-sets.
+        other : DataArray or numpy.ndarray
+          The array with which to convolve the contents of self.  This must
+          have the same number of dimensions as self, but it can have fewer
+          elements. When this array contains a symmetric filtering function,
+          the center of the function should be placed at the center of pixel,
+          ``(other.shape - 1)//2``.
+
+          Note that passing a DataArray object is equivalent to just
+          passing its DataArray.data member. If it has any variances,
+          these are ignored.
+        inplace : bool
+            If False (the default), return a new object containing the
+            convolved array.
+            If True, record the convolved array in self and return self.
+
+        Returns
+        -------
+        `~mpdaf.obj.DataArray`
+
+        """
+        out = self if inplace else self.copy()
+
+        if out.ndim != other.ndim:
+            raise IOError('The other array must have the same rank as self')
+
+        if np.any(np.asarray(other.shape) > np.asarray(self.shape)):
+            raise IOError('The other array must be no larger than self')
+
+        kernel = other.data if isinstance(other, DataArray) else other
+
+        # Replace any masked pixels in the convolution kernel with zeros.
+        if isinstance(kernel, ma.MaskedArray) and ma.count_masked(kernel) > 0:
+            kernel = kernel.filled(0.0)
+
+        # Replace any masked pixels in out._data with zeros
+        masked = self._mask is not None and self._mask.sum() > 0
+        if masked:
+            out._data = out.data.filled(0.0)
+        elif out._mask is None and ~np.isfinite(out._data.sum()):
+            out._data = out._data.copy()
+            out._data[~np.isfinite(out._data)] = 0.0
+
+        # Are there any variances to be propagated?
+        if out._var is not None:
+            # Replace any masked pixels in out._var with zeros
+            if masked:
+                out._var = out.var.filled(0.0)
+            elif out._mask is None and ~np.isfinite(out._var.sum()):
+                out._var = out._var.copy()
+                out._var[~np.isfinite(out._var)] = 0.0
+
+        # Calling the external function now
+        out._data, out._var = cube_convolve(out._data, kernel,
+                                            variance=out._var,
+                                            fft=fft, perslice=perslice)
+
+        return out
+
+    def convolve_cube_to_psf(self, target_fwhm, target_nmoffat=None,
+                             input_function='moffat', target_function="gaussian",
+                             outcube_name=None, factor_fwhm=3,
+                             fft=True, perslice=True):
         """Convolve the cube for a target function 'gaussian' or 'moffat'
 
         Args:
@@ -276,6 +372,10 @@ class MuseCube(Cube):
             target_function (str): 'gaussian' or 'moffat' ['gaussian']
             factor_fwhm (float): number of FWHM for size of Kernel
             fft (bool): use FFT to convolve or not [False]
+            perslice (bool): doing it per slice, or not [True]
+                If doing it per slice, using a direct astropy fft. If
+                doing it with the cube, it uses much more memory but is
+                more efficient as the convolution is done via mpdaf directly.
 
         Creates:
             Convolved cube
@@ -304,16 +404,18 @@ class MuseCube(Cube):
                                target_nmoffat=target_nmoffat, b=self.psf_b,
                                scale=scale_spaxel, compute_kernel='pypher')
 
-        if fft:
-            upipe.print_info("Starting the FFT convolution")
-            conv_cube = self.fftconvolve(other=kernel3d)
-        else:
-            upipe.print_info("Starting the convolution")
-            conv_cube = self.convolve(other=kernel3d)
+        # Calling the local method using astropy convolution
+        conv_cube = self.astropy_convolve(other=kernel3d, fft=fft,
+                                          perslice=perslice)
 
         # Write the output
         upipe.print_info("Writing up the derived cube")
         conv_cube.write(joinpath(cube_folder, outcube_name))
+
+        # Write the kernel3D
+        upipe.print_info("Writing up the used kernel")
+        kercube = Cube(data=kernel3d)
+        kercube.write(joinpath(cube_folder, "ker3d_{}".format(outcube_name)))
 
         # just provide the output name by folder+name
         return cube_folder, outcube_name
