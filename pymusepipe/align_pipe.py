@@ -947,11 +947,12 @@ class AlignMusePointing(object):
             upipe.print_info("              {0:8.4f} {1:8.4f}".format(
                     self.total_off_arcsec[nima][0],
                     self.total_off_arcsec[nima][1]))
-        upipe.print_info("Total in PIXEL")
+        upipe.print_info("Total in PIXEL     X        Y         ROT(DEG) ")
         for nima in range(self.nimages):
-            upipe.print_info("              {0:8.4f} {1:8.4f}".format(
+            upipe.print_info("              {0:8.4f} {1:8.4f} {2:8.4f}".format(
                     self.total_off_pixel[nima][0],
-                    self.total_off_pixel[nima][1]))
+                    self.total_off_pixel[nima][1]),
+                    self.muse_rotangles[nima])
 
     def save_fits_offset_table(self, name_output_table=None, 
             folder_output_table=None,

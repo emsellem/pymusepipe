@@ -159,6 +159,8 @@ def gaussian_kernel(fwhm, size, scale=0.2, **kwargs):
             (y_size, x_size) order. In each case size must be an integer number
             of pixels.
         scale (float): pixel scale of the image
+        **kwargs: is there to absorb any additional parameter which could be
+           provided (but won't be used).
 
     """
     if np.isscalar(size):
@@ -352,7 +354,7 @@ def cube_convolve(data, kernel, variance=None, fft=True, perslice=True):
         kernel:
 
     Returns:
-        the convolved 3D datacube
+        the convolved 3D data and its variance
 
     """
     if fft:

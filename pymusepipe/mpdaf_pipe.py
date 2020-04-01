@@ -378,7 +378,7 @@ class MuseCube(Cube):
                 more efficient as the convolution is done via mpdaf directly.
 
         Creates:
-            Convolved cube
+            Folder and convolved cube names
         """
         # Separate folder and name of file
         cube_folder, cube_name = os.path.split(self.filename)
