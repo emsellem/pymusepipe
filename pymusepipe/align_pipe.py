@@ -279,6 +279,11 @@ def get_conversion_factor(input_unit, output_unit, filter_name="WFI"):
     conversion: astropy unit conversion
     """
 
+    if filter_name no in dict_equivalencies:
+        upipe.print_warning("Didn't find conversion for this filter. "
+                            "Using 1.0 as a conversion factor")
+        return 1.0
+
     equivalencies = dict_equivalencies[filter_name]
     # First testing if the quantities are Quantity
     # If not, transform them 
