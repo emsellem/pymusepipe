@@ -264,7 +264,7 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
-    def astropy_convolve(self, other, fft=True, perslice=True, inplace=False):
+    def astropy_convolve(self, other, fft=True, inplace=False):
         """Convolve a DataArray with an array of the same number of dimensions
         using a specified convolution function.
 
@@ -354,15 +354,14 @@ class MuseCube(Cube):
 
         # Calling the external function now
         out._data, out._var = cube_convolve(out._data, kernel,
-                                            variance=out._var,
-                                            fft=fft, perslice=perslice)
+                                            variance=out._var, fft=fft)
 
         return out
 
     def convolve_cube_to_psf(self, target_fwhm, target_nmoffat=None,
                              input_function='moffat', target_function="gaussian",
                              outcube_name=None, factor_fwhm=3,
-                             fft=True, perslice=True):
+                             fft=True):
         """Convolve the cube for a target function 'gaussian' or 'moffat'
 
         Args:
@@ -405,8 +404,7 @@ class MuseCube(Cube):
                                scale=scale_spaxel, compute_kernel='pypher')
 
         # Calling the local method using astropy convolution
-        conv_cube = self.astropy_convolve(other=kernel3d, fft=fft,
-                                          perslice=perslice)
+        conv_cube = self.astropy_convolve(other=kernel3d, fft=fft)
 
         # Write the output
         upipe.print_info("Writing up the derived cube")
@@ -561,6 +559,77 @@ class MuseCube(Cube):
                     [filter_name], ['filter name used'])
 
         return refimage
+
+    def mask_trail(self, pq1=[0, 0], pq2=[10, 10], width=1.0,
+                   margins=0., reset=False, save=True, **kwargs):
+        """Build a cube mask from 2 points measured from a trail on an image
+
+        Input
+        -----
+        pq1: array or tuple (float)
+            p and q coordinates of point 1 along the trail
+        pq2: array or tuple (float)
+            p and q coordinates of point 2 along the trail
+        width: float
+            Value (in pixel) of the full slit width to exclude
+        margins: float
+            Value (in pixel) to extend the slit beyond the 2 extrema
+            If 0, this means limiting it to the extrema themselves.
+            Default is None, which mean infinitely long slit
+        reset (bool): if True, reset the mask before masking the slit
+        save (bool): if True, save the masked cube
+        """
+        # If width = 0 just don't do anything
+        if width <= 0.:
+            upipe.print_warning("Trail width is 0, hence no doing anything")
+            return
+        w2 = width / 2.
+
+        # Calculating the coordinates of the p and q's
+        # X2 - X1 -> note that X is q, hence the second value
+        # Y2 - Y1 -> note that Y is p, hence the first value
+        pq1 = np.asarray(pq1)
+        pq2 = np.asarray(pq2)
+        vect = pq2 - pq1
+        nvect = vect / np.hypot(vect[0], vect[1])
+        ovect = np.array([nvect[1], -nvect[0]])
+
+        # New corners depending on width and margins
+        corner1 = pq1 - margins * nvect + w2 * ovect
+        corner2 = pq1 - margins * nvect - w2 * ovect
+        corner3 = pq2 + margins * nvect - w2 * ovect
+        corner4 = pq2 + margins * nvect + w2 * ovect
+        # This is the new tuple to feed mask_polygon
+        pol = [tuple(corner1), tuple(corner2), tuple(corner3), tuple(corner4)]
+
+        out = self.copy()
+        # Reset mask if requested
+        if reset:
+            out.unmask()
+
+        out.mask_polygon(pol, unit_poly=None, inside=True)
+
+        # Rewrite a new cube
+        if save:
+            suffix_out = kwargs.pop("suffix_out", "tmask")
+            use_folder = kwargs.pop("use_folder", True)
+
+            cube_folder, cube_name = os.path.split(self.filename)
+            trailcube_name = "{0}{1}".format(suffix_out, cube_name)
+            if use_folder:
+                trailcube_name = joinpath(cube_folder, trailcube_name)
+
+            upipe.print_info("Writing the new Cube {}".format(trailcube_name))
+            out.write(trailcube_name)
+
+    def save_mask(self, mask_name="dummy_mask.fits"):
+        """Save the mask into a 0-1 image
+        """
+        newimage = self.copy()
+        newimage.data = np.where(self.mask, 0, 1).astype(np.int)
+        newimage.mask[:, :] = False
+        newimage.write(mask_name)
+
 
 class MuseSkyContinuum(object):
     def __init__(self, filename):
@@ -783,7 +852,6 @@ class MuseImage(Image):
         # Mask based on the extent of the slit
         if extent is not None:
             y01, x01 = ind[0] - pq1[0], ind[1] - pq1[1]
-            y02, x02 = ind[0] - pq2[0], ind[1] - pq2[1]
             angle21 = np.arctan2(y01, x01) - np.arctan2(y21, x21)
             xcoord1 = np.hypot(x01, y01) * np.cos(angle21)
             ext_mask = (xcoord1 > -extent) & (xcoord1 - np.hypot(x21, y21) < extent)  
