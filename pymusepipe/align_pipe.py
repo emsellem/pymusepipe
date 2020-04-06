@@ -1664,10 +1664,9 @@ class AlignMusePointing(object):
             print("Low / High level REF  flux: "
                     "{0:8.4e} {1:8.4e}".format(lowlevel_ref, highlevel_ref))
 
-        # Save the frames if in debug mode
-        if self._debug:
-            self._temp_refdata = refdata
-            self._temp_musedata = musedata
+        # Save the frames in case this is needed
+        self._temp_refdata = refdata
+        self._temp_musedata = musedata
 
         # Get the WCS from mpdaf to allow rotation if needed
         refwcs = self.list_wcs_proj_refhdu[nima]
@@ -1676,7 +1675,7 @@ class AlignMusePointing(object):
         plotwcs = awcs.WCS(self.list_offmuse_hdu[nima].header)
 
         # Apply rotation in degrees
-        # Apply it to the rerence image not to couple it with the offset
+        # Apply it to the reference image not to couple it with the offset
         if rotation != 0:
             if self.verbose:
                 upipe.print_warning("Apply a rotation of "
@@ -1747,8 +1746,9 @@ class AlignMusePointing(object):
                       + highlevel_muse)
             chunk_x = musedata.shape[0] // (ncuts + 1)
             chunk_y = musedata.shape[1] // (ncuts + 1)
-            ax.plot(diffima[np.arange(ncuts)*chunk_x,:].T, 'k-')
-            ax.plot(diffima[:,np.arange(ncuts)*chunk_x], 'r-')
+            ax.plot(diffima[np.arange(ncuts)*chunk_x,:].T, 'k-', label='X')
+            ax.plot(diffima[:,np.arange(ncuts)*chunk_y], 'r-', label='Y')
+            ax.legend(loc=0)
             ax.set_ylim(-20,20)
             ax.set_xlabel("[pixels]", fontsize=20)
             ax.set_ylabel("[%]", fontsize=20)
