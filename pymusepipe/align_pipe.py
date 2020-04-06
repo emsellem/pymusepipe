@@ -1121,8 +1121,7 @@ class AlignMusePointing(object):
         self.shift_arcsecond(extra_arcsec, nima)
 
         # Compare contours if plot is set to True
-        if self.plot:
-            self.compare(nima=nima, **kwargs)
+        self.compare(nima=nima, **kwargs)
 
     def _get_list_muse_images(self):
         """Extract the name of the muse images
@@ -1667,6 +1666,10 @@ class AlignMusePointing(object):
         # Save the frames in case this is needed
         self._temp_refdata = refdata
         self._temp_musedata = musedata
+
+        # Stop here if plot is not needed
+        if not self.plot:
+            return
 
         # Get the WCS from mpdaf to allow rotation if needed
         refwcs = self.list_wcs_proj_refhdu[nima]
