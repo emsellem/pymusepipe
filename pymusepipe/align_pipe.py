@@ -1700,6 +1700,7 @@ class AlignMusePointing(object):
             ax.set_ylabel("RefData")
             ax.plot(x, my_linear_model(polypar.beta, x), 'k')
             # ax.plot([np.min(x), np.max(x)], [np.min(x), np.max(x)], 'r')
+            plt.tight_layout()
 
             self.list_figures.append(current_fig)
             current_fig += 1
@@ -1738,6 +1739,7 @@ class AlignMusePointing(object):
             ax.legend([h1[0], h2[0]], ['MUSE', 'REF'])
             if nima is not None:
                 plt.title("Image #{0:03d}".format(nima))
+            plt.tight_layout()
 
             self.list_figures.append(current_fig)
             current_fig += 1
@@ -1755,6 +1757,7 @@ class AlignMusePointing(object):
             ax.set_ylim(-20,20)
             ax.set_xlabel("[pixels]", fontsize=20)
             ax.set_ylabel("[%]", fontsize=20)
+            plt.tight_layout()
             self.list_figures.append(current_fig)
             current_fig += 1
 
@@ -1762,6 +1765,7 @@ class AlignMusePointing(object):
             fig, ax = open_new_wcs_figure(current_fig, plotwcs)
             ratio = 100. * (refdata - musedata) / (musedata + 1.e-12)
             im = ax.imshow(ratio, vmin=-percentage, vmax=percentage)
-            cbar = fig.colorbar(im)
+            cbar = fig.colorbar(im, shrink=0.8)
+            plt.tight_layout()
             self.list_figures.append(current_fig)
             current_fig += 1
