@@ -746,13 +746,6 @@ class AlignMusePointing(object):
             upipe.print_error("Problem in opening frames, please check your input")
             return
 
-        # find the cross correlation peaks for each image
-        # This is using zero offset and zero rotation
-        # as all parameters have been reset above
-        # New values will be taken out from the cross-correlation or fits table 
-        # just below with the init_guess_offset
-        self.find_ncross_peak()
-
         # Initialise the offsets using the cross-correlation or FITS table
         self.init_guess_offset(self.firstguess, **kwargs)
 
@@ -814,6 +807,13 @@ class AlignMusePointing(object):
 
         if firstguess == "crosscorr":
             upipe.print_info("Using cross-correlation as the initial guess")
+            # find the cross correlation peaks for each image
+            # This is using zero offset and zero rotation
+            # as all parameters have been reset above
+            # New values will be taken out from the cross-correlation or fits table
+            # just below with the init_guess_offset
+            self.find_ncross_peak()
+
             self.init_off_arcsec = self.cross_off_arcsec * 1.0
             self.init_off_pixel = self.cross_off_pixel * 1.0
         elif firstguess == "fits":
