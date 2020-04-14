@@ -1130,9 +1130,9 @@ class AlignMusePointing(object):
         from pathlib import Path
 
         if self.name_muse_images is None:
-            set_of_paths = glob.glob("{0}{1}*{2}*".format(
-                    self.folder_muse_images,
-                    self.suffix_images, self.filter_name))
+            set_of_paths = glob.glob("{0}*{1}*.fits".format(
+                    joinpath(self.folder_muse_images,
+                    self.suffix_images), self.filter_name))
             self.list_muse_images = [Path(muse_path).name 
                                      for muse_path in set_of_paths]
             # Sort alphabetically
@@ -1185,7 +1185,7 @@ class AlignMusePointing(object):
         self.list_name_offmusehdr = ["{0}{1:03d}.hdr".format(
                 self.name_offmusehdr, i+1) for i in range(self.nimages)]
         self.list_hdulist_muse = [pyfits.open(
-                self.folder_muse_images + self.list_muse_images[i]) 
+                joinpath(self.folder_muse_images, self.list_muse_images[i]))
                 for i in range(self.nimages)]
         self.list_muse_hdu = [hdu[self.hdu_ext[1]] 
                               for hdu in self.list_hdulist_muse]
@@ -1232,8 +1232,8 @@ class AlignMusePointing(object):
         """Open the reference image hdu
         """
         # Open the images
-        hdulist_reference = pyfits.open(self.folder_reference 
-                                        + self.name_reference)
+        hdulist_reference = pyfits.open(joinpath(self.folder_reference,
+                                        self.name_reference))
         self.reference_hdu = hdulist_reference[self.hdu_ext[0]]
         if self.reference_hdu.data is None:
             upipe.print_error("No data found in extension of reference frame")
