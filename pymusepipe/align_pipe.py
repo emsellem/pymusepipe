@@ -730,6 +730,8 @@ class AlignMusePointing(object):
         self.ima_background = np.zeros_like(self.ima_norm_factors)
         self.muse_rotangles = np.zeros_like(self.ima_norm_factors)
         self.threshold_muse = np.zeros_like(self.ima_norm_factors) + threshold_muse
+        self._convolve_muse = np.zeros_like(self.ima_norm_factors)
+        self._convolve_reference = np.zeros_like(self.ima_norm_factors)
         # Default lists for date, mjd, tpls of the MUSE images
         self.ima_dateobs = [None] * self.nimages
         self.ima_mjdobs = [None] * self.nimages
@@ -1570,9 +1572,11 @@ class AlignMusePointing(object):
         if convolve_muse > 0 :
             kernel = Gaussian2DKernel(x_stddev=convolve_muse)
             musedata = convolve(musedata, kernel)
+            self._convolve_muse[nima] = convolve_muse
         if convolve_reference > 0 :
             kernel = Gaussian2DKernel(x_stddev=convolve_reference)
             refdata = convolve(refdata, kernel)
+            self._convolve_reference[nima] = convolve_reference
 
         # Getting the result of the normalisation
         if threshold_muse is not None:
@@ -1631,19 +1635,32 @@ class AlignMusePointing(object):
             automatically derived from percentiles, but will
             not necessarily be the same (which can bring
             confusion but may sometimes be useful).
+        nima_museref
         
         Makes a maximum of 4 figures
         """
         # Getting the data
         musedata, refdata = self.get_image_normfactor(nima=nima, 
-                median_filter=median_filter, 
-                convolve_muse=convolve_muse,
-                convolve_reference=convolve_reference,
-                threshold_muse=threshold_muse)
+                                median_filter=median_filter,
+                                convolve_muse=convolve_muse,
+                                convolve_reference=convolve_reference,
+                                threshold_muse=threshold_muse)
+
+        # Getting data from the MUSE ref image if one is given
+        nima_museref = kwargs.pop("nima_museref", None)
+        museref = nima_museref is not None
+        if museref:
+            musedataR, refdataR = self.get_image_normfactor(nima=nima_museref,
+                                                    median_filter=median_filter,
+                                                    convolve_muse=self._convolve_muse[nima_museref],
+                                                    convolve_reference=self._convolve_reference[nima_museref],
+                                                    threshold_muse=self.threshold_muse[nima_museref])
 
         # If normalising, using the median ratio fit
         if normalise or shownormalise :
             polypar = self.ima_polypar[nima]
+            if museref:
+                polyparR = self.ima_polypar[nima_museref]
 
         # If normalising, use the polypar slope and background
         if normalise :
@@ -1653,6 +1670,8 @@ class AlignMusePointing(object):
                          polypar.beta[0]))
 
             musedata = (polypar.beta[0] + musedata) * polypar.beta[1]
+            if museref:
+                musedataR = (polyparR.beta[0] + musedataR) * polyparR.beta[1]
 
         # Getting the range of relevant fluxes
         lowlevel_muse, highlevel_muse = self._get_flux_range(musedata)
@@ -1743,7 +1762,47 @@ class AlignMusePointing(object):
 
             self.list_figures.append(current_fig)
             current_fig += 1
-            np.seterr(divide = 'warn', invalid='warn') 
+            np.seterr(divide = 'warn', invalid='warn')
+
+        if museref:
+            np.seterr(divide = 'ignore', invalid='ignore')
+            fig, ax = open_new_wcs_figure(current_fig, plotwcs)
+
+            # Defining the levels for MUSE
+            if levels is not None:
+                levels_muse = levels
+            else :
+                levels_muse = np.linspace(np.log10(lowlevel_muse),
+                                          np.log10(highlevel_muse),
+                                          nlevels)
+            # Plot contours for MUSE current image
+            cmuseset = ax.contour(np.log10(musedata),
+                                  levels_muse, colors='k',
+                                  origin='lower', linestyles='solid')
+
+            # now define Ref levels if not samecontour
+            if samecontour:
+                levels_ref = cmuseset.levels
+            else:
+                levels_ref = np.linspace(np.log10(lowlevel_ref),
+                                         np.log10(highlevel_ref),
+                                         nlevels)
+            # Plot contours for Ref
+            cmusesetR = ax.contour(np.log10(musedataR), levels=levels_muse,
+                                  colors='r', origin='lower',
+                                  linestyles='solid', alpha=0.5)
+
+            ax.set_aspect('equal')
+            h1,_ = cmuseset.legend_elements()
+            h2,_ = cmusesetR.legend_elements()
+            ax.legend([h1[0], h2[0]], ['MUSE', 'MUSEREF'])
+            if nima is not None:
+                plt.title("Image #{0:03d} / #{0:03d}".format(nima, nima_museref))
+            plt.tight_layout()
+
+            self.list_figures.append(current_fig)
+            current_fig += 1
+            np.seterr(divide = 'warn', invalid='warn')
 
         if showcuts:
             fig, ax = open_new_wcs_figure(current_fig)
