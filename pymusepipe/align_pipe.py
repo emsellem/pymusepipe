@@ -1677,7 +1677,16 @@ class AlignMusePointing(object):
         # Getting data from the MUSE ref image if one is given
         museref = nima_museref is not None
         if museref:
-            musedataR, refdataR = self.get_image_normfactor(nima=nima_museref,
+            drot = self.muse_rotangles[nima] - self.muse_rotangles[nima_museref]
+            # Projecting the MUSE image onto the MUSE reference
+            musehduR = self._project_hdu(muse_hdu=self.list_offmuse_hdu[nima_museref],
+                                         rotation=drot,
+                                         hdu_ref=self.list_offmuse_hdu[nima],
+                                         conversion=False)
+            # Getting the data
+            musedataR = musehduR.data
+            # Getting the normalisation right
+            dummy_muse, dummy_ref = self.get_image_normfactor(nima=nima_museref,
                                                     median_filter=median_filter,
                                                     convolve_muse=self._convolve_muse[nima_museref],
                                                     convolve_reference=self._convolve_reference[nima_museref],
@@ -1843,7 +1852,6 @@ class AlignMusePointing(object):
                                          nlevels)
             # Plot contours for Ref
             cmusesetR = ax.contour(np.log10(musedataR), levels=levels_muse,
-                                   transform=ax.get_transform(plotwcsR),
                                    colors='r', origin='lower',
                                    linestyles='solid', alpha=0.5)
 
