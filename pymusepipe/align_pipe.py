@@ -1694,6 +1694,7 @@ class AlignMusePointing(object):
 
         # WCS for plotting using astropy
         plotwcs = awcs.WCS(self.list_offmuse_hdu[nima].header)
+        plotwcsR = awcs.WCS(self.list_offmuse_hdu[nima_museref].header)
 
         # Apply rotation in degrees
         # Apply it to the reference image not to couple it with the offset
@@ -1763,6 +1764,31 @@ class AlignMusePointing(object):
             current_fig += 1
             np.seterr(divide = 'warn', invalid='warn')
 
+        if showcuts:
+            fig, ax = open_new_wcs_figure(current_fig)
+            diffima = (refdata - musedata) * 200. / (lowlevel_muse 
+                      + highlevel_muse)
+            chunk_x = musedata.shape[0] // (ncuts + 1)
+            chunk_y = musedata.shape[1] // (ncuts + 1)
+            c1 = ax.plot(diffima[np.arange(ncuts)*chunk_x,:].T, 'k-', label='X')
+            c2 = ax.plot(diffima[:,np.arange(ncuts)*chunk_y], 'r-', label='Y')
+            ax.legend(handles=[c1[0], c2[0]], loc=0)
+            ax.set_ylim(-20,20)
+            ax.set_xlabel("[pixels]", fontsize=20)
+            ax.set_ylabel("[%]", fontsize=20)
+            plt.tight_layout()
+            self.list_figures.append(current_fig)
+            current_fig += 1
+
+        if showdiff:
+            fig, ax = open_new_wcs_figure(current_fig, plotwcs)
+            ratio = 100. * (refdata - musedata) / (musedata + 1.e-12)
+            im = ax.imshow(ratio, vmin=-percentage, vmax=percentage)
+            cbar = fig.colorbar(im, shrink=0.8)
+            plt.tight_layout()
+            self.list_figures.append(current_fig)
+            current_fig += 1
+
         if museref:
             np.seterr(divide = 'ignore', invalid='ignore')
             fig, ax = open_new_wcs_figure(current_fig, plotwcs)
@@ -1788,8 +1814,9 @@ class AlignMusePointing(object):
                                          nlevels)
             # Plot contours for Ref
             cmusesetR = ax.contour(np.log10(musedataR), levels=levels_muse,
-                                  colors='r', origin='lower',
-                                  linestyles='solid', alpha=0.5)
+                                   transform=ax.get_transform(plotwcsR),
+                                   colors='r', origin='lower',
+                                   linestyles='solid', alpha=0.5)
 
             ax.set_aspect('equal')
             h1,_ = cmuseset.legend_elements()
@@ -1802,28 +1829,3 @@ class AlignMusePointing(object):
             self.list_figures.append(current_fig)
             current_fig += 1
             np.seterr(divide = 'warn', invalid='warn')
-
-        if showcuts:
-            fig, ax = open_new_wcs_figure(current_fig)
-            diffima = (refdata - musedata) * 200. / (lowlevel_muse 
-                      + highlevel_muse)
-            chunk_x = musedata.shape[0] // (ncuts + 1)
-            chunk_y = musedata.shape[1] // (ncuts + 1)
-            c1 = ax.plot(diffima[np.arange(ncuts)*chunk_x,:].T, 'k-', label='X')
-            c2 = ax.plot(diffima[:,np.arange(ncuts)*chunk_y], 'r-', label='Y')
-            ax.legend(handles=[c1[0], c2[0]], loc=0)
-            ax.set_ylim(-20,20)
-            ax.set_xlabel("[pixels]", fontsize=20)
-            ax.set_ylabel("[%]", fontsize=20)
-            plt.tight_layout()
-            self.list_figures.append(current_fig)
-            current_fig += 1
-
-        if showdiff:
-            fig, ax = open_new_wcs_figure(current_fig, plotwcs)
-            ratio = 100. * (refdata - musedata) / (musedata + 1.e-12)
-            im = ax.imshow(ratio, vmin=-percentage, vmax=percentage)
-            cbar = fig.colorbar(im, shrink=0.8)
-            plt.tight_layout()
-            self.list_figures.append(current_fig)
-            current_fig += 1
