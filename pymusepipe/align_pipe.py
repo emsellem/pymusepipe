@@ -1597,7 +1597,7 @@ class AlignMusePointing(object):
             normalise=True, median_filter=True, 
             ncuts=5, percentage=5.,
             rotation=0.0,
-            threshold_muse=None):
+            threshold_muse=None, nima_museref=None):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
          
@@ -1647,7 +1647,6 @@ class AlignMusePointing(object):
                                 threshold_muse=threshold_muse)
 
         # Getting data from the MUSE ref image if one is given
-        nima_museref = kwargs.pop("nima_museref", None)
         museref = nima_museref is not None
         if museref:
             musedataR, refdataR = self.get_image_normfactor(nima=nima_museref,
