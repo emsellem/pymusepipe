@@ -1399,6 +1399,51 @@ class AlignMusePointing(object):
 
         return lperc, hperc
 
+    def _project_hdu(self, muse_hdu=None, hdu_ref=None, rotation=0.0,
+                     conversion=False):
+        """Project the reference image onto the MUSE field
+        Hidden function, as only used internally
+
+        Input
+        -----
+        muse_hdu: HDU [None]
+            Input hdu
+        hdu_ref: HDU [None]
+        rotation: float [0]
+            Rotation angle in degrees
+
+        Returns
+        -------
+        hdu_repr: HDU
+            Reprojected HDU. None if nothing is provided
+        """
+        # The mpdaf way to project an image onto an other one
+        # WARNING: the reference image will be converted in flux
+        if conversion:
+            conversion_factor = self.conversion_factor
+        else:
+            conversion_factor = 1.0
+
+        if muse_hdu is not None and hdu_ref is not None:
+            wcs_ref = WCS(hdr=hdu_ref.header)
+            ima_ref = Image(
+                data=hdu_ref.data * conversion_factor,
+                wcs=wcs_ref)
+
+            wcs_muse = WCS(hdr=muse_hdu.header)
+            if rotation != 0.:
+                wcs_muse.rotate(-rotation)
+            ima_muse = Image(data=np.nan_to_num(muse_hdu.data), wcs=wcs_muse)
+
+            ima_ref_proj = ima_ref.align_with_image(ima_muse, flux=True)
+            hdu_repr = ima_ref_proj.get_data_hdu()
+
+        else:
+            hdu_repr = None
+            print("Warning: please provide target HDU to allow reprojection")
+
+        return hdu_repr
+
     def _project_reference_hdu(self, muse_hdu=None, rotation=0.0):
         """Project the reference image onto the MUSE field
         Hidden function, as only used internally
@@ -1415,27 +1460,10 @@ class AlignMusePointing(object):
         hdu_repr: HDU
             Reprojected HDU. None if nothing is provided
         """
-        # The mpdaf way to project an image onto an other one
-        # WARNING: the reference image will be converted in flux
-        if muse_hdu is not None:
-            wcs_ref = WCS(hdr=self.reference_hdu.header)
-            ima_ref = Image(
-                    data=self.reference_hdu.data * self.conversion_factor, 
-                    wcs=wcs_ref)
 
-            wcs_muse = WCS(hdr=muse_hdu.header)
-            if rotation != 0.:
-                wcs_muse.rotate(-rotation)
-            ima_muse = Image(data=np.nan_to_num(muse_hdu.data), wcs=wcs_muse)
-
-            ima_ref_proj = ima_ref.align_with_image(ima_muse, flux=True)
-            hdu_repr = ima_ref_proj.get_data_hdu()
-
-        else:
-            hdu_repr = None
-            print("Warning: please provide target HDU to allow reprojection")
-
-        return hdu_repr
+        return self._project_hdu(muse_hdu=muse_hdu, rotation=rotation,
+                                 hdu_ref=self.reference_hdu,
+                                 conversion=True)
 
     def _add_user_arc_offset(self, extra_arcsec=[0., 0.], nima=0):
         """Add user offset in arcseconds
@@ -1689,8 +1717,8 @@ class AlignMusePointing(object):
         if not self.plot:
             return
 
-        # Get the WCS from mpdaf to allow rotation if needed
-        refwcs = self.list_wcs_proj_refhdu[nima]
+#        # Get the WCS from mpdaf to allow rotation if needed
+#        refwcs = self.list_wcs_proj_refhdu[nima]
 
         # WCS for plotting using astropy
         plotwcs = awcs.WCS(self.list_offmuse_hdu[nima].header)
@@ -1703,7 +1731,7 @@ class AlignMusePointing(object):
             if self.verbose:
                 upipe.print_warning("Apply a rotation of "
                                     "{0} degrees".format(rotation))
-            refwcs.rotate(rotation)
+#            refwcs.rotate(rotation)
 
         # Preparing the figure
         current_fig = start_nfig
@@ -1711,7 +1739,7 @@ class AlignMusePointing(object):
 
         # Starting the plotting
         if shownormalise:
-            #plotting the normalization
+            # plotting the normalization
             fig, ax = open_new_wcs_figure(current_fig)
             (x, y) = (polypar.med[0][polypar.selection], 
                       polypar.med[1][polypar.selection])
