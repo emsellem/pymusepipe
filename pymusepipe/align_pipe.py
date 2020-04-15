@@ -1694,7 +1694,8 @@ class AlignMusePointing(object):
 
         # WCS for plotting using astropy
         plotwcs = awcs.WCS(self.list_offmuse_hdu[nima].header)
-        plotwcsR = awcs.WCS(self.list_offmuse_hdu[nima_museref].header)
+        if museref:
+            plotwcsR = awcs.WCS(self.list_offmuse_hdu[nima_museref].header)
 
         # Apply rotation in degrees
         # Apply it to the reference image not to couple it with the offset
