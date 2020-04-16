@@ -194,10 +194,15 @@ def append_file(filename, content):
     with open(filename, "a") as myfile:
         myfile.write(content)
         
+def abspath(path) :
+    """Normalise the path to get it short but absolute
+    """
+    return os.path.abspath(os.path.realpath(path))
+
 def normpath(path) :
     """Normalise the path to get it short
     """
-    return os.path.relpath(os.path.realpath(path))
+    return os.path.normpath(os.path.realpath(path))
 
 def doppler_shift(wavelength, velocity=0.):
     """Return the redshifted wavelength

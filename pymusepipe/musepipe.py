@@ -742,7 +742,7 @@ class MusePipe(PipePrep, PipeRecipes):
         if stage not in self._dic_paths:
             upipe.print_error("[_get_fullpath_expo] stage {} not "
                               "in dic_paths dict".format(stage))
-        return upipe.normpath(getattr(self._dic_paths[stage], self._get_attr_expo(expotype)))
+        return upipe.abspath(getattr(self._dic_paths[stage], self._get_attr_expo(expotype)))
 
     def _get_path_files(self, expotype):
-        return upipe.normpath(getattr(self.paths, expotype.lower()))
+        return upipe.abspath(getattr(self.paths, expotype.lower()))
