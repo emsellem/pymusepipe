@@ -1293,7 +1293,7 @@ class AlignMusePointing(object):
         # Projecting the reference image onto the MUSE field
         tmphdr = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
                                             name_musehdr), overwrite=True)
-        proj_ref_hdu = self._project_reference_hdu(muse_hdu, rotation=rotation)
+        proj_ref_hdu = self._align_reference_hdu(muse_hdu, rotation=rotation)
 
         # Cleaning the images
         if minflux is None:
@@ -1399,8 +1399,8 @@ class AlignMusePointing(object):
 
         return lperc, hperc
 
-    def _project_hdu(self, muse_hdu=None, hdu_ref=None, rotation=0.0,
-                     conversion=False):
+    def _align_hdu(self, hdu_target=None, hdu_to_align=None, rotation=0.0,
+                   conversion=False):
         """Project the reference image onto the MUSE field
         Hidden function, as only used internally
 
@@ -1425,26 +1425,30 @@ class AlignMusePointing(object):
             conversion_factor = 1.0
 
         if muse_hdu is not None and hdu_ref is not None:
-            wcs_ref = WCS(hdr=hdu_ref.header)
-            ima_ref = Image(
-                data=hdu_ref.data * conversion_factor,
-                wcs=wcs_ref)
+            # Getting the reference image data and WCS
+            wcs_to_align = WCS(hdr=hdu_to_align.header)
+            ima_to_align = Image(data=hdu_to_align.data * conversion_factor,
+                                 wcs=wcs_to_align)
 
-            wcs_muse = WCS(hdr=muse_hdu.header)
+            # Getting the MUSE image data and WCS
+            wcs_target = WCS(hdr=hdu_target.header)
             if rotation != 0.:
-                wcs_muse.rotate(-rotation)
-            ima_muse = Image(data=np.nan_to_num(muse_hdu.data), wcs=wcs_muse)
+                wcs_target.rotate(-rotation)
+            ima_target = Image(data=np.nan_to_num(hdu_target.data),
+                               wcs=wcs_target)
 
-            ima_ref_proj = ima_ref.align_with_image(ima_muse, flux=True)
-            hdu_repr = ima_ref_proj.get_data_hdu()
+            # Aligning the reference image with the MUSE image using mpdaf
+            # align_with_image
+            ima_aligned = ima_to_align.align_with_image(ima_target, flux=True)
+            hdu_aligned = ima_aligned.get_data_hdu()
 
         else:
-            hdu_repr = None
+            hdu_aligned = None
             print("Warning: please provide target HDU to allow reprojection")
 
-        return hdu_repr
+        return hdu_aligned
 
-    def _project_reference_hdu(self, muse_hdu=None, rotation=0.0):
+    def _align_reference_hdu(self, hdu_target=None, rotation=0.0):
         """Project the reference image onto the MUSE field
         Hidden function, as only used internally
          
@@ -1461,9 +1465,9 @@ class AlignMusePointing(object):
             Reprojected HDU. None if nothing is provided
         """
 
-        return self._project_hdu(muse_hdu=muse_hdu, rotation=rotation,
-                                 hdu_ref=self.reference_hdu,
-                                 conversion=True)
+        return self._align_hdu(hdu_target=hdu_target, rotation=rotation,
+                               hdu_to_align=self.reference_hdu,
+                               conversion=True)
 
     def _add_user_arc_offset(self, extra_arcsec=[0., 0.], nima=0):
         """Add user offset in arcseconds
@@ -1547,8 +1551,8 @@ class AlignMusePointing(object):
                 overwrite=True)
 
         # Reprojecting the Reference image onto the new MUSE frame
-        self.list_proj_refhdu[nima] = self._project_reference_hdu(
-                muse_hdu=self.list_offmuse_hdu[nima], 
+        self.list_proj_refhdu[nima] = self._align_reference_hdu(
+                hdu_target=self.list_offmuse_hdu[nima],
                 rotation=self.muse_rotangles[nima])
         # Now reading the WCS and saving it in the list
         self.list_wcs_proj_refhdu[nima] = WCS(
@@ -1619,13 +1623,10 @@ class AlignMusePointing(object):
         return musedata, refdata
 
     def compare(self, start_nfig=1, nlevels=10, levels=None, convolve_muse=0.,
-            convolve_reference=0., samecontour=True, nima=0,
-            showcontours=True, showcuts=True, 
-            shownormalise=True, showdiff=True,
-            normalise=True, median_filter=True, 
-            ncuts=5, percentage=5.,
-            rotation=0.0,
-            threshold_muse=None, nima_museref=None):
+                convolve_reference=0., samecontour=True, nima=0,
+                showcontours=True, showcuts=True, shownormalise=True, showdiff=True,
+                normalise=True, median_filter=True, ncuts=5, percentage=5.,
+                rotation=0.0, threshold_muse=None, nima_museref=None):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
          
@@ -1679,19 +1680,12 @@ class AlignMusePointing(object):
         if museref:
             drot = self.muse_rotangles[nima] - self.muse_rotangles[nima_museref]
             # Projecting the MUSE image onto the MUSE reference
-            musehduR = self._project_hdu(muse_hdu=self.list_offmuse_hdu[nima_museref],
-                                         rotation=drot,
-                                         hdu_ref=self.list_offmuse_hdu[nima],
-                                         conversion=False)
+            musehduR = self._align_hdu(hdu_to_align=self.list_offmuse_hdu[nima],
+                                       rotation=drot,
+                                       hdu_target=self.list_offmuse_hdu[nima_museref],
+                                       conversion=False)
             # Getting the data
             musedataR = filtermed_image(musehduR.data, self.border)
-
-            # Getting the normalisation right
-            dummy_muse, dummy_ref = self.get_image_normfactor(nima=nima_museref,
-                                                    median_filter=median_filter,
-                                                    convolve_muse=self._convolve_muse[nima_museref],
-                                                    convolve_reference=self._convolve_reference[nima_museref],
-                                                    threshold_muse=self.threshold_muse[nima_museref])
 
         # If normalising, using the median ratio fit
         if normalise or shownormalise :
