@@ -1424,7 +1424,7 @@ class AlignMusePointing(object):
         else:
             conversion_factor = 1.0
 
-        if muse_hdu is not None and hdu_ref is not None:
+        if hdu_target is not None and hdu_to_align is not None:
             # Getting the reference image data and WCS
             wcs_to_align = WCS(hdr=hdu_to_align.header)
             ima_to_align = Image(data=hdu_to_align.data * conversion_factor,
