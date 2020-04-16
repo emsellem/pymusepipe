@@ -1684,7 +1684,8 @@ class AlignMusePointing(object):
                                          hdu_ref=self.list_offmuse_hdu[nima],
                                          conversion=False)
             # Getting the data
-            musedataR = musehduR.data
+            musedataR = filtermed_image(musehduR.data, self.border)
+
             # Getting the normalisation right
             dummy_muse, dummy_ref = self.get_image_normfactor(nima=nima_museref,
                                                     median_filter=median_filter,
