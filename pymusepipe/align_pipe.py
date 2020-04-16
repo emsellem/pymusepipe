@@ -1702,7 +1702,7 @@ class AlignMusePointing(object):
         if normalise or shownormalise :
             polypar = self.ima_polypar[nima]
             if museref:
-                polyparC = self.ima_polypar[nima_museref]
+                polyparR = self.ima_polypar[nima_museref]
 
         # If normalising, use the polypar slope and background
         if normalise :
