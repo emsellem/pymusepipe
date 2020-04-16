@@ -1719,6 +1719,8 @@ class AlignMusePointing(object):
         # Save the frames in case this is needed
         self._temp_refdata = refdata
         self._temp_musedata = musedata
+        if museref:
+            self._temp_musedataR = musedataR
 
         # Stop here if plot is not needed
         if not self.plot:
