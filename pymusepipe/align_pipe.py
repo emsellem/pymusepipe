@@ -1693,7 +1693,7 @@ class AlignMusePointing(object):
             musedataR = filtermed_image(self.list_offmuse_hdu[nima_museref].data, 0.)
             if self._convolve_muse[nima_museref] > 0 :
                 kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima_museref])
-                musedataR = convolve(musedataC, kernel)
+                musedataR = convolve(musedataR, kernel)
             if self._convolve_muse[nima] > 0 :
                 kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima])
                 musedataC = convolve(musedataC, kernel)
