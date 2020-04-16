@@ -1686,6 +1686,9 @@ class AlignMusePointing(object):
                                        conversion=False)
             # Getting the data
             musedataR = filtermed_image(musehduR.data, self.border)
+            if self._convolve_muse[nima_museref] > 0 :
+                kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima_museref])
+                musedataR = convolve(musedataR, kernel)
 
         # If normalising, using the median ratio fit
         if normalise or shownormalise :
@@ -1721,13 +1724,8 @@ class AlignMusePointing(object):
         if not self.plot:
             return
 
-#        # Get the WCS from mpdaf to allow rotation if needed
-#        refwcs = self.list_wcs_proj_refhdu[nima]
-
         # WCS for plotting using astropy
         plotwcs = awcs.WCS(self.list_offmuse_hdu[nima].header)
-        if museref:
-            plotwcsR = awcs.WCS(self.list_offmuse_hdu[nima_museref].header)
 
         # Apply rotation in degrees
         # Apply it to the reference image not to couple it with the offset
@@ -1735,7 +1733,6 @@ class AlignMusePointing(object):
             if self.verbose:
                 upipe.print_warning("Apply a rotation of "
                                     "{0} degrees".format(rotation))
-#            refwcs.rotate(rotation)
 
         # Preparing the figure
         current_fig = start_nfig
@@ -1855,7 +1852,7 @@ class AlignMusePointing(object):
             h2,_ = cmusesetR.legend_elements()
             ax.legend([h1[0], h2[0]], ['MUSE', 'MUSEREF'])
             if nima is not None:
-                plt.title("Image #{0:03d} / #{0:03d}".format(nima, nima_museref))
+                plt.title("Image #{0:03d} / #{1:03d}".format(nima, nima_museref))
             plt.tight_layout()
 
             self.list_figures.append(current_fig)
