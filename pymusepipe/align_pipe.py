@@ -423,7 +423,7 @@ def filtermed_image(data, border=10, filter_size=2):
     """
     # Omit the border pixels
     if border > 0:
-        data = crop_data(data)
+        data = crop_data(data, border=border)
     meddata = nd.filters.median_filter(data, filter_size)
 
     return meddata
@@ -1589,12 +1589,10 @@ class AlignMusePointing(object):
         """
         # If median filter do the filtermed_image process including the border
         # Both for the muse data and the reference data
+        # No cropping here
         if median_filter:
-            musedata = filtermed_image(self.list_offmuse_hdu[nima].data, 
-                                       self.border)
-            refdata = filtermed_image(
-                    self.list_proj_refhdu[nima].data,
-                    self.border)
+            musedata = filtermed_image(self.list_offmuse_hdu[nima].data, 0.)
+            refdata = filtermed_image(self.list_proj_refhdu[nima].data, 0.)
         # Otherwise just copy the data
         else:
             musedata = copy.copy(self.list_offmuse_hdu[nima].data)
@@ -1614,12 +1612,18 @@ class AlignMusePointing(object):
         if threshold_muse is not None:
             self.threshold_muse[nima] = threshold_muse
 
-        self.ima_polypar[nima] = get_image_norm_poly(musedata, 
-                        refdata, chunk_size=self.chunk_size,
+        # Cropping the data
+        musedataC = crop_data(musedata, self.border)
+        refdataC = crop_data(refdata, self.border)
+
+        self.ima_polypar[nima] = get_image_norm_poly(musedataC,
+                        refdataC, chunk_size=self.chunk_size,
                         threshold1=self.threshold_muse[nima])
         if self.use_polynorm:
             self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
             self.ima_background[nima] = self.ima_polypar[nima].beta[0]
+
+        # Returning the uncropped data
         return musedata, refdata
 
     def compare(self, start_nfig=1, nlevels=10, levels=None, convolve_muse=0.,
@@ -1685,10 +1689,14 @@ class AlignMusePointing(object):
                                        hdu_target=self.list_offmuse_hdu[nima_museref],
                                        conversion=False)
             # Getting the data
-            musedataR = filtermed_image(musehduR.data, self.border)
+            musedataR = filtermed_image(musehduR.data, 0.)
+            musedataC = filtermed_image(self.list_offmuse_hdu[nima].data, 0.)
             if self._convolve_muse[nima_museref] > 0 :
                 kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima_museref])
                 musedataR = convolve(musedataR, kernel)
+            if self._convolve_muse[nima] > 0 :
+                kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima])
+                musedataC = convolve(musedataC, kernel)
 
         # If normalising, using the median ratio fit
         if normalise or shownormalise :
@@ -1706,6 +1714,7 @@ class AlignMusePointing(object):
             musedata = (polypar.beta[0] + musedata) * polypar.beta[1]
             if museref:
                 musedataR = (polyparR.beta[0] + musedataR) * polyparR.beta[1]
+                musedataC = (polypar.beta[0] + musedataC) * polypar.beta[1]
 
         # Getting the range of relevant fluxes
         lowlevel_muse, highlevel_muse = self._get_flux_range(musedata)
@@ -1721,6 +1730,7 @@ class AlignMusePointing(object):
         self._temp_musedata = musedata
         if museref:
             self._temp_musedataR = musedataR
+            self._temp_musedataC = musedataC
 
         # Stop here if plot is not needed
         if not self.plot:
@@ -1833,13 +1843,13 @@ class AlignMusePointing(object):
                                           np.log10(highlevel_muse),
                                           nlevels)
             # Plot contours for MUSE current image
-            cmuseset = ax.contour(np.log10(musedata),
+            cmusesetC = ax.contour(np.log10(musedataC),
                                   levels_muse, colors='k',
                                   origin='lower', linestyles='solid')
 
             # now define Ref levels if not samecontour
             if samecontour:
-                levels_ref = cmuseset.levels
+                levels_ref = cmusesetC.levels
             else:
                 levels_ref = np.linspace(np.log10(lowlevel_ref),
                                          np.log10(highlevel_ref),
@@ -1850,7 +1860,7 @@ class AlignMusePointing(object):
                                    linestyles='solid', alpha=0.5)
 
             ax.set_aspect('equal')
-            h1,_ = cmuseset.legend_elements()
+            h1,_ = cmusesetC.legend_elements()
             h2,_ = cmusesetR.legend_elements()
             ax.legend([h1[0], h2[0]], ['MUSE', 'MUSEREF'])
             if nima is not None:
