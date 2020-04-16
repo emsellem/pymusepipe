@@ -1689,11 +1689,11 @@ class AlignMusePointing(object):
                                        hdu_target=self.list_offmuse_hdu[nima_museref],
                                        conversion=False)
             # Getting the data
-            musedataR = filtermed_image(musehduR.data, 0.)
-            musedataC = filtermed_image(self.list_offmuse_hdu[nima].data, 0.)
+            musedataC = filtermed_image(musehduR.data, 0.)
+            musedataR = filtermed_image(self.list_offmuse_hdu[nima_museref].data, 0.)
             if self._convolve_muse[nima_museref] > 0 :
-                kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima_museref])
-                musedataR = convolve(musedataR, kernel)
+                kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima_museef])
+                musedataR = convolve(musedataC, kernel)
             if self._convolve_muse[nima] > 0 :
                 kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima])
                 musedataC = convolve(musedataC, kernel)
@@ -1702,7 +1702,7 @@ class AlignMusePointing(object):
         if normalise or shownormalise :
             polypar = self.ima_polypar[nima]
             if museref:
-                polyparR = self.ima_polypar[nima_museref]
+                polyparC = self.ima_polypar[nima_museref]
 
         # If normalising, use the polypar slope and background
         if normalise :
@@ -1713,8 +1713,8 @@ class AlignMusePointing(object):
 
             musedata = (polypar.beta[0] + musedata) * polypar.beta[1]
             if museref:
-                musedataR = (polyparR.beta[0] + musedataR) * polyparR.beta[1]
                 musedataC = (polypar.beta[0] + musedataC) * polypar.beta[1]
+                musedataR = (polyparR.beta[0] + musedataR) * polyparR.beta[1]
 
         # Getting the range of relevant fluxes
         lowlevel_muse, highlevel_muse = self._get_flux_range(musedata)
