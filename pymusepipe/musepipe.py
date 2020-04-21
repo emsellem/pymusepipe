@@ -589,7 +589,8 @@ class MusePipe(PipePrep, PipeRecipes):
         self.sort_raw_tables()
 
     def save_expo_table(self, expotype, tpl_gtable, stage="master",
-                        fits_tablename=None, aggregate=True, suffix="", overwrite=None, update=None):
+                        fits_tablename=None, aggregate=True, suffix="",
+                        overwrite=None, update=None):
         """Save the Expo (Master or not) Table corresponding to the expotype
         """
         self._set_option_astropy_table(overwrite, update)
@@ -628,7 +629,8 @@ class MusePipe(PipePrep, PipeRecipes):
             # Check if we want to overwrite or add the line in
             elif not self._overwrite_astropy_table:
                 upipe.print_warning("Astropy Table {0} already exists, "
-                                    " use overwrite_astropy_table to overwrite it".format(fits_tablename),
+                                    " use overwrite_astropy_table to "
+                                    "overwrite it".format(fits_tablename),
                                     pipe=self)
                 return
 
@@ -640,13 +642,9 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         if checkmode is not None:
             self.checkmode = checkmode
-        else:
-            checkmode = self.checkmode
 
         if strong_checkmode is not None:
             self.strong_checkmode = strong_checkmode
-        else:
-            strong_checkmode = self.strong_checkmode
 
         if len(self.Tables.Rawfiles) == 0:
             upipe.print_error("Raw files is empty, hence cannot be sorted")

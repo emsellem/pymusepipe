@@ -681,6 +681,12 @@ class AlignMusePointing(object):
         # Use polynorm or not
         self.use_polynorm = kwargs.pop("use_polynorm", True)
 
+        # Use rotation angles if they exist or not
+        self.use_rotangles = kwargs.pop("use_rotangles", True)
+        if self.use_rotangles:
+            upipe.print_warning("By default, rotation angles given in initial "
+                                "offset table will be used if present.")
+
         # Getting the unit conversions
         self.convert_units = kwargs.pop("convert_units", True)
         if self.convert_units :
@@ -701,7 +707,7 @@ class AlignMusePointing(object):
         self.minflux_crosscorr = kwargs.pop("minflux_crosscorr", 0.)
 
         # Get the MUSE images
-        self._get_list_muse_images(**kwargs)
+        self._get_list_muse_images()
         upipe.print_info("{0} MUSE images detected as input".format(
                             self.nimages))
         if self.nimages == 0:
@@ -749,7 +755,7 @@ class AlignMusePointing(object):
             return
 
         # Initialise the offsets using the cross-correlation or FITS table
-        self.init_guess_offset(self.firstguess, **kwargs)
+        self.init_guess_offset(self.firstguess)
 
         self.total_off_arcsec = self.init_off_arcsec + self.extra_off_arcsec
         self.total_off_pixel = self.init_off_pixel + self.extra_off_pixel
@@ -853,6 +859,11 @@ class AlignMusePointing(object):
                         np.isnan(self.offset_table['ROTANGLE']), 
                         0., self.offset_table['ROTANGLE'])
                 rotangle_exist = True
+            if not rotangle_exist:
+                upipe.print_warning("Rotation angles not present in offset table."
+                                    "Please use argument 'rotation' in 'run' "
+                                    "to force a non zero value.")
+                self.use_rotangles = False
 
             # Loop over the images, using MJD
             for nima, mjd in enumerate(self.ima_mjdobs):
@@ -1078,8 +1089,9 @@ class AlignMusePointing(object):
         rotation: float [0]
             Angle to rotate the image (in degrees)
         use_rotangles: bool
-            Default is False. If True, use the rotation value
-            from self.init_muse_rotangles
+            Default is defined by the self.use_rotangles parameter.
+            If True, use the rotation value from self.init_muse_rotangles
+            If False, use the given rotation.
         threshold_muse: float [0]
             Threshold to consider when plotting the comparison
         
@@ -1106,15 +1118,18 @@ class AlignMusePointing(object):
         else:
             extra_arcsec = kwargs.pop("extra_arcsec", [0., 0.])
 
-        use_rotangles = kwargs.pop("use_rotangles", False)
+        # Use or not the initial rotation angles
+        use_rotangles = kwargs.pop("use_rotangles", self.use_rotangles)
         if use_rotangles:
             # Using the initial given value
             self.muse_rotangles[nima] = self.init_muse_rotangles[nima]
             upipe.print_warning("Rotation angle read from the initial values "
-                                "in self.init_muse_rotangles")
+                                "in self.init_muse_rotangles. Input argument"
+                                "'rotation' will be ignored")
         else:
             # Using default 0 rotation and threshold for this run
             self.muse_rotangles[nima] = kwargs.pop("rotation", 0.0)
+
         upipe.print_warning("Rotation will be = {0} degrees".format(
                                  self.muse_rotangles[nima]))
         self.threshold_muse[nima] = kwargs.pop("threshold_muse", 0.0)

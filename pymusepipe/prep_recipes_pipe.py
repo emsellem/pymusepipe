@@ -578,8 +578,10 @@ class PipePrep(SofPipe) :
             self.recipe_scibasic(self.current_sof, tpl, expotype, dir_products, name_products, suffix)
 
             # Write the Processed files Table and save it
+            # Note: always overwrite the table so that a fresh numbering is done
             gtable['iexpo'] = list_expo
-            self.save_expo_table(expotype, gtable, "processed", aggregate=False, update=True)
+            self.save_expo_table(expotype, gtable, "processed", aggregate=False,
+                                 update=False, overwrite=True)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
