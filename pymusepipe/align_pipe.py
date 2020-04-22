@@ -229,7 +229,7 @@ def get_image_norm_poly(data1, data2, chunk_size=15,
     # Selecting where data is supposed to be good
     pos = (med[0] > threshold1) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > threshold2)
     # Guess the slope from this selection
-    guess_slope = np.nanmedian(med[1][pos] / med[0][pos])
+    guess_slope = np.abs(np.nanmedian(med[1][pos] / med[0][pos]))
 
     # Doing the regression itself
     result = regress_odr(x=med[0][pos], y=med[1][pos], sx=std[0][pos],
