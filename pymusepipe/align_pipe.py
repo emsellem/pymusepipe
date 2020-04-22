@@ -681,11 +681,12 @@ class AlignMusePointing(object):
         # Use polynorm or not
         self.use_polynorm = kwargs.pop("use_polynorm", True)
 
-        # Use rotation angles if they exist or not
+        # Use rotation angles from the offset table if they exist
         self.use_rotangles = kwargs.pop("use_rotangles", True)
         if self.use_rotangles:
             upipe.print_warning("By default, rotation angles given in initial "
-                                "offset table will be used if present.")
+                                "offset table will be used if they exist. If "
+                                "not, all initial rotation angles will be set to 0.")
 
         # Getting the unit conversions
         self.convert_units = kwargs.pop("convert_units", True)
@@ -721,10 +722,11 @@ class AlignMusePointing(object):
         # Initialise the needed arrays for the offsets
         self.cross_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
         self.extra_off_pixel = np.zeros_like(self.cross_off_pixel)
-        self.total_off_pixel = np.zeros_like(self.cross_off_pixel)
+
         self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
-        self.total_off_arcsec = np.zeros_like(self.cross_off_pixel)
+
+        self.extra_rotangles = np.zeros_like(self.cross_off_pixel)
         # RESET! all parameters
         self._reset_init_guess_values()
 
@@ -734,7 +736,6 @@ class AlignMusePointing(object):
         # Normalisation factor to be saved or used
         self.ima_norm_factors = np.zeros((self.nimages), dtype=np.float64)
         self.ima_background = np.zeros_like(self.ima_norm_factors)
-        self.muse_rotangles = np.zeros_like(self.ima_norm_factors)
         self.threshold_muse = np.zeros_like(self.ima_norm_factors) + threshold_muse
         self._convolve_muse = np.zeros_like(self.ima_norm_factors)
         self._convolve_reference = np.zeros_like(self.ima_norm_factors)
@@ -756,9 +757,6 @@ class AlignMusePointing(object):
 
         # Initialise the offsets using the cross-correlation or FITS table
         self.init_guess_offset(self.firstguess)
-
-        self.total_off_arcsec = self.init_off_arcsec + self.extra_off_arcsec
-        self.total_off_pixel = self.init_off_pixel + self.extra_off_pixel
 
         # Now doing the shifts and projections with the guess/input values
         for nima in range(self.nimages):
@@ -863,7 +861,6 @@ class AlignMusePointing(object):
                 upipe.print_warning("Rotation angles not present in offset table."
                                     "Please use argument 'rotation' in 'run' "
                                     "to force a non zero value.")
-                self.use_rotangles = False
 
             # Loop over the images, using MJD
             for nima, mjd in enumerate(self.ima_mjdobs):
@@ -877,14 +874,14 @@ class AlignMusePointing(object):
                             self.offset_table['DEC_OFFSET'][ind_table[ind]] * 3600.]
                     self.init_flux_scale[nima] = nonan_flux_scale_table[ind_table[ind]]
                     if rotangle_exist:
-                        self.init_muse_rotangles[nima] = nonan_rotangle_table[ind_table[ind]]
+                        self.init_rotangles[nima] = nonan_rotangle_table[ind_table[ind]]
                     else:
-                        self.init_muse_rotangles[nima] = 0.0
+                        self.init_rotangles[nima] = 0.0
                 # Otherwise use default values
                 else :
                     self.init_flux_scale[nima] = 1.0
                     self.init_off_arcsec[nima] = [0., 0.]
-                    self.init_muse_rotangles[nima] = 0.0
+                    self.init_rotangles[nima] = 0.0
 
                 # Transform into pixel values
                 self.init_off_pixel[nima] = arcsec_to_pixel(
@@ -899,7 +896,7 @@ class AlignMusePointing(object):
         self.init_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
         self.init_off_arcsec = np.zeros((self.nimages, 2), dtype=np.float64)
         self.init_flux_scale = np.ones(self.nimages, dtype=np.float64)
-        self.init_muse_rotangles = np.zeros(self.nimages, dtype=np.float64)
+        self.init_rotangles = np.zeros(self.nimages, dtype=np.float64)
 
     def open_offset_table(self, name_table=None):
         """Read offset table from fits file
@@ -963,14 +960,14 @@ class AlignMusePointing(object):
         for nima in range(self.nimages):
             upipe.print_info("Image {0:03d} - {1}".format(nima, self.list_muse_images[nima]))
             upipe.print_info("              {0:8.4f} {1:8.4f}".format(
-                    self.total_off_arcsec[nima][0],
-                    self.total_off_arcsec[nima][1]))
+                    self._total_off_arcsec[nima][0],
+                    self._total_off_arcsec[nima][1]))
         upipe.print_info("Total in PIXEL     X        Y         ROT(DEG) ")
         for nima in range(self.nimages):
             upipe.print_info("              {0:8.4f} {1:8.4f} {2:8.4f}".format(
-                    self.total_off_pixel[nima][0],
-                    self.total_off_pixel[nima][1],
-                    self.muse_rotangles[nima]))
+                    self._total_off_pixel[nima][0],
+                    self._total_off_pixel[nima][1],
+                    self._total_rotangles[nima]))
 
     def save_fits_offset_table(self, name_output_table=None, 
             folder_output_table=None,
@@ -1042,16 +1039,16 @@ class AlignMusePointing(object):
         fits_table[pointing_names['table']] = self.ima_pointing
 
         # Saving the final values
-        fits_table['RA_OFFSET'] = self.total_off_arcsec[:,0] / 3600. \
+        fits_table['RA_OFFSET'] = self._total_off_arcsec[:,0] / 3600. \
                 / np.cos(np.deg2rad(self.list_dec_muse))
-        fits_table['DEC_OFFSET'] = self.total_off_arcsec[:,1] / 3600.
+        fits_table['DEC_OFFSET'] = self._total_off_arcsec[:,1] / 3600.
         if save_flux_scale:
             fits_table['FLUX_SCALE'] = self.ima_norm_factors
         else:
             fits_table['FLUX_SCALE'] = 1.0
         if save_other_params:
             fits_table['BACKGROUND'] = self.ima_background
-            fits_table['ROTANGLE'] = self.muse_rotangles
+            fits_table['ROTANGLE'] = self._total_rotangles
 
         # Deal with RA_OFFSET_ORIG if needed
         if exist_ra_offset:
@@ -1086,30 +1083,26 @@ class AlignMusePointing(object):
         extra_arcsec: list of 2 floats [0,0]
             Offsets in X and Y in arcsec to add to the existing
             guessed offsets. Ignored if extra_pixel is given.
-        rotation: float [0]
+        extra_rotation: rotation in degrees [0]
             Angle to rotate the image (in degrees)
-        use_rotangles: bool
-            Default is defined by the self.use_rotangles parameter.
-            If True, use the rotation value from self.init_muse_rotangles
-            If False, use the given rotation.
         threshold_muse: float [0]
             Threshold to consider when plotting the comparison
-        
-        Plots (if self.plot is True)
-        ----------------------------
-        This plots a set of comparison maps:
-           * flux comparison (1 to 1)
-           * Map of the flux ratio
-           * Contours of the two scaled maps
-           * Cuts of the division between the 2 maps
+
+        Additional arguments
+        --------------------
+        plot (bool): if True, will plot the comparison
+            If not used, will use the default self.plot
+               * flux comparison (1 to 1)
+               * Map of the flux ratio
+               * Contours of the two scaled maps
+               * Cuts of the division between the 2 maps
+
+        See also all arguments from self.compare
         """
         if nima not in range(self.nimages) :
             upipe.print_error("nima not within the range "
                               "allowed by self.nimages ({0})".format(self.nimages))
             return
-
-        # Overwrite the plot option if given
-        self.plot = kwargs.pop("plot", self.plot)
 
         if "extra_pixel" in kwargs:
             extra_pixel = kwargs.pop("extra_pixel", [0., 0.])
@@ -1118,24 +1111,11 @@ class AlignMusePointing(object):
         else:
             extra_arcsec = kwargs.pop("extra_arcsec", [0., 0.])
 
-        # Use or not the initial rotation angles
-        use_rotangles = kwargs.pop("use_rotangles", self.use_rotangles)
-        if use_rotangles:
-            # Using the initial given value
-            self.muse_rotangles[nima] = self.init_muse_rotangles[nima]
-            upipe.print_warning("Rotation angle read from the initial values "
-                                "in self.init_muse_rotangles. Input argument"
-                                "'rotation' will be ignored")
-        else:
-            # Using default 0 rotation and threshold for this run
-            self.muse_rotangles[nima] = kwargs.pop("rotation", 0.0)
-
-        upipe.print_warning("Rotation will be = {0} degrees".format(
-                                 self.muse_rotangles[nima]))
-        self.threshold_muse[nima] = kwargs.pop("threshold_muse", 0.0)
+        # Define the additional rotation angle
+        extra_rotangle = kwargs.pop("extra_rotation", 0.0)
 
         # Add the offset from user
-        self.shift_arcsecond(extra_arcsec, nima)
+        self.shift_arcsecond(extra_arcsec, extra_rotangle, nima)
 
         # Compare contours if plot is set to True
         self.compare(nima=nima, **kwargs)
@@ -1282,7 +1262,7 @@ class AlignMusePointing(object):
             self.cross_off_pixel[nima] = self.find_cross_peak(
                     self.list_muse_hdu[nima],
                     self.list_name_musehdr[nima], 
-                    rotation=self.muse_rotangles[nima], 
+                    rotation=self.init_rotangles[nima],
                     minflux=minflux)
             self.cross_off_arcsec[nima] = pixel_to_arcsec(
                     self.list_muse_hdu[nima],
@@ -1484,31 +1464,39 @@ class AlignMusePointing(object):
                                hdu_to_align=self.reference_hdu,
                                conversion=True)
 
-    def _add_user_arc_offset(self, extra_arcsec=[0., 0.], nima=0):
-        """Add user offset in arcseconds
-        and update total_off_pixel and arcsec
-         
+    @property
+    def _total_rotangles(self):
+        return self.init_rotangles + self.extra_rotangles
+
+    @property
+    def _total_off_pixel(self):
+        return self.init_off_pixel + self.extra_off_pixel
+
+    @property
+    def _total_off_arcsec(self):
+        return self.init_off_arcsec + self.extra_off_arcsec
+
+    def _add_user_arc_offset(self, extra_arcsec=[0., 0.],
+                             extra_rotation=0., nima=0):
+        """Add user offset in arcseconds and transform into pixels
+
         Input
         -----
         extra_arcsec: list of 2 floats [0,0]
             Extra offsets (x,y) in arcseconds
+        extra_rotation: rotation in degrees [0]
         nima: int
             Index of image to consider
         """
         # Transforming the arc into pix
         self.extra_off_arcsec[nima] = extra_arcsec
-
-        # Adding the user offset
-        self.total_off_arcsec[nima] = (self.init_off_arcsec[nima]
-                             + self.extra_off_arcsec[nima])
-
         # Transforming into pixels - would be better with setter
         self.extra_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
                 self.extra_off_arcsec[nima])
-        self.total_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
-                self.total_off_arcsec[nima])
+        # And the rotation angle in degrees
+        self.extra_rotangles[nima] = extra_rotation
 
-    def shift_arcsecond(self, extra_arcsec=[0., 0.], nima=0):
+    def shift_arcsecond(self, extra_arcsec=[0., 0.], extra_rotation=0., nima=0):
         """Shift image with index nima with the total offset
         after adding any extra given offset
         This does not return anything but could in principle
@@ -1518,10 +1506,11 @@ class AlignMusePointing(object):
         -----
         extra_arcsec: list of 2 floats [0,0]
             Extra offsets (x,y) in arcseconds
+        extra_rotation: rotation in degrees [0]
         nima: int
             Index of image to consider
         """
-        self._add_user_arc_offset(extra_arcsec, nima)
+        self._add_user_arc_offset(extra_arcsec, extra_rotation, nima)
         self.shift(nima)
 
     def shift(self, nima=0):
@@ -1543,15 +1532,15 @@ class AlignMusePointing(object):
             print("Image {0:03d} - {1}".format(nima, self.list_muse_images[nima]))
             print("Shifting CRPIX1 by {0:8.4f} pixels "
                   "/ {1:8.4f} arcsec".format(
-                      self.total_off_pixel[nima][0], 
-                      self.total_off_arcsec[nima][0]))
-        newhdr['CRPIX1'] = newhdr['CRPIX1'] + self.total_off_pixel[nima][0]
+                      self._total_off_pixel[nima][0],
+                      self._total_off_arcsec[nima][0]))
+        newhdr['CRPIX1'] = newhdr['CRPIX1'] + self._total_off_pixel[nima][0]
         if self.verbose:
             print("         CRPIX2 by {0:8.4f} pixels "
                   "/ {1:8.4f} arcsec".format(
-                      self.total_off_pixel[nima][1], 
-                      self.total_off_arcsec[nima][1]))
-        newhdr['CRPIX2'] = newhdr['CRPIX2'] + self.total_off_pixel[nima][1]
+                      self._total_off_pixel[nima][1],
+                      self._total_off_arcsec[nima][1]))
+        newhdr['CRPIX2'] = newhdr['CRPIX2'] + self._total_off_pixel[nima][1]
 
         # Creating a new Primary HDU with the input data, and the new Header
         self.list_offmuse_hdu[nima] = pyfits.PrimaryHDU(
@@ -1568,7 +1557,7 @@ class AlignMusePointing(object):
         # Reprojecting the Reference image onto the new MUSE frame
         self.list_proj_refhdu[nima] = self._align_reference_hdu(
                 hdu_target=self.list_offmuse_hdu[nima],
-                rotation=self.muse_rotangles[nima])
+                rotation=self._total_rotangles[nima])
         # Now reading the WCS and saving it in the list
         self.list_wcs_proj_refhdu[nima] = WCS(
                 self.list_proj_refhdu[nima].header)
@@ -1645,7 +1634,7 @@ class AlignMusePointing(object):
                 convolve_reference=0., samecontour=True, nima=0,
                 showcontours=True, showcuts=True, shownormalise=True, showdiff=True,
                 normalise=True, median_filter=True, ncuts=5, percentage=5.,
-                rotation=0.0, threshold_muse=None, nima_museref=None):
+                nima_museref=None, **kwargs):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
          
@@ -1664,8 +1653,6 @@ class AlignMusePointing(object):
             between the 2 maps to be shown ("cuts")
         percentage: float [5]
             Used to compute which percentile to show
-        rotation: float [0]
-            Adding a rotation (in degrees) in case it is needed
         start_nfig: int [1]
             Number of the matplotlib Figure to start with
         nlevels: int [10]
@@ -1687,6 +1674,8 @@ class AlignMusePointing(object):
         
         Makes a maximum of 4 figures
         """
+        threshold_muse = kwargs.pop("threshold_muse", self.threshold_muse[nima])
+
         # Getting the data
         musedata, refdata = self.get_image_normfactor(nima=nima, 
                                 median_filter=median_filter,
@@ -1697,7 +1686,7 @@ class AlignMusePointing(object):
         # Getting data from the MUSE ref image if one is given
         museref = nima_museref is not None
         if museref:
-            drot = self.muse_rotangles[nima] - self.muse_rotangles[nima_museref]
+            drot = self._total_rotangles[nima] - self._total_rotangles[nima_museref]
             # Projecting the MUSE image onto the MUSE reference
             musehduR = self._align_hdu(hdu_to_align=self.list_offmuse_hdu[nima],
                                        rotation=drot,
@@ -1748,18 +1737,12 @@ class AlignMusePointing(object):
             self._temp_musedataC = musedataC
 
         # Stop here if plot is not needed
-        if not self.plot:
+        plot = kwargs.pop("plot", self.plot)
+        if not plot:
             return
 
         # WCS for plotting using astropy
         plotwcs = awcs.WCS(self.list_offmuse_hdu[nima].header)
-
-        # Apply rotation in degrees
-        # Apply it to the reference image not to couple it with the offset
-        if rotation != 0:
-            if self.verbose:
-                upipe.print_warning("Apply a rotation of "
-                                    "{0} degrees".format(rotation))
 
         # Preparing the figure
         current_fig = start_nfig
