@@ -726,7 +726,8 @@ class AlignMusePointing(object):
         self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
 
-        self.extra_rotangles = np.zeros_like(self.cross_off_pixel)
+        self.extra_rotangles = np.zeros((self.nimages), dtype=np.float64)
+
         # RESET! all parameters
         self._reset_init_guess_values()
 
