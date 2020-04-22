@@ -1555,6 +1555,8 @@ class AlignMusePointing(object):
                 joinpath(self.header_folder_name, self.list_name_offmusehdr[nima]), 
                 overwrite=True)
 
+        upipe.print_info("Rotation of {} will be applied".format(
+                            self._total_rotangles[nima]))
         # Reprojecting the Reference image onto the new MUSE frame
         self.list_proj_refhdu[nima] = self._align_reference_hdu(
                 hdu_target=self.list_offmuse_hdu[nima],
