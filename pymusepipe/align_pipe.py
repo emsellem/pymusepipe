@@ -964,7 +964,7 @@ class AlignMusePointing(object):
         upipe.print_info("OFFSETS =ARCSEC=    X        Y     =PIXEL=   X        Y     == ROT(DEG)")
         for nima in range(self.nimages):
             upipe.print_info("Image {0:03d} - {1}".format(nima, self.list_muse_images[nima]))
-            upipe.print_info("        =ARCSEC= {0:8.4f} {1:8.4f} =PIXEL= {0:8.4f} {1:8.4f} == {2:8.4f}".format(
+            upipe.print_info("        =ARCSEC= {0:8.4f} {1:8.4f} =PIXEL= {2:8.4f} {3:8.4f} == {4:8.4f}".format(
                     self._total_off_arcsec[nima][0],
                     self._total_off_arcsec[nima][1],
                     self._total_off_pixel[nima][0],
