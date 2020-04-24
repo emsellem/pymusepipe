@@ -958,7 +958,7 @@ class AlignMusePointing(object):
                     fits_table['DEC_OFFSET'][nima]*3600.))
 
     def print_images_names(self):
-        """Print out the offset from the Alignment class
+        """Print out the names of the images being considered for alignment
         """
         upipe.print_info("Image names")
         for nima in range(self.nimages):
@@ -969,7 +969,7 @@ class AlignMusePointing(object):
         """
         upipe.print_info("#---- Offset recorded so far ----#")
         upipe.print_info("#    Name                OFFSETS =ARCSEC=    "
-                         "X        Y     =PIXEL=   X        Y     == ROT(DEG)")
+                         "X        Y    =PIXEL=     X        Y    =ROT=  (DEG)")
         for nima in range(self.nimages):
             upipe.print_info("{0:03d} -{1:>26} =ARCSEC= {2:8.4f} {3:8.4f} "
                              "=PIXEL= {4:8.4f} {5:8.4f} =ROT= {6:8.4f}".format(
