@@ -703,8 +703,11 @@ class AlignMusePointing(object):
         # Initialise the parameters for the first guess
         self.firstguess = kwargs.pop("firstguess", "crosscorr")
         self.folder_offset_table = kwargs.pop("folder_offset_table", None)
+        self.folder_output_table = kwargs.pop("folder_output_table", None)
         if self.folder_offset_table is None:
             self.folder_offset_table = self.folder_muse_images
+        if self.folder_output_table is None:
+            self.folder_output_table = self.folder_offset_table
         self.name_offset_table = kwargs.pop("name_offset_table", None)
         self.minflux_crosscorr = kwargs.pop("minflux_crosscorr", 0.)
 
@@ -1012,9 +1015,7 @@ class AlignMusePointing(object):
         self.name_output_table = name_output_table.replace(".fits", 
                 "{0}.fits".format(self.suffix))
 
-        if folder_output_table is None:
-            self.folder_output_table = self.folder_offset_table
-        else:
+        if folder_output_table is not None:
             self.folder_output_table = folder_output_table
         exist_table, fits_table = self.open_offset_table(
                joinpath(self.folder_output_table, self.name_output_table))
