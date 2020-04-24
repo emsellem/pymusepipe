@@ -968,12 +968,12 @@ class AlignMusePointing(object):
         """Print out the offset from the Alignment class
         """
         upipe.print_info("#---- Offset recorded so far ----#")
-        upipe.print_info("#    Name                OFFSETS =ARCSEC=    "
-                         "X        Y    =PIXEL=     X        Y    =ROT=  (DEG)")
+        upipe.print_info("#    Name               OFFSETS  |ARCSEC|   "
+                         "X        Y     |PIXEL|    X        Y      |ROT| (DEG)")
         for nima in range(self.nimages):
-            upipe.print_info("{0:03d} -{1:>26} =ARCSEC= {2:8.4f} {3:8.4f} "
-                             "=PIXEL= {4:8.4f} {5:8.4f} =ROT= {6:8.4f}".format(
-                             nima, self.list_muse_images[nima][-30:-5],
+            upipe.print_info("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
+                             " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}".format(
+                             nima, self.list_muse_images[nima][-29:-5],
                              self._total_off_arcsec[nima][0],
                              self._total_off_arcsec[nima][1],
                              self._total_off_pixel[nima][0],
@@ -1563,8 +1563,8 @@ class AlignMusePointing(object):
                 joinpath(self.header_folder_name, self.list_name_offmusehdr[nima]), 
                 overwrite=True)
 
-        upipe.print_info("Rotation of {} will be applied".format(
-                            self._total_rotangles[nima]))
+        upipe.print_info("Image {0:03d} Rotation of {1} will be applied".format(
+                            nima, self._total_rotangles[nima]))
         # Reprojecting the Reference image onto the new MUSE frame
         self.list_proj_refhdu[nima] = self._align_reference_hdu(
                 hdu_target=self.list_offmuse_hdu[nima],
