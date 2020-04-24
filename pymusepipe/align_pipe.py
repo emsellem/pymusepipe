@@ -957,19 +957,28 @@ class AlignMusePointing(object):
                             * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                     fits_table['DEC_OFFSET'][nima]*3600.))
 
+    def print_images_names(self):
+        """Print out the offset from the Alignment class
+        """
+        upipe.print_info("Image names")
+        for nima in range(self.nimages):
+            upipe.print_info("{0:03d} - {1}".format(nima, self.list_muse_images[nima]))
+
     def print_offset(self):
         """Print out the offset from the Alignment class
         """
         upipe.print_info("#---- Offset recorded so far ----#")
-        upipe.print_info("OFFSETS =ARCSEC=    X        Y     =PIXEL=   X        Y     == ROT(DEG)")
+        upipe.print_info("#    Name                OFFSETS =ARCSEC=    "
+                         "X        Y     =PIXEL=   X        Y     == ROT(DEG)")
         for nima in range(self.nimages):
-            upipe.print_info("Image {0:03d} - {1}".format(nima, self.list_muse_images[nima]))
-            upipe.print_info("        =ARCSEC= {0:8.4f} {1:8.4f} =PIXEL= {2:8.4f} {3:8.4f} == {4:8.4f}".format(
-                    self._total_off_arcsec[nima][0],
-                    self._total_off_arcsec[nima][1],
-                    self._total_off_pixel[nima][0],
-                    self._total_off_pixel[nima][1],
-                    self._total_rotangles[nima]))
+            upipe.print_info("{0:03d} -{1:>26} =ARCSEC= {2:8.4f} {3:8.4f} "
+                             "=PIXEL= {4:8.4f} {5:8.4f} =ROT= {6:8.4f}".format(
+                             nima, self.list_muse_images[nima][-30:-5],
+                             self._total_off_arcsec[nima][0],
+                             self._total_off_arcsec[nima][1],
+                             self._total_off_pixel[nima][0],
+                             self._total_off_pixel[nima][1],
+                             self._total_rotangles[nima]))
 
     def save_fits_offset_table(self, name_output_table=None, 
             folder_output_table=None,
