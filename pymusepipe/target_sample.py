@@ -554,9 +554,6 @@ class MusePipeSample(object):
 
         # Fetch the default folder for the WCS files which is the folder
         # of the Combined cubes
-#        self.init_combine(targetname=targetname, folder_offset_table=folder_offset_table,
-#                          offset_table_name=offset_table_name)
-#        default_comb_folder = self.pipes_combine[targetname].paths.cubes
         default_comb_folder = self.targets[targetname].combcubes_path
         # Now fetch the value set by the user
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
@@ -750,9 +747,13 @@ class MusePipeSample(object):
         list_pointing_names = ["P{0:02d}".format(np.int(pointing))
                                for pointing in list_pointings]
 
-        folder_ref_wcs = kwargs.pop("folder_ref_wcs", comb_folder)
-        self.pipes_mosaic[targetname] = MuseCubeMosaic(output_wcs=...,
-                                                       folder_cubes=...,
+        default_comb_folder = self.targets[targetname].combcubes_path
+        folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
+        ref_wcs = kwargs.pop("ref_wcs", self._combined_wcs_name)
+        folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
+        self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
+                                                       folder_ref_wcs=folder_ref_wcs,
+                                                       folder_cubes=folder_cubes,
                                                        prefix_cubes="DATACUBE_FINAL_WCS",
                                                        list_suffix=list_pointing_names)
 
@@ -762,12 +763,26 @@ class MusePipeSample(object):
                          **kwargs)
 
         # Doing the mosaic with mad
-        self.pipes_mosaic[targetname].madcombine()
+        suffix = kwargs.pop("suffix", "WCS_Pall_mad")
+        default_cube_name = "{0}_DATACUBE_FINAL_{1}.fits".format(targetname, suffix)
+        output_cube_name = kwargs.pop("output_cube_name", default_cube_name)
+        self.pipes_mosaic[targetname].madcombine(output_cube_name=output_cube_name)
+
         # Constructing the images for that mosaic
         if self.__phangs:
             filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
         else:
             filter_list = kwargs.pop("filter_list", default_filter_list)
+
+        mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
+        cube = MuseCube(mosaic_name)
+        upipe.print_info("Building images for each filter in the list")
+        for filter in filter_list:
+            upipe.print_info("Filter = {}".format(filter))
+            ima = cube.get_filter_image(filter_name="")
+            ima_name = "{0}_IMAGE_FOV_{1}_{2}.fits".format(targetname, filter,
+                                                           suffix)
+            ima.write(ima_name)
 
     def init_combine(self, targetname=None, list_pointings="all",
                      folder_offset_table=None, offset_table_name=None, **kwargs):
@@ -796,15 +811,13 @@ class MusePipeSample(object):
         """Run the combine recipe. Shortcut for combine[targetname].run_combine()
         """
         self.init_combine(targetname=targetname, **kwargs)
-        self.pipes_combine[targetname].run_combine()
+        self.pipes_combine[targetname].run_combine(**kwargs)
 
-    def combine_target_pointings_withmasks(self, targetname=None, 
-            combine=True, masks=True, perpointing_combine=True, mosaic_wcs=True,
-            **kwargs):
+    def create_reference_wcs(self, targetname=None,
+            pointings_wcs=True, mosaic_wcs=True, **kwargs):
         """Run the combine for individual exposures first building up
         a mask.
         """
         self.init_combine(targetname=targetname, **kwargs)
-        self.pipes_combine[targetname].run_combine_all_single_pointings_withmasks(
-            combine=combine, masks=masks, perpointing_combine=perpointing_combine,
-            mosaic_wcs=mosaic_wcs, **kwargs)
+        self.pipes_combine[targetname].create_reference_wcs(pointings_wcs=pointings_wcs,
+                                                  mosaic_wcs=mosaic_wcs, **kwargs)

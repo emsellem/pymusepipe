@@ -84,14 +84,17 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
     return flux_cont
 
 class MuseCubeMosaic(CubeMosaic):
-    def __init__(self, output_wcs, folder_cubes="",
+    def __init__(self, ref_wcs, folder_ref_wcs="", folder_cubes="",
                  prefix_cubes="DATACUBE_FINAL_WCS",
                  list_suffix=[], verbose=False):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
+        self.folder_ref_wcs = folder_ref_wcs
+        self.ref_wcs = ref_wcs
         if not self._check_folder():
             return
+        full_wcs_name = joinpath(self.folder_ref_wcs, self.ref_wcs)
 
         self.prefix_cubes = prefix_cubes
         self.list_suffix = list_suffix
@@ -100,12 +103,16 @@ class MuseCubeMosaic(CubeMosaic):
         self.build_list()
 
         # Initialise the super class
-        super(MuseCubeMosaic, self).__init__(self.list_cubes, output_wcs)
+        super(MuseCubeMosaic, self).__init__(self.list_cubes, full_wcs_name)
 
     def _check_folder(self):
         if not os.path.isdir(self.folder_cubes):
             upipe.print_error("Cube Folder {} does not exists \n"
                               "- Aborting".format(self.folder_cubes))
+            return False
+        if not os.path.isdir(self.folder_ref_wcs):
+            upipe.print_error("WCS Folder {} does not exists \n"
+                              "- Aborting".format(self.folder_ref_wcs))
             return False
         return True
 
@@ -180,6 +187,7 @@ class MuseCubeMosaic(CubeMosaic):
                 return
 
         full_cube_name = joinpath(self.folder_cubes, outcube_name)
+        self.mosaic_cube_name = full_cube_name
         upipe.print_info("Writing the new Cube {}".format(full_cube_name))
         cube.write(full_cube_name)
 

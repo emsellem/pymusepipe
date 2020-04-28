@@ -393,56 +393,6 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             return name
 
-    def run_combine_all_single_pointings_withmasks(self, combine=True, masks=True, 
-            mosaic_wcs=True, perpointing_combine=True, **kwargs):
-        """Run all combine recipes including WCS and masks
-
-        combine: bool [True]
-            Default is True. Will run the combine for all pointings.
-
-        masks: bool [True]
-            Will run the combined WCS and the individual pointing ones
-            (and masks).
-
-        mosaic_wcs (bool): [True]. Reference WCS for the full mosaic
-            
-        perpointing_combine: bool [True]
-            Will run individual pointings using the WCS.
-        """
-        lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
-        if combine:
-            upipe.print_info("Running the mosaic combine")
-            offset_table_name = kwargs.get("offset_table_name", None)
-            folder_offset_table = kwargs.get("folder_offset_table",
-                                             self.folder_offset_table)
-            if offset_table_name is not None:
-                self._check_offset_table(offset_table_name, folder_offset_table)
-            self.run_combine(lambdaminmax=lambdaminmax,
-                             offset_table_name=offset_table_name,
-                             folder_offset_table=folder_offset_table)
-
-        if masks:
-            # Creating the full mosaic WCS first with a narrow lambda range
-            upipe.print_info("Start creating the narrow-lambda WCS and Masks")
-            _ = self.create_combined_wcs()
-            # Then creating the mask WCS for each pointing
-            upipe.print_info("Start creating the individual Pointings Masks")
-            self.create_all_pointings_mask_wcs(lambdaminmax_mosaic=lambdaminmax, 
-                                               **kwargs)
-
-        if mosaic_wcs:
-            # Creating a reference WCS for the Full Mosaic with the right 
-            # Spectral coverage for a full mosaic
-            upipe.print_info("Start creating the full-lambda WCS")
-            self._combined_wcs_name = self.create_combined_wcs(
-                prefix_wcs=default_prefix_wcs_mosaic,
-                lambdaminmax_wcs=lambdaminmax_for_mosaic)
-
-        if perpointing_combine:
-            upipe.print_info("Running the Individual Pointing combine")
-            # Then merging each single pointing using the masks
-            self.run_combine_all_single_pointings(**kwargs)
-
     def _check_pointings(self, dic_exposures_in_pointings=None):
         """Check if pointings and dictionary are compatible
         """
@@ -683,6 +633,36 @@ class MusePointings(SofPipe, PipeRecipes):
         for name in self.pipe_params._dic_folders_target:
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
 
+    def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True,
+                                 **kwargs):
+        """Create the WCS reference files, for all individual pointings and for
+        the mosaic.
+
+        pointings_wcs: bool [True]
+            Will run the individual pointing WCS
+        mosaic_wcs: bool [True]
+            Will run the combined WCS
+        lambdaminmax: [float, float]
+
+        """
+        lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
+        if pointings_wcs:
+            # Creating the full mosaic WCS first with a narrow lambda range
+            upipe.print_info("Start creating the narrow-lambda WCS and Masks")
+            _ = self.create_combined_wcs()
+            # Then creating the mask WCS for each pointing
+            upipe.print_info("Start creating the individual Pointings Masks")
+            self.create_all_pointings_wcs(lambdaminmax_mosaic=lambdaminmax,
+                                          **kwargs)
+
+        if mosaic_wcs:
+            # Creating a reference WCS for the Full Mosaic with the right
+            # Spectral coverage for a full mosaic
+            upipe.print_info("Start creating the full-lambda WCS")
+            self._combined_wcs_name = self.create_combined_wcs(
+                prefix_wcs=default_prefix_wcs_mosaic,
+                lambdaminmax_wcs=lambdaminmax_for_mosaic)
+
     def run_combine_all_single_pointings(self,
                                          add_suffix="",
                                          sof_filename='pointings_combine',
@@ -766,11 +746,12 @@ class MusePointings(SofPipe, PipeRecipes):
                          ref_wcs=ref_wcs,
                          **kwargs)
 
-    def create_all_pointings_mask_wcs(self, filter_list="white", **kwargs):
+    def create_all_pointings_wcs(self, filter_list="white", **kwargs):
         """Create all pointing masks one by one
         as well as the wcs for each individual pointings. Using the grid
         from the global WCS of the mosaic but restricting it to the 
         range of non-NaN.
+        Hence this needs a global WCS mosaic as a reference to work.
 
         Input
         -----
@@ -782,17 +763,17 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Additional suffix if needed
         for pointing in list_pointings:
-            upipe.print_info("Making WCS Mask for pointing {0:02d}".format(pointing))
-            _ = self.create_pointing_mask_wcs(pointing=pointing,
-                                          filter_list=filter_list,
-                                          **kwargs)
+            upipe.print_info("Making WCS Mask for "
+                             "pointing {0:02d}".format(pointing))
+            _ = self.create_pointing_wcs(pointing=pointing,
+                                         filter_list=filter_list, **kwargs)
 
-    def create_pointing_mask_wcs(self, pointing, 
+    def create_pointing_wcs(self, pointing,
             lambdaminmax_mosaic=lambdaminmax_for_mosaic,
             filter_list="white", **kwargs):
         """Create the mask of a given pointing
-        And also a WCS file which can then be used to compute individual pointings
-        with a fixed WCS.
+        And also a WCS file which can then be used to compute individual
+        pointings with a fixed WCS.
 
         Input
         -----
