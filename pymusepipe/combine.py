@@ -415,21 +415,25 @@ class MusePointings(SofPipe, PipeRecipes):
             # get the path
             if self._pixtab_in_comb_folder:
                 path_pixtables = self.paths.cubes
+                pointing_suffix = "_P{0:02d}".format(np.int(pointing))
             else:
                 path_pointing = getattr(self.paths, self.dic_name_pointings[pointing])
                 path_pixtables = path_pointing + self.pipe_params.object
+                pointing_suffix = ""
             # List existing pixtabs, using the given suffix
-            list_pixtabs = glob.glob(path_pixtables + "{0}{1}*fits".format(
-                                     pixtable_suffix, self.suffix))
+            list_pixtabs = glob.glob(path_pixtables + "{0}{1}{2}*fits".format(
+                                     pixtable_suffix, self.suffix,
+                                     pointing_suffix))
 
             # Take (or not) the fixed pixtables
             if self.use_fixed_pixtables:
                 suffix_to_consider = "{0}{1}".format(self.suffix_fixed_pixtables,
                                                      pixtable_suffix)
                 list_fixed_pixtabs = glob.glob(path_pixtables +
-                                               "{0}{1}*fits".format(
+                                               "{0}{1}{2}*fits".format(
                                                    suffix_to_consider,
-                                                   self.suffix))
+                                                   self.suffix,
+                                                   pointing_suffix))
 
                 # Looping over the existing fixed pixtables
                 for fixed_pixtab in list_fixed_pixtabs:
