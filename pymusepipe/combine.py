@@ -379,7 +379,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Going back to initial working directory
         self.goto_origfolder()
 
-    def _add_targetname(self, name):
+    def _add_targetname(self, name, asprefix=True):
         """Add targetname to input name and return it
         
         Input
@@ -391,7 +391,10 @@ class MusePointings(SofPipe, PipeRecipes):
         new name including targetname
         """
         if self.add_targetname:
-            return "{0}_{1}".format(self.targetname, name)
+            if asprefix:
+                return "{0}_{1}".format(self.targetname, name)
+            else:
+                return "{0}_{1}".format(name, self.targetname)
         else:
             return name
 
@@ -668,7 +671,8 @@ class MusePointings(SofPipe, PipeRecipes):
                              "cube with short spectral range")
             self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
                              filter_list="white",
-                             prefix_all=default_prefix_wcs)
+                             prefix_all=default_prefix_wcs,
+                             targetname_asprefix=False)
         else:
             upipe.print_info("Start creating the narrow-lambda WCS and Masks")
             _ = self.create_combined_wcs(refcube_name=refcube_name)
@@ -1006,9 +1010,10 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Adding target name as prefix or not
         self.add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        asprefix = kwargs.pop("targetname_asprefix", True)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         prefix_all = kwargs.pop("prefix_all", "")
-        prefix_all = self._add_targetname(prefix_all)
+        prefix_all = self._add_targetname(prefix_all, asprefix)
 
         if "offset_table_name" in kwargs:
             offset_table_name = kwargs.pop("offset_table_name")
