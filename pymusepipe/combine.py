@@ -311,6 +311,7 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info("The Log file will be {0}".format(log_filename))
         self.log_filename = log_filename
         self.suffix = suffix
+        self.add_targetname = kwargs.pop("add_targetname", True)
 
         # End of parameter settings #########################
 
@@ -1000,7 +1001,7 @@ class MusePointings(SofPipe, PipeRecipes):
         expotype = kwargs.pop("expotype", 'REDUCED')
 
         # Adding target name as prefix or not
-        self.add_targetname = kwargs.pop("add_targetname", True)
+        self.add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         prefix_all = kwargs.pop("prefix_all", "")
         prefix_all = self._add_targetname(prefix_all)
