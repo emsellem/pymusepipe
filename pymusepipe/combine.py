@@ -689,7 +689,6 @@ class MusePointings(SofPipe, PipeRecipes):
             # Spectral coverage for a full mosaic
             upipe.print_info("Start creating the full-lambda WCS")
             self._combined_wcs_name = self.create_combined_wcs(
-                refcube_name=refcube_name,
                 prefix_wcs=default_prefix_wcs_mosaic,
                 lambdaminmax_wcs=lambdaminmax_for_mosaic)
 
