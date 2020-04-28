@@ -653,7 +653,7 @@ class MusePointings(SofPipe, PipeRecipes):
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
 
     def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True,
-                                 **kwargs):
+                             reference_cube=True, **kwargs):
         """Create the WCS reference files, for all individual pointings and for
         the mosaic.
 
@@ -665,17 +665,20 @@ class MusePointings(SofPipe, PipeRecipes):
 
         """
         lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
-        refcube_name = kwargs.pop("refcube_name", None)
-        if refcube_name is None:
-            upipe.print_info("First creating a reference (mosaic) "
-                             "cube with short spectral range")
-            self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
-                             filter_list="white",
-                             prefix_all=default_prefix_wcs,
-                             targetname_asprefix=False)
-        else:
-            upipe.print_info("Start creating the narrow-lambda WCS and Masks")
-            _ = self.create_combined_wcs(refcube_name=refcube_name)
+
+        # Creating the reference cube if not existing
+        if reference_cube:
+            refcube_name = kwargs.pop("refcube_name", None)
+            if refcube_name is None:
+                upipe.print_info("First creating a reference (mosaic) "
+                                 "cube with short spectral range")
+                self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
+                                 filter_list="white",
+                                 prefix_all=default_prefix_wcs,
+                                 targetname_asprefix=False)
+            else:
+                upipe.print_info("Start creating the narrow-lambda WCS and Masks")
+                _ = self.create_combined_wcs(refcube_name=refcube_name)
 
         if pointings_wcs:
             # Creating the full mosaic WCS first with a narrow lambda range
