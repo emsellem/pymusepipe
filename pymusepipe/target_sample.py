@@ -525,7 +525,7 @@ class MusePipeSample(object):
 
     def finalise_reduction(self, targetname=None, rot_pixtab=True, create_wcs=True,
                            create_expocubes=True, offset_table_name=None,
-                           folder_offset_table, **kwargs):
+                           folder_offset_table=None, **kwargs):
         """Finalise the reduction steps by using the offset table, rotating the
         pixeltables, then reconstructing the PIXTABLE_REDUCED, produce reference
         WCS for each pointing, and then run the reconstruction of the final
