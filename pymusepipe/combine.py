@@ -394,7 +394,7 @@ class MusePointings(SofPipe, PipeRecipes):
             if asprefix:
                 return "{0}_{1}".format(self.targetname, name)
             else:
-                return "{0}_{1}".format(name, self.targetname)
+                return "{0}{1}_".format(name, self.targetname)
         else:
             return name
 
