@@ -403,6 +403,8 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Getting the pieces of the names to be used for pixtabs
         pixtable_suffix = prep_recipes_pipe.dic_products_scipost['individual'][0]
+        if self._pixtab_in_comb_folder and self.add_targetname:
+            pixtable_suffix = self._add_targetname(pixtable_suffix)
 
         # Initialise the dictionary of pixtabs to be found in each pointing
         self.dic_pixtabs_in_pointings = {}
