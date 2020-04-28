@@ -945,8 +945,8 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Now transforming this into a bona fide 1 extension WCS file
         combined_wcs_name = joinpath(cfolder, cname)
-        d = pyfits.getdata(full_cname, ext=1)
-        h = pyfits.getheader(full_cname, ext=1)
+        d = pyfits.getdata(combined_wcs_name, ext=1)
+        h = pyfits.getheader(combined_wcs_name, ext=1)
         hdu = pyfits.PrimaryHDU(data=d, header=h)
         hdu.writeto(combined_wcs_name, overwrite=True)
         upipe.print_info("...Done")
