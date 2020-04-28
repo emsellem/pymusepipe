@@ -689,6 +689,7 @@ class MusePointings(SofPipe, PipeRecipes):
             # Spectral coverage for a full mosaic
             upipe.print_info("Start creating the full-lambda WCS")
             self._combined_wcs_name = self.create_combined_wcs(
+                refcube_name=refcube_name,
                 prefix_wcs=default_prefix_wcs_mosaic,
                 lambdaminmax_wcs=lambdaminmax_for_mosaic)
 
@@ -954,7 +955,7 @@ class MusePointings(SofPipe, PipeRecipes):
             # getting the name of the final datacube (mosaic)
             cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
             cube_suffix = self._add_targetname(cube_suffix)
-            name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
+            refcube_name = joinpath(self.paths.cubes, cube_suffix + ".fits")
 
         # test if cube exists
         if not os.path.isfile(refcube_name):
