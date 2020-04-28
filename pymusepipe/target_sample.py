@@ -870,11 +870,13 @@ class MusePipeSample(object):
         self.init_combine(targetname=targetname, **kwargs)
         self.pipes_combine[targetname].run_combine(**kwargs)
 
-    def create_reference_wcs(self, targetname=None,
-            pointings_wcs=True, mosaic_wcs=True, **kwargs):
+    def create_reference_wcs(self, targetname=None, pointings_wcs=True,
+                             mosaic_wcs=True, refcube_name=None, **kwargs):
         """Run the combine for individual exposures first building up
         a mask.
         """
         self.init_combine(targetname=targetname, **kwargs)
         self.pipes_combine[targetname].create_reference_wcs(pointings_wcs=pointings_wcs,
-                                                  mosaic_wcs=mosaic_wcs, **kwargs)
+                                                  mosaic_wcs=mosaic_wcs,
+                                                  refcube_name=refcube_name,
+                                                            **kwargs)
