@@ -646,10 +646,18 @@ class MusePointings(SofPipe, PipeRecipes):
 
         """
         lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
+        refcube_name = kwargs.pop("refcube_name", None)
+        if refcube_name is None:
+            upipe.print_info("First creating a reference (mosaic) cube with short spectral range")
+            self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
+                             filter_list="white",
+                             prefix_all=default_prefix_wcs)
+        else:
+            upipe.print_info("Start creating the narrow-lambda WCS and Masks")
+            _ = self.create_combined_wcs(refcube_name=refcube_name)
+
         if pointings_wcs:
             # Creating the full mosaic WCS first with a narrow lambda range
-            upipe.print_info("Start creating the narrow-lambda WCS and Masks")
-            _ = self.create_combined_wcs()
             # Then creating the mask WCS for each pointing
             upipe.print_info("Start creating the individual Pointings Masks")
             self.create_all_pointings_wcs(lambdaminmax_mosaic=lambdaminmax,
@@ -897,7 +905,7 @@ class MusePointings(SofPipe, PipeRecipes):
         upipe.print_info("...Done")
         return full_cname
 
-    def create_combined_wcs(self, name_cube=None, 
+    def create_combined_wcs(self, refcube_name=None,
             lambdaminmax_wcs=lambdaminmax_for_wcs,
             **kwargs):
         """Create the reference WCS from the full mosaic
@@ -905,7 +913,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         Input
         -----
-        name_cube: str
+        refcube_name: str
             Name of the cube. Can be None, and then the final
             datacube from the combine folder will be used.
         wave1: float - optional
@@ -921,20 +929,20 @@ class MusePointings(SofPipe, PipeRecipes):
         # Adding targetname in names or not
         self.add_targetname = kwargs.pop("add_targetname", True)
 
-        if name_cube is None:
+        if refcube_name is None:
             # getting the name of the final datacube (mosaic)
             cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
             cube_suffix = self._add_targetname(cube_suffix)
             name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
 
         # test if cube exists
-        if not os.path.isfile(name_cube):
+        if not os.path.isfile(refcube_name):
             upipe.print_error("[combine/create_combined_wcs] File {0} does not exist "
-                              "- Aborting.".format(name_cube))
+                              "- Aborting.".format(refcube_name))
             return
 
         # Opening the cube via MuseCube
-        refcube = MuseCube(filename=name_cube)
+        refcube = MuseCube(filename=refcube_name)
 
         # Creating the new cube
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)

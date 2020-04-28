@@ -570,7 +570,10 @@ class MusePipeSample(object):
                      cube_suffix = "{0}_{1}".format(targetname, cube_suffix)
                 name_wcs = "{0}_P{1:02d}.fits".format(cube_suffix,
                                                       np.int(pointing))
-            suffix = "_WCS_P{0:02d}".format(np.int(pointing))
+            if name_wcs is not None:
+                suffix = "_WCS_P{0:02d}".format(np.int(pointing))
+            else:
+                suffix = "_P{0:02d}".format(np.int(pointing))
             kwargs_pointing = {'ref_wcs': name_wcs,
                                'suffix': suffix,
                                'folder_ref_wcs': folder_ref_wcs,
