@@ -523,6 +523,60 @@ class MusePipeSample(object):
         self.reduce_target(targetname=targetname, list_pointings=list_pointings, 
                 first_recipe="align_bypointing", **kwargs)
 
+    def finalise_reduction(self, targetname=None, rot_pixtab=True, create_wcs=True,
+                           create_expocubes=True, offset_table_name=None,
+                           folder_offset_table, **kwargs):
+        """Finalise the reduction steps by using the offset table, rotating the
+        pixeltables, then reconstructing the PIXTABLE_REDUCED, produce reference
+        WCS for each pointing, and then run the reconstruction of the final
+        individual cubes
+
+        Args:
+            targetname (str):
+            rot_pixtab (bool):
+            create_wcs (bool):
+            create_expocubes (bool):
+            offset_table_name (str):
+            folder_offset_table (str):
+            **kwargs:
+
+        Returns:
+
+        """
+        if rot_pixtab:
+            # We first use the offset table to rotate the pixtables
+            upipe.print_info("========== ROTATION OF PIXTABLES ===============")
+            phangs.rotate_pixtables_target(targetname=targetname,
+                                           offset_table_name=offset_table_name,
+                                           folder_offset_table=folder_offset_table,
+                                           fakemode=False)
+            # We then reconstruct the pixtable reduced so we can
+            # redo a muse_exp_combine if needed
+            upipe.print_info("==== REDUCED PIXTABLES for REFERENCE MOSAIC ====")
+            phangs.run_target_scipost_perexpo(targetname=targetname,
+                                              offset_table_name=offset_table_name,
+                                              folder_offset_table=folder_offset_table,
+                                              save="individual",
+                                              wcs_auto=False, norm_skycontinuum=True)
+
+        if create_wcs:
+            # Creating the WCS reference frames. Full mosaic and individual
+            # Pointings.
+            upipe.print_info("=========== CREATION OF WCS MASKS ==============")
+            phangs.create_reference_wcs(targetname=targetname,
+                                        folder_offset_table=offset_table_name,
+                                        offset_table_name=final_offset_table,
+                                        fakemode=False)
+
+        if create_expocubes:
+            # Running the individual cubes now with the same WCS reference
+            upipe.print_info("=========== CREATION OF EXPO CUBES =============")
+            phangs.run_target_scipost_perexpo(targetname=targetname,
+                                              offset_table_name=offset_table_name,
+                                              folder_offset_table=folder_offset_table,
+                                              save="cube",
+                                              wcs_auto=True, **kwargs)
+
     def run_target_scipost_perexpo(self, targetname=None, list_pointings=None,
                                    folder_offset_table=None, offset_table_name=None,
                                    **kwargs):

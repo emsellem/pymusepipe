@@ -248,6 +248,7 @@ class MusePointings(SofPipe, PipeRecipes):
                  rc_filename=None, cal_filename=None,
                  combined_folder_name="Combined", suffix="",
                  offset_table_name=None,
+                 folder_offset_table=None,
                  log_filename="MusePipeCombine.log",
                  verbose=True, debug=False, **kwargs):
         """Initialisation of class muse_expo
@@ -310,7 +311,6 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info("The Log file will be {0}".format(log_filename))
         self.log_filename = log_filename
         self.suffix = suffix
-        folder_offset_table = kwargs.pop("folder_offset_table", None)
 
         # End of parameter settings #########################
 
@@ -364,7 +364,8 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
 
         # Checking input pointings and pixtables
-        self._check_pointings(dic_exposures_in_pointings)
+        self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
+        self._get_pixtable_list(dic_exposures_in_pointings)
 
         # Checking input offset table and corresponding pixtables
         self._check_offset_table(offset_table_name, folder_offset_table)
@@ -393,7 +394,8 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             return name
 
-    def _check_pointings(self, dic_exposures_in_pointings=None):
+    def _get_pixtable_list(self, dic_exposures_in_pointings=None,
+                           folder_pixtables=None):
         """Check if pointings and dictionary are compatible
         """
         # Dictionary of exposures to select per pointing
@@ -408,17 +410,23 @@ class MusePointings(SofPipe, PipeRecipes):
         # Loop on Pointings
         for pointing in self.list_pointings:
             # get the path
-            path_pointing = getattr(self.paths, self.dic_name_pointings[pointing])
+            if self._pixtab_in_comb_folder:
+                path_pixtables = self.paths.cubes
+            else:
+                path_pointing = getattr(self.paths, self.dic_name_pointings[pointing])
+                path_pixtables = path_pointing + self.pipe_params.object
             # List existing pixtabs, using the given suffix
-            list_pixtabs = glob.glob(path_pointing + self.pipe_params.object +
-                                     "{0}{1}*fits".format(pixtable_suffix, self.suffix))
+            list_pixtabs = glob.glob(path_pixtables + "{0}{1}*fits".format(
+                                     pixtable_suffix, self.suffix))
 
             # Take (or not) the fixed pixtables
             if self.use_fixed_pixtables:
                 suffix_to_consider = "{0}{1}".format(self.suffix_fixed_pixtables,
                                                      pixtable_suffix)
-                list_fixed_pixtabs = glob.glob(path_pointing + self.pipe_params.object +
-                                               "{0}{1}*fits".format(suffix_to_consider, self.suffix))
+                list_fixed_pixtabs = glob.glob(path_pixtables +
+                                               "{0}{1}*fits".format(
+                                                   suffix_to_consider,
+                                                   self.suffix))
 
                 # Looping over the existing fixed pixtables
                 for fixed_pixtab in list_fixed_pixtabs:
@@ -454,7 +462,8 @@ class MusePointings(SofPipe, PipeRecipes):
                 select_list_pixtabs = []
                 # this is the list of exposures to consider
                 if pointing not in self.dic_exposures_in_pointings:
-                    upipe.print_warning("Pointing {} not in dictionary - skipping".format(pointing))
+                    upipe.print_warning("Pointing {} not in dictionary "
+                                        "- skipping".format(pointing))
                 else:
                     list_expo = self.dic_exposures_in_pointings[pointing]
                     # We loop on that list
@@ -648,7 +657,8 @@ class MusePointings(SofPipe, PipeRecipes):
         lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
         refcube_name = kwargs.pop("refcube_name", None)
         if refcube_name is None:
-            upipe.print_info("First creating a reference (mosaic) cube with short spectral range")
+            upipe.print_info("First creating a reference (mosaic) "
+                             "cube with short spectral range")
             self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
                              filter_list="white",
                              prefix_all=default_prefix_wcs)
