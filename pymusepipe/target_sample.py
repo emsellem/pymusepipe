@@ -871,12 +871,14 @@ class MusePipeSample(object):
             else:
                 filter_list = kwargs.pop("filter_list", default_filter_list)
 
+            filter_list = filter_list.split(',')
+
             mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
             cube = MuseCube(filename=mosaic_name)
             upipe.print_info("Building images for each filter in the list")
             for filter in filter_list:
                 upipe.print_info("Filter = {}".format(filter))
-                ima = cube.get_filter_image(filter_name="")
+                ima = cube.get_filter_image(filter_name=filter)
                 ima_name = "{0}_IMAGE_FOV_{1}_{2}.fits".format(targetname, filter,
                                                                suffix)
                 ima.write(joinpath(folder_cubes, ima_name))
