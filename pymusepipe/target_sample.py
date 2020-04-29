@@ -814,17 +814,19 @@ class MusePipeSample(object):
 
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
+        folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
+        prefix_cubes = "DATACUBE_FINAL_WCS"
         if add_targetname:
             wcs_prefix = "{}_".format(targetname)
+            prefix_cubes = "{0}_{1}".format(targetname, prefix_cubes)
         else:
             wcs_prefix = ""
         ref_wcs = kwargs.pop("ref_wcs", "{0}{1}DATACUBE_FINAL.fits".format(
                                  default_prefix_wcs_mosaic, wcs_prefix))
-        folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
                                                        folder_ref_wcs=folder_ref_wcs,
                                                        folder_cubes=folder_cubes,
-                                                       prefix_cubes="DATACUBE_FINAL_WCS",
+                                                       prefix_cubes=prefix_cubes,
                                                        list_suffix=list_pointing_names)
 
     def mosaic(self, targetname=None, list_pointings="all", **kwargs):
