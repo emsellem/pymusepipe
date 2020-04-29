@@ -15,15 +15,14 @@ from os.path import join as joinpath
 import numpy as np
 
 from pymusepipe import util_pipe as upipe
-from pymusepipe.musepipe import MusePipe
-from pymusepipe.config_pipe import (PHANGS_reduc_config,
-                                    default_short_PHANGS_filter_list,
-                                    default_short_filter_list,
-                                    default_prefix_wcs,
-                                    default_prefix_wcs_mosaic)
-from pymusepipe.init_musepipe import InitMuseParameters
-from pymusepipe.combine import MusePointings
-from pymusepipe.align_pipe import rotate_pixtables
+from .musepipe import MusePipe
+from .config_pipe import (PHANGS_reduc_config, default_short_PHANGS_filter_list,
+                          default_short_filter_list, default_prefix_wcs,
+                          default_prefix_wcs_mosaic)
+from .init_musepipe import InitMuseParameters
+from .combine import MusePointings
+from .align_pipe import rotate_pixtables
+from .mpdaf_pipe import MuseCubeMosaic
 from .prep_recipes_pipe import dic_products_scipost
 from .version import __version__ as version_pack
 
