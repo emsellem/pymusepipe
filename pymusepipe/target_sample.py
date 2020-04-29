@@ -19,7 +19,8 @@ from pymusepipe.musepipe import MusePipe
 from pymusepipe.config_pipe import (PHANGS_reduc_config,
                                     default_short_PHANGS_filter_list,
                                     default_short_filter_list,
-                                    default_prefix_wcs)
+                                    default_prefix_wcs,
+                                    default_prefix_wcs_mosaic)
 from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.combine import MusePointings
 from pymusepipe.align_pipe import rotate_pixtables
@@ -771,10 +772,7 @@ class MusePipeSample(object):
         if len(list_pointings) == 0:
             return
 
-        # add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         prefix = kwargs.pop("prefix", "")
-        # if add_targetname:
-        #     prefix = "{}_{}".format(targetname, prefix)
         if folder_offset_table is None:
             folder_offset_table = self.pipes[targetname][list_pointings[0]].paths.alignment
         offset_table = Table.read(joinpath(folder_offset_table, offset_table_name))
@@ -805,6 +803,7 @@ class MusePipeSample(object):
         list_pointings: list [or "all"=default]
             List of pointings (e.g., [1,2,3])
         """
+        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         # Check if pointings are valid
         list_pointings = self._check_pointings(targetname, list_pointings)
         if len(list_pointings) == 0:
@@ -816,7 +815,12 @@ class MusePipeSample(object):
 
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
-        ref_wcs = kwargs.pop("ref_wcs", self._combined_wcs_name)
+        if add_targetname:
+            wcs_prefix = "{}_".format(targetname)
+        else:
+            wcs_prefix = ""
+        ref_wcs = kwargs.pop("ref_wcs", "{0}{1}DATACUBE_FINAL.fits".format(
+                                 default_prefic_wcs_mosaic, wcs_prefix))
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
                                                        folder_ref_wcs=folder_ref_wcs,
@@ -825,9 +829,20 @@ class MusePipeSample(object):
                                                        list_suffix=list_pointing_names)
 
     def mosaic(self, targetname=None, list_pointings="all", **kwargs):
+        """
 
+        Args:
+            targetname:
+            list_pointings:
+            **kwargs:
+
+        Returns:
+
+        """
+
+        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
-                         **kwargs)
+                         add_targetname=add_targetname, **kwargs)
 
         # Doing the mosaic with mad
         suffix = kwargs.pop("suffix", "WCS_Pall_mad")
