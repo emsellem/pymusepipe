@@ -854,7 +854,7 @@ class MusePipeSample(object):
         default_cube_name = joinpath(folder_cubes, default_cube_name)
 
         outcube_name = kwargs.pop("output_cube_name", default_cube_name)
-        outcube_name = joinpath(folder_cubes, output_cube_name)
+        outcube_name = joinpath(folder_cubes, outcube_name)
 
         self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name)
 
