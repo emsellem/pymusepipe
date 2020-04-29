@@ -599,11 +599,14 @@ class MusePipeSample(object):
         # WCS imposed by setting the reference
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         prefix_all = kwargs.pop("prefix_all", "")
+        cube_suffix = dic_products_scipost['cube'][0]
         if add_targetname:
             prefix_all = "{0}_{1}".format(targetname, prefix_all)
+            cube_suffix = "{0}_{1}".format(targetname, cube_suffix)
         save = kwargs.pop("save", 'cube')
 
         wcs_auto = kwargs.pop("wcs_auto", True)
+        wcs_suffix = "{0}{1}".format(default_prefix_wcs, cube_suffix)
         if not wcs_auto:
             name_wcs = kwargs.pop("name_wcs", None)
 
@@ -620,8 +623,6 @@ class MusePipeSample(object):
         # Running the scipost_perexpo for all pointings individually
         for pointing in list_pointings:
             if wcs_auto:
-                cube_suffix = dic_products_scipost['cube'][0]
-                wcs_suffix = "{0}{1}".format(default_prefix_wcs, cube_suffix)
                 name_wcs = "{0}_P{1:02d}.fits".format(wcs_suffix, np.int(pointing))
             if name_wcs is not None:
                 suffix = "_WCS_P{0:02d}".format(np.int(pointing))
