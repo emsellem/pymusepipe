@@ -539,7 +539,14 @@ class MuseCube(Cube):
         """
         try:
             upipe.print_info("Reading MUSE filter {0}".format(filter_name))
-            refimage = self.get_band_image(filter_name)
+            if filter_name.lower() == "white":
+                filter_wave = np.array([4000.,5000.,6000.,7000.,
+                                        8000.,9000.,10000.])
+                filter_sensitivity = np.ones_like(filter_wave)
+                refimage = self.bandpass_image(filter_wave, filter_sensitivity,
+                                           interpolation='linear')
+            else:
+                refimage = self.get_band_image(filter_name)
         except ValueError:
             # initialise the filter file
             upipe.print_info("Reading private reference filter {0}".format(filter_name))
