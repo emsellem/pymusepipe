@@ -621,7 +621,7 @@ class MusePipeSample(object):
         for pointing in list_pointings:
             if wcs_auto:
                 cube_suffix = dic_products_scipost['cube'][0]
-                wcs_suffix = "{0}{1}"(default_prefix_wcs, cube_suffix)
+                wcs_suffix = "{0}{1}".format(default_prefix_wcs, cube_suffix)
                 name_wcs = "{0}_{1}_P{1:02d}.fits".format(wcs_suffix, cube_suffix,
                                                       np.int(pointing))
             if name_wcs is not None:
