@@ -24,7 +24,7 @@ from .config_pipe import (PHANGS_reduc_config,
 from .init_musepipe import InitMuseParameters
 from .combine import MusePointings
 from .align_pipe import rotate_pixtables
-from .mpdaf_pipe import MuseCubeMosaic
+from .mpdaf_pipe import MuseCubeMosaic, MuseCube
 from .prep_recipes_pipe import dic_products_scipost
 from .version import __version__ as version_pack
 
