@@ -844,6 +844,8 @@ class MusePipeSample(object):
         """
 
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        build_cube = kwargs.pop("build_cube", True)
+        build_images = kwargs.pop("build_images", True)
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
                          add_targetname=add_targetname, **kwargs)
 
@@ -855,26 +857,29 @@ class MusePipeSample(object):
         default_cube_name = "{0}_DATACUBE_FINAL_{1}.fits".format(targetname, suffix)
         default_cube_name = joinpath(folder_cubes, default_cube_name)
 
+
         outcube_name = kwargs.pop("output_cube_name", default_cube_name)
         outcube_name = joinpath(folder_cubes, outcube_name)
+        # Doing the MAD combination using mpdaf. Note the build_cube fakemode
+        self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name,
+                                                 fakemode=~build_cube)
 
-        self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name)
+        if build_images:
+            # Constructing the images for that mosaic
+            if self.__phangs:
+                filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
+            else:
+                filter_list = kwargs.pop("filter_list", default_filter_list)
 
-        # Constructing the images for that mosaic
-        if self.__phangs:
-            filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
-        else:
-            filter_list = kwargs.pop("filter_list", default_filter_list)
-
-        mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
-        cube = MuseCube(mosaic_name)
-        upipe.print_info("Building images for each filter in the list")
-        for filter in filter_list:
-            upipe.print_info("Filter = {}".format(filter))
-            ima = cube.get_filter_image(filter_name="")
-            ima_name = "{0}_IMAGE_FOV_{1}_{2}.fits".format(targetname, filter,
-                                                           suffix)
-            ima.write(joinpath(folder_cubes, ima_name))
+            mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
+            cube = MuseCube(mosaic_name)
+            upipe.print_info("Building images for each filter in the list")
+            for filter in filter_list:
+                upipe.print_info("Filter = {}".format(filter))
+                ima = cube.get_filter_image(filter_name="")
+                ima_name = "{0}_IMAGE_FOV_{1}_{2}.fits".format(targetname, filter,
+                                                               suffix)
+                ima.write(joinpath(folder_cubes, ima_name))
 
     def init_combine(self, targetname=None, list_pointings="all",
                      folder_offset_table=None, offset_table_name=None, **kwargs):

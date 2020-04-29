@@ -163,7 +163,8 @@ class MuseCubeMosaic(CubeMosaic):
             upipe.print_info("Found {} cubes in this folder".format(
                                  self.ncubes))
 
-    def madcombine(self, folder_cubes=None, outcube_name="dummy.fits", mad=True):
+    def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",
+                   fakemode=False, mad=True):
         """Combine the CubeMosaic and write it out.
 
         Args:
@@ -178,7 +179,8 @@ class MuseCubeMosaic(CubeMosaic):
         # Combine
         upipe.print_info("Starting the combine of "
                          "all {} input cubes".format(self.ncubes))
-        cube, expmap, statpix, rejmap = self.pycombine(mad=mad)
+        if not fakemode:
+            cube, expmap, statpix, rejmap = self.pycombine(mad=mad)
 
         # Saving
         if folder_cubes is not None:
@@ -188,8 +190,9 @@ class MuseCubeMosaic(CubeMosaic):
 
         full_cube_name = joinpath(self.folder_cubes, outcube_name)
         self.mosaic_cube_name = full_cube_name
-        upipe.print_info("Writing the new Cube {}".format(full_cube_name))
-        cube.write(full_cube_name)
+        if not fakemode:
+            upipe.print_info("Writing the new Cube {}".format(full_cube_name))
+            cube.write(full_cube_name)
 
 class MuseCube(Cube):
     """Wrapper around the mpdaf Cube functionalities
