@@ -820,7 +820,7 @@ class MusePipeSample(object):
         else:
             wcs_prefix = ""
         ref_wcs = kwargs.pop("ref_wcs", "{0}{1}DATACUBE_FINAL.fits".format(
-                                 default_prefic_wcs_mosaic, wcs_prefix))
+                                 default_prefix_wcs_mosaic, wcs_prefix))
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
                                                        folder_ref_wcs=folder_ref_wcs,
