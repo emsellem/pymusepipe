@@ -328,10 +328,14 @@ class MusePipeSample(object):
         """
         # Info of the pointings and extracting the observing run for each pointing
         target_pointings = self.targets[targetname].list_pointings
-        # if no list_pointings we just do them all
-        if list_pointings == None:
-            list_pointings = target_pointings
+
+        # Now the list of pointings
+        if isinstance(list_pointings, str):
+            # if no list_pointings we just do them all
+            if list_pointings.lower() == "all" or list_pointings is None:
+                list_pointings = target_pointings
         else:
+            # Check they exist
             if any([_ not in target_pointings for _ in list_pointings]) :
                 upipe.print_error("ERROR: no pointing {0} for the given target".format(
                                     list_pointings))
@@ -821,8 +825,15 @@ class MusePipeSample(object):
 
         # Doing the mosaic with mad
         suffix = kwargs.pop("suffix", "WCS_Pall_mad")
+        default_comb_folder = self.targets[targetname].combcubes_path
+        folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
+
         default_cube_name = "{0}_DATACUBE_FINAL_{1}.fits".format(targetname, suffix)
+        default_cube_name = joinpath(folder_cubes, default_cube_name)
+
         output_cube_name = kwargs.pop("output_cube_name", default_cube_name)
+        output_cube_name = joinpath(folder_cubes, output_cube_name)
+
         self.pipes_mosaic[targetname].madcombine(output_cube_name=output_cube_name)
 
         # Constructing the images for that mosaic
@@ -839,7 +850,7 @@ class MusePipeSample(object):
             ima = cube.get_filter_image(filter_name="")
             ima_name = "{0}_IMAGE_FOV_{1}_{2}.fits".format(targetname, filter,
                                                            suffix)
-            ima.write(ima_name)
+            ima.write(joinpath(folder_cubes, ima_name))
 
     def init_combine(self, targetname=None, list_pointings="all",
                      folder_offset_table=None, offset_table_name=None, **kwargs):
