@@ -872,7 +872,7 @@ class MusePipeSample(object):
                 filter_list = kwargs.pop("filter_list", default_filter_list)
 
             mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
-            cube = MuseCube(mosaic_name)
+            cube = MuseCube(filename=mosaic_name)
             upipe.print_info("Building images for each filter in the list")
             for filter in filter_list:
                 upipe.print_info("Filter = {}".format(filter))
