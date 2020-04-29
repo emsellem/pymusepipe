@@ -18,7 +18,8 @@ from pymusepipe import util_pipe as upipe
 from pymusepipe.musepipe import MusePipe
 from pymusepipe.config_pipe import (PHANGS_reduc_config,
                                     default_short_PHANGS_filter_list,
-                                    default_short_filter_list)
+                                    default_short_filter_list,
+                                    default_prefix_wcs)
 from pymusepipe.init_musepipe import InitMuseParameters
 from pymusepipe.combine import MusePointings
 from pymusepipe.align_pipe import rotate_pixtables
@@ -201,7 +202,7 @@ class MusePipeSample(object):
 
         # Initialisation of targets
         self.init_pipes = kwargs.pop("init_pipes", True)
-        self. add_targetname = kwargs.pop("add_targetname", True)
+        self.add_targetname = kwargs.pop("add_targetname", True)
         self._init_targets()
 
     def _init_calib_files(self):
@@ -620,9 +621,8 @@ class MusePipeSample(object):
         for pointing in list_pointings:
             if wcs_auto:
                 cube_suffix = dic_products_scipost['cube'][0]
-                if add_targetname:
-                     cube_suffix = "{0}_{1}".format(targetname, cube_suffix)
-                name_wcs = "{0}_P{1:02d}.fits".format(cube_suffix,
+                wcs_suffix = "{0}{1}"(default_prefix_wcs, cube_suffix)
+                name_wcs = "{0}_{1}_P{1:02d}.fits".format(wcs_suffix, cube_suffix,
                                                       np.int(pointing))
             if name_wcs is not None:
                 suffix = "_WCS_P{0:02d}".format(np.int(pointing))

@@ -841,13 +841,11 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Adding targetname for the final names
         prefix_mask = self._add_targetname(prefix_mask)
-        prefix_wcs = self._add_targetname(prefix_wcs)
+        prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
 
         name_mask = "{0}DATACUBE_FINAL_P{1:02d}.fits".format(
             prefix_mask, np.int(pointing))
-        finalname_mask = "{0}P{1:02d}.fits".format(prefix_mask,
-                                                   np.int(pointing))
-        finalname_wcs = "{0}P{1:02d}.fits".format(prefix_wcs,
+        finalname_wcs = "{0}DATACUBE_FINAL_P{1:02d}.fits".format(prefix_wcs,
                                                   np.int(pointing))
 
         # First create a subcube without all the Nan
