@@ -552,15 +552,15 @@ class MusePipeSample(object):
             # We first use the offset table to rotate the pixtables
             upipe.print_info("========== ROTATION OF PIXTABLES ===============")
             self.rotate_pixtables_target(targetname=targetname,
-                                         offset_table_name=offset_table_name,
                                          folder_offset_table=folder_offset_table,
+                                         offset_table_name=offset_table_name,
                                          fakemode=False)
             # We then reconstruct the pixtable reduced so we can
             # redo a muse_exp_combine if needed
             upipe.print_info("==== REDUCED PIXTABLES for REFERENCE MOSAIC ====")
             self.run_target_scipost_perexpo(targetname=targetname,
-                                            offset_table_name=offset_table_name,
                                             folder_offset_table=folder_offset_table,
+                                            offset_table_name=offset_table_name,
                                             save="individual",
                                             wcs_auto=False, norm_skycontinuum=True)
 
@@ -569,16 +569,16 @@ class MusePipeSample(object):
             # Pointings.
             upipe.print_info("=========== CREATION OF WCS MASKS ==============")
             self.create_reference_wcs(targetname=targetname,
-                                      folder_offset_table=offset_table_name,
-                                      offset_table_name=final_offset_table,
+                                      folder_offset_table=folder_offset_table,
+                                      offset_table_name=offset_table_name,
                                       fakemode=False)
 
         if create_expocubes:
             # Running the individual cubes now with the same WCS reference
             upipe.print_info("=========== CREATION OF EXPO CUBES =============")
             self.run_target_scipost_perexpo(targetname=targetname,
-                                            offset_table_name=offset_table_name,
                                             folder_offset_table=folder_offset_table,
+                                            offset_table_name=offset_table_name,
                                             save="cube",
                                             wcs_auto=True, **kwargs)
 
