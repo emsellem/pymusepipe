@@ -853,10 +853,10 @@ class MusePipeSample(object):
         default_cube_name = "{0}_DATACUBE_FINAL_{1}.fits".format(targetname, suffix)
         default_cube_name = joinpath(folder_cubes, default_cube_name)
 
-        output_cube_name = kwargs.pop("output_cube_name", default_cube_name)
-        output_cube_name = joinpath(folder_cubes, output_cube_name)
+        outcube_name = kwargs.pop("output_cube_name", default_cube_name)
+        outcube_name = joinpath(folder_cubes, output_cube_name)
 
-        self.pipes_mosaic[targetname].madcombine(output_cube_name=output_cube_name)
+        self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name)
 
         # Constructing the images for that mosaic
         if self.__phangs:
