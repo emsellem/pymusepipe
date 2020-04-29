@@ -16,9 +16,11 @@ import numpy as np
 
 from pymusepipe import util_pipe as upipe
 from .musepipe import MusePipe
-from .config_pipe import (PHANGS_reduc_config, default_short_PHANGS_filter_list,
-                          default_short_filter_list, default_prefix_wcs,
-                          default_prefix_wcs_mosaic)
+from .config_pipe import (PHANGS_reduc_config,
+                          default_short_PHANGS_filter_list,
+                          default_short_filter_list,
+                          default_PHANGS_filter_list, default_filter_list,
+                          default_prefix_wcs, default_prefix_wcs_mosaic)
 from .init_musepipe import InitMuseParameters
 from .combine import MusePointings
 from .align_pipe import rotate_pixtables
