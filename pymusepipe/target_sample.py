@@ -330,9 +330,16 @@ class MusePipeSample(object):
         target_pointings = self.targets[targetname].list_pointings
 
         # Now the list of pointings
-            # if no list_pointings we just do them all
-        if list_pointings.lower() == "all" or list_pointings is None:
+        if list_pointings is None:
             list_pointings = target_pointings
+        elif isinstance(list_pointings, str):
+            # if no list_pointings we just do them all
+            if list_pointings.lower() == "all":
+                list_pointings = target_pointings
+            else:
+                upipe.print_error("ERROR: list of pointings {} "
+                                  "not recognised".format(list_pointings))
+                return []
         else:
             # Check they exist
             if any([_ not in target_pointings for _ in list_pointings]) :
