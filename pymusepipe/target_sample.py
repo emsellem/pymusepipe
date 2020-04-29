@@ -622,8 +622,7 @@ class MusePipeSample(object):
             if wcs_auto:
                 cube_suffix = dic_products_scipost['cube'][0]
                 wcs_suffix = "{0}{1}".format(default_prefix_wcs, cube_suffix)
-                name_wcs = "{0}_{1}_P{2:02d}.fits".format(wcs_suffix, cube_suffix,
-                                                      np.int(pointing))
+                name_wcs = "{0}_P{1:02d}.fits".format(wcs_suffix, np.int(pointing))
             if name_wcs is not None:
                 suffix = "_WCS_P{0:02d}".format(np.int(pointing))
             else:
