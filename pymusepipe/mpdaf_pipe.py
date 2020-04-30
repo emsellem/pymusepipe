@@ -35,6 +35,7 @@ from mpdaf.drs import PixTable
 from astropy.io import fits as pyfits
 from astropy import units as u
 
+import pymusepipe
 from pymusepipe import util_pipe as upipe
 from .config_pipe import default_wave_wcs, AO_mask_lambda, dic_extra_filters
 
