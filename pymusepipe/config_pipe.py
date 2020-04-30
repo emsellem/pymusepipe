@@ -114,11 +114,11 @@ PHANGS_combine_config = {'fakemode':False, 'nocache':False}
 # Extra filters which may be used in the course of the reduction
 dic_extra_filters = {
         # Narrow band filter 
-        "WFI_BB": "Filter/LaSilla_WFI_ESO844.txt",
+        "WFI_BB": "data/Filters/LaSilla_WFI_ESO844p.txt",
         # Broad band filter
-        "WFI_NB": "Filter/LaSilla_WFI_ESO856.txt",
+        "WFI_NB": "data/Filters/LaSilla_WFI_ESO856p.txt",
         # DUPONT R filter
-	"DUPONT_R": "Filter/LCO_SITe3_r.txt"
+	    "DUPONT_R": "data/Filters/LCO_SITe3_rp.txt"
         }
 
 # Default hard-coded fits files - Calibration Tables

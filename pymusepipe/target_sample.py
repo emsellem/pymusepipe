@@ -874,7 +874,7 @@ class MusePipeSample(object):
             filter_list = filter_list.split(',')
 
             mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
-            if os.path.isfile(mosaic_name):
+            if not os.path.isfile(mosaic_name):
                 upipe.print_error("Mosaic cube file does not exist = {} \n"
                                   "Aborting Image reconstruction".format(mosaic_name))
                 return

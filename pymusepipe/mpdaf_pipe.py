@@ -36,7 +36,7 @@ from astropy.io import fits as pyfits
 from astropy import units as u
 
 from pymusepipe import util_pipe as upipe
-from .config_pipe import default_wave_wcs, AO_mask_lambda
+from .config_pipe import default_wave_wcs, AO_mask_lambda, dic_extra_filters
 
 from .cube_convolve import cube_kernel, cube_convolve
 
@@ -533,7 +533,7 @@ class MuseCube(Cube):
                 title="{0} map".format(line))
 
     def get_filter_image(self, filter_name=None, own_filter_file=None, filter_folder="",
-            dic_extra_filters=None):
+            dic_filters=None):
         """Get an image given by a filter. If the filter belongs to
         the filter list, then use that, otherwise use the given file
         """
@@ -552,14 +552,20 @@ class MuseCube(Cube):
         except ValueError:
             # initialise the filter file
             upipe.print_info("Reading private reference filter {0}".format(filter_name))
-            if dic_extra_filters is not None:
-                if filter_name in dic_extra_filters:
-                    filter_file = dic_extra_filters[filter_name]
-                else:
-                    upipe.print_error("[mpdaf_pipe / get_filter_image] "
-                                      "Filter name not in private dictionary - Aborting")
-                    return
+
+            # First we check the extra dictionary if provided
+            if dic_filters is not None:
+                if filter_name in dic_filters:
+                    filter_file = dic_filters[filter_name]
+            # then we check the package internal filter list
+            elif filter_name in dic_extra_filters:
+                upipe.print_info("Found filter in pymusepipe internal dictionary "
+                                 "(see data/Filters)")
+                filter_folder = pymusepipe.__path__[0]
+                filter_file = dic_extra_filters[filter_name]
             else:
+                upipe.print_warning("[mpdaf_pipe / get_filter_image] "
+                                  "Filter name not in private dictionary - Aborting")
                 if own_filter_file is None:
                     upipe.print_error("[mpdaf_pipe / get_filter_image] "
                                       "No extra filter dictionary and "
