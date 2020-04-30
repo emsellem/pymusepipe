@@ -153,7 +153,7 @@ class MuseCubeMosaic(CubeMosaic):
                                                self.folder_cubes,
                                                prefix_to_consider))
             upipe.print_info("Initial set of {:02d} fixed "
-                             "cubes found".format(len(list_fixed_cubes))
+                             "cubes found".format(len(list_fixed_cubes)))
 
             # Looping over the existing fixed pixtables
             for fixed_cube in list_fixed_cubes:
