@@ -285,7 +285,8 @@ def get_suffix_product(expotype):
     return dic_listMasterObject[expotype]
 
 default_prefix_wcs = "refwcs_"
-default_prefix_wcs_mosaic = "fullrefwcs_"
+prefix_mosaic = "full"
+default_prefix_wcs_mosaic = "{0}{1}".format(prefix_mosaic, default_prefix_wcs)
 default_wave_wcs = 6500.0
 default_prefix_mask = "mask_"
 

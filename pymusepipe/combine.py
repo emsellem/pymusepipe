@@ -37,9 +37,10 @@ from pymusepipe.create_sof import SofPipe
 from pymusepipe.init_musepipe import InitMuseParameters
 import pymusepipe.util_pipe as upipe
 from pymusepipe import musepipe, prep_recipes_pipe
-from pymusepipe.config_pipe import default_filter_list, default_PHANGS_filter_list, dic_combined_folders
-from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask, default_prefix_wcs_mosaic
-from pymusepipe.config_pipe import dic_listObject, lambdaminmax_for_wcs, lambdaminmax_for_mosaic
+from pymusepipe.config_pipe import (default_filter_list, default_PHANGS_filter_list,
+                                    dic_combined_folders, default_prefix_wcs,
+                                    default_prefix_mask, prefix_mosaic, dic_listObject,
+                                    lambdaminmax_for_wcs, lambdaminmax_for_mosaic)
 from pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -702,9 +703,9 @@ class MusePointings(SofPipe, PipeRecipes):
             # Spectral coverage for a full mosaic
             upipe.print_info("@@@@@@@ Start creating the full-lambda WCS @@@@@@@")
             self._combined_wcs_name = self.create_combined_wcs(
-                prefix_wcs=default_prefix_wcs_mosaic,
-                lambdaminmax_wcs=lambdaminmax_for_mosaic,
-                refcube_name=wcs_refcube_name)
+                                        prefix_wcs=prefix_mosaic,
+                                        lambdaminmax_wcs=lambdaminmax_for_mosaic,
+                                        refcube_name=wcs_refcube_name)
 
     def run_combine_all_single_pointings(self,
                                          add_suffix="",
