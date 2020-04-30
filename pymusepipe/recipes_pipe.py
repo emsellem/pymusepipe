@@ -357,7 +357,7 @@ class PipeRecipes(object) :
                               "{name_imaout}".format(
                                   nocache=self.nocache, 
                                   name_imain=self.joinprod(name_prod+suff_prod), 
-                                  name_imaout=name_imaout)
+                                  name_imaout=name_imaout))
             if "DATACUBE" in name_imaout:
                 self.__combined_cube_name = name_imaout
 
