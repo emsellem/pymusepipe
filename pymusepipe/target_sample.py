@@ -588,6 +588,7 @@ class MusePipeSample(object):
                                             folder_offset_table=folder_offset_table,
                                             offset_table_name=offset_table_name,
                                             save="cube",
+                                            norm_continuum=True,
                                             wcs_auto=True, **kwargs)
 
     def run_target_scipost_perexpo(self, targetname=None, list_pointings=None,
