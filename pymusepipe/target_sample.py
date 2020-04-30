@@ -862,7 +862,7 @@ class MusePipeSample(object):
         outcube_name = joinpath(folder_cubes, outcube_name)
         # Doing the MAD combination using mpdaf. Note the build_cube fakemode
         self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name,
-                                                 fakemode=~build_cube)
+                                                 fakemode=not build_cube)
 
         if build_images:
             # Constructing the images for that mosaic
