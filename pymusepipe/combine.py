@@ -670,30 +670,41 @@ class MusePointings(SofPipe, PipeRecipes):
         if reference_cube:
             refcube_name = kwargs.pop("refcube_name", None)
             if refcube_name is None:
-                upipe.print_info("First creating a reference (mosaic) "
-                                 "cube with short spectral range")
+                upipe.print_info("@@@@@@@ First creating a reference (mosaic) "
+                                 "cube with short spectral range @@@@@@@")
                 self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
                                  filter_list="white",
                                  prefix_all=default_prefix_wcs,
                                  targetname_asprefix=False)
+                wcs_refcube_name = self.__combined_cube_name
             else:
-                upipe.print_info("Start creating the narrow-lambda WCS and Masks")
-                _ = self.create_combined_wcs(refcube_name=refcube_name)
+                upipe.print_info("@@@@@@@@ Start creating the narrow-lambda "
+                                 "WCS and Masks @@@@@@@@")
+                wcs_refcube_name = self.create_combined_wcs(
+                                       refcube_name=refcube_name)
+        else:
+            # getting the name of the final datacube (mosaic)
+            cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            cube_name = "{0}{1}.fits".format(default_prefix_wcs,
+                                          self._add_targetname(cube_suffix))
+            wcs_refcube_name = joinpath(self.paths.cubes, cube_name)
 
         if pointings_wcs:
             # Creating the full mosaic WCS first with a narrow lambda range
             # Then creating the mask WCS for each pointing
-            upipe.print_info("Start creating the individual Pointings Masks")
+            upipe.print_info("@@@@@@@@ Start creating the individual "
+                             "Pointings Masks @@@@@@@@")
             self.create_all_pointings_wcs(lambdaminmax_mosaic=lambdaminmax,
                                           **kwargs)
 
         if mosaic_wcs:
             # Creating a reference WCS for the Full Mosaic with the right
             # Spectral coverage for a full mosaic
-            upipe.print_info("Start creating the full-lambda WCS")
+            upipe.print_info("@@@@@@@ Start creating the full-lambda WCS @@@@@@@")
             self._combined_wcs_name = self.create_combined_wcs(
                 prefix_wcs=default_prefix_wcs_mosaic,
-                lambdaminmax_wcs=lambdaminmax_for_mosaic)
+                lambdaminmax_wcs=lambdaminmax_for_mosaic,
+                refcube_name=wcs_refcube_name)
 
     def run_combine_all_single_pointings(self,
                                          add_suffix="",

@@ -538,13 +538,15 @@ class MuseCube(Cube):
         the filter list, then use that, otherwise use the given file
         """
         try:
-            upipe.print_info("Reading MUSE filter {0}".format(filter_name))
+            upipe.print_info("Building Image with MUSE "
+                             "filter {0}".format(filter_name))
             if filter_name.lower() == "white":
-                filter_wave = np.array([4000.,5000.,6000.,7000.,
-                                        8000.,9000.,10000.])
-                filter_sensitivity = np.ones_like(filter_wave)
-                refimage = self.bandpass_image(filter_wave, filter_sensitivity,
-                                           interpolation='linear')
+                # filter_wave = np.array([4000.,5000.,6000.,7000.,
+                #                         8000.,9000.,10000.])
+                # filter_sensitivity = np.ones_like(filter_wave)
+                # refimage = self.bandpass_image(filter_wave, filter_sensitivity,
+                #                            interpolation='linear')
+                refimage = self.sum(axis=0)
             else:
                 refimage = self.get_band_image(filter_name)
         except ValueError:
@@ -568,7 +570,8 @@ class MuseCube(Cube):
             # Now reading the filter data
             path_filter = joinpath(filter_folder, filter_file)
             filter_wave, filter_sensitivity = np.loadtxt(path_filter, unpack=True)
-            refimage = self.bandpass_image(filter_wave, filter_sensitivity, 
+            upipe.print_info("Building Image with filter {}".format(filter_name))
+            refimage = self.bandpass_image(filter_wave, filter_sensitivity,
                                            interpolation='linear')
             key = 'HIERARCH ESO DRS MUSE FILTER NAME'
             refimage.primary_header[key] = (filter_name, 'filter name used')

@@ -350,10 +350,14 @@ class PipeRecipes(object) :
         for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products, 
                 suffix_prefinalnames, prefix_products):
 
+            name_imaout = "{name_imaout}{suffix}{suff_pre}.fits".format(
+                         name_imaout=joinpath(dir_products, pre_prod+name_prod),
+                         suff_pre=suff_pre, suffix=suffix)
             self.run_oscommand("{nocache} mv {name_imain}.fits "
-                              "{name_imaout}{suffix}{suff_pre}.fits".format(
+                              "{name_imaout}".format(
                                   nocache=self.nocache, 
                                   name_imain=self.joinprod(name_prod+suff_prod), 
-                                  name_imaout=joinpath(dir_products, pre_prod+name_prod),
-                                  suff_pre=suff_pre, suffix=suffix))
+                                  name_imaout=name_imaout)
+            if "DATACUBE" in name_imaout:
+                self.__combined_cube_name = name_imaout
 
