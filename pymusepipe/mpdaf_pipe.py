@@ -149,6 +149,7 @@ class MuseCubeMosaic(CubeMosaic):
                                 "when relevant".format(self.prefix_fixed_cubes))
             prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
                                                  prefix_cubes)
+            print("HERE={0}{1}*fits".format(self.folder_cubes, prefix_to_consider))
             list_fixed_cubes = glob.glob("{0}{1}*fits".format(
                                                self.folder_cubes,
                                                prefix_to_consider))
