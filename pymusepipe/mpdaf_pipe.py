@@ -86,7 +86,8 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
 class MuseCubeMosaic(CubeMosaic):
     def __init__(self, ref_wcs, folder_ref_wcs="", folder_cubes="",
                  prefix_cubes="DATACUBE_FINAL_WCS",
-                 list_suffix=[], verbose=False):
+                 list_suffix=[], use_fixed_cubes=True,
+                 prefix_fixed_cubes="tmask", verbose=False):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
@@ -98,6 +99,8 @@ class MuseCubeMosaic(CubeMosaic):
 
         self.prefix_cubes = prefix_cubes
         self.list_suffix = list_suffix
+        self.prefix_fixed_cubes = prefix_fixed_cubes
+        self.use_fixed_cubes = use_fixed_cubes
 
         # Building the list of cubes
         self.build_list()
@@ -139,6 +142,33 @@ class MuseCubeMosaic(CubeMosaic):
         # get the list of cubes and return if 0 found
         list_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                      self.prefix_cubes))
+        # Take (or not) the fixed pixtables
+        if self.use_fixed_cubes:
+            prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
+                                                 prefix_cubes)
+            list_fixed_cubes = glob.glob("{0}{1}*fits".format(
+                                               self.folder_cubes,
+                                               prefix_to_consider))
+
+            # Looping over the existing fixed pixtables
+            for fixed_cube in list_fixed_cubes:
+                # Finding the name of the original one
+                orig_cube = fixed_pixtab.replace(prefix_to_consider,
+                                                   prefix_cubes)
+                if orig_cube in list_cubes:
+                    # If it exists, remove it
+                    list_cubes.remove(orig_cube)
+                    # and add the fixed one
+                    list_cubes.append(fixed_cube)
+                    upipe.print_warning("Fixed Cube {} was included "
+                                        "in the list".format(fixed_cube))
+                    upipe.print_warning("and Cube {} was thus removed from "
+                                        "the list".format(orig_cube))
+                else:
+                    upipe.print_warning("Original Cube {} not "
+                                        "found".format(orig_cube))
+                    upipe.print_warning("Hence will not include fixed "
+                                        "Cube in the list {}".format(fixed_cube))
 
         # if the list of suffix is empty, just use all cubes
         if len(self.list_suffix) == 0:

@@ -244,7 +244,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
 class MusePointings(SofPipe, PipeRecipes):
     def __init__(self, targetname=None, list_pointings="all",
                  dic_exposures_in_pointings=None,
-                 suffix_fixed_pixtables="tmask",
+                 prefix_fixed_pixtables="tmask",
                  folder_config="",
                  rc_filename=None, cal_filename=None,
                  combined_folder_name="Combined", suffix="",
@@ -269,10 +269,10 @@ class MusePointings(SofPipe, PipeRecipes):
             Default is False
         vsystemic: float 
             Default is 0. Systemic velocity of the galaxy [in km/s]
-        suffix_fixed_pixtables: str
+        prefix_fixed_pixtables: str
             Suffix for fixed PixTables. Default is ''.
         use_fixed_pixtables: bool
-            Default is False. If True, will use suffix_fixed_pixtables to filter out
+            Default is False. If True, will use prefix_fixed_pixtables to filter out
             Pixtables which have been fixed.
 
         Other possible entries
@@ -304,7 +304,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Including or not the fixed Pixtables in place of the original ones
         self.use_fixed_pixtables = kwargs.pop("use_fixed_pixtables", False)
-        self.suffix_fixed_pixtables = suffix_fixed_pixtables
+        self.prefix_fixed_pixtables = prefix_fixed_pixtables
 
         # Setting other default attributes
         if log_filename is None:
@@ -431,18 +431,18 @@ class MusePointings(SofPipe, PipeRecipes):
 
             # Take (or not) the fixed pixtables
             if self.use_fixed_pixtables:
-                suffix_to_consider = "{0}{1}".format(self.suffix_fixed_pixtables,
+                prefix_to_consider = "{0}{1}".format(self.prefix_fixed_pixtables,
                                                      pixtable_suffix)
                 list_fixed_pixtabs = glob.glob(path_pixtables +
                                                "{0}{1}{2}*fits".format(
-                                                   suffix_to_consider,
+                                                   prefix_to_consider,
                                                    self.suffix,
                                                    pointing_suffix))
 
                 # Looping over the existing fixed pixtables
                 for fixed_pixtab in list_fixed_pixtabs:
                     # Finding the name of the original one
-                    orig_pixtab = fixed_pixtab.replace(suffix_to_consider,
+                    orig_pixtab = fixed_pixtab.replace(prefix_to_consider,
                                                        pixtable_suffix)
                     if orig_pixtab in list_pixtabs:
                         # If it exists, remove it
