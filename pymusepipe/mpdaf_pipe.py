@@ -148,8 +148,7 @@ class MuseCubeMosaic(CubeMosaic):
             upipe.print_warning("Using Fixed cubes with prefix {} "
                                 "when relevant".format(self.prefix_fixed_cubes))
             prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
-                                                 prefix_cubes)
-            print("HERE={0}{1}*fits".format(self.folder_cubes, prefix_to_consider))
+                                                 self.prefix_cubes)
             list_fixed_cubes = glob.glob("{0}{1}*fits".format(
                                                self.folder_cubes,
                                                prefix_to_consider))
@@ -159,7 +158,8 @@ class MuseCubeMosaic(CubeMosaic):
             # Looping over the existing fixed pixtables
             for fixed_cube in list_fixed_cubes:
                 # Finding the name of the original one
-                orig_cube = fixed_cube.replace(prefix_to_consider, prefix_cubes)
+                orig_cube = fixed_cube.replace(prefix_to_consider,
+                                               self.prefix_cubes)
                 if orig_cube in list_cubes:
                     # If it exists, remove it
                     list_cubes.remove(orig_cube)
