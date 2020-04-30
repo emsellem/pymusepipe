@@ -146,7 +146,7 @@ class MuseCubeMosaic(CubeMosaic):
         # Take (or not) the fixed pixtables
         if self.use_fixed_cubes:
             upipe.print_warning("Using Fixed cubes with prefix {} "
-                                "when relevant".format(self.prefix_cubes))
+                                "when relevant".format(self.prefix_fixed_cubes))
             prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
                                                  prefix_cubes)
             list_fixed_cubes = glob.glob("{0}{1}*fits".format(
