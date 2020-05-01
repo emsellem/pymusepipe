@@ -677,7 +677,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                  filter_list="white",
                                  prefix_all=default_prefix_wcs,
                                  targetname_asprefix=False)
-                wcs_refcube_name = self.__combined_cube_name
+                wcs_refcube_name = self._combined_cube_name
             else:
                 upipe.print_info("@@@@@@@@ Start creating the narrow-lambda "
                                  "WCS and Masks @@@@@@@@")

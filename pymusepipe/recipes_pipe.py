@@ -359,5 +359,5 @@ class PipeRecipes(object) :
                                   name_imain=self.joinprod(name_prod+suff_prod), 
                                   name_imaout=name_imaout))
             if "DATACUBE" in name_imaout:
-                self.__combined_cube_name = name_imaout
+                self._combined_cube_name = name_imaout
 
