@@ -11,6 +11,8 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Importing modules
 import os
 import time
+from os.path import join as joinpath
+import copy
 
 # Numpy
 import numpy as np
@@ -19,9 +21,12 @@ from astropy import constants as const
 from astropy.io import fits as pyfits
 
 # Import package modules
-from pymusepipe.emission_lines import list_emission_lines
-from pymusepipe.emission_lines import full_muse_wavelength_range
-from pymusepipe.config_pipe import default_filter_list
+from .emission_lines import list_emission_lines
+from .emission_lines import full_muse_wavelength_range
+from .config_pipe import default_filter_list
+from . import util_pipe as upipe
+
+from mpdaf.obj import Image
 
 from collections import OrderedDict
 
@@ -384,20 +389,100 @@ def reconstruct_filter_images(cubename, filter_list=default_filter_list,
                   filter_list, cubename, filter_fits_file)
     os.system(command)
 
-def add_key_pointing_expo(name_image, iexpo, pointing):
+def add_key_pointing_expo(imaname, iexpo, pointing):
     """Add pointing and expo number to image
 
     Input
     -----
-    name_image: str
+    imaname: str
     iexpo: int
     pointing: int
     """
     # Writing the pointing and iexpo in the IMAGE_FOV
-    this_image = pyfits.open(name_image, mode='update')
+    this_image = pyfits.open(imaname, mode='update')
     this_image[0].header['MUSEPIPE_POINTING'] = (pointing, "Pointing number")
     this_image[0].header['MUSEPIPE_IEXPO'] = (iexpo, "Exposure number")
     this_image.flush()
     print_info("Keywords MUSEPIPE_POINTING/EXPO updated for image {}".format(
-        name_image))
+        imaname))
 
+def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
+                     **kwargs):
+    """Routine to remove potential Nan around an image and reconstruct
+    an optimal WCS reference image. The rotation angle is provided as a way
+    to optimise the extent of the output image, removing Nan along X and Y
+    at that angle.
+
+    Args:
+        ima_name (str): input image name. No default.
+        ima_folder (str): input image folder ['']
+        outwcs_folder (str): folder where to write the output frame. Default is
+            None which means that it will use the folder of the input image.
+        rotangle (float): rotation angle in degrees [0]
+        **kwargs:
+            in_suffix (str): in suffix to remove from name ['prealign']
+            out_suffix (str): out suffix to add to name ['rotwcs']
+            margin_factor (float): factor to extend the image [1.1]
+
+    Returns:
+
+    """
+
+    # Reading the input names and setting output folder
+    fullname = joinpath(ima_folder, ima_name)
+    ima_folder, ima_name = os.path.split(fullname)
+    if outwcs_folder is None:
+        outwcs_folder = ima_folder
+
+    # Suffix
+    in_suffix = kwargs.pop("in_suffix", "prealign")
+    out_suffix = kwargs.pop("out_suffix", "rotwcs")
+
+    # Get margin if needed
+    margin_factor = kwargs.pop("margin_factor", 1.1)
+    extend_fraction = np.maximum(0., (margin_factor - 1.))
+    upipe.print_info("Will use a {:5.2f}% extra margin".format(
+                     extend_fraction*100.))
+
+    # Opening the image via mpdaf
+    imawcs = Image(fullname)
+    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(np.int)
+
+    # New dimensions and extend current image
+    new_dim = tuple(np.array(imawcs.shape).astype(np.int) + extra_pixels)
+    ima_ext = imawcs.regrid(newdim=new_dim, refpos=imawcs.get_start(),
+                            refpix=tuple(extra_pixels / 2.),
+                            newinc=imawcs.get_step()[0]*3600.)
+
+    # Copy and rotate WCS
+    new_wcs = copy.deepcopy(ima_ext.wcs)
+    upipe.print_info("Rotating WCS by {} degrees".format(rotangle))
+    new_wcs.rotate(rotangle)
+
+    # New rotated image
+    ima_rot = Image(data=np.nan_to_num(ima_ext.data), wcs=new_wcs)
+
+    # Then resample the image using the initial one as your reference
+    ima_rot_resampled = ima_rot.align_with_image(ima_ext, flux=True)
+
+    # Crop NaN
+    ima_rot_resampled.crop()
+
+    # get the new header with wcs and rotate back
+    finalwcs = (ima_rot_resampled.wcs).rotate(-rotangle)
+
+    # create the final image
+    final_rot_image = Image(data=ima_rot_resampled.data, wcs=finalwcs)
+
+    # Save image
+    if isinstance(in_suffix, str) and in_suffix != "" and in_suffix in ima_name:
+            out_name = ima_name.replace(in_suffix, out_suffix)
+    else:
+        name, extension = os.path.splitext(ima_name)
+        if out_suffix != "":
+            out_suffix = "_{}".format(out_suffix)
+        out_name = "{0}{1}{2}".format(name, out_suffix, extension)
+
+    # write output
+    final_rot_image.write(joinpath(outwcs_folder, out_name))
+    return outwcs_folder, out_name

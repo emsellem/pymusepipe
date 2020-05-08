@@ -770,10 +770,10 @@ class AlignMusePointing(object):
     def show_norm_factors(self):
         """Print some information about the normalisation factors.
         """
-        print("Normalisation factors")
-        print("Image # : InitFluxScale     SlopeFit       NormFactor       Background")
+        upipe.print_info("Normalisation factors")
+        upipe.print_info("Image # : InitFluxScale     SlopeFit       NormFactor       Background")
         for nima in range(self.nimages):
-            print("Image {0:03d}:  {1:10.6e}   {2:10.6e}     {3:10.6e}     {4:10.6e}".format(
+            upipe.print_info("Image {0:03d}:  {1:10.6e}   {2:10.6e}     {3:10.6e}     {4:10.6e}".format(
                     nima,
                     self.init_flux_scale[nima], 
                     self.ima_polypar[nima].beta[1],
@@ -784,10 +784,10 @@ class AlignMusePointing(object):
         """Print some information about the linearly fitted parameters
         pertaining to the normalisation.
         """
-        print("Normalisation factors")
-        print("Image # : BackGround        Slope")
+        upipe.print_info("Normalisation factors")
+        upipe.print_info("Image # : BackGround        Slope")
         for nima in self.nimages:
-            print("Image {0:03d}:  {1:10.6e}   {2:10.6e}".format(
+            upipe.print_info("Image {0:03d}:  {1:10.6e}   {2:10.6e}".format(
                     nima,
                     self.ima_polypar[nima].beta[0], 
                     self.ima_polypar[nima].beta[1]))

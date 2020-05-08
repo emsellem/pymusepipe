@@ -478,6 +478,8 @@ class MuseCube(Cube):
             **kwargs:
 
         Returns:
+            cube_folder, outcube_name (str, str): the name of the folder where
+               the output cube is, and its name
 
         """
 
