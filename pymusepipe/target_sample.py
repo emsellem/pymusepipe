@@ -577,10 +577,16 @@ class MusePipeSample(object):
             # Pointings.
             upipe.print_info("=========== CREATION OF WCS MASKS ==============")
             dic_exposures_in_pointings = kwargs.pop("dic_exposures_in_pointings", None)
+            mosaic_wcs = kwargs.pop("mosaic_wcs", True)
+            reference_cube = kwargs.pop("reference_cube", True)
+            pointings_wcs = kwargs.pop("pointings_wcs", True)
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
                                       offset_table_name=offset_table_name,
                                       dic_exposures_in_pointings=dic_exposures_in_pointings,
+                                      reference_cube=reference_cube,
+                                      mosaic_wcs=mosaic_wcs,
+                                      pointings_wcs=pointings_wcs,
                                       fakemode=False)
 
         if create_expocubes:
