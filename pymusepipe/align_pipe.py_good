@@ -1297,8 +1297,7 @@ class AlignMusePointing(object):
         # Projecting the reference image onto the MUSE field
         tmphdr = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
                                             name_musehdr), overwrite=True)
-        hdu_target, proj_ref_hdu = self._align_reference_hdu(muse_hdu,
-                                                             target_rotation=rotation)
+        proj_ref_hdu = self._align_reference_hdu(muse_hdu, rotation=rotation)
 
         # Cleaning the images
         if minflux is None:
@@ -1404,8 +1403,8 @@ class AlignMusePointing(object):
 
         return lperc, hperc
 
-    def _align_hdu(self, hdu_target=None, hdu_to_align=None, target_rotation=0.0,
-                   to_align_rotation=0.0, conversion=False):
+    def _align_hdu(self, hdu_target=None, hdu_to_align=None, rotation=0.0,
+                   conversion=False):
         """Project the reference image onto the MUSE field
         Hidden function, as only used internally
 
@@ -1414,9 +1413,7 @@ class AlignMusePointing(object):
         muse_hdu: HDU [None]
             Input hdu
         hdu_ref: HDU [None]
-        to_align_rotation: float [0]
-            Rotation angle in degrees
-        target_rotation: float [0]
+        rotation: float [0]
             Rotation angle in degrees
 
         Returns
@@ -1434,18 +1431,15 @@ class AlignMusePointing(object):
         if hdu_target is not None and hdu_to_align is not None:
             # Getting the reference image data and WCS
             wcs_to_align = WCS(hdr=hdu_to_align.header)
-            if to_align_rotation != 0.:
-                wcs_to_align.rotate(-to_align_rotation)
             ima_to_align = Image(data=hdu_to_align.data * conversion_factor,
                                  wcs=wcs_to_align)
 
             # Getting the MUSE image data and WCS
             wcs_target = WCS(hdr=hdu_target.header)
-            if target_rotation != 0.:
-                wcs_target.rotate(-target_rotation)
+            if rotation != 0.:
+                wcs_target.rotate(-rotation)
             ima_target = Image(data=np.nan_to_num(hdu_target.data),
                                wcs=wcs_target)
-            hdu_target = ima_target.get_data_hdu()
 
             # Aligning the reference image with the MUSE image using mpdaf
             # align_with_image
@@ -1456,10 +1450,9 @@ class AlignMusePointing(object):
             hdu_aligned = None
             print("Warning: please provide target HDU to allow reprojection")
 
-        return hdu_target, hdu_aligned
+        return hdu_aligned
 
-    def _align_reference_hdu(self, hdu_target=None, target_rotation=0.0,
-                             ref_rotation=0.0):
+    def _align_reference_hdu(self, hdu_target=None, rotation=0.0):
         """Project the reference image onto the MUSE field
         Hidden function, as only used internally
          
@@ -1476,9 +1469,7 @@ class AlignMusePointing(object):
             Reprojected HDU. None if nothing is provided
         """
 
-        return self._align_hdu(hdu_target=hdu_target,
-                               target_rotation=target_rotation,
-                               to_align_rotation=ref_rotation,
+        return self._align_hdu(hdu_target=hdu_target, rotation=rotation,
                                hdu_to_align=self.reference_hdu,
                                conversion=True)
 
@@ -1575,9 +1566,9 @@ class AlignMusePointing(object):
         upipe.print_info("Image {0:03d} Rotation of {1} will be applied".format(
                             nima, self._total_rotangles[nima]))
         # Reprojecting the Reference image onto the new MUSE frame
-        hdu_target, self.list_proj_refhdu[nima] = self._align_reference_hdu(
+        self.list_proj_refhdu[nima] = self._align_reference_hdu(
                 hdu_target=self.list_offmuse_hdu[nima],
-                target_rotation=self._total_rotangles[nima])
+                rotation=self._total_rotangles[nima])
         # Now reading the WCS and saving it in the list
         self.list_wcs_proj_refhdu[nima] = WCS(
                 self.list_proj_refhdu[nima].header)
@@ -1706,15 +1697,15 @@ class AlignMusePointing(object):
         # Getting data from the MUSE ref image if one is given
         museref = nima_museref is not None
         if museref:
+            drot = self._total_rotangles[nima] - self._total_rotangles[nima_museref]
             # Projecting the MUSE image onto the MUSE reference
-            musehduR, musehduC = self._align_hdu(hdu_to_align=self.list_offmuse_hdu[nima],
-                                       target_rotation=self._total_rotangles[nima_museref],
-                                       to_align_rotation=self._total_rotangles[nima],
+            musehduR = self._align_hdu(hdu_to_align=self.list_offmuse_hdu[nima],
+                                       rotation=drot,
                                        hdu_target=self.list_offmuse_hdu[nima_museref],
                                        conversion=False)
             # Getting the data
-            musedataR = filtermed_image(musehduR.data, 0.)
-            musedataC = filtermed_image(musehduC.data, 0.)
+            musedataC = filtermed_image(musehduR.data, 0.)
+            musedataR = filtermed_image(self.list_offmuse_hdu[nima_museref].data, 0.)
             if self._convolve_muse[nima_museref] > 0 :
                 kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima_museref])
                 musedataR = convolve(musedataR, kernel)
