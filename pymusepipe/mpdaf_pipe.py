@@ -88,7 +88,8 @@ class MuseCubeMosaic(CubeMosaic):
     def __init__(self, ref_wcs, folder_ref_wcs="", folder_cubes="",
                  prefix_cubes="DATACUBE_FINAL_WCS",
                  list_suffix=[], use_fixed_cubes=True,
-                 prefix_fixed_cubes="tmask", verbose=False):
+                 prefix_fixed_cubes="tmask", verbose=False,
+                 dic_exposures_in_pointings=None):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
@@ -102,6 +103,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.list_suffix = list_suffix
         self.prefix_fixed_cubes = prefix_fixed_cubes
         self.use_fixed_cubes = use_fixed_cubes
+        self.dic_exposures_in_pointings = dic_exposures_in_pointings
 
         # Building the list of cubes
         self.build_list()
@@ -141,9 +143,15 @@ class MuseCubeMosaic(CubeMosaic):
             self.prefix_cubes = prefix_cubes
 
         # get the list of cubes and return if 0 found
-        list_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
+        list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                      self.prefix_cubes))
-        # Take (or not) the fixed pixtables
+        # Filter if dic_exposures_in_pointings is provided
+        if self.dic_exposures_in_pointings is not None:
+            list_cubes = 0
+        else:
+            list_cubes = list_existing_cubes
+
+        # Take (or not) the fixed Cubes
         if self.use_fixed_cubes:
             upipe.print_warning("Using Fixed cubes with prefix {} "
                                 "when relevant".format(self.prefix_fixed_cubes))

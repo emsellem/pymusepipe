@@ -469,7 +469,8 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
     ima_rot_resampled.crop()
 
     # get the new header with wcs and rotate back
-    finalwcs = (ima_rot_resampled.wcs).rotate(-rotangle)
+    finalwcs = ima_rot_resampled.wcs
+    finalwcs.rotate(-rotangle)
 
     # create the final image
     final_rot_image = Image(data=ima_rot_resampled.data, wcs=finalwcs)
