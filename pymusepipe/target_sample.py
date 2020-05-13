@@ -312,7 +312,7 @@ class MusePipeSample(object):
             if self.init_pipes:
                 self.set_pipe_target(targetname)
 
-    def _check_pointings(self, targetname, list_pointings):
+    def _check_pointings_list(self, targetname, list_pointings):
         """Check if pointing is in the list of pointings
         Returns the list of pointings if ok. If not, return an empty list
 
@@ -333,22 +333,18 @@ class MusePipeSample(object):
 
         # Now the list of pointings
         if list_pointings is None:
-            list_pointings = target_pointings
-        elif isinstance(list_pointings, str):
-            # if no list_pointings we just do them all
-            if list_pointings.lower() == "all":
-                list_pointings = target_pointings
-            else:
-                upipe.print_error("ERROR: list of pointings {} "
-                                  "not recognised".format(list_pointings))
-                return []
+            return target_pointings
         else:
+            checked_list_pointings = []
             # Check they exist
-            if any([_ not in target_pointings for _ in list_pointings]) :
-                upipe.print_error("ERROR: no pointing {0} for the given target".format(
-                                    list_pointings))
+            for pointing in list_pointings:
+                if pointing not in target_pointings:
+                    upipe.print_warning("No pointing {} for the given "
+                                        "target".format(pointing))
+                else:
+                    checked_list_pointings.append(pointing)
                 return []
-        return list_pointings
+            return checked_list_pointings
 
     def _check_targetname(self, targetname):
         """Check if targetname is in list
@@ -395,7 +391,7 @@ class MusePipeSample(object):
         upipe.print_info("=== Initialising MusePipe for Target {name} ===".format(name=targetname))
 
         # Check if pointings are valid
-        list_pointings = self._check_pointings(targetname, list_pointings)
+        list_pointings = self._check_pointings_list(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
@@ -580,7 +576,7 @@ class MusePipeSample(object):
             mosaic_wcs = kwargs.pop("mosaic_wcs", True)
             reference_cube = kwargs.pop("reference_cube", True)
             pointings_wcs = kwargs.pop("pointings_wcs", True)
-            list_pointings = kwargs.get("list_pointings", "all")
+            list_pointings = kwargs.get("list_pointings", None)
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
                                       offset_table_name=offset_table_name,
@@ -615,7 +611,7 @@ class MusePipeSample(object):
 
         """
         # Check if pointings are valid
-        list_pointings = self._check_pointings(targetname, list_pointings)
+        list_pointings = self._check_pointings_list(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
@@ -696,7 +692,7 @@ class MusePipeSample(object):
                 first_recipe=recipe_name, last_recipe=recipe_name, **kwargs)
 
         # Check if pointings are valid
-        list_pointings = self._check_pointings(targetname, list_pointings)
+        list_pointings = self._check_pointings_list(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
@@ -748,7 +744,7 @@ class MusePipeSample(object):
             self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
 
         # Check if pointings are valid
-        list_pointings = self._check_pointings(targetname, list_pointings)
+        list_pointings = self._check_pointings_list(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
@@ -780,7 +776,7 @@ class MusePipeSample(object):
                                  list_pointings=list_pointings, **kwargs)
 
         # Check if pointings are valid
-        list_pointings = self._check_pointings(targetname, list_pointings)
+        list_pointings = self._check_pointings_list(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
@@ -805,19 +801,19 @@ class MusePipeSample(object):
                              list_ifu=None, angle=angle, fakemode=fakemode,
                              prefix=prefix, **kwargs)
 
-    def init_mosaic(self, targetname=None, list_pointings="all", **kwargs):
+    def init_mosaic(self, targetname=None, list_pointings=None, **kwargs):
         """Prepare the combination of targets
 
         Input
         -----
         targetname: str [None]
             Name of target
-        list_pointings: list [or "all"=default]
+        list_pointings: list [or None=default meaning all pointings]
             List of pointings (e.g., [1,2,3])
         """
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         # Check if pointings are valid
-        list_pointings = self._check_pointings(targetname, list_pointings)
+        list_pointings = self._check_pointings_list(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
@@ -842,7 +838,7 @@ class MusePipeSample(object):
                                                        prefix_cubes=prefix_cubes,
                                                        list_suffix=list_pointing_names)
 
-    def mosaic(self, targetname=None, list_pointings="all", **kwargs):
+    def mosaic(self, targetname=None, list_pointings=None, **kwargs):
         """
 
         Args:
@@ -898,7 +894,7 @@ class MusePipeSample(object):
                                                                suffix)
                 ima.write(joinpath(folder_cubes, ima_name))
 
-    def init_combine(self, targetname=None, list_pointings="all",
+    def init_combine(self, targetname=None, list_pointings=None,
                      folder_offset_table=None, offset_table_name=None, **kwargs):
         """Prepare the combination of targets
 
@@ -906,7 +902,7 @@ class MusePipeSample(object):
         -----
         targetname: str [None]
             Name of target
-        list_pointings: list [or "all"=default]
+        list_pointings: list [or None=default= all pointings]
             List of pointings (e.g., [1,2,3])
         offset_table_name: str
             Name of Offset table

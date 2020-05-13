@@ -242,7 +242,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
 
 
 class MusePointings(SofPipe, PipeRecipes):
-    def __init__(self, targetname=None, list_pointings="all",
+    def __init__(self, targetname=None, list_pointings=None,
                  dic_exposures_in_pointings=None,
                  prefix_fixed_pixtables="tmask",
                  folder_config="",
@@ -336,14 +336,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
 
-        # Now the list of pointings
-        if isinstance(list_pointings, str):
-            if list_pointings.lower() == "all":
-                self.list_pointings = get_list_pointings(
-                    joinpath(self.pipe_params.root, self.targetname))
-        else:
-            self.list_pointings = list_pointings
-
+        self.list_pointings = self._check_list_pointings(list_pointings)
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
@@ -379,6 +372,35 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Going back to initial working directory
         self.goto_origfolder()
+
+    @property
+    def full_pointings_list(self):
+        return get_list_pointings( joinpath(self.pipe_params.root,
+                                            self.targetname))
+
+    def _check_pointings_list(self, list_pointings=None):
+        """set the list pointings to self
+
+        Args:
+            list_pointings:
+
+        Returns:
+            list_pointings after decrypting
+        """
+        # Now the list of pointings
+        if list_pointings is None:
+            # This is using all the existing pointings
+            return self.full_pointings_list
+        else:
+            checked_list_pointings = []
+            for pointing in list_pointings:
+                if pointing not in self.list_pointings:
+                    upipe.print_warning("No pointing {} for the given "
+                                        "target".format(pointing))
+                else:
+                    checked_list_pointings.append(pointing)
+
+            return checked_list_pointings
 
     def _add_targetname(self, name, asprefix=True):
         """Add targetname to input name and return it
@@ -733,11 +755,12 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         # If list_pointings is None using the initially set up one
         list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+        list_pointings = self._check_pointings_list(list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Combining single pointings - Pointing {0:02d}".format(
-                             pointing))
+                             np.int(pointing)))
             self.run_combine_single_pointing(pointing, add_suffix=add_suffix,
                                              sof_filename=sof_filename,
                                              **kwargs)
@@ -804,6 +827,7 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         # If list_pointings is None using the initially set up one
         list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+        list_pointings = self._check_pointings_list(list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
@@ -1038,6 +1062,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # If list_pointings is None using the initially set up one
         list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+        list_pointings = self._check_pointings_list(list_pointings)
 
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2
