@@ -378,8 +378,7 @@ class MusePointings(SofPipe, PipeRecipes):
         return get_list_pointings( joinpath(self.pipe_params.root,
                                             self.targetname))
 
-    def _check_pointings_list(self, list_pointings=None,
-                              default_list=self.full_pointings_list):
+    def _check_pointings_list(self, list_pointings=None, default_list=None):
         """set the list pointings to self
 
         Args:
@@ -391,7 +390,10 @@ class MusePointings(SofPipe, PipeRecipes):
         # Now the list of pointings
         if list_pointings is None:
             # This is using all the existing pointings
-            return default_list
+            if default_list is None:
+                return self.full_pointings_list
+            else:
+                return default_list
         else:
             checked_list_pointings = []
             for pointing in list_pointings:
