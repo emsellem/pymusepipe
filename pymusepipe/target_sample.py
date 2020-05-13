@@ -343,7 +343,6 @@ class MusePipeSample(object):
                                         "target".format(pointing))
                 else:
                     checked_pointings_list.append(pointing)
-                return []
             return checked_pointings_list
 
     def _check_targetname(self, targetname):
