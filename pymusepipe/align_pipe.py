@@ -1124,7 +1124,10 @@ class AlignMusePointing(object):
         extra_rotangle = kwargs.pop("extra_rotation", 0.0)
 
         # Add the offset from user
-        self.shift_arcsecond(extra_arcsec, extra_rotangle, nima)
+        border = kwargs.get("border", self.border)
+        chunk_size = kwargs.get("chunk_size", self.chunk_size)
+        self.shift_arcsecond(extra_arcsec, extra_rotangle, nima,
+                             border=border, chunk_size=chunk_size)
 
         # Compare contours if plot is set to True
         self.compare(nima=nima, **kwargs)
@@ -1514,7 +1517,8 @@ class AlignMusePointing(object):
         # And the rotation angle in degrees
         self.extra_rotangles[nima] = extra_rotation
 
-    def shift_arcsecond(self, extra_arcsec=[0., 0.], extra_rotation=0., nima=0):
+    def shift_arcsecond(self, extra_arcsec=[0., 0.], extra_rotation=0., nima=0,
+                        **kwargs):
         """Shift image with index nima with the total offset
         after adding any extra given offset
         This does not return anything but could in principle
@@ -1529,9 +1533,9 @@ class AlignMusePointing(object):
             Index of image to consider
         """
         self._add_user_arc_offset(extra_arcsec, extra_rotation, nima)
-        self.shift(nima)
+        self.shift(nima, **kwargs)
 
-    def shift(self, nima=0):
+    def shift(self, nima=0, **kwargs):
         """Create New HDU after shifting it with the right offset
         (only considering image with index nima)
          
@@ -1583,11 +1587,11 @@ class AlignMusePointing(object):
                 self.list_proj_refhdu[nima].header)
 
         # Getting the normalisation factors again
-        musedata, refdata = self.get_image_normfactor(nima)
+        musedata, refdata = self.get_image_normfactor(nima, **kwargs)
 
     def get_image_normfactor(self, nima=0, median_filter=True, 
             convolve_muse=0., convolve_reference=0.,
-            threshold_muse=None):
+            threshold_muse=None, **kwargs):
         """Get the normalisation factor for image nima
          
         Input
@@ -1637,11 +1641,13 @@ class AlignMusePointing(object):
             self.threshold_muse[nima] = threshold_muse
 
         # Cropping the data
-        musedataC = crop_data(musedata, self.border)
-        refdataC = crop_data(refdata, self.border)
+        border = kwargs.pop("border", self.border)
+        musedataC = crop_data(musedata, border)
+        refdataC = crop_data(refdata, border)
 
+        chunk_size = kwargs.pop("chunk_size", self.chunk_size)
         self.ima_polypar[nima] = get_image_norm_poly(musedataC,
-                        refdataC, chunk_size=self.chunk_size,
+                        refdataC, chunk_size=chunk_size,
                         threshold1=self.threshold_muse[nima])
         if self.use_polynorm:
             self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
@@ -1695,13 +1701,16 @@ class AlignMusePointing(object):
         Makes a maximum of 4 figures
         """
         threshold_muse = kwargs.pop("threshold_muse", self.threshold_muse[nima])
+        border = kwargs.pop("border", self.border)
+        chunk_size = kwargs.pop("chunk_size", self.chunk_size)
 
         # Getting the data
         musedata, refdata = self.get_image_normfactor(nima=nima, 
                                 median_filter=median_filter,
                                 convolve_muse=convolve_muse,
                                 convolve_reference=convolve_reference,
-                                threshold_muse=threshold_muse)
+                                threshold_muse=threshold_muse,
+                                border=border, chunk_size=chunk_size)
 
         # Getting data from the MUSE ref image if one is given
         museref = nima_museref is not None
