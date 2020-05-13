@@ -71,14 +71,23 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
     # interpolation linearly the filter throughput onto
     # the spectrum wavelength
     specwave = spectrum.wave.coord()
-    effS = np.interp(specwave, wave_filter, throughput_filter)
+    specdata = spectrum.data
+
+    # If we have an AO mask, we interpolate the spectrum within that range
     if AO_mask:
-        goodpix = (specwave < AO_mask_lambda[0]) | (specwave > AO_mask_lambda[1])
-    else:
-        goodpix = (np.abs(effS) >= 0)
-    filtwave = np.sum(effS[goodpix]) 
+        outside_AO = (specwave < AO_mask_lambda[0]) | (specwave > AO_mask_lambda[1])
+        good_spectrum = np.interp(specwave, specwave[outside_AO],
+                                  specdata[outside_AO])
+        # Replacing the interval with interpolated spectrum
+        specdata[~outside_AO] = good_spectrum[~outside_AO]
+
+    effS = np.interp(specwave, wave_filter, throughput_filter)
+    # Retaining only positive values
+    goodpix = (effS > 0)
+
+    filtwave = np.sum(effS[goodpix])
     if filtwave > 0:
-        flux_cont = np.sum(spectrum.data[goodpix] * effS[goodpix]) / filtwave 
+        flux_cont = np.sum(spectrum.data[goodpix] * effS[goodpix]) / filtwave
     else:
         flux_cont = 0.0
 
