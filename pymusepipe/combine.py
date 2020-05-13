@@ -336,7 +336,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.init_default_param(dic_combined_folders)
         self._dic_combined_folders = dic_combined_folders
 
-        self.list_pointings = self._check_list_pointings(list_pointings)
+        self.list_pointings = self._check_pointings_list(list_pointings)
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
@@ -378,7 +378,8 @@ class MusePointings(SofPipe, PipeRecipes):
         return get_list_pointings( joinpath(self.pipe_params.root,
                                             self.targetname))
 
-    def _check_pointings_list(self, list_pointings=None):
+    def _check_pointings_list(self, list_pointings=None,
+                              default_list=self.full_pointings_list):
         """set the list pointings to self
 
         Args:
@@ -390,7 +391,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Now the list of pointings
         if list_pointings is None:
             # This is using all the existing pointings
-            return self.full_pointings_list
+            return default_list
         else:
             checked_list_pointings = []
             for pointing in list_pointings:
@@ -732,6 +733,7 @@ class MusePointings(SofPipe, PipeRecipes):
     def run_combine_all_single_pointings(self,
                                          add_suffix="",
                                          sof_filename='pointings_combine',
+                                         list_pointings=None,
                                          **kwargs):
         """Run for all pointings individually, provided in the 
         list of pointings, by just looping over the pointings.
@@ -754,8 +756,8 @@ class MusePointings(SofPipe, PipeRecipes):
             Default is 4000 and 10000 for the lower and upper limits, resp.
         """
         # If list_pointings is None using the initially set up one
-        list_pointings = kwargs.pop("list_pointings", self.list_pointings)
-        list_pointings = self._check_pointings_list(list_pointings)
+        list_pointings = self._check_pointings_list(list_pointings,
+                                                    self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
@@ -813,7 +815,8 @@ class MusePointings(SofPipe, PipeRecipes):
                          ref_wcs=ref_wcs,
                          **kwargs)
 
-    def create_all_pointings_wcs(self, filter_list="white", **kwargs):
+    def create_all_pointings_wcs(self, filter_list="white",
+                                 list_pointings=None, **kwargs):
         """Create all pointing masks one by one
         as well as the wcs for each individual pointings. Using the grid
         from the global WCS of the mosaic but restricting it to the 
@@ -826,8 +829,8 @@ class MusePointings(SofPipe, PipeRecipes):
             List of filter names to be used. 
         """
         # If list_pointings is None using the initially set up one
-        list_pointings = kwargs.pop("list_pointings", self.list_pointings)
-        list_pointings = self._check_pointings_list(list_pointings)
+        list_pointings = self._check_pointings_list(list_pointings,
+                                                    self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
@@ -1020,6 +1023,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
     def run_combine(self, sof_filename='pointings_combine',
                     lambdaminmax=[4000., 10000.],
+                    list_pointings=None,
                     suffix="", **kwargs):
         """MUSE Exp_combine treatment of the reduced pixtables
         Will run the esorex muse_exp_combine routine
@@ -1061,8 +1065,8 @@ class MusePointings(SofPipe, PipeRecipes):
         self.goto_folder(self.paths.data, addtolog=True)
 
         # If list_pointings is None using the initially set up one
-        list_pointings = kwargs.pop("list_pointings", self.list_pointings)
-        list_pointings = self._check_pointings_list(list_pointings)
+        list_pointings = self._check_pointings_list(list_pointings,
+                                                    self.list_pointings)
 
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2

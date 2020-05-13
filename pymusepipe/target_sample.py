@@ -335,16 +335,16 @@ class MusePipeSample(object):
         if list_pointings is None:
             return target_pointings
         else:
-            checked_list_pointings = []
+            checked_pointings_list = []
             # Check they exist
             for pointing in list_pointings:
                 if pointing not in target_pointings:
                     upipe.print_warning("No pointing {} for the given "
                                         "target".format(pointing))
                 else:
-                    checked_list_pointings.append(pointing)
+                    checked_pointings_list.append(pointing)
                 return []
-            return checked_list_pointings
+            return checked_pointings_list
 
     def _check_targetname(self, targetname):
         """Check if targetname is in list
