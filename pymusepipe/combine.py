@@ -808,7 +808,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Making WCS Mask for "
-                             "pointing {0:02d}".format(pointing))
+                             "pointing {0:02d}".format(np.int(pointing)))
             _ = self.create_pointing_wcs(pointing=pointing,
                                          filter_list=filter_list, **kwargs)
 
