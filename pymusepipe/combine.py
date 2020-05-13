@@ -387,17 +387,16 @@ class MusePointings(SofPipe, PipeRecipes):
         Returns:
             list_pointings after decrypting
         """
+        if default_list is None:
+            default_list = self.full_pointings_list
         # Now the list of pointings
         if list_pointings is None:
             # This is using all the existing pointings
-            if default_list is None:
-                return self.full_pointings_list
-            else:
-                return default_list
+            return default_list
         else:
             checked_list_pointings = []
             for pointing in list_pointings:
-                if pointing not in self.list_pointings:
+                if pointing not in default_list:
                     upipe.print_warning("No pointing {} for the given "
                                         "target".format(pointing))
                 else:
