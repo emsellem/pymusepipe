@@ -487,3 +487,53 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
     # write output
     final_rot_image.write(joinpath(outwcs_folder, out_name))
     return outwcs_folder, out_name
+
+def filter_list_with_pdict(input_list, list_pointings=None,
+                                      dic_files_in_pointings=None):
+    """Filter out exposures (pixtab or cube namelist) using a dictionary which
+    has a list of pointings and for each pointing a list of exposure number.
+
+    Args:
+        input_list (list of str):  input list to filter
+        dic_files_in_pointings (dict):  dictionary used to filter
+
+    Returns:
+        selected_list: selected list of files
+
+    """
+    if dic_files_in_pointings is None:
+          selected_list = input_list
+
+    # Otherwise use the ones which are given via their expo numbers
+    else:
+        selected_list = []
+        # this is the list of exposures to consider
+
+        if list_pointings is None:
+            list_pointings = dic_files_in_pointings.keys()
+        elif not isinstance(list_pointings, list):
+            upipe.print_error("Cannot recognise input pointing(s)")
+            return selected_list
+
+        for pointing in list_pointings:
+            if pointing not in dic_files_in_pointings:
+                upipe.print_warning("Pointing {} not in dictionary "
+                                    "- skipping".format(pointing))
+            else:
+                list_expo = dic_files_in_pointings[pointing]
+                # We loop on that list
+                for expotuple in list_expo:
+                    tpl, nexpo = expotuple[0], expotuple[1]
+                    for expo in nexpo:
+                        # Check whether this exists in the our cube list
+                        suffix_expo = "_{0:04d}".format(np.int(expo))
+                        for filename in input_list:
+                            if (suffix_expo in filename) and (tpl in filename):
+                                # We select the file
+                                selected_list.append(filename)
+                                # And remove it from the list
+                                input_list.remove(filename)
+                                # We break out of the cube for loop
+                                break
+
+    return selected_list

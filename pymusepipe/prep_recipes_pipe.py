@@ -1125,7 +1125,7 @@ class PipePrep(SofPipe) :
                         offset_table_name=offset_table_name)
             else:
                 prefix_skycontinuum = ""
-            if skymethod != "none" :
+            if skymethod != "none":
                 self._add_calib_to_sofdict("SKY_LINES")
                 self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', 
                         "processed", suffix=suffix_skycontinuum, 

@@ -32,19 +32,20 @@ except ImportError:
 import warnings
 
 # Importing pymusepipe modules
-from pymusepipe.recipes_pipe import PipeRecipes
-from pymusepipe.create_sof import SofPipe
-from pymusepipe.init_musepipe import InitMuseParameters
-import pymusepipe.util_pipe as upipe
-from pymusepipe import musepipe, prep_recipes_pipe
-from pymusepipe.config_pipe import (default_filter_list, default_PHANGS_filter_list,
-                                    dic_combined_folders, default_prefix_wcs,
-                                    default_prefix_mask, prefix_mosaic, dic_listObject,
-                                    lambdaminmax_for_wcs, lambdaminmax_for_mosaic)
-from pymusepipe.mpdaf_pipe import MuseCube
+from .recipes_pipe import PipeRecipes
+from .create_sof import SofPipe
+from .init_musepipe import InitMuseParameters
+import .util_pipe as upipe
+from .util_pipe import filter_list_with_pdict
+from pymuseepipe import musepipe, prep_recipes_pipe
+from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
+                          dic_combined_folders, default_prefix_wcs,
+                          default_prefix_mask, prefix_mosaic, dic_listObject,
+                          lambdaminmax_for_wcs, lambdaminmax_for_mosaic)
+from .mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
-from pymusepipe.align_pipe import mjd_names, date_names
+from .align_pipe import mjd_names, date_names
 
 __version__ = '0.0.3 (4 Sep 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
@@ -469,55 +470,26 @@ class MusePointings(SofPipe, PipeRecipes):
                     orig_pixtab = fixed_pixtab.replace(prefix_to_consider,
                                                        pixtable_suffix)
                     if orig_pixtab in list_pixtabs:
-                        # If it exists, remove it
-                        list_pixtabs.remove(orig_pixtab)
-                        # and add the fixed one
-                        list_pixtabs.append(fixed_pixtab)
-                        upipe.print_warning("Fixed PixTable {0} was included in the list".format(
-                            fixed_pixtab))
-                        upipe.print_warning("and Pixtable {0} was thus removed from the list".format(
-                            orig_pixtab))
+                        # If it exists, replace it
+                        list_pixtabs[list_pixtabs.index(orig_pixtab)] = fixed_pixtab
+                        upipe.print_warning("Fixed PixTable {0} was included in "
+                                            "the list and Pixtable {1} was thus "
+                                            "removed from the list.".format(
+                                               fixed_pixtab, orig_pixtab))
                     else:
-                        upipe.print_warning("Original Pixtable {0} not found".format(
-                            orig_pixtab))
-                        upipe.print_warning("Hence will not include fixed PixTable in the list"
-                                            "{0}".format(fixed_pixtab))
+                        upipe.print_warning("Original Pixtable {0} not found."
+                                            "Hence will not include fixed "
+                                            "PixTable in the list {0}".format(
+                                               orig_pixtab, fixed_pixtab))
 
             full_list = copy.copy(list_pixtabs)
             full_list.sort()
             self.dic_allpixtabs_in_pointings[pointing] = full_list
 
-            # if no selection on exposure names are given
-            # Select all existing pixtabs
-            if self.dic_exposures_in_pointings is None:
-                select_list_pixtabs = list_pixtabs
-
-            # Otherwise use the ones which are given via their expo numbers
-            else:
-                select_list_pixtabs = []
-                # this is the list of exposures to consider
-                if pointing not in self.dic_exposures_in_pointings:
-                    upipe.print_warning("Pointing {} not in dictionary "
-                                        "- skipping".format(pointing))
-                else:
-                    list_expo = self.dic_exposures_in_pointings[pointing]
-                    # We loop on that list
-                    for expotuple in list_expo:
-                        tpl, nexpo = expotuple[0], expotuple[1]
-                        for expo in nexpo:
-                            # Check whether this exists in the our cube list
-                            suffix_expo = "_{0:04d}".format(np.int(expo))
-                            if self._debug:
-                                upipe.print_debug("Checking which exposures are tested")
-                                upipe.print_debug(suffix_expo)
-                            for pixtab in list_pixtabs:
-                                if (suffix_expo in pixtab) and (tpl in pixtab):
-                                    # We select the cube
-                                    select_list_pixtabs.append(pixtab)
-                                    # And remove it from the list
-                                    list_pixtabs.remove(pixtab)
-                                    # We break out of the cube for loop
-                                    break
+            # Filter the list with the pointing dictionary if given
+            select_list_pixtabs = filter_list_with_pdict(list_pixtabs,
+                                                         [pointing],
+                                                         self.dic_exposures_in_pointings)
 
             select_list_pixtabs.sort()
             self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs

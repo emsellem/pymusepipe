@@ -154,11 +154,11 @@ class MuseCubeMosaic(CubeMosaic):
         # get the list of cubes and return if 0 found
         list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                      self.prefix_cubes))
-        # Filter if dic_exposures_in_pointings is provided
-        if self.dic_exposures_in_pointings is not None:
-            list_cubes = 0
-        else:
-            list_cubes = list_existing_cubes
+
+        # Filter the list with the pointing dictionary if given
+        list_cubes = filter_list_with_pdict(list_existing_cubes,
+                                            list_pointings=None,
+                                            dic_files_in_pointings=self.dic_exposures_in_pointings)
 
         # Take (or not) the fixed Cubes
         if self.use_fixed_cubes:
