@@ -536,4 +536,6 @@ def filter_list_with_pdict(input_list, list_pointings=None,
                                 # We break out of the cube for loop
                                 break
 
+    upipe.print_info("Selected {0}/{1} files after dictionary filtering".format(
+                        len(selected_list), len(input_list)))
     return selected_list

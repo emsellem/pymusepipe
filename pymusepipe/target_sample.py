@@ -853,8 +853,10 @@ class MusePipeSample(object):
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         build_cube = kwargs.pop("build_cube", True)
         build_images = kwargs.pop("build_images", True)
+        dic_expo = kwargs.pop("dic_exposures_in_pointings", None)
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
-                         add_targetname=add_targetname, **kwargs)
+                         add_targetname=add_targetname,
+                         dic_exposures_in_pointings=dic_expo)
 
         # Doing the mosaic with mad
         suffix = kwargs.pop("suffix", "WCS_Pall_mad")

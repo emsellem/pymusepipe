@@ -156,7 +156,12 @@ class MuseCubeMosaic(CubeMosaic):
         list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                      self.prefix_cubes))
 
+        upipe.print_info("Found {} existing Cubes in this folder".format(
+                           len(list_existing_cubes)))
         # Filter the list with the pointing dictionary if given
+        if self.dic_exposures_in_pointings is not None:
+            upipe.print_info("Will be using a dictionary for "
+                             "selecting the appropriate cubes")
         list_cubes = filter_list_with_pdict(list_existing_cubes,
                                             list_pointings=None,
                                             dic_files_in_pointings=self.dic_exposures_in_pointings)
@@ -213,7 +218,7 @@ class MuseCubeMosaic(CubeMosaic):
                               " {}: please change suffix".format(
                                   self.prefix_cubes))
         else:
-            upipe.print_info("Found {} cubes in this folder".format(
+            upipe.print_info("Found {} cubes to be processed".format(
                                  self.ncubes))
 
     def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",
