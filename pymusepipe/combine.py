@@ -35,7 +35,7 @@ import warnings
 from .recipes_pipe import PipeRecipes
 from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
-import .util_pipe as upipe
+from pymusepipe import util_pipe as upipe
 from .util_pipe import filter_list_with_pdict
 from pymuseepipe import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
