@@ -38,6 +38,7 @@ from astropy import units as u
 import pymusepipe
 from pymusepipe import util_pipe as upipe
 from .config_pipe import default_wave_wcs, AO_mask_lambda, dic_extra_filters
+from .util_pipe import filter_list_with_pdict
 
 from .cube_convolve import cube_kernel, cube_convolve
 
