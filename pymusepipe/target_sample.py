@@ -835,7 +835,8 @@ class MusePipeSample(object):
                                                        folder_ref_wcs=folder_ref_wcs,
                                                        folder_cubes=folder_cubes,
                                                        prefix_cubes=prefix_cubes,
-                                                       list_suffix=list_pointing_names)
+                                                       list_suffix=list_pointing_names,
+                                                       **kwargs)
 
     def mosaic(self, targetname=None, list_pointings=None, **kwargs):
         """
