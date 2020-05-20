@@ -897,7 +897,8 @@ class MusePipeSample(object):
                 ima.write(joinpath(folder_cubes, ima_name))
 
     def init_combine(self, targetname=None, list_pointings=None,
-                     folder_offset_table=None, offset_table_name=None, **kwargs):
+                     folder_offset_table=None, offset_table_name=None,
+                     **kwargs):
         """Prepare the combination of targets
 
         Input
@@ -918,6 +919,12 @@ class MusePipeSample(object):
                                                  offset_table_name=offset_table_name,
                                                  folder_offset_table=folder_offset_table,
                                                  log_filename=log_filename, **kwargs)
+
+    def combine_targets_per_pointing(self, targetname=None, **kwargs):
+        """Run the combine recipe. Shortcut for combine[targetname].run_combine()
+        """
+        self.init_combine(targetname=targetname, **kwargs)
+        self.pipes_combine[targetname].run_combine_all_single_pointings(**kwargs)
 
     def combine_target(self, targetname=None, **kwargs):
         """Run the combine recipe. Shortcut for combine[targetname].run_combine()
