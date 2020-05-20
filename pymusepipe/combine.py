@@ -777,10 +777,9 @@ class MusePointings(SofPipe, PipeRecipes):
                                     "Hence will overwrite ref_wcs given input")
             prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
             self.add_targetname = kwargs.pop("add_targetname", True)
-            prefix_wcs = self._add_targetname(prefix_wcs)
-
-            ref_wcs = "{0}P{1:02d}.fits".format(prefix_wcs,
-                                                np.int(pointing))
+            prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
+            ref_wcs = "{0}DATACUBE_FINAL_P{1:02d}.fits".format(prefix_wcs,
+                                                               np.int(pointing))
 
         # Running the combine for that single pointing
         self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix,
