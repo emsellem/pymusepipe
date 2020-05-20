@@ -920,7 +920,7 @@ class MusePipeSample(object):
                                                  folder_offset_table=folder_offset_table,
                                                  log_filename=log_filename, **kwargs)
 
-    def combine_targets_per_pointing(self, targetname=None, **kwargs):
+    def combine_target_per_pointing(self, targetname=None, **kwargs):
         """Run the combine recipe. Shortcut for combine[targetname].run_combine()
         """
         self.init_combine(targetname=targetname, **kwargs)
