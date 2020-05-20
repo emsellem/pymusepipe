@@ -501,6 +501,7 @@ def filter_list_with_pdict(input_list, list_pointings=None,
         selected_list: selected list of files
 
     """
+    nfiles_input_list = len(input_list)
     if dic_files_in_pointings is None:
           selected_list = input_list
 
@@ -536,6 +537,8 @@ def filter_list_with_pdict(input_list, list_pointings=None,
                                 # We break out of the cube for loop
                                 break
 
-    upipe.print_info("Selected {0}/{1} files after dictionary filtering".format(
-                        len(selected_list), len(input_list)))
+    upipe.print_info("Pointings {0} - Selected {1}/{2} files after "
+                     "dictionary filtering".format(list_pointings,
+                                                   len(selected_list),
+                                                   nfiles_input_list))
     return selected_list
