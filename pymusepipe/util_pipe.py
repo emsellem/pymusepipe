@@ -489,7 +489,8 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
     return outwcs_folder, out_name
 
 def filter_list_with_pdict(input_list, list_pointings=None,
-                                      dic_files_in_pointings=None):
+                           dic_files_in_pointings=None,
+                           verbose=True):
     """Filter out exposures (pixtab or cube namelist) using a dictionary which
     has a list of pointings and for each pointing a list of exposure number.
 
@@ -537,8 +538,9 @@ def filter_list_with_pdict(input_list, list_pointings=None,
                                 # We break out of the cube for loop
                                 break
 
-    upipe.print_info("Pointings {0} - Selected {1}/{2} files after "
-                     "dictionary filtering".format(list_pointings,
-                                                   len(selected_list),
-                                                   nfiles_input_list))
+    if verbose:
+        upipe.print_info("Pointings {0} - Selected {1}/{2} files after "
+                         "dictionary filtering".format(list_pointings,
+                                                len(selected_list),
+                                                nfiles_input_list))
     return selected_list

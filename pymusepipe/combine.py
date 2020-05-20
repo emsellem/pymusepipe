@@ -424,8 +424,7 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             return name
 
-    def _get_pixtable_list(self, dic_exposures_in_pointings=None,
-                           folder_pixtables=None):
+    def _get_pixtable_list(self, dic_exposures_in_pointings=None):
         """Check if pointings and dictionary are compatible
         """
         # Dictionary of exposures to select per pointing
@@ -489,7 +488,8 @@ class MusePointings(SofPipe, PipeRecipes):
             # Filter the list with the pointing dictionary if given
             select_list_pixtabs = filter_list_with_pdict(list_pixtabs,
                                                          [pointing],
-                                                         self.dic_exposures_in_pointings)
+                                                         self.dic_exposures_in_pointings,
+                                                         verbose=self.verbose)
 
             select_list_pixtabs.sort()
             self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs
