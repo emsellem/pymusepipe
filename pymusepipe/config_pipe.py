@@ -31,7 +31,7 @@ default_short_PHANGS_filter_list = ("white,WFI_BB,DUPONT_R")
 #======================================================================#
 # For musepipe module
 
-dic_expotypes = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
+dict_expotypes = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
         'ILLUM': 'FLAT,LAMP,ILLUM', 'TWILIGHT': 'FLAT,SKY', 
         'WAVE': 'WAVE', 'STD': 'STD', 'AST': 'AST',
         'OBJECT': 'OBJECT', 'SKY': 'SKY',
@@ -39,12 +39,12 @@ dic_expotypes = {'DARK': 'DARK', 'BIAS' : 'BIAS', 'FLAT': 'FLAT,LAMP',
         'GEOMETRY': 'GEOMETRY'
         }
 
-dic_astrogeo = {'ASTROMETRY': 'Astrometric calibration (ASTROMETRY)',
+dict_astrogeo = {'ASTROMETRY': 'Astrometric calibration (ASTROMETRY)',
                 'GEOMETRY': 'WAVE,MASK'
                 }
 
 # This dictionary contains the types
-dic_listMaster = {'DARK': 'MASTER_DARK', 
+dict_listMaster = {'DARK': 'MASTER_DARK',
         'BIAS': 'MASTER_BIAS', 
         'FLAT': 'MASTER_FLAT',
         'TRACE': 'TRACE_TABLE',
@@ -54,13 +54,13 @@ dic_listMaster = {'DARK': 'MASTER_DARK',
         'STD': 'PIXTABLE_STD' 
         }
 
-dic_listObject = {'OBJECT': 'PIXTABLE_OBJECT', 
+dict_listObject = {'OBJECT': 'PIXTABLE_OBJECT',
         'SKY': 'PIXTABLE_SKY', 
         'STD': 'PIXTABLE_STD',
         'REDUCED': 'PIXTABLE_REDUCED'
         }
 
-dic_listMasterObject = {**dic_listMaster, **dic_listObject}
+dict_listMasterObject = {**dict_listMaster, **dict_listObject}
 
 listexpo_files = {
         "OBJECT" : ['object', 'OBJECT', str, '20A'],
@@ -93,7 +93,7 @@ suffix_rawfiles = ['fits.fz', 'fits']
 #======================================================================#
 # for init_musepipe module
 
-dic_user_folders = {
+dict_user_folders = {
         # values provide the folder and whether or not this should be attempted to create
             # Muse calibration files (common to all)
             "musecalib": "/home/mcelroy/reflex/install/calib/muse-2.2/cal/'",
@@ -112,7 +112,7 @@ PHANGS_reduc_config = {'fakemode':False, 'nocache':False, 'checkmode':False,
 PHANGS_combine_config = {'fakemode':False, 'nocache':False}
 
 # Extra filters which may be used in the course of the reduction
-dic_extra_filters = {
+dict_extra_filters = {
         # Narrow band filter 
         "WFI_BB": "data/Filters/LaSilla_WFI_ESO844p.txt",
         # Broad band filter
@@ -123,7 +123,7 @@ dic_extra_filters = {
 
 # Default hard-coded fits files - Calibration Tables
 # These are also overwritten by the given calib input file (if provided)
-dic_calib_tables = {
+dict_calib_tables = {
             # Muse geometric file
             "geo_table": "geometry_table_wfm.fits",
             # Astrometry
@@ -147,7 +147,7 @@ dic_calib_tables = {
 # Default structure folders
 # If already existing, won't be created
 # If not, will be created automatically
-dic_input_folders = {
+dict_input_folders = {
             # Raw Data files
             "rawfiles" : "Raw/",
             # Config files
@@ -165,7 +165,7 @@ dic_input_folders = {
 # Values provide the folder names for the file structure
 # If already existing, won't be created
 # If not, will be created automatically
-dic_folders = {
+dict_folders = {
             # Master Calibration files
             "master" : "Master/",
             # Object files
@@ -185,11 +185,11 @@ dic_folders = {
 # This dictionary includes extra folders for certain specific task
 # e.g., alignment - associated with the target
 # Will be created automatically if not already existing
-dic_folders_target = {
+dict_folders_target = {
         "alignment" : "Alignment/",
         }
 
-dic_combined_folders = {
+dict_combined_folders = {
         # Sof files
         "sof": "Sof/",
         # Combined products
@@ -211,7 +211,7 @@ dic_combined_folders = {
 #======================================================================#
 # For musepipe module
 
-dic_geo_astrowcs_table = {
+dict_geo_astrowcs_table = {
     'comm1' :   ['2014-02-09', '2014-02-09'], # mean date
     'comm2a':   ['2014-04-27', '2014-05-06'],
     'comm2b':   ['2014-07-24', '2014-08-03'],
@@ -282,7 +282,7 @@ default_offset_table = {'date': [date_names['table'], 'S23', ""],
 
 #--- Some useful functions using the input configuration --------------#
 def get_suffix_product(expotype):
-    return dic_listMasterObject[expotype]
+    return dict_listMasterObject[expotype]
 
 default_prefix_wcs = "refwcs_"
 prefix_mosaic = "full"
@@ -296,7 +296,7 @@ lambdaminmax_for_mosaic = [4700, 9400]
 
 #===========================================
 # Recipes for data reduction
-dic_recipes_per_num = {1:'bias', 2:'flat', 3:'wave', 
+dict_recipes_per_num = {1:'bias', 2:'flat', 3:'wave',
                4: 'lsf', 5:'twilight', 
                6:'scibasic_all', 7:'standard',
                8:'sky', 9:'prep_align', 10:'align_bypointing', 
@@ -304,6 +304,6 @@ dic_recipes_per_num = {1:'bias', 2:'flat', 3:'wave',
                13:'scipost_sky', 14:'combine_pointing'}
 
 # and creating the inverse dictionary
-dic_recipes_per_name = {}
-for key in dic_recipes_per_num:
-    dic_recipes_per_name[dic_recipes_per_num[key]] = key
+dict_recipes_per_name = {}
+for key in dict_recipes_per_num:
+    dict_recipes_per_name[dict_recipes_per_num[key]] = key

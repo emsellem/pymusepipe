@@ -30,7 +30,7 @@ from scipy.signal import correlate
 from scipy.odr import ODR, Model, RealData
 
 # Astropy
-import astropy.wcs as awcs
+from astropy import wcs as awcs
 from astropy.io import fits as pyfits
 from astropy.modeling import models, fitting
 from astropy.stats import mad_std
@@ -41,16 +41,18 @@ from astropy.convolution import Gaussian2DKernel, convolve
 # Import mpdaf
 from mpdaf.obj import Image, WCS
 
+
 def is_sequence(arg):
     return (not hasattr(arg, "strip") and
             hasattr(arg, "__getitem__") or
             hasattr(arg, "__iter__"))
 
+
 # Import needed modules from pymusepipe
-import pymusepipe.util_pipe as upipe
-from pymusepipe.config_pipe import mjd_names, date_names, tpl_names
-from pymusepipe.config_pipe import pointing_names, iexpo_names
-from pymusepipe.config_pipe import default_offset_table, dic_listObject
+from . import util_pipe as upipe
+from .config_pipe import mjd_names, date_names, tpl_names
+from .config_pipe import pointing_names, iexpo_names
+from .config_pipe import default_offset_table, dict_listObject
 
 # ================== Default units ======================== #
 # Define useful units
@@ -75,7 +77,7 @@ def create_offset_table(image_names=[], table_folder="",
         overwrite (bool): if the table exists, it will be overwritten if set
             to True only. [False]
 
-    Returns:
+    Creates:
         A fits table with the output given name.
     """
 
@@ -124,6 +126,7 @@ def create_offset_table(image_names=[], table_folder="",
     # Write the table
     offset_table.write(table_fullname, overwrite=overwrite)
 
+
 def open_new_wcs_figure(nfig, mywcs=None):
     """Open a new figure (with number nfig) with given wcs.
     If not WCS is provided, just opens a subplot in that figure.
@@ -146,6 +149,7 @@ def open_new_wcs_figure(nfig, mywcs=None):
         return fig, fig.add_subplot(1, 1, 1)
     else:
         return fig, fig.add_subplot(1, 1, 1, projection=mywcs)
+
 
 def chunk_stats(list_data, chunk_size=15):
     """Cut the datasets in 2d chunks and take the median
@@ -190,6 +194,7 @@ def chunk_stats(list_data, chunk_size=15):
     std_data = np.nan_to_num(std_data)
     return med_data, std_data
 
+
 def my_linear_model(B, x):
     """Linear function for the regression.
      
@@ -202,6 +207,7 @@ def my_linear_model(B, x):
         An array = B[1] * (x + B[0])
     """
     return B[1] * (x + B[0])
+
 
 def get_image_norm_poly(data1, data2, chunk_size=15, 
         threshold1=0., threshold2=0):
@@ -219,9 +225,8 @@ def get_image_norm_poly(data1, data2, chunk_size=15,
         threshold2 (float): 2 floats defining the lower threshold for filtering
     
     Returns
-    -------
-    result: python structure
-        Result of the regression (ODR)
+        result: python structure
+                Result of the regression (ODR)
     """
     # proceeds by splitting the data arrays in chunks of chunk_size
     med, std = chunk_stats([data1, data2], chunk_size=chunk_size)
@@ -240,21 +245,20 @@ def get_image_norm_poly(data1, data2, chunk_size=15,
     result.selection = pos
     return result
 
+
 def regress_odr(x, y, sx, sy, beta0=[0., 1.]):
     """Return an ODR linear regression using scipy.odr.ODR
-     
-    Input
-    -----
-    x, y: arrays
-        Input nD arrays with signal
-    sx, sy: arrays
-        Input nD arrays (as x,y) with standard deviations
-    beta0: list of 2 floats
-        Initial guess for the constant and slope
-    
-    Returns
-    -------
-    result: result of the ODR analysis
+
+    Args:
+        x (np.array): Input nD arrays with signal
+        y (np.array):
+        sx (np.array): Input nD arrays (as x,y) with standard deviations
+        sy (np.array):
+        beta0 (list of 2 floats): Initial guess for the constant and slope
+
+    Returns:
+        result: result of the ODR analysis
+
     """
     linear = Model(my_linear_model)
     mydata = RealData(x.ravel(), y.ravel(), sx=sx.ravel(), sy=sy.ravel())
@@ -372,6 +376,7 @@ def pixel_to_arcsec(hdu, xy_pixel=[0.,0.]):
     yarc = np.sum(dels * input_wcs.pixel_scale_matrix[1, :] * 3600.)
     return xarc, yarc
 
+
 def crop_data(data, border=10):
     """Crop a 2D data and return it cropped after a border
     has been removed (number of pixels) from each edge
@@ -404,6 +409,7 @@ def crop_data(data, border=10):
              " while border is {1}".format(data.shape, border))
         return data
 
+
 def filtermed_image(data, border=10, filter_size=2):
     """Process image by removing the borders
     and filtering it via a median filter
@@ -428,6 +434,7 @@ def filtermed_image(data, border=10, filter_size=2):
     meddata = nd.filters.median_filter(data, filter_size)
 
     return meddata
+
 
 def prepare_image(data, border=10, dynamic_range=10, 
                   median_window=10, minflux=0.0):
@@ -466,7 +473,7 @@ def prepare_image(data, border=10, dynamic_range=10,
 
     return cdata
 
-## ====== ROTATION OF PIXTABLES ===== ##
+
 def rotate_pixtables(folder="", name_suffix="", list_ifu=None,
                      angle=0., **kwargs):
     """Will update the derotator angle in each of the 24 pixtables
@@ -493,6 +500,7 @@ def rotate_pixtables(folder="", name_suffix="", list_ifu=None,
         rotate_pixtable(folder=folder, name_suffix=name_suffix, nifu=nifu,
                         angle=angle, **kwargs)
 
+
 def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     """Rotate a single IFU PIXTABLE_OBJECT
     Will thus update the HIERARCH ESO INS DROT POSANG keyword.
@@ -512,10 +520,10 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     angle_orig_keyword = "{0} ORIG".format(angle_keyword)
 
     pixtable_basename = kwargs.pop("pixtable_basename",
-                                   dic_listObject['OBJECT'])
+                                   dict_listObject['OBJECT'])
     prefix = kwargs.pop("prefix", "")
     name_pixtable = "{0}{1}_{2}-{3:02d}.fits".format(prefix, pixtable_basename,
-                                                  name_suffix, np.int(nifu))
+                                                     name_suffix, np.int(nifu))
     fullname_pixtable = joinpath(folder, name_pixtable)
     fakemode = kwargs.pop("fakemode", False)
 

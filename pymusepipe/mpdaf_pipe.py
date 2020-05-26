@@ -37,7 +37,7 @@ from astropy import units as u
 
 import pymusepipe
 from pymusepipe import util_pipe as upipe
-from .config_pipe import default_wave_wcs, AO_mask_lambda, dic_extra_filters
+from .config_pipe import default_wave_wcs, AO_mask_lambda, dict_extra_filters
 from .util_pipe import filter_list_with_pdict
 
 from .cube_convolve import cube_kernel, cube_convolve
@@ -99,7 +99,7 @@ class MuseCubeMosaic(CubeMosaic):
                  prefix_cubes="DATACUBE_FINAL_WCS",
                  list_suffix=[], use_fixed_cubes=True,
                  prefix_fixed_cubes="tmask", verbose=False,
-                 dic_exposures_in_pointings=None):
+                 dict_exposures=None):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
@@ -113,7 +113,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.list_suffix = list_suffix
         self.prefix_fixed_cubes = prefix_fixed_cubes
         self.use_fixed_cubes = use_fixed_cubes
-        self.dic_exposures_in_pointings = dic_exposures_in_pointings
+        self.dict_exposures = dict_exposures
 
         # Building the list of cubes
         self.build_list()
@@ -159,12 +159,12 @@ class MuseCubeMosaic(CubeMosaic):
         upipe.print_info("Found {} existing Cubes in this folder".format(
                            len(list_existing_cubes)))
         # Filter the list with the pointing dictionary if given
-        if self.dic_exposures_in_pointings is not None:
+        if self.dict_exposures is not None:
             upipe.print_info("Will be using a dictionary for "
                              "selecting the appropriate cubes")
         list_cubes = filter_list_with_pdict(list_existing_cubes,
                                             list_pointings=None,
-                                            dic_files_in_pointings=self.dic_exposures_in_pointings)
+                                            dict_files=self.dict_exposures)
 
         # Take (or not) the fixed Cubes
         if self.use_fixed_cubes:
@@ -593,7 +593,7 @@ class MuseCube(Cube):
                 title="{0} map".format(line))
 
     def get_filter_image(self, filter_name=None, own_filter_file=None, filter_folder="",
-            dic_filters=None):
+            dict_filters=None):
         """Get an image given by a filter. If the filter belongs to
         the filter list, then use that, otherwise use the given file
         """
@@ -614,15 +614,15 @@ class MuseCube(Cube):
             upipe.print_info("Reading private reference filter {0}".format(filter_name))
 
             # First we check the extra dictionary if provided
-            if dic_filters is not None:
-                if filter_name in dic_filters:
-                    filter_file = dic_filters[filter_name]
+            if dict_filters is not None:
+                if filter_name in dict_filters:
+                    filter_file = dict_filters[filter_name]
             # then we check the package internal filter list
-            elif filter_name in dic_extra_filters:
+            elif filter_name in dict_extra_filters:
                 upipe.print_info("Found filter in pymusepipe internal dictionary "
                                  "(see data/Filters)")
                 filter_folder = pymusepipe.__path__[0]
-                filter_file = dic_extra_filters[filter_name]
+                filter_file = dict_extra_filters[filter_name]
             else:
                 upipe.print_warning("[mpdaf_pipe / get_filter_image] "
                                   "Filter name not in private dictionary - Aborting")

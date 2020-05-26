@@ -66,9 +66,9 @@ from pymusepipe.prep_recipes_pipe import PipePrep
 import pymusepipe.util_pipe as upipe
 from pymusepipe.config_pipe import (
     suffix_rawfiles, suffix_prealign, suffix_checkalign,
-    listexpo_files, dic_listObject, dic_listMaster, dic_listMasterObject,
-    dic_expotypes, dic_geo_astrowcs_table, exclude_list_checkmode,
-    dic_astrogeo, )
+    listexpo_files, dict_listObject, dict_listMaster, dict_listMasterObject,
+    dict_expotypes, dict_geo_astrowcs_table, exclude_list_checkmode,
+    dict_astrogeo, )
 
 __version__ = '2.0.2 (25/09/2019)'
 
@@ -255,31 +255,31 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # ==============================================
         # Creating the extra pipeline folder structure
-        for folder in self.pipe_params._dic_input_folders:
-            upipe.safely_create_folder(self.pipe_params._dic_input_folders[folder], verbose=verbose)
+        for folder in self.pipe_params._dict_input_folders:
+            upipe.safely_create_folder(self.pipe_params._dict_input_folders[folder], verbose=verbose)
 
         # ==============================================
         # Creating the folder structure itself if needed
-        for folder in self.pipe_params._dic_folders:
-            upipe.safely_create_folder(self.pipe_params._dic_folders[folder], verbose=verbose)
+        for folder in self.pipe_params._dict_folders:
+            upipe.safely_create_folder(self.pipe_params._dict_folders[folder], verbose=verbose)
 
         # ==============================================
         # Init the Master exposure flag dictionary
         self.Master = {}
-        for mastertype in dic_listMaster:
+        for mastertype in dict_listMaster:
             upipe.safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=verbose)
             self.Master[mastertype] = False
 
         # Init the Object folder
-        for objecttype in dic_listObject:
+        for objecttype in dict_listObject:
             upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=verbose)
 
-        self._dic_listMasterObject = dic_listMasterObject
+        self._dict_listMasterObject = dict_listMasterObject
 
         # ==============================================
         # Creating the folders in the TARGET root folder 
         # e.g, for the alignment images
-        for name in self.pipe_params._dic_folders_target:
+        for name in self.pipe_params._dict_folders_target:
             upipe.safely_create_folder(getattr(self.paths, name), verbose=verbose)
 
         # ==============================================
@@ -302,13 +302,13 @@ class MusePipe(PipePrep, PipeRecipes):
         """Initialise the dictionary for the geo and astrometry files
         Transforms the dates into datetimes
         """
-        self._dic_geoastro = {}
-        for name in dic_geo_astrowcs_table:
-            startd = dt.strptime(dic_geo_astrowcs_table[name][0],
+        self._dict_geoastro = {}
+        for name in dict_geo_astrowcs_table:
+            startd = dt.strptime(dict_geo_astrowcs_table[name][0],
                                  "%Y-%m-%d").date()
-            endd = dt.strptime(dic_geo_astrowcs_table[name][1],
+            endd = dt.strptime(dict_geo_astrowcs_table[name][1],
                                "%Y-%m-%d").date()
-            self._dic_geoastro[name] = [startd, endd]
+            self._dict_geoastro[name] = [startd, endd]
 
     def retrieve_geoastro_name(self, date_str, filetype='geo', mode='wfm'):
         """Retrieving the astrometry or geometry fits file name
@@ -322,9 +322,9 @@ class MusePipe(PipePrep, PipeRecipes):
         mode: str
             'wfm' or 'nfm' - MUSE mode
         """
-        dic_pre = {'geo': 'geometry_table',
+        dict_pre = {'geo': 'geometry_table',
                    'astro': 'astrometry_wcs'}
-        if filetype not in dic_pre:
+        if filetype not in dict_pre:
             upipe.print_error("Could not decipher the filetype option "
                               "in retrieve_geoastro")
             return None
@@ -332,13 +332,13 @@ class MusePipe(PipePrep, PipeRecipes):
         # Transform into a datetime date
         date_dt = dt.strptime(date_str, "%Y-%m-%dT%H:%M:%S").date()
         # get all the distance to the dates (start+end together)
-        near = {min(abs(date_dt - self._dic_geoastro[name][0]),
-                    abs(date_dt - self._dic_geoastro[name][1])):
-                    name for name in self._dic_geoastro}
+        near = {min(abs(date_dt - self._dict_geoastro[name][0]),
+                    abs(date_dt - self._dict_geoastro[name][1])):
+                    name for name in self._dict_geoastro}
         # Find the minimum distance and get the name
         ga_suffix = near[min(near.keys())]
         # Build the name with the prefix, suffix and mode
-        ga_name = "{0}_{1}_{2}.fits".format(dic_pre[filetype],
+        ga_name = "{0}_{1}_{2}.fits".format(dict_pre[filetype],
                                             mode, ga_suffix)
         return ga_name
 
@@ -397,27 +397,27 @@ class MusePipe(PipePrep, PipeRecipes):
         self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
         self.paths.target = joinpath(self.paths.root, self.targetname)
 
-        for name in list(self.pipe_params._dic_folders.keys()) \
-                    + list(self.pipe_params._dic_input_folders.keys()):
+        for name in list(self.pipe_params._dict_folders.keys()) \
+                    + list(self.pipe_params._dict_input_folders.keys()):
             setattr(self.paths, name, joinpath(self.paths.data,
                                                getattr(self.pipe_params, name)))
 
         # Creating the filenames for Master files
         self.paths.Master = PipeObject("All Paths for Master files "
                                        "useful for the pipeline")
-        for expotype in dic_listMaster:
+        for expotype in dict_listMaster:
             # Adding the path of the folder
             setattr(self.paths.Master, self._get_attr_expo(expotype),
                     joinpath(self.paths.data, self._get_path_expo(expotype,
                                                                   "master")))
 
-            self._dic_paths = {"master": self.paths.Master, "processed": self.paths}
+            self._dict_paths = {"master": self.paths.Master, "processed": self.paths}
 
         # Creating the attributes for the folders needed in the TARGET
         # root folder, e.g., for alignments
-        for name in self.pipe_params._dic_folders_target:
+        for name in self.pipe_params._dict_folders_target:
             setattr(self.paths, name, joinpath(self.paths.target,
-                                               self.pipe_params._dic_folders_target[name]))
+                                               self.pipe_params._dict_folders_target[name]))
 
     def _reset_tables(self):
         """Reseting the astropy Tables for expotypes
@@ -429,12 +429,12 @@ class MusePipe(PipePrep, PipeRecipes):
         self.Tables.Master = PipeObject("Astropy Tables for each mastertype")
         self.Tables.Processed = PipeObject("Astropy Tables for each processed type")
         self.Tables.Reduced = PipeObject("Astropy Tables for each reduced type")
-        self._dic_tables = {"raw": self.Tables.Raw, "master": self.Tables.Master,
+        self._dict_tables = {"raw": self.Tables.Raw, "master": self.Tables.Master,
                             "processed": self.Tables.Processed, "reduced": self.Tables.Reduced}
-        self._dic_suffix_astro = {"raw": "RAW", "master": "MASTER",
+        self._dict_suffix_astro = {"raw": "RAW", "master": "MASTER",
                                   "processed": "PRO", "reduced": "RED"}
 
-        for expotype in dic_expotypes:
+        for expotype in dict_expotypes:
             setattr(self.Tables.Raw, self._get_attr_expo(expotype), [])
 
     def read_all_astro_tables(self, reset=False):
@@ -443,12 +443,12 @@ class MusePipe(PipePrep, PipeRecipes):
         if reset or not hasattr(self, "Tables"):
             self._reset_tables()
 
-        for mastertype in dic_listMaster:
-            setattr(self._dic_tables["master"], self._get_attr_expo(mastertype),
+        for mastertype in dict_listMaster:
+            setattr(self._dict_tables["master"], self._get_attr_expo(mastertype),
                     self.read_astropy_table(mastertype, stage="master"))
 
-        for expotype in dic_listObject:
-            setattr(self._dic_tables["processed"], self._get_attr_expo(expotype),
+        for expotype in dict_listObject:
+            setattr(self._dict_tables["processed"], self._get_attr_expo(expotype),
                     self.read_astropy_table(expotype, stage="processed"))
 
     def read_astropy_table(self, expotype=None, stage="master"):
@@ -532,7 +532,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                 new_infodic[k] = func(header[keyword])
                             elif k == 'TYPE':
                                 # Find the key which is right
-                                astrogeo_keys = [tk for tk, tv in dic_astrogeo.items() if tv == header['OBJECT']]
+                                astrogeo_keys = [tk for tk, tv in dict_astrogeo.items() if tv == header['OBJECT']]
                                 # Nothing found?
                                 if len(astrogeo_keys) == 0:
                                     good_file = False
@@ -635,7 +635,7 @@ class MusePipe(PipePrep, PipeRecipes):
                 return
 
         table_to_save.write(full_tablename, format="fits", overwrite=True)
-        setattr(self._dic_tables[stage], attr_expo, table_to_save)
+        setattr(self._dict_tables[stage], attr_expo, table_to_save)
 
     def sort_raw_tables(self, checkmode=None, strong_checkmode=None):
         """Provide lists of exposures with types defined in the dictionary
@@ -651,9 +651,9 @@ class MusePipe(PipePrep, PipeRecipes):
             return
 
         # Sorting alphabetically (thus by date)
-        for expotype in dic_expotypes:
+        for expotype in dict_expotypes:
             try:
-                mask = (self.Tables.Rawfiles['type'] == dic_expotypes[expotype])
+                mask = (self.Tables.Rawfiles['type'] == dict_expotypes[expotype])
                 if self.checkmode:
                     maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
                     if (expotype.upper() not in exclude_list_checkmode) or self.strong_checkmode:
@@ -670,13 +670,13 @@ class MusePipe(PipePrep, PipeRecipes):
         """Get the name of the fits table covering
         a certain expotype
         """
-        fitstablename = "{0}_{1}_{2}list_table.fits".format(self._dic_suffix_astro[stage],
+        fitstablename = "{0}_{1}_{2}list_table.fits".format(self._dict_suffix_astro[stage],
                                                             expotype.lower(), suffix)
         return joinpath(self.paths.astro_tables, fitstablename)
 
     def _get_table_expo(self, expotype, stage="master"):
         try:
-            return getattr(self._dic_tables[stage], self._get_attr_expo(expotype))
+            return getattr(self._dict_tables[stage], self._get_attr_expo(expotype))
         except AttributeError:
             upipe.print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
             return Table()
@@ -737,10 +737,10 @@ class MusePipe(PipePrep, PipeRecipes):
         return masterfolder
 
     def _get_fullpath_expo(self, expotype, stage="master"):
-        if stage not in self._dic_paths:
+        if stage not in self._dict_paths:
             upipe.print_error("[_get_fullpath_expo] stage {} not "
-                              "in dic_paths dict".format(stage))
-        return upipe.abspath(getattr(self._dic_paths[stage], self._get_attr_expo(expotype)))
+                              "in dict_paths dict".format(stage))
+        return upipe.abspath(getattr(self._dict_paths[stage], self._get_attr_expo(expotype)))
 
     def _get_path_files(self, expotype):
         return upipe.abspath(getattr(self.paths, expotype.lower()))

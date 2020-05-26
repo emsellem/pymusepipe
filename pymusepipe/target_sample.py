@@ -18,14 +18,16 @@ from pymusepipe import util_pipe as upipe
 from .musepipe import MusePipe
 from .config_pipe import (PHANGS_reduc_config,
                           default_short_PHANGS_filter_list,
+                          default_PHANGS_filter_list,
                           default_short_filter_list,
-                          default_PHANGS_filter_list, default_filter_list,
-                          default_prefix_wcs, default_prefix_wcs_mosaic)
+                          default_filter_list,
+                          default_prefix_wcs,
+                          default_prefix_wcs_mosaic)
 from .init_musepipe import InitMuseParameters
 from .combine import MusePointings
 from .align_pipe import rotate_pixtables
 from .mpdaf_pipe import MuseCubeMosaic, MuseCube
-from .prep_recipes_pipe import dic_products_scipost
+from .prep_recipes_pipe import dict_products_scipost
 from .version import __version__ as version_pack
 
 from astropy.table import Table
@@ -33,7 +35,7 @@ from astropy.table import Table
 # ----------------- Galaxies and Pointings ----------------#
 # Sample of galaxies
 # For each galaxy, we provide the pointings numbers and the run attached to that pointing
-dic_SAMPLE_example = {
+dict_SAMPLE_example = {
         "NGC628": ['P100', {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0}],
         "NGC1087": ['P101', {1:1}], 
         }
@@ -173,7 +175,7 @@ class MusePipeSample(object):
                 - The second one is the list of pointings, itself a dictionary
                   with a 0 or 1 for each pointing number depending on whether
                   this should be included in the reduction or not.
-                  Results can be seen in self.dic_targets dictionary.
+                  Results can be seen in self.dict_targets dictionary.
         rc_filename: str
             Default to None
         cal_filename: str
@@ -201,6 +203,17 @@ class MusePipeSample(object):
 
         # Initialisation of rc and cal files
         self._init_calib_files()
+        # Setting the filters
+        if self.__phangs:
+            self._short_filter_list = kwargs.pop("short_filter_list",
+                                                 default_short_PHANGS_filter_list)
+            self._filter_list = kwargs.pop("filter_list",
+                                           default_PHANGS_filter_list)
+        else:
+            self._short_filter_list = kwargs.pop("short_filter_list",
+                                                 default_short_filter_list)
+            self._filter_list = kwargs.pop("filter_list",
+                                           default_filter_list)
 
         # Initialisation of targets
         self.init_pipes = kwargs.pop("init_pipes", True)
@@ -221,6 +234,7 @@ class MusePipeSample(object):
         self.root_path = init_cal_params.root
         self._subfolders = np.unique([self.sample[targetname][0]
                                 for targetname in self.targetnames])
+
         for subfolder in self._subfolders:
             update_calib_file(rc_filename, subfolder, folder_config=folder_config)
             update_calib_file(cal_filename, subfolder, folder_config=folder_config)
@@ -531,9 +545,11 @@ class MusePipeSample(object):
         self.reduce_target(targetname=targetname, list_pointings=list_pointings, 
                 first_recipe="align_bypointing", **kwargs)
 
-    def finalise_reduction(self, targetname=None, rot_pixtab=True, create_wcs=True,
+    def finalise_reduction(self, targetname=None, rot_pixtab=False, create_wcs=True,
                            create_expocubes=True, offset_table_name=None,
-                           folder_offset_table=None, **kwargs):
+                           folder_offset_table=None,
+                           dict_exposures=None,
+                           **kwargs):
         """Finalise the reduction steps by using the offset table, rotating the
         pixeltables, then reconstructing the PIXTABLE_REDUCED, produce reference
         WCS for each pointing, and then run the reconstruction of the final
@@ -565,13 +581,15 @@ class MusePipeSample(object):
                                             folder_offset_table=folder_offset_table,
                                             offset_table_name=offset_table_name,
                                             save="individual",
-                                            wcs_auto=False, norm_skycontinuum=True)
+                                            wcs_auto=False,
+                                            norm_skycontinuum=True,
+                                            dict_exposures=dict_exposures)
 
         if create_wcs:
             # Creating the WCS reference frames. Full mosaic and individual
             # Pointings.
             upipe.print_info("=========== CREATION OF WCS MASKS ==============")
-            dic_exposures_in_pointings = kwargs.pop("dic_exposures_in_pointings", None)
+            dict_exposures = kwargs.pop("dict_exposures", None)
             mosaic_wcs = kwargs.pop("mosaic_wcs", True)
             reference_cube = kwargs.pop("reference_cube", True)
             pointings_wcs = kwargs.pop("pointings_wcs", True)
@@ -579,7 +597,7 @@ class MusePipeSample(object):
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
                                       offset_table_name=offset_table_name,
-                                      dic_exposures_in_pointings=dic_exposures_in_pointings,
+                                      dict_exposures=dict_exposures,
                                       reference_cube=reference_cube,
                                       mosaic_wcs=mosaic_wcs,
                                       pointings_wcs=pointings_wcs,
@@ -594,7 +612,18 @@ class MusePipeSample(object):
                                             offset_table_name=offset_table_name,
                                             save="cube",
                                             norm_skycontinuum=True,
-                                            wcs_auto=True, **kwargs)
+                                            wcs_auto=True,
+                                            dict_exposures=dict_exposures,
+                                            **kwargs)
+
+        if create_pointingcubes:
+            # Running the pointing cubes now with the same WCS reference
+            upipe.print_info("========= CREATION OF POINTING CUBES ===========")
+            self.combine_target_per_pointing(targetname=targetname,
+                                             offset_table_name=final_offset_table,
+                                             folder_offset_table=folder_offset_table,
+                                             dict_exposures=dict_exposures,
+                                             filter_list=self._short_filter_list)
 
     def run_target_scipost_perexpo(self, targetname=None, list_pointings=None,
                                    folder_offset_table=None, offset_table_name=None,
@@ -617,7 +646,7 @@ class MusePipeSample(object):
         # WCS imposed by setting the reference
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         prefix_all = kwargs.pop("prefix_all", "")
-        cube_suffix = dic_products_scipost['cube'][0]
+        cube_suffix = dict_products_scipost['cube'][0]
         if add_targetname:
             prefix_all = "{0}_{1}".format(targetname, prefix_all)
             cube_suffix = "{0}_{1}".format(targetname, cube_suffix)
@@ -633,10 +662,7 @@ class MusePipeSample(object):
         default_comb_folder = self.targets[targetname].combcubes_path
         # Now fetch the value set by the user
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
-        if self.__phangs:
-            filter_list = kwargs.pop("filter_list", default_short_PHANGS_filter_list)
-        else:
-            filter_list = kwargs.pop("filter_list", default_short_filter_list)
+        filter_list = kwargs.pop("filter_list", self._short_filter_list)
 
         # Running the scipost_perexpo for all pointings individually
         for pointing in list_pointings:
@@ -853,10 +879,10 @@ class MusePipeSample(object):
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         build_cube = kwargs.pop("build_cube", True)
         build_images = kwargs.pop("build_images", True)
-        dic_expo = kwargs.pop("dic_exposures_in_pointings", None)
+        dict_expo = kwargs.pop("dict_exposures", None)
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
                          add_targetname=add_targetname,
-                         dic_exposures_in_pointings=dic_expo)
+                         dict_exposures=dict_expo)
 
         # Doing the mosaic with mad
         suffix = kwargs.pop("suffix", "WCS_Pall_mad")
@@ -875,12 +901,8 @@ class MusePipeSample(object):
 
         if build_images:
             # Constructing the images for that mosaic
-            if self.__phangs:
-                filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
-            else:
-                filter_list = kwargs.pop("filter_list", default_filter_list)
-
-            filter_list = filter_list.split(',')
+            filter_list = (kwargs.pop("filter_list",
+                                      self._filter_list)).split(',')
 
             mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
             if not os.path.isfile(mosaic_name):

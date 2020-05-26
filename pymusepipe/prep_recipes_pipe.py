@@ -24,7 +24,7 @@ from pymusepipe.align_pipe import create_offset_table
 from pymusepipe import musepipe
 from pymusepipe.mpdaf_pipe import MuseSkyContinuum,MuseFilter
 from pymusepipe.config_pipe import mjd_names,get_suffix_product
-from pymusepipe.config_pipe import dic_recipes_per_num, dic_recipes_per_name
+from pymusepipe.config_pipe import dict_recipes_per_num, dict_recipes_per_name
 
 try :
     import astropy as apy
@@ -38,11 +38,11 @@ except ImportError :
 list_recipes = ['bias', 'flat', 'wave', 'lsf', 
         'twilight', 'scibasic_all', 'std', 'sky']
         
-dic_files_iexpo_products = {
+dict_files_iexpo_products = {
         'ALIGN': ['SOURCE_LIST']
         }
 
-dic_files_products = {
+dict_files_products = {
         'STD': ['DATACUBE_STD', 'STD_FLUXES', 
             'STD_RESPONSE', 'STD_TELLURIC'],
         'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
@@ -51,7 +51,7 @@ dic_files_products = {
         'ALIGN': ['OFFSET_LIST']
         }
 
-dic_products_scipost = {
+dict_products_scipost = {
         'cube': ['DATACUBE_FINAL', 'IMAGE_FOV'],
         'individual': ['PIXTABLE_REDUCED'],
         'stacked': ['OBJECT_RESAMPLED'],
@@ -102,7 +102,7 @@ def _get_combine_products(filter_list='white', prefix_all=""):
     suffix_products = []
     suffix_prefinalnames = []
     prefix_products = []
-    for prod in dic_products_scipost['cube']:
+    for prod in dict_products_scipost['cube']:
         if prod == "IMAGE_FOV":
             for i, value in enumerate(filter_list.split(','), start=1):
                 suffix_products.append("_{0:04d}".format(i))
@@ -131,7 +131,7 @@ class PipePrep(SofPipe) :
         self.list_recipes = deepcopy(list_recipes)
         self.first_recipe = first_recipe
         if last_recipe is None:
-            self.last_recipe = np.max(list(dic_recipes_per_num.keys()))
+            self.last_recipe = np.max(list(dict_recipes_per_num.keys()))
         else:
             self.last_recipe = last_recipe
 
@@ -147,7 +147,7 @@ class PipePrep(SofPipe) :
     def select_tpl_files(self, expotype=None, tpl="ALL", stage="raw"):
         """Selecting a subset of files from a certain type
         """
-        if expotype not in musepipe.dic_expotypes:
+        if expotype not in musepipe.dict_expotypes:
             upipe.print_info("ERROR: input {0} is not in the list of possible values".format(expotype),
                     pipe=self)
             return 
@@ -174,8 +174,8 @@ class PipePrep(SofPipe) :
         # for recipe in self.list_recipes:
         upipe.print_info("=============================================")
         upipe.print_info("The dictionary of recipes which can be run is")
-        for key in dic_recipes_num:
-            print("{0}: {1}".format(key, dic_recipes_num[key]))
+        for key in dict_recipes_num:
+            print("{0}: {1}".format(key, dict_recipes_num[key]))
         upipe.print_info("=============================================")
 
     @print_my_function_name
@@ -193,51 +193,51 @@ class PipePrep(SofPipe) :
             Default is "model".
         """
         # Dictionary of arguments for each recipe
-        default_dic_kwargs_recipes = {'twilight': {'illum': illum},
+        default_dict_kwargs_recipes = {'twilight': {'illum': illum},
                              'scibasic_all': {'illum': illum},
                              'sky': {'fraction': fraction},
                              'prep_align': {'skymethod': skymethod},
                              'scipost_per_expo': {'skymethod': skymethod}
                              }
 
-        dic_kwargs_recipes = kwargs.pop("param_recipes", {})
-        for key in default_dic_kwargs_recipes:
-            if key in dic_kwargs_recipes:
-                dic_kwargs_recipes[key].update(default_dic_kwargs_recipes[key])
+        dict_kwargs_recipes = kwargs.pop("param_recipes", {})
+        for key in default_dict_kwargs_recipes:
+            if key in dict_kwargs_recipes:
+                dict_kwargs_recipes[key].update(default_dict_kwargs_recipes[key])
             else:
-                dic_kwargs_recipes[key] = default_dic_kwargs_recipes[key]
+                dict_kwargs_recipes[key] = default_dict_kwargs_recipes[key]
 
         # First and last recipe to be used
         first_recipe = kwargs.pop("first_recipe", self.first_recipe)
         last_recipe = kwargs.pop("last_recipe", self.last_recipe)
-        if last_recipe is None: last_recipe = np.max(list(dic_recipes_per_num.keys()))
+        if last_recipe is None: last_recipe = np.max(list(dict_recipes_per_num.keys()))
 
         # Transforming first and last if they are strings and not numbers
         if isinstance(first_recipe, str):
-            if first_recipe not in dic_recipes_per_name:
+            if first_recipe not in dict_recipes_per_name:
                 upipe.print_error("First recipe {} not in list of recipes".format(first_recipe))
                 return
-            first_recipe = dic_recipes_per_name[first_recipe]
+            first_recipe = dict_recipes_per_name[first_recipe]
         if isinstance(last_recipe, str):
-            if last_recipe not in dic_recipes_per_name:
+            if last_recipe not in dict_recipes_per_name:
                 upipe.print_error("Last recipe {} not in list of recipes".format(last_recipe))
                 return
-            last_recipe = dic_recipes_per_name[last_recipe]
+            last_recipe = dict_recipes_per_name[last_recipe]
 
         # Printing the info about which recipes will be used
         upipe.print_info("Data reduction from recipe {0} to {1}".format(
-                            dic_recipes_per_num[first_recipe],
-                            dic_recipes_per_num[last_recipe]))
+                            dict_recipes_per_num[first_recipe],
+                            dict_recipes_per_num[last_recipe]))
         upipe.print_info("               [steps {0} - {1}]".format(
                             first_recipe, last_recipe))
 
         # Now doing the recipes one by one in order
         for ind in range(first_recipe, last_recipe + 1):
-            recipe = dic_recipes_per_num[ind]
+            recipe = dict_recipes_per_num[ind]
             name_recipe = "run_{}".format(recipe)
             # Including the kwargs for each recipe
-            if recipe in dic_kwargs_recipes:
-                kdic = dic_kwargs_recipes[recipe]
+            if recipe in dict_kwargs_recipes:
+                kdic = dict_kwargs_recipes[recipe]
             else:
                 kdic = {}
             getattr(self, name_recipe)(**kdic)
@@ -501,7 +501,7 @@ class PipePrep(SofPipe) :
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
             # Names and folder of final Master Wave
             dir_twilight = self._get_fullpath_expo('TWILIGHT', "master")
-            name_twilight = deepcopy(dic_files_products['TWILIGHT'])
+            name_twilight = deepcopy(dict_files_products['TWILIGHT'])
             self.recipe_twilight(self.current_sof, dir_twilight, name_twilight, tpl)
 
         # Write the MASTER TWILIGHT Table and save it
@@ -621,7 +621,7 @@ class PipePrep(SofPipe) :
             self._sofdict['PIXTABLE_STD'] = [joinpath(self._get_fullpath_expo("STD", "processed"),
                 'PIXTABLE_STD_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename=sof_filename + "_" + mytpl, new=True)
-            name_std = deepcopy(dic_files_products['STD'])
+            name_std = deepcopy(dict_files_products['STD'])
             dir_std = self._get_fullpath_expo('STD', "master")
             self.recipe_std(self.current_sof, dir_std, name_std, mytpl)
 
@@ -672,7 +672,7 @@ class PipePrep(SofPipe) :
                 'PIXTABLE_SKY_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo, j+1)) for j in range(24)]
             self.write_sof(sof_filename="{0}_{1}_{2:02d}".format(sof_filename, mytpl, iexpo), new=True)
             dir_sky = self._get_fullpath_expo('SKY', "processed")
-            name_sky = deepcopy(dic_files_products['SKY'])
+            name_sky = deepcopy(dict_files_products['SKY'])
             self.recipe_sky(self.current_sof, dir_sky, name_sky, mytpl, iexpo, fraction)
 
         # Write the MASTER files Table and save it
@@ -823,7 +823,7 @@ class PipePrep(SofPipe) :
         if self.verbose:
             upipe.print_info("Filter list is {0}".format(filter_list), pipe=self)
         for option in list_options:
-            for prod in dic_products_scipost[option]:
+            for prod in dict_products_scipost[option]:
                 if prod == "IMAGE_FOV":
                     for i, value in enumerate(filter_list.split(','), 
                             start=1):
@@ -938,11 +938,11 @@ class PipePrep(SofPipe) :
                     status = -2
 
             if status < 0:
-                dic_err = {-1: "MJD", -2: "BACKGROUND"}
+                dict_err = {-1: "MJD", -2: "BACKGROUND"}
                 upipe.print_error("Table {0} - {1}".format(folder_offset_table,
                                   offset_table_name))
                 upipe.print_error("Could not find {0} value in offset table".format(
-                                    dic_err[status]))
+                                    dict_err[status]))
                 upipe.print_warning("A background of 0 will be assumed, and")
                 upipe.print_warning("a normalisation of 1 will be used for the SKY_CONTINUUM")
                 return ""
@@ -1103,7 +1103,7 @@ class PipePrep(SofPipe) :
             if offset_table_name is None:
                 folder_offset_table = self._get_fullpath_expo(expotype, "processed")
                 offset_table_name = '{0}{1}_{2}_{3}.fits'.format(
-                                       dic_files_products['ALIGN'][0], 
+                                       dict_files_products['ALIGN'][0],
                                        suffix, filter_for_alignment, tpl)
             else:
                 if folder_offset_table is None:
@@ -1226,14 +1226,14 @@ class PipePrep(SofPipe) :
                                               for iexpo in list_group_expo]
             self._sofdict['IMAGE_FOV'] = list_images
             create_offset_table(list_images, table_folder=self.paths.pipe_products, 
-                                table_name="{0}.fits".format(dic_files_products['ALIGN'][0]))
+                                table_name="{0}.fits".format(dict_files_products['ALIGN'][0]))
             upipe.print_info("Creating empty OFFSET_LIST.fits using images list", 
                     pipe=self)
             self.write_sof(sof_filename=sof_filename + long_suffix, new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
-            namein_align = deepcopy(dic_files_products['ALIGN'])
-            nameout_align = [name + long_suffix for name in deepcopy(dic_files_products['ALIGN'])] 
-            for iter_file in dic_files_iexpo_products['ALIGN']:
+            namein_align = deepcopy(dict_files_products['ALIGN'])
+            nameout_align = [name + long_suffix for name in deepcopy(dict_files_products['ALIGN'])]
+            for iter_file in dict_files_iexpo_products['ALIGN']:
                 for iexpo in list_group_expo:
                     namein_align.append('{0}_{1:04d}'.format(iter_file, iexpo))
                     nameout_align.append('{0}_bygroup{1}_{2:04d}'.format(iter_file, long_suffix, iexpo))
@@ -1301,17 +1301,17 @@ class PipePrep(SofPipe) :
         self._sofdict['IMAGE_FOV'] = list_images
         upipe.print_info("Creating empty OFFSET_LIST.fits using images list", pipe=self)
         create_offset_table(list_images, table_folder=self.paths.pipe_products, 
-                            table_name="{0}.fits".format(dic_files_products['ALIGN'][0]))
+                            table_name="{0}.fits".format(dict_files_products['ALIGN'][0]))
 
         # Write the SOF
         self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}_{3}".format(
                        long_suffix, expotype, pointing, tpl), new=True)
         dir_align = self._get_fullpath_expo('OBJECT', "processed")
-        namein_align = deepcopy(dic_files_products['ALIGN'])
+        namein_align = deepcopy(dict_files_products['ALIGN'])
         nameout_align = [name + "{0}_{1}_{2}_{3}".format(
                          long_suffix, expotype, pointing, tpl) 
-                             for name in deepcopy(dic_files_products['ALIGN'])] 
-        for iter_file in dic_files_iexpo_products['ALIGN']:
+                             for name in deepcopy(dict_files_products['ALIGN'])]
+        for iter_file in dict_files_iexpo_products['ALIGN']:
             for i, row in enumerate(align_table):
                 namein_align.append('{0}_{1:04d}'.format(iter_file, i+1))
                 nameout_align.append('{0}_bypointing{1}_{2}_{3:04d}'.format(
@@ -1337,8 +1337,8 @@ class PipePrep(SofPipe) :
             name_offset_table = "XX"
 
         # Use the save from the alignment module
-        tstamp = self.dic_alignments.present_tstamp
-        self.dic_alignments[tstamp].save(name_offset_table)
+        tstamp = self.dict_alignments.present_tstamp
+        self.dict_alignments[tstamp].save(name_offset_table)
 
     @print_my_function_name
     def run_fine_alignment(self, name_ima_reference=None, nexpo=1, list_expo=[], line=None, 
@@ -1346,9 +1346,9 @@ class PipePrep(SofPipe) :
         """Run the alignment on this pointing using or not a reference image
         """
         # If not yet initialised, build the dictionary
-        if not hasattr(self, "dic_alignments"):
+        if not hasattr(self, "dict_alignments"):
             # Create an empty dictionary with a None timestamp
-            self.dic_alignments = upipe.TimeStampDict()
+            self.dict_alignments = upipe.TimeStampDict()
             # Reset to True to initialise the structure
             reset = True
 
@@ -1363,11 +1363,11 @@ class PipePrep(SofPipe) :
                     list_expo=list_expo, line=line, 
                     filter_for_alignment=filter_for_alignment, bygroup=bygroup)
             # if dictionary is empty, it creates the first timestamp
-            self.dic_alignments.create_new_timestamp(self.align_group)
+            self.dict_alignments.create_new_timestamp(self.align_group)
 
         # Run the alignment
-        tstamp = self.dic_alignments.present_tstamp
-        self.dic_alignments[tstamp].run(nexpo)
+        tstamp = self.dict_alignments.present_tstamp
+        self.dict_alignments[tstamp].run(nexpo)
         
     @print_my_function_name
     def get_align_group(self, name_ima_reference=None, list_expo=[], line=None, 
@@ -1457,7 +1457,7 @@ class PipePrep(SofPipe) :
         # Producing the list of REDUCED PIXTABLES
         self._add_calib_to_sofdict("FILTER_LIST")
         pixtable_name = get_suffix_product('REDUCED')
-        pixtable_name_thisone = dic_products_scipost['individual']
+        pixtable_name_thisone = dict_products_scipost['individual']
 
         # Setting the default option of offset_list
         # And looking for that table, adding it to the sof file
@@ -1468,7 +1468,7 @@ class PipePrep(SofPipe) :
             offset_list_tablename = kwargs.pop("offset_list_tablename", None)
             if offset_list_tablename is None:
                 offset_list_tablename = "{0}{1}_{2}_{3}_{4}.fits".format(
-                        dic_files_products['ALIGN'][0], long_suffix,
+                        dict_files_products['ALIGN'][0], long_suffix,
                         expotype, pointing, tpl)
             if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
                 upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(

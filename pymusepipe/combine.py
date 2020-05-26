@@ -39,8 +39,8 @@ from pymusepipe import util_pipe as upipe
 from .util_pipe import filter_list_with_pdict
 from pymusepipe import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
-                          dic_combined_folders, default_prefix_wcs,
-                          default_prefix_mask, prefix_mosaic, dic_listObject,
+                          dict_combined_folders, default_prefix_wcs,
+                          default_prefix_mask, prefix_mosaic, dict_listObject,
                           lambdaminmax_for_wcs, lambdaminmax_for_mosaic)
 from .mpdaf_pipe import MuseCube
 
@@ -75,7 +75,6 @@ def get_list_periods(root_path=""):
     upipe.print_info("Periods list: {0}".format(str(list_periods)))
     return list_periods
 
-
 def get_list_targets(period_path=""):
     """Getting a list of existing periods
     for a given path
@@ -96,7 +95,7 @@ def get_list_targets(period_path=""):
     upipe.print_info("Potential Targets -- list: {0}".format(str(list_targets)))
     return list_targets
 
-def build_dic_exposures(target_path=""):
+def build_dict_exposures(target_path=""):
     """
 
     Parameters
@@ -105,19 +104,19 @@ def build_dic_exposures(target_path=""):
 
     Returns
     -------
-    dic_expo: dict
+    dict_expo: dict
         Dictionary of exposures in each pointing
 
     """
     list_pointings = get_list_pointings(target_path)
-    dic_expos = {}
+    dict_expos = {}
     for pointing in list_pointings:
         name_pointing = "P{:02d}".format(pointing)
         upipe.print_info("For pointing {0}".format(name_pointing))
-        dic_p = get_list_exposures(joinpath(target_path, name_pointing))
-        dic_expos[pointing] = [(tpl, dic_p[tpl]) for tpl in dic_p]
+        dict_p = get_list_exposures(joinpath(target_path, name_pointing))
+        dict_expos[pointing] = [(tpl, dict_p[tpl]) for tpl in dict_p]
 
-    return dic_expos
+    return dict_expos
 
 def get_list_pointings(target_path=""):
     """Getting a list of existing pointings
@@ -140,7 +139,6 @@ def get_list_pointings(target_path=""):
     list_pointings.sort()
     upipe.print_info("Pointings list: {0}".format(str(list_pointings)))
     return list_pointings
-
 
 def get_list_exposures(pointing_path=""):
     """Getting a list of exposures from a given path
@@ -167,20 +165,20 @@ def get_list_exposures(pointing_path=""):
     sorted_list = sorted(list_expos, key=lambda e: (e[0], e[1]))
 
     # Building the final list
-    dic_expos = {}
+    dict_expos = {}
     for l in sorted_list:
         tpl = l[0]
-        if tpl in dic_expos:
-            dic_expos[tpl].append(l[1])
+        if tpl in dict_expos:
+            dict_expos[tpl].append(l[1])
         else:
-            dic_expos[tpl] = [l[1]]
+            dict_expos[tpl] = [l[1]]
 
     # Finding the full list of tpl
     upipe.print_info("Exposures list:")
-    for tpl in dic_expos:
-        upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dic_expos[tpl]))
+    for tpl in dict_expos:
+        upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dict_expos[tpl]))
 
-    return dic_expos
+    return dict_expos
 
 def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
     """Provide a list of reduced pixtables
@@ -195,10 +193,10 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
         Additional suffix, if needed, for the names of the PixTables.
     """
     # Getting the pieces of the names to be used for pixtabs
-    pixtable_suffix = prep_recipes_pipe.dic_products_scipost['individual'][0]
+    pixtable_suffix = prep_recipes_pipe.dict_products_scipost['individual'][0]
 
     # Initialise the dictionary of pixtabs to be found in each pointing
-    dic_pixtables = {}
+    dict_pixtables = {}
 
     # Defining the pointing list if not provided
     # Done by scanning the target path
@@ -214,7 +212,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
                                  "{0}{1}*fits".format(pixtable_suffix, suffix))
 
         # Reset the needed temporary dictionary
-        dic_tpl = {}
+        dict_tpl = {}
         # Loop over the pixtables for that pointing
         for pixtab in list_pixtabs:
             # Split over the PIXTABLE_REDUCED string
@@ -224,27 +222,26 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
             # Find the tpl
             tpl = sl[1].split("_" + expo)[0]
             # If not already there, add it
-            if tpl not in dic_tpl:
-                dic_tpl[tpl] = [np.int(expo)]
+            if tpl not in dict_tpl:
+                dict_tpl[tpl] = [np.int(expo)]
             # if already accounted for, add the expo number
             else:
-                dic_tpl[tpl].append(np.int(expo))
+                dict_tpl[tpl].append(np.int(expo))
 
         # Creating the full list for that pointing
         full_list = []
-        for tpl in dic_tpl:
-            dic_tpl[tpl].sort()
-            full_list.append((tpl, dic_tpl[tpl]))
+        for tpl in dict_tpl:
+            dict_tpl[tpl].sort()
+            full_list.append((tpl, dict_tpl[tpl]))
 
         # And now filling in the dictionary for that pointing
-        dic_pixtables[pointing] = full_list
+        dict_pixtables[pointing] = full_list
 
-    return dic_pixtables
-
+    return dict_pixtables
 
 class MusePointings(SofPipe, PipeRecipes):
     def __init__(self, targetname=None, list_pointings=None,
-                 dic_exposures_in_pointings=None,
+                 dict_exposures=None,
                  prefix_fixed_pixtables="tmask",
                  folder_config="",
                  rc_filename=None, cal_filename=None,
@@ -296,9 +293,11 @@ class MusePointings(SofPipe, PipeRecipes):
         self.targetname = targetname
         self.__phangs = kwargs.pop("PHANGS", False)
         if self.__phangs:
-            self.filter_list = kwargs.pop("filter_list", default_PHANGS_filter_list)
+            self.filter_list = kwargs.pop("filter_list",
+                                          default_PHANGS_filter_list)
         else:
-            self.filter_list = kwargs.pop("filter_list", default_filter_list)
+            self.filter_list = kwargs.pop("filter_list",
+                                          default_filter_list)
 
         self.combined_folder_name = combined_folder_name
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
@@ -334,8 +333,8 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.data = "{0}/{1}/".format(self.targetname,
                                                   self.combined_folder_name)
 
-        self.pipe_params.init_default_param(dic_combined_folders)
-        self._dic_combined_folders = dic_combined_folders
+        self.pipe_params.init_default_param(dict_combined_folders)
+        self._dict_combined_folders = dict_combined_folders
 
         self.list_pointings = self._check_pointings_list(list_pointings)
         # Setting all the useful paths
@@ -356,12 +355,12 @@ class MusePointings(SofPipe, PipeRecipes):
         self.goto_folder(self.paths.data)
 
         # Now create full path folder 
-        for folder in self._dic_combined_folders:
-            upipe.safely_create_folder(self._dic_combined_folders[folder], verbose=verbose)
+        for folder in self._dict_combined_folders:
+            upipe.safely_create_folder(self._dict_combined_folders[folder], verbose=verbose)
 
         # Checking input pointings and pixtables
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
-        self._get_pixtable_list(dic_exposures_in_pointings)
+        self._get_pixtable_list(dict_exposures)
 
         # Checking input offset table and corresponding pixtables
         self._check_offset_table(offset_table_name, folder_offset_table)
@@ -424,20 +423,20 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             return name
 
-    def _get_pixtable_list(self, dic_exposures_in_pointings=None):
+    def _get_pixtable_list(self, dict_exposures=None):
         """Check if pointings and dictionary are compatible
         """
         # Dictionary of exposures to select per pointing
-        self.dic_exposures_in_pointings = dic_exposures_in_pointings
+        self.dict_exposures = dict_exposures
 
         # Getting the pieces of the names to be used for pixtabs
-        pixtable_suffix = prep_recipes_pipe.dic_products_scipost['individual'][0]
+        pixtable_suffix = prep_recipes_pipe.dict_products_scipost['individual'][0]
         if self._pixtab_in_comb_folder and self.add_targetname:
             pixtable_suffix = self._add_targetname(pixtable_suffix)
 
         # Initialise the dictionary of pixtabs to be found in each pointing
-        self.dic_pixtabs_in_pointings = {}
-        self.dic_allpixtabs_in_pointings = {}
+        self.dict_pixtabs_in_pointings = {}
+        self.dict_allpixtabs_in_pointings = {}
         # Loop on Pointings
         for pointing in self.list_pointings:
             # get the path
@@ -445,7 +444,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 path_pixtables = self.paths.cubes
                 pointing_suffix = "_P{0:02d}".format(np.int(pointing))
             else:
-                path_pointing = getattr(self.paths, self.dic_name_pointings[pointing])
+                path_pointing = getattr(self.paths, self.dict_name_pointings[pointing])
                 path_pixtables = path_pointing + self.pipe_params.object
                 pointing_suffix = ""
             # List existing pixtabs, using the given suffix
@@ -483,16 +482,16 @@ class MusePointings(SofPipe, PipeRecipes):
 
             full_list = copy.copy(list_pixtabs)
             full_list.sort()
-            self.dic_allpixtabs_in_pointings[pointing] = full_list
+            self.dict_allpixtabs_in_pointings[pointing] = full_list
 
             # Filter the list with the pointing dictionary if given
             select_list_pixtabs = filter_list_with_pdict(list_pixtabs,
                                                          [pointing],
-                                                         self.dic_exposures_in_pointings,
+                                                         self.dict_exposures,
                                                          verbose=self.verbose)
 
             select_list_pixtabs.sort()
-            self.dic_pixtabs_in_pointings[pointing] = select_list_pixtabs
+            self.dict_pixtabs_in_pointings[pointing] = select_list_pixtabs
 
     def _read_offset_table(self, offset_table_name=None, folder_offset_table=None):
         """Reading the Offset Table
@@ -563,7 +562,7 @@ class MusePointings(SofPipe, PipeRecipes):
         nincluded_pixtab = 0
         for pointing in self.list_pointings:
             pixtab_to_exclude = []
-            for pixtab_name in self.dic_pixtabs_in_pointings[pointing]:
+            for pixtab_name in self.dict_pixtabs_in_pointings[pointing]:
                 pixtab_header = pyfits.getheader(pixtab_name)
                 mjd_obs = pixtab_header['MJD-OBS']
                 date_obs = pixtab_header['DATE-OBS']
@@ -578,7 +577,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 # Exclude the one which have not been found
             nexcluded_pixtab += len(pixtab_to_exclude)
             for pixtab in pixtab_to_exclude:
-                self.dic_pixtabs_in_pointings[pointing].remove(pixtab)
+                self.dict_pixtabs_in_pointings[pointing].remove(pixtab)
                 if self.verbose:
                     upipe.print_warning("PIXTABLE [not found in OffsetTable]: "
                                         "{0}".format(pixtab))
@@ -623,7 +622,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
     def set_fullpath_names(self):
         """Create full path names to be used
-        That includes: root, data, target, but also _dic_paths, paths
+        That includes: root, data, target, but also _dict_paths, paths
         """
         # initialisation of the full paths 
         self.paths = musepipe.PipeObject("All Paths useful for the pipeline")
@@ -631,23 +630,23 @@ class MusePointings(SofPipe, PipeRecipes):
         self.paths.data = joinpath(self.paths.root, self.pipe_params.data)
         self.paths.target = joinpath(self.paths.root, self.targetname)
 
-        self._dic_paths = {"combined": self.paths}
+        self._dict_paths = {"combined": self.paths}
 
-        for name in self._dic_combined_folders:
+        for name in self._dict_combined_folders:
             setattr(self.paths, name, joinpath(self.paths.data, getattr(self.pipe_params, name)))
 
         # Creating the filenames for Master files
-        self.dic_name_pointings = {}
+        self.dict_name_pointings = {}
         for pointing in self.list_pointings:
             name_pointing = "P{0:02d}".format(np.int(pointing))
-            self.dic_name_pointings[pointing] = name_pointing
+            self.dict_name_pointings[pointing] = name_pointing
             # Adding the path of the folder
             setattr(self.paths, name_pointing,
                     joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.targetname, pointing)))
 
         # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
-        for name in self.pipe_params._dic_folders_target:
-            setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dic_folders_target[name]))
+        for name in self.pipe_params._dict_folders_target:
+            setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dict_folders_target[name]))
 
     def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True,
                              reference_cube=True, **kwargs):
@@ -681,7 +680,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                        refcube_name=refcube_name)
         else:
             # getting the name of the final datacube (mosaic)
-            cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
             cube_name = "{0}{1}.fits".format(default_prefix_wcs,
                                           self._add_targetname(cube_suffix))
             wcs_refcube_name = joinpath(self.paths.cubes, cube_name)
@@ -910,7 +909,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         if name_cube is None:
             # getting the name of the final datacube (mosaic)
-            cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
             cube_suffix = self._add_targetname(cube_suffix)
             name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
 
@@ -964,7 +963,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         if refcube_name is None:
             # getting the name of the final datacube (mosaic)
-            cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
             cube_suffix = self._add_targetname(cube_suffix)
             refcube_name = joinpath(self.paths.cubes, cube_suffix + ".fits")
 
@@ -1042,7 +1041,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Abort if only one exposure is available
         # exp_combine needs a minimum of 2
-        nexpo_tocombine = sum(len(self.dic_pixtabs_in_pointings[pointing])
+        nexpo_tocombine = sum(len(self.dict_pixtabs_in_pointings[pointing])
                               for pointing in list_pointings)
         if nexpo_tocombine <= 1:
             upipe.print_warning("All considered pointings only "
@@ -1062,7 +1061,7 @@ class MusePointings(SofPipe, PipeRecipes):
         if wcs_auto:
             upipe.print_warning("wcs_auto is True, hence overwriting ref_wcs name")
             # getting the name of the final datacube (mosaic)
-            cube_suffix = prep_recipes_pipe.dic_products_scipost['cube'][0]
+            cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
             cube_suffix = self._add_targetname(cube_suffix)
             ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
             upipe.print_warning("ref_wcs used is {0}".format(ref_wcs))
@@ -1085,10 +1084,10 @@ class MusePointings(SofPipe, PipeRecipes):
             self._sofdict['OFFSET_LIST'] = [joinpath(self.folder_offset_table,
                                                      self.offset_table_name)]
 
-        pixtable_name = dic_listObject[expotype]
+        pixtable_name = dict_listObject[expotype]
         self._sofdict[pixtable_name] = []
         for pointing in list_pointings:
-            self._sofdict[pixtable_name] += self.dic_pixtabs_in_pointings[pointing]
+            self._sofdict[pixtable_name] += self.dict_pixtabs_in_pointings[pointing]
 
         self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename,
                                                         self.targetname,

@@ -489,21 +489,21 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
     return outwcs_folder, out_name
 
 def filter_list_with_pdict(input_list, list_pointings=None,
-                           dic_files_in_pointings=None,
+                           dict_files=None,
                            verbose=True):
     """Filter out exposures (pixtab or cube namelist) using a dictionary which
     has a list of pointings and for each pointing a list of exposure number.
 
     Args:
         input_list (list of str):  input list to filter
-        dic_files_in_pointings (dict):  dictionary used to filter
+        dict_files (dict):  dictionary used to filter
 
     Returns:
         selected_list: selected list of files
 
     """
     nfiles_input_list = len(input_list)
-    if dic_files_in_pointings is None:
+    if dict_files is None:
           selected_list = input_list
 
     # Otherwise use the ones which are given via their expo numbers
@@ -512,17 +512,17 @@ def filter_list_with_pdict(input_list, list_pointings=None,
         # this is the list of exposures to consider
 
         if list_pointings is None:
-            list_pointings = dic_files_in_pointings.keys()
+            list_pointings = dict_files.keys()
         elif not isinstance(list_pointings, list):
             upipe.print_error("Cannot recognise input pointing(s)")
             return selected_list
 
         for pointing in list_pointings:
-            if pointing not in dic_files_in_pointings:
+            if pointing not in dict_files:
                 upipe.print_warning("Pointing {} not in dictionary "
                                     "- skipping".format(pointing))
             else:
-                list_expo = dic_files_in_pointings[pointing]
+                list_expo = dict_files[pointing]
                 # We loop on that list
                 for expotuple in list_expo:
                     tpl, nexpo = expotuple[0], expotuple[1]
