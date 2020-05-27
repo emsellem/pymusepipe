@@ -19,9 +19,9 @@ from astropy import constants as const
 from astropy.io import fits as pyfits
 
 # Import package modules
-from pymusepipe.emission_lines import list_emission_lines
-from pymusepipe.emission_lines import full_muse_wavelength_range
-from pymusepipe.config_pipe import default_filter_list
+from src.pymusepipe import list_emission_lines
+from src.pymusepipe import full_muse_wavelength_range
+from src.pymusepipe import default_filter_list
 
 from collections import OrderedDict
 

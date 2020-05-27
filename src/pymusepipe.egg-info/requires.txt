@@ -1,0 +1,4 @@
+mpdaf
+numpy
+scipy
+astropy

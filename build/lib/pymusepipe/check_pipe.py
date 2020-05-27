@@ -10,7 +10,6 @@ __contact__   = " <eric.emsellem@eso.org>"
 # This module will take a MusePipe object and do the plot check ups
 
 # Standard modules
-import os
 from os.path import join as joinpath
 import glob
 
@@ -20,10 +19,10 @@ __version__ = '0.0.4 (21 Feb 2019)'
 # v0.0.2: Added some import after moving MuseCube, MuseImage, etc
 # v0.0.1: initial
 
-from pymusepipe.graph_pipe import GraphMuse
-from pymusepipe.musepipe import MusePipe
-from pymusepipe.mpdaf_pipe import MuseCube, MuseSpectrum, MuseSetSpectra
-from pymusepipe.mpdaf_pipe import MuseImage, MuseSetImages, get_sky_spectrum
+from src.pymusepipe import GraphMuse
+from src.pymusepipe import MusePipe
+from src.pymusepipe.mpdaf_pipe import MuseCube, MuseSpectrum, MuseSetSpectra
+from src.pymusepipe.mpdaf_pipe import MuseImage, MuseSetImages, get_sky_spectrum
 
 name_final_datacube = "DATACUBE_FINAL.fits"
 PLOT = '\033[1;34;20m'

@@ -12,4 +12,7 @@
     <option name="format" value="GOOGLE" />
     <option name="myDocStringFormat" value="Google" />
   </component>
+  <component name="ReSTService">
+    <option name="DOC_DIR" value="$MODULE_DIR$" />
+  </component>
 </module>

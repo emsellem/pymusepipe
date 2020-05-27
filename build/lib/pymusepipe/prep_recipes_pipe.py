@@ -18,13 +18,12 @@ from copy import deepcopy
 import numpy as np
 
 # pymusepipe modules
-from pymusepipe import util_pipe as upipe
-from pymusepipe.create_sof import SofPipe
-from pymusepipe.align_pipe import create_offset_table
-from pymusepipe import musepipe
-from pymusepipe.mpdaf_pipe import MuseSkyContinuum,MuseFilter
-from pymusepipe.config_pipe import mjd_names,get_suffix_product
-from pymusepipe.config_pipe import dic_recipes_per_num, dic_recipes_per_name
+from src.pymusepipe import util_pipe as upipe, musepipe
+from src.pymusepipe import SofPipe
+from src.pymusepipe import create_offset_table
+from src.pymusepipe.mpdaf_pipe import MuseSkyContinuum,MuseFilter
+from src.pymusepipe import mjd_names,get_suffix_product
+from src.pymusepipe import dic_recipes_per_num, dic_recipes_per_name
 
 try :
     import astropy as apy

@@ -30,7 +30,8 @@ pymusepipe needs a number of standard modules/packages including:
    * **astropy** as a general provider of many useful functions and structures, most importantly the astropy Tables.
 
 The convolution package of pymusepipe (allowing full convolution of a datacube) uses
-**pypher** which is thus a requirement for this module to work.
+**pypher** which is thus a requirement for that module to work.
+
 This also includes a heavy-based usage of **mpdaf**, which is a super useful package
 developed by the MUSE GTO-CRAL Team, to process and analyse datacubes, and more specifically
 MUSE cubes, images and spectra.
@@ -80,7 +81,10 @@ Imagine you have
    * a target or field named "NGC1000" (just for the sake of using an example).
    * several pointings (each pointing can represent a set of OBs which have 
    roughly the same coordinates, best is that they have a very significant 
-   overlap): 1, 2, and 3
+   overlap): 1, 2, and 3. Note that this 'pointing' structure may not reflect your
+   own observational strategy. There are cases where one OB includes different pointings.
+   What is important here is that each 'pointing' is either a full single OB, or several
+   OBs with the same pointing.
 
 Then under your data root folder <my_data_folder> create the following folder structure:
 ```

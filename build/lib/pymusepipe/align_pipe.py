@@ -47,10 +47,10 @@ def is_sequence(arg):
             hasattr(arg, "__iter__"))
 
 # Import needed modules from pymusepipe
-import pymusepipe.util_pipe as upipe
-from pymusepipe.config_pipe import mjd_names, date_names, tpl_names
-from pymusepipe.config_pipe import pointing_names, iexpo_names
-from pymusepipe.config_pipe import default_offset_table, dic_listObject
+from src import pymusepipe as upipe
+from src.pymusepipe import mjd_names, date_names, tpl_names
+from src.pymusepipe import pointing_names, iexpo_names
+from src.pymusepipe import default_offset_table, dic_listObject
 
 # ================== Default units ======================== #
 # Define useful units

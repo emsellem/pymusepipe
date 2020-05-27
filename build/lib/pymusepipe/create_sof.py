@@ -19,8 +19,8 @@ from os.path import join as joinpath
 
 from collections import OrderedDict
 
-from pymusepipe import util_pipe as upipe
-from pymusepipe.config_pipe import get_suffix_product
+from src.pymusepipe import util_pipe as upipe
+from src.pymusepipe import get_suffix_product
 
 class SofDict(OrderedDict) :
     """New Dictionary for the SOF writing

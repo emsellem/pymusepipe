@@ -32,18 +32,18 @@ except ImportError:
 import warnings
 
 # Importing pymusepipe modules
-from pymusepipe.recipes_pipe import PipeRecipes
-from pymusepipe.create_sof import SofPipe
-from pymusepipe.init_musepipe import InitMuseParameters
-import pymusepipe.util_pipe as upipe
-from pymusepipe import musepipe, prep_recipes_pipe
-from pymusepipe.config_pipe import default_filter_list, default_PHANGS_filter_list, dic_combined_folders
-from pymusepipe.config_pipe import default_prefix_wcs, default_prefix_mask, default_prefix_wcs_mosaic
-from pymusepipe.config_pipe import dic_listObject, lambdaminmax_for_wcs, lambdaminmax_for_mosaic
-from pymusepipe.mpdaf_pipe import MuseCube
+from src.pymusepipe.recipes_pipe import PipeRecipes
+from src.pymusepipe import SofPipe, musepipe
+from src.pymusepipe.init_musepipe import InitMuseParameters
+from src import pymusepipe as upipe
+from src.pymusepipe import prep_recipes_pipe
+from src.pymusepipe import default_filter_list, default_PHANGS_filter_list, dic_combined_folders
+from src.pymusepipe import default_prefix_wcs, default_prefix_mask, default_prefix_wcs_mosaic
+from src.pymusepipe import dic_listObject, lambdaminmax_for_wcs, lambdaminmax_for_mosaic
+from src.pymusepipe.mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
-from pymusepipe.align_pipe import mjd_names, date_names
+from src.pymusepipe import mjd_names, date_names
 
 __version__ = '0.0.3 (4 Sep 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work

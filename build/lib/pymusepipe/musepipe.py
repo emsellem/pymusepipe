@@ -60,11 +60,11 @@ from astropy.utils.exceptions import AstropyWarning
 from datetime import datetime as dt
 
 # Importing pymusepipe modules
-from pymusepipe.init_musepipe import InitMuseParameters
-from pymusepipe.recipes_pipe import PipeRecipes
-from pymusepipe.prep_recipes_pipe import PipePrep
-import pymusepipe.util_pipe as upipe
-from pymusepipe.config_pipe import (
+from src.pymusepipe.init_musepipe import InitMuseParameters
+from src.pymusepipe.recipes_pipe import PipeRecipes
+from src.pymusepipe.prep_recipes_pipe import PipePrep
+from src import pymusepipe as upipe
+from src.pymusepipe import (
     suffix_rawfiles, suffix_prealign, suffix_checkalign,
     listexpo_files, dic_listObject, dic_listMaster, dic_listMasterObject,
     dic_expotypes, dic_geo_astrowcs_table, exclude_list_checkmode,

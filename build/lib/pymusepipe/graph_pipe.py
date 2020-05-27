@@ -14,7 +14,6 @@ __contact__   = " <eric.emsellem@eso.org>"
 # and adapted it to the pymusepipe package
 
 # Importing modules
-import numpy as np
 
 # Standard modules
 
@@ -23,7 +22,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.gridspec as gridspec
 
-from pymusepipe.mpdaf_pipe import MuseImage, MuseSpectrum, MuseSetImages, MuseSetSpectra
+from src.pymusepipe.mpdaf_pipe import MuseSetImages, MuseSetSpectra
 
 __version__ = '0.0.1 (23 March 2018)'
 

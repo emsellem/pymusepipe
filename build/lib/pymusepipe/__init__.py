@@ -8,8 +8,3 @@
 """
 from .version import __date__, __version__
 
-from pymusepipe import (align_pipe, combine, config_pipe, create_sof,
-                        emission_lines, graph_pipe, init_musepipe,
-                        mpdaf_pipe, musepipe, prep_recipes_pipe, recipes_pipe,
-                        target_sample, util_pipe)
-

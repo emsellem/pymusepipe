@@ -18,7 +18,7 @@ from os.path import join as joinpath
 import subprocess
 
 # pymusepipe modules
-from pymusepipe import util_pipe as upipe
+from src.pymusepipe import util_pipe as upipe
 from .version import __version__ as pipeversion
 
 # Likwid command

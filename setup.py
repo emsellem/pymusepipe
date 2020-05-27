@@ -1,11 +1,15 @@
+# -*- coding: utf-8 -*-"""
+"""
+    Setup file for pymusepipe.
+    Use setup.cfg to configure your project.
+"""
 # Licensed under a MIT style license - see LICENSE.txt
 
 from __future__ import absolute_import, division, print_function
-
 from setuptools import setup, find_packages
 
 version = {}
-with open("pymusepipe/version.py") as fp:
+with open("src/pymusepipe/version.py") as fp:
     exec(fp.read(), version)
 
 with open('README.md', 'r') as f:

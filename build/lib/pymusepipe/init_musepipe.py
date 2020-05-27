@@ -17,10 +17,10 @@ import re
 
 import copy
 
-from pymusepipe import util_pipe as upipe
-from pymusepipe.config_pipe import (dic_user_folders, default_rc_filename,
-        dic_extra_filters, dic_calib_tables, dic_input_folders, 
-        dic_folders, dic_folders_target)
+from src.pymusepipe import util_pipe as upipe
+from src.pymusepipe import (dic_user_folders, default_rc_filename,
+                            dic_extra_filters, dic_calib_tables, dic_input_folders,
+                            dic_folders, dic_folders_target)
 
 ############################################################
 # Some fixed parameters for the structure
