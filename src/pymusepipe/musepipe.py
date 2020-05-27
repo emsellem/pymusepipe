@@ -501,7 +501,7 @@ class MusePipe(PipePrep, PipeRecipes):
             # Check the raw folder
             self.goto_folder(self.paths.rawfiles)
             # Get the list of files from the Raw data folder
-            files = os.listdir("")
+            files = os.listdir()
 
             smalldic = {"FILENAME": ['filename', '', str, '100A']}
             fulldic = listexpo_files.copy()

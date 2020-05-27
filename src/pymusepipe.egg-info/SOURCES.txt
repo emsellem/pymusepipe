@@ -1,4 +1,6 @@
 .gitignore
+AUTHORS.rst
+CHANGELOG.rst
 LICENSE.txt
 MANIFEST.in
 README.md
@@ -17,6 +19,16 @@ setup.py
 .spyproject/workspace.ini
 config_templates/calib_tables.dic
 config_templates/rc.dic
+docs/Makefile
+docs/authors.rst
+docs/changelog.rst
+docs/conf.py
+docs/howto.rst
+docs/index.rst
+docs/license.rst
+docs/_static/.gitignore
+docs/api/modules.rst
+docs/api/pymusepipe.rst
 src/pymusepipe/__init__.py
 src/pymusepipe/align_pipe.py
 src/pymusepipe/check_pipe.py
@@ -40,3 +52,6 @@ src/pymusepipe.egg-info/dependency_links.txt
 src/pymusepipe.egg-info/not-zip-safe
 src/pymusepipe.egg-info/requires.txt
 src/pymusepipe.egg-info/top_level.txt
+src/pymusepipe/data/Filters/LCO_SITe3_rp.txt
+src/pymusepipe/data/Filters/LaSilla_WFI_ESO844p.txt
+src/pymusepipe/data/Filters/LaSilla_WFI_ESO856p.txt
