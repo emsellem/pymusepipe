@@ -546,8 +546,8 @@ class MusePipeSample(object):
                 first_recipe="align_bypointing", **kwargs)
 
     def finalise_reduction(self, targetname=None, rot_pixtab=False, create_wcs=True,
-                           create_expocubes=True, offset_table_name=None,
-                           folder_offset_table=None,
+                           create_expocubes=True, create_pixtables=True,
+                           offset_table_name=None, folder_offset_table=None,
                            dict_exposures=None,
                            **kwargs):
         """Finalise the reduction steps by using the offset table, rotating the
@@ -574,6 +574,10 @@ class MusePipeSample(object):
                                          folder_offset_table=folder_offset_table,
                                          offset_table_name=offset_table_name,
                                          fakemode=False)
+
+        norm_skycontinuum = kwargs.pop("norm_skycontinuum", True)
+        skymethod = kwargs.pop("skymethod", 'model')
+        if create_pixtables:
             # We then reconstruct the pixtable reduced so we can
             # redo a muse_exp_combine if needed
             upipe.print_info("==== REDUCED PIXTABLES for REFERENCE MOSAIC ====")
@@ -582,8 +586,9 @@ class MusePipeSample(object):
                                             offset_table_name=offset_table_name,
                                             save="individual",
                                             wcs_auto=False,
-                                            norm_skycontinuum=True,
-                                            dict_exposures=dict_exposures)
+                                            norm_skycontinuum=norm_skycontinuum,
+                                            dict_exposures=dict_exposures,
+                                            skymethod=skymethod)
 
         if create_wcs:
             # Creating the WCS reference frames. Full mosaic and individual
@@ -611,9 +616,9 @@ class MusePipeSample(object):
                                             folder_offset_table=folder_offset_table,
                                             offset_table_name=offset_table_name,
                                             save="cube",
-                                            norm_skycontinuum=True,
-                                            wcs_auto=True,
+                                            norm_skycontinuum=norm_skycontinuum,
                                             dict_exposures=dict_exposures,
+                                            skymethod=skymethod,
                                             **kwargs)
 
         if create_pointingcubes:
@@ -655,7 +660,7 @@ class MusePipeSample(object):
         wcs_auto = kwargs.pop("wcs_auto", True)
         wcs_suffix = "{0}{1}".format(default_prefix_wcs, cube_suffix)
         if not wcs_auto:
-            name_wcs = kwargs.pop("name_wcs", None)
+            ref_wcs = kwargs.pop("ref_wcs", None)
 
         # Fetch the default folder for the WCS files which is the folder
         # of the Combined cubes
@@ -667,12 +672,12 @@ class MusePipeSample(object):
         # Running the scipost_perexpo for all pointings individually
         for pointing in list_pointings:
             if wcs_auto:
-                name_wcs = "{0}_P{1:02d}.fits".format(wcs_suffix, np.int(pointing))
-            if name_wcs is not None:
+                ref_wcs = "{0}_P{1:02d}.fits".format(wcs_suffix, np.int(pointing))
+            if ref_wcs is not None:
                 suffix = "_WCS_P{0:02d}".format(np.int(pointing))
             else:
                 suffix = "_P{0:02d}".format(np.int(pointing))
-            kwargs_pointing = {'ref_wcs': name_wcs,
+            kwargs_pointing = {'ref_wcs': ref_wcs,
                                'suffix': suffix,
                                'folder_ref_wcs': folder_ref_wcs,
                                'sof_filename': 'scipost_wcs',
