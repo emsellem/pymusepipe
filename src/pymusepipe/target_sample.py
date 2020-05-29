@@ -599,11 +599,13 @@ class MusePipeSample(object):
             reference_cube = kwargs.pop("reference_cube", True)
             pointings_wcs = kwargs.pop("pointings_wcs", True)
             list_pointings = kwargs.get("list_pointings", None)
+            refcube_name = kwargs.pop("refcube_name", None)
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
                                       offset_table_name=offset_table_name,
                                       dict_exposures=dict_exposures,
                                       reference_cube=reference_cube,
+                                      refcube_name=refcube_name,
                                       mosaic_wcs=mosaic_wcs,
                                       pointings_wcs=pointings_wcs,
                                       list_pointings=list_pointings,

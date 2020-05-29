@@ -46,6 +46,7 @@ from .mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
 from .align_pipe import mjd_names, date_names
+prefix_final_cube = prep_recipes_pipe.dict_products_scipost['cube'][0]
 
 __version__ = '0.0.3 (4 Sep 2019)'
 # 0.0.2 28 Feb, 2019: trying to make it work
@@ -152,7 +153,8 @@ def get_list_exposures(pointing_path=""):
     list_expos: list of int
     """
     # Done by scanning the target path
-    list_files = glob.glob(pointing_path + "/Object/DATACUBE_FINAL*_????.fits")
+    list_files = glob.glob(pointing_path + "/Object/{}*_????.fits".format(
+                              prefix_final_cube))
     list_expos = []
     for name in list_files:
         [(tpl, lint)] = re.findall(r'\_(\S{19})\_(\d{4}).fits', name)
@@ -773,12 +775,15 @@ class MusePointings(SofPipe, PipeRecipes):
         if wcs_from_mosaic:
             if ref_wcs is not None:
                 upipe.print_warning("wcs_from_mosaic is set to True. "
-                                    "Hence will overwrite ref_wcs given input")
-            prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
-            self.add_targetname = kwargs.pop("add_targetname", True)
-            prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
-            ref_wcs = "{0}DATACUBE_FINAL_P{1:02d}.fits".format(prefix_wcs,
-                                                               np.int(pointing))
+                                    "but will not overwrite ref_wcs as it was"
+                                    "specifically provided")
+            else:
+                prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+                self.add_targetname = kwargs.pop("add_targetname", True)
+                prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
+                ref_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
+                                                        prefix_final_cube,
+                                                        np.int(pointing))
 
         # Running the combine for that single pointing
         self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix,
@@ -835,6 +840,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.add_targetname = kwargs.pop("add_targetname", True)
         prefix_mask = kwargs.pop("prefix_mask", default_prefix_mask)
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+        wcs_auto = kwargs.pop("wcs_auto", True)
 
         # Running combine with the ref WCS with only 2 spectral pixels
         # Limit the maximum lambda to the wcs ones
@@ -844,7 +850,8 @@ class MusePointings(SofPipe, PipeRecipes):
                                          add_targetname=self.add_targetname,
                                          prefix_all=prefix_mask,
                                          lambdaminmax=lambdaminmax_for_wcs,
-                                         wcs_auto=True, **kwargs)
+                                         wcs_auto=wcs_auto,
+                                         **kwargs)
 
         # Now creating the mask with 0's and 1's
         dir_mask = upipe.normpath(self.paths.cubes)
@@ -853,10 +860,12 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_mask = self._add_targetname(prefix_mask)
         prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
 
-        name_mask = "{0}DATACUBE_FINAL_P{1:02d}.fits".format(
-            prefix_mask, np.int(pointing))
-        finalname_wcs = "{0}DATACUBE_FINAL_P{1:02d}.fits".format(prefix_wcs,
+        name_mask = "{0}{1}_P{2:02d}.fits".format(prefix_mask,
+                                                  prefix_final_cube,
                                                   np.int(pointing))
+        finalname_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
+                                               prefix_final_cube,
+                                               np.int(pointing))
 
         # First create a subcube without all the Nan
         mask_cube = MuseCube(filename=joinpath(dir_mask, name_mask))
@@ -1059,11 +1068,15 @@ class MusePointings(SofPipe, PipeRecipes):
         wcs_auto = kwargs.pop("wcs_auto", False)
         ref_wcs = kwargs.pop("ref_wcs", None)
         if wcs_auto:
-            upipe.print_warning("wcs_auto is True, hence overwriting ref_wcs name")
-            # getting the name of the final datacube (mosaic)
-            cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
-            cube_suffix = self._add_targetname(cube_suffix)
-            ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
+            if ref_wcs is not None:
+                 upipe.print_warning("wcs_auto is True, but ref_wcs was "
+                                     "specifically provided, and "
+                                     "will not be overwritten.")
+            else:
+                # getting the name of the final datacube (mosaic)
+                cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
+                cube_suffix = self._add_targetname(cube_suffix)
+                ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
             upipe.print_warning("ref_wcs used is {0}".format(ref_wcs))
 
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", upipe.normpath(self.paths.cubes))
