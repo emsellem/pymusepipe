@@ -651,7 +651,8 @@ class MusePointings(SofPipe, PipeRecipes):
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dict_folders_target[name]))
 
     def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True,
-                             reference_cube=True, **kwargs):
+                             reference_cube=True, refcube_name=None,
+                             **kwargs):
         """Create the WCS reference files, for all individual pointings and for
         the mosaic.
 
@@ -666,7 +667,6 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Creating the reference cube if not existing
         if reference_cube:
-            refcube_name = kwargs.pop("refcube_name", None)
             if refcube_name is None:
                 upipe.print_info("@@@@@@@ First creating a reference (mosaic) "
                                  "cube with short spectral range @@@@@@@")
