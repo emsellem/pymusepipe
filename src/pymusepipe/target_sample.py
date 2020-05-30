@@ -958,11 +958,13 @@ class MusePipeSample(object):
                                                  folder_offset_table=folder_offset_table,
                                                  log_filename=log_filename, **kwargs)
 
-    def combine_target_per_pointing(self, targetname=None, **kwargs):
+    def combine_target_per_pointing(self, targetname=None, wcs_from_pointing=True,
+                                    **kwargs):
         """Run the combine recipe. Shortcut for combine[targetname].run_combine()
         """
         self.init_combine(targetname=targetname, **kwargs)
-        self.pipes_combine[targetname].run_combine_all_single_pointings(**kwargs)
+        self.pipes_combine[targetname].run_combine_all_single_pointings(
+                wcs_from_pointing=wcs_from_pointing, **kwargs)
 
     def combine_target(self, targetname=None, **kwargs):
         """Run the combine recipe. Shortcut for combine[targetname].run_combine()

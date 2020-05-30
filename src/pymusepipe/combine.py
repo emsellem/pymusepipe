@@ -768,14 +768,13 @@ class MusePointings(SofPipe, PipeRecipes):
         suffix = "{0}_P{1:02d}".format(add_suffix, np.int(pointing))
 
         ref_wcs = kwargs.pop("ref_wcs", None)
-        wcs_from_mosaic = kwargs.pop("wcs_from_mosaic", True)
+        wcs_from_pointing = kwargs.pop("wcs_from_pointing", False)
 
-        # Wcs_from_mosaic
-        # If true, use the reference wcs
-        print(wcs_from_mosaic, ref_wcs)
-        if wcs_from_mosaic:
+        # Wcs_from_pointing
+        # If true, use the reference pointing wcs
+        if wcs_from_pointing:
             if ref_wcs is not None:
-                upipe.print_warning("wcs_from_mosaic is set to True. "
+                upipe.print_warning("wcs_from_pointing is set to True. "
                                     "but will not overwrite ref_wcs as it was"
                                     "specifically provided")
             else:
