@@ -978,12 +978,13 @@ class MusePipeSample(object):
 
     def create_reference_wcs(self, targetname=None, pointings_wcs=True,
                              mosaic_wcs=True, reference_cube=True,
-                             ref_wcs=None, folder_ref_wcs=None,
+                             ref_wcs=None,
                              refcube_name=None, **kwargs):
         """Run the combine for individual exposures first building up
         a mask.
         """
         self.init_combine(targetname=targetname, **kwargs)
+        folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
         self.pipes_combine[targetname].create_reference_wcs(pointings_wcs=pointings_wcs,
                                                   mosaic_wcs=mosaic_wcs,
                                                   reference_cube=reference_cube,
