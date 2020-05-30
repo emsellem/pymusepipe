@@ -195,9 +195,6 @@ class MusePipe(PipePrep, PipeRecipes):
         self._save_alignment_images = kwargs.pop("save_alignment_images", True)
 
         #        super(MusePipe, self).__init__(**kwargs)
-        # Filter for alignment
-        self.filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
-        self.filter_list = kwargs.pop("filter_list", "white")
 
         # Setting the default attibutes #####################
         self.targetname = targetname
@@ -224,8 +221,14 @@ class MusePipe(PipePrep, PipeRecipes):
         last_recipe = kwargs.pop("last_recipe", None)
         init_raw_table = kwargs.pop("init_raw_table", True)
 
+        # Filter for alignment
+        filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
+        filter_list = kwargs.pop("filter_list", "white")
         # Init of the subclasses
-        PipePrep.__init__(self, first_recipe=first_recipe, last_recipe=last_recipe)
+        PipePrep.__init__(self, first_recipe=first_recipe,
+                          last_recipe=last_recipe,
+                          filter_for_alignment=filter_for_alignment,
+                          filter_list=filter_list)
         PipeRecipes.__init__(self, **kwargs)
 
         # =========================================================== #

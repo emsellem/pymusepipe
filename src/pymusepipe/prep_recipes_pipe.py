@@ -91,7 +91,7 @@ def print_my_function_name(f):
     """
     @functools.wraps(f)
     def wrapped(*myargs, **mykwargs):
-        upipe.print_info(f.__name__)
+        upipe.print_info("################   " + f.__name__ + "   ################")
         return f(*myargs, **mykwargs)
     return wrapped
 
@@ -175,8 +175,8 @@ class PipePrep(SofPipe) :
         # for recipe in self.list_recipes:
         upipe.print_info("=============================================")
         upipe.print_info("The dictionary of recipes which can be run is")
-        for key in dict_recipes_num:
-            print("{0}: {1}".format(key, dict_recipes_num[key]))
+        for key in dict_recipes_per_num:
+            print("{0}: {1}".format(key, dict_recipes_per_num[key]))
         upipe.print_info("=============================================")
 
     @print_my_function_name
@@ -1342,8 +1342,8 @@ class PipePrep(SofPipe) :
         self.dict_alignments[tstamp].save(name_offset_table)
 
     @print_my_function_name
-    def run_fine_alignment(self, name_ima_reference=None, nexpo=1, list_expo=[], line=None, 
-            bygroup=False, reset=False):
+    def run_fine_alignment(self, name_ima_reference=None, nexpo=1, list_expo=[],
+                           line=None, bygroup=False, reset=False, **kwargs):
         """Run the alignment on this pointing using or not a reference image
         """
         # If not yet initialised, build the dictionary

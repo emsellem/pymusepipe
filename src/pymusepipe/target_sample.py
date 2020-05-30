@@ -11,6 +11,7 @@ __contact__   = " <eric.emsellem@eso.org>"
 # Standard modules
 import os
 from os.path import join as joinpath
+import copy
 
 import numpy as np
 
@@ -547,6 +548,7 @@ class MusePipeSample(object):
 
     def finalise_reduction(self, targetname=None, rot_pixtab=False, create_wcs=True,
                            create_expocubes=True, create_pixtables=True,
+                           create_pointingcubes=True,
                            offset_table_name=None, folder_offset_table=None,
                            dict_exposures=None,
                            **kwargs):
@@ -627,7 +629,7 @@ class MusePipeSample(object):
             # Running the pointing cubes now with the same WCS reference
             upipe.print_info("========= CREATION OF POINTING CUBES ===========")
             self.combine_target_per_pointing(targetname=targetname,
-                                             offset_table_name=final_offset_table,
+                                             offset_table_name=offset_table_name,
                                              folder_offset_table=folder_offset_table,
                                              dict_exposures=dict_exposures,
                                              filter_list=self._short_filter_list)
@@ -743,7 +745,7 @@ class MusePipeSample(object):
             if not self.pipes[targetname][pointing]._raw_table_initialised:
                 self.pipes[targetname][pointing].init_raw_table(overwrite=True)
             if self.__phangs:
-                self.pipes[targetname][pointing].run_phangs_recipes(param_recipes=_this_param_recipes,
+                self.pipes[targetname][pointing].run_phangs_recipes(param_recipes=this_param_recipes,
                                                                     **kwargs_recipe)
             else:
                 self.pipes[targetname][pointing].run_recipes(param_recipes=this_param_recipes,

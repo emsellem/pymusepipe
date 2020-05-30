@@ -1072,6 +1072,7 @@ class MusePointings(SofPipe, PipeRecipes):
                  upipe.print_warning("wcs_auto is True, but ref_wcs was "
                                      "specifically provided, and "
                                      "will not be overwritten.")
+                 upipe.print_warning("Provided ref_wcs is {}".format(ref_wcs))
             else:
                 # getting the name of the final datacube (mosaic)
                 cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
