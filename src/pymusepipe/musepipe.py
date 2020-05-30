@@ -222,13 +222,11 @@ class MusePipe(PipePrep, PipeRecipes):
         init_raw_table = kwargs.pop("init_raw_table", True)
 
         # Filter for alignment
-        filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
-        filter_list = kwargs.pop("filter_list", "white")
+        self.filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
+        self.filter_list = kwargs.pop("filter_list", "white")
         # Init of the subclasses
         PipePrep.__init__(self, first_recipe=first_recipe,
-                          last_recipe=last_recipe,
-                          filter_for_alignment=filter_for_alignment,
-                          filter_list=filter_list)
+                          last_recipe=last_recipe)
         PipeRecipes.__init__(self, **kwargs)
 
         # =========================================================== #
