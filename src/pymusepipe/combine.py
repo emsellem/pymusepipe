@@ -1082,7 +1082,6 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_warning("ref_wcs used is {0}".format(ref_wcs))
 
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", upipe.normpath(self.paths.cubes))
-        print(folder_ref_wcs, ref_wcs)
         if ref_wcs is not None:
             full_ref_wcs = joinpath(folder_ref_wcs, ref_wcs)
             if not os.path.isfile(full_ref_wcs):

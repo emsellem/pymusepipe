@@ -603,7 +603,9 @@ class MusePipeSample(object):
             list_pointings = kwargs.get("list_pointings", None)
             refcube_name = kwargs.pop("refcube_name", None)
             full_ref_wcs = kwargs.pop("full_ref_wcs", None)
-            folder_full_ref_wcs = kwargs.pop("folder_full_ref_wcs", None)
+            default_comb_folder = self.targets[targetname].combcubes_path
+            folder_full_ref_wcs = kwargs.pop("folder_full_ref_wcs",
+                                             default_comb_folder)
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
                                       offset_table_name=offset_table_name,
