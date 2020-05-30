@@ -772,6 +772,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Wcs_from_mosaic
         # If true, use the reference wcs
+        print(wcs_from_mosaic, ref_wcs)
         if wcs_from_mosaic:
             if ref_wcs is not None:
                 upipe.print_warning("wcs_from_mosaic is set to True. "
