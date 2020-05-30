@@ -602,6 +602,8 @@ class MusePipeSample(object):
             pointings_wcs = kwargs.pop("pointings_wcs", True)
             list_pointings = kwargs.get("list_pointings", None)
             refcube_name = kwargs.pop("refcube_name", None)
+            full_ref_wcs = kwargs.pop("full_ref_wcs", None)
+            folder_full_ref_wcs = kwargs.pop("folder_full_ref_wcs", None)
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
                                       offset_table_name=offset_table_name,
@@ -611,6 +613,8 @@ class MusePipeSample(object):
                                       mosaic_wcs=mosaic_wcs,
                                       pointings_wcs=pointings_wcs,
                                       list_pointings=list_pointings,
+                                      ref_wcs=full_ref_wcs,
+                                      folder_ref_wcs=folder_full_ref_wcs,
                                       fakemode=False)
 
         if create_expocubes:
