@@ -26,7 +26,7 @@ from .emission_lines import full_muse_wavelength_range
 from .config_pipe import default_filter_list
 from . import util_pipe as upipe
 
-from mpdaf.obj import Image
+from mpdaf.obj import Image, Cube
 
 from collections import OrderedDict
 
