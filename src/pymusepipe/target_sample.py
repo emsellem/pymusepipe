@@ -902,21 +902,23 @@ class MusePipeSample(object):
         build_cube = kwargs.pop("build_cube", True)
         build_images = kwargs.pop("build_images", True)
         dict_expo = kwargs.pop("dict_exposures", None)
-        self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
-                         add_targetname=add_targetname,
-                         dict_exposures=dict_expo)
 
         # Doing the mosaic with mad
         suffix = kwargs.pop("suffix", "WCS_Pall_mad")
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
 
+        # defining the default cube name here to then define the output cube name
         default_cube_name = "{0}_DATACUBE_FINAL_{1}.fits".format(targetname, suffix)
         default_cube_name = joinpath(folder_cubes, default_cube_name)
-
-
         outcube_name = kwargs.pop("output_cube_name", default_cube_name)
         outcube_name = joinpath(folder_cubes, outcube_name)
+
+        # Initiliase the mosaic
+        self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
+                         add_targetname=add_targetname,
+                         dict_exposures=dict_expo, **kwargs)
+
         # Doing the MAD combination using mpdaf. Note the build_cube fakemode
         self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name,
                                                  fakemode=not build_cube)
