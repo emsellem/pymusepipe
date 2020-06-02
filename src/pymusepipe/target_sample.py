@@ -549,7 +549,7 @@ class MusePipeSample(object):
     def finalise_reduction(self, targetname=None, rot_pixtab=False, create_wcs=True,
                            create_expocubes=True, create_pixtables=True,
                            create_pointingcubes=True,
-                           offset_table_name=None, folder_offset_table=None,
+                           name_offset_table=None, folder_offset_table=None,
                            dict_exposures=None,
                            **kwargs):
         """Finalise the reduction steps by using the offset table, rotating the
@@ -562,7 +562,7 @@ class MusePipeSample(object):
             rot_pixtab (bool):
             create_wcs (bool):
             create_expocubes (bool):
-            offset_table_name (str):
+            name_offset_table (str):
             folder_offset_table (str):
             **kwargs:
 
@@ -574,7 +574,7 @@ class MusePipeSample(object):
             upipe.print_info("========== ROTATION OF PIXTABLES ===============")
             self.rotate_pixtables_target(targetname=targetname,
                                          folder_offset_table=folder_offset_table,
-                                         offset_table_name=offset_table_name,
+                                         name_offset_table=name_offset_table,
                                          fakemode=False)
 
         norm_skycontinuum = kwargs.pop("norm_skycontinuum", True)
@@ -585,7 +585,7 @@ class MusePipeSample(object):
             upipe.print_info("==== REDUCED PIXTABLES for REFERENCE MOSAIC ====")
             self.run_target_scipost_perexpo(targetname=targetname,
                                             folder_offset_table=folder_offset_table,
-                                            offset_table_name=offset_table_name,
+                                            name_offset_table=name_offset_table,
                                             save="individual",
                                             wcs_auto=False,
                                             norm_skycontinuum=norm_skycontinuum,
@@ -608,7 +608,7 @@ class MusePipeSample(object):
                                              default_comb_folder)
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
-                                      offset_table_name=offset_table_name,
+                                      name_offset_table=name_offset_table,
                                       dict_exposures=dict_exposures,
                                       reference_cube=reference_cube,
                                       refcube_name=refcube_name,
@@ -624,7 +624,7 @@ class MusePipeSample(object):
             upipe.print_info("=========== CREATION OF EXPO CUBES =============")
             self.run_target_scipost_perexpo(targetname=targetname,
                                             folder_offset_table=folder_offset_table,
-                                            offset_table_name=offset_table_name,
+                                            name_offset_table=name_offset_table,
                                             save="cube",
                                             norm_skycontinuum=norm_skycontinuum,
                                             dict_exposures=dict_exposures,
@@ -635,13 +635,13 @@ class MusePipeSample(object):
             # Running the pointing cubes now with the same WCS reference
             upipe.print_info("========= CREATION OF POINTING CUBES ===========")
             self.combine_target_per_pointing(targetname=targetname,
-                                             offset_table_name=offset_table_name,
+                                             name_offset_table=name_offset_table,
                                              folder_offset_table=folder_offset_table,
                                              dict_exposures=dict_exposures,
                                              filter_list=self._short_filter_list)
 
     def run_target_scipost_perexpo(self, targetname=None, list_pointings=None,
-                                   folder_offset_table=None, offset_table_name=None,
+                                   folder_offset_table=None, name_offset_table=None,
                                    **kwargs):
         """Build the cube per exposure using a given WCS
 
@@ -692,7 +692,7 @@ class MusePipeSample(object):
                                'folder_ref_wcs': folder_ref_wcs,
                                'sof_filename': 'scipost_wcs',
                                'dir_products': default_comb_folder,
-                               'offset_table_name': offset_table_name,
+                               'name_offset_table': name_offset_table,
                                'folder_offset_table': folder_offset_table,
                                'offset_list': True,
                                'filter_list': filter_list,
@@ -808,7 +808,7 @@ class MusePipeSample(object):
             upipe.print_info("====== END   - POINTING {0:2d} ======".format(pointing))
 
     def rotate_pixtables_target(self, targetname=None, list_pointings=None,
-                                folder_offset_table=None, offset_table_name=None,
+                                folder_offset_table=None, name_offset_table=None,
                                 fakemode=False, **kwargs):
         """Rotate all pixel table of a certain targetname and pointings
         """
@@ -830,7 +830,7 @@ class MusePipeSample(object):
         prefix = kwargs.pop("prefix", "")
         if folder_offset_table is None:
             folder_offset_table = self.pipes[targetname][list_pointings[0]].paths.alignment
-        offset_table = Table.read(joinpath(folder_offset_table, offset_table_name))
+        offset_table = Table.read(joinpath(folder_offset_table, name_offset_table))
         offset_table.sort(["POINTING_OBS", "IEXPO_OBS"])
         # Loop on the pointings
 
@@ -943,7 +943,7 @@ class MusePipeSample(object):
                 ima.write(joinpath(folder_cubes, ima_name))
 
     def init_combine(self, targetname=None, list_pointings=None,
-                     folder_offset_table=None, offset_table_name=None,
+                     folder_offset_table=None, name_offset_table=None,
                      **kwargs):
         """Prepare the combination of targets
 
@@ -953,7 +953,7 @@ class MusePipeSample(object):
             Name of target
         list_pointings: list [or None=default= all pointings]
             List of pointings (e.g., [1,2,3])
-        offset_table_name: str
+        name_offset_table: str
             Name of Offset table
         """
         log_filename = kwargs.pop("log_filename", "{0}_combine_{1}.log".format(targetname, version_pack))
@@ -962,7 +962,7 @@ class MusePipeSample(object):
                                                  rc_filename=self.targets[targetname].rc_filename,
                                                  cal_filename=self.targets[targetname].cal_filename,
                                                  folder_config=self.targets[targetname].folder_config,
-                                                 offset_table_name=offset_table_name,
+                                                 name_offset_table=name_offset_table,
                                                  folder_offset_table=folder_offset_table,
                                                  log_filename=log_filename, **kwargs)
 

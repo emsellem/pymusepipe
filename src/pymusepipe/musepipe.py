@@ -680,20 +680,20 @@ class MusePipe(PipePrep, PipeRecipes):
             upipe.print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
             return Table()
 
-    def _read_offset_table(self, offset_table_name=None, folder_offset_table=None):
+    def _read_offset_table(self, name_offset_table=None, folder_offset_table=None):
         """Reading the Offset Table
 
         Input
         -----
-        offset_table_name: str
+        name_offset_table: str
             Name of the offset table
             Default is None
         folder_offset_table: str
             Name of the folder to find the offset table
             Default is None
         """
-        self.offset_table_name = offset_table_name
-        if self.offset_table_name is None:
+        self.name_offset_table = name_offset_table
+        if self.name_offset_table is None:
             upipe.print_warning("No Offset table name given")
             self.offset_table = Table()
             return
@@ -704,16 +704,16 @@ class MusePipe(PipePrep, PipeRecipes):
         else:
             self.folder_offset_table = folder_offset_table
 
-        full_offset_table_name = joinpath(self.folder_offset_table,
-                                          self.offset_table_name)
-        if not os.path.isfile(full_offset_table_name):
+        fullname_offset_table = joinpath(self.folder_offset_table,
+                                          self.name_offset_table)
+        if not os.path.isfile(fullname_offset_table):
             upipe.print_error("Offset table [{0}] not found".format(
-                full_offset_table_name))
+                fullname_offset_table))
             self.offset_table = Table()
             return
 
         # Opening the offset table
-        self.offset_table = Table.read(full_offset_table_name)
+        self.offset_table = Table.read(fullname_offset_table)
 
     def _select_closest_mjd(self, mjdin, group_table):
         """Get the closest frame within the expotype

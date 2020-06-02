@@ -742,7 +742,7 @@ class PipePrep(SofPipe) :
                     **extra_kwargs)
 
     @print_my_function_name
-    def run_check_align(self, offset_table_name, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
+    def run_check_align(self, name_offset_table, sof_filename='scipost', expotype="OBJECT", tpl="ALL",
             line=None, suffix="", folder_offset_table=None, **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter to check if the alignments are ok (after rotation 
@@ -780,7 +780,7 @@ class PipePrep(SofPipe) :
                     tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
                     lambdaminmax=[lmin, lmax], save='cube', 
                     offset_list=True, filter_list=filter_for_alignment,
-                    offset_table_name=offset_table_name,
+                    name_offset_table=name_offset_table,
                     folder_offset_table=folder_offset_table,
                     **extra_kwargs)
 
@@ -895,7 +895,7 @@ class PipePrep(SofPipe) :
         return found_expo, list_expo, group_list_expo, group_table
 
     def _normalise_skycontinuum(self, mjd_expo, tpl_expo, iexpo, 
-            suffix="", offset_table_name=None, **kwargs):
+            suffix="", name_offset_table=None, **kwargs):
         """Create a normalised continuum, to be included in the sof file
         """
         stage = "processed"
@@ -924,11 +924,11 @@ class PipePrep(SofPipe) :
         if normalise_factor is None:
             # Checking input offset table and corresponding pixtables
             folder_offset_table = kwargs.pop("folder_offset_table", None)
-            self._read_offset_table(offset_table_name, folder_offset_table)
+            self._read_offset_table(name_offset_table, folder_offset_table)
             # Get the background value
             if mjd_names['table'] not in self.offset_table.columns:
                 upipe.print_warning("No MJD column in offset table {0}".format(
-                                     offset_table_name))
+                                     name_offset_table))
                 status = -1
             else:    
                 table_mjdobs = self.offset_table[mjd_names['table']]
@@ -941,7 +941,7 @@ class PipePrep(SofPipe) :
             if status < 0:
                 dict_err = {-1: "MJD", -2: "BACKGROUND"}
                 upipe.print_error("Table {0} - {1}".format(folder_offset_table,
-                                  offset_table_name))
+                                  name_offset_table))
                 upipe.print_error("Could not find {0} value in offset table".format(
                                     dict_err[status]))
                 upipe.print_warning("A background of 0 will be assumed, and")
@@ -1002,7 +1002,7 @@ class PipePrep(SofPipe) :
             Type of skymethod. See MUSE manual.
         offset_list: bool
             If True, using an OFFSET list. Default is True.
-        offset_table_name: str
+        name_offset_table: str
             Name of the offset table table. If not provided, will use the 
             default name produced during the pipeline run.
         filter_for_alignment: str
@@ -1041,11 +1041,11 @@ class PipePrep(SofPipe) :
 
         # Offsets
         offset_list = kwargs.pop("offset_list", False)
-        offset_table_name = kwargs.pop("offset_table_name", None)
+        name_offset_table = kwargs.pop("name_offset_table", None)
         folder_offset_table = kwargs.pop("folder_offset_table", None)
         if offset_list:
             upipe.print_info("Will use offset table: {0} in {1}".format(
-                offset_table_name, folder_offset_table))
+                name_offset_table, folder_offset_table))
 
         # Misc parameters - autocalib, barycentric correction, AC
         autocalib = kwargs.pop("autocalib", "none")
@@ -1101,16 +1101,16 @@ class PipePrep(SofPipe) :
             if ref_wcs is not None:
                 self._sofdict['OUTPUT_WCS'] = [joinpath(folder_ref_wcs, ref_wcs)]
 
-            if offset_table_name is None:
+            if name_offset_table is None:
                 folder_offset_table = self._get_fullpath_expo(expotype, "processed")
-                offset_table_name = '{0}{1}_{2}_{3}.fits'.format(
+                name_offset_table = '{0}{1}_{2}_{3}.fits'.format(
                                        dict_files_products['ALIGN'][0],
                                        suffix, filter_for_alignment, tpl)
             else:
                 if folder_offset_table is None:
                     folder_offset_table = self.paths.alignment
             if offset_list :
-                self._sofdict['OFFSET_LIST'] = [joinpath(folder_offset_table, offset_table_name)]
+                self._sofdict['OFFSET_LIST'] = [joinpath(folder_offset_table, name_offset_table)]
 
             # The sky subtraction method on the sky continuum to normalise it
             # But only if requested
@@ -1123,7 +1123,7 @@ class PipePrep(SofPipe) :
                         tpl_expo=tpl, iexpo=list_group_expo[0], 
                         suffix=suffix_skycontinuum, 
                         folder_offset_table=folder_offset_table,
-                        offset_table_name=offset_table_name)
+                        name_offset_table=name_offset_table)
             else:
                 prefix_skycontinuum = ""
             if skymethod != "none":
