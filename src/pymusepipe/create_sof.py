@@ -150,6 +150,9 @@ class SofPipe(object) :
                 calfolder = self.paths.rawfiles
                 geofile = expo_table['filename'][index]
             else:
+                upipe.print_warning("Did not find a GEOMETRY entry in Astropy "
+                                    "table. Using default GEOMETRY"
+                                    "Check if Raw Table was initialised")
                 calfolder = self.pipe_params.musecalib
                 geofile = self.pipe_params.geo_table
 
@@ -169,6 +172,9 @@ class SofPipe(object) :
                 calfolder = self.paths.rawfiles
                 astrofile = expo_table['filename'][index]
             else:
+                upipe.print_warning("Did not find an ASTROMETRY entry in Astropy "
+                                    "Raw table. Using default ASTROMETRY."
+                                    "Check if Raw Table was initialised")
                 calfolder = self.pipe_params.musecalib
                 astrofile = self.pipe_params.astro_table
 
