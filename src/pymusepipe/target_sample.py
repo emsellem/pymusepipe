@@ -460,7 +460,7 @@ class MusePipeSample(object):
                 folder_config=folder_config, rc_filename=rc_filename,
                 cal_filename=cal_filename, log_filename=log_filename_pointing,
                 first_recipe=first_recipe, last_recipe=last_recipe,
-                init_raw_table=False, verbose=verbose, **kwargs)
+                init_raw_table=True, verbose=verbose, **kwargs)
 
             # Saving the command
             self.pipes[targetname][pointing].history = python_command

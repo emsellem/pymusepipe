@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pymusepipe
-Version: 2.9.9.post19
+Version: 2.9.9.post20
 Summary: python module to reduce MUSE Raw data and combine them
 Home-page: https://github.com/emsellem/pipemusepipe
 Author: Eric Emsellem
