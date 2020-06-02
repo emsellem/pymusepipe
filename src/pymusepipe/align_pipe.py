@@ -562,8 +562,8 @@ class AlignMusePointing(object):
     """Class to align MUSE images onto a reference image.
     """
     def __init__(self, name_reference,
-                 folder_reference=".",
-                 folder_muse_images=".",
+                 folder_reference=None,
+                 folder_muse_images=None,
                  name_muse_images=None,
                  sel_indices_images=None,
                  median_window=10,
@@ -653,6 +653,9 @@ class AlignMusePointing(object):
         self.median_window = median_window
         self.dynamic_range = dynamic_range
         self.name_reference = name_reference
+        default_folder = os.getcwd()
+        if folder_reference is None:
+            folder_reference = default_folder
         self.folder_reference = folder_reference
 
         # Debug option
@@ -668,6 +671,8 @@ class AlignMusePointing(object):
 
         self.name_muse_images = name_muse_images
         self.sel_indices_images = sel_indices_images
+        if folder_muse_images is None:
+            folder_muse_images = default_folder
         self.folder_muse_images = folder_muse_images
         # Check if folder muse images exists
         if not os.path.isdir(self.folder_muse_images):
@@ -685,7 +690,7 @@ class AlignMusePointing(object):
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
         self.name_refhdr = kwargs.pop("name_refhdr", "reference.hdr")
         self.suffix_images = kwargs.pop("suffix_muse_images", "IMAGE_FOV")
-        self.filter_name = kwargs.pop("filter_name", "WFI_BB")
+        self.filter_name = kwargs.pop("filter_name", "Cousins_R")
 
         # Use polynorm or not
         self.use_polynorm = kwargs.pop("use_polynorm", True)
