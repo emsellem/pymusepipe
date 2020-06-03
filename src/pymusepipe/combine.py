@@ -248,7 +248,7 @@ class MusePointings(SofPipe, PipeRecipes):
                  folder_config="",
                  rc_filename=None, cal_filename=None,
                  combined_folder_name="Combined", suffix="",
-                 name_offset_name=None,
+                 name_offset_table=None,
                  folder_offset_table=None,
                  log_filename="MusePipeCombine.log",
                  verbose=True, debug=False, **kwargs):
@@ -365,7 +365,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self._get_pixtable_list(dict_exposures)
 
         # Checking input offset table and corresponding pixtables
-        self._check_offset_table(name_offset_name, folder_offset_table)
+        self._check_offset_table(name_offset_table, folder_offset_table)
         # END CHECK UP ============================================
 
         # Making the output folders in a safe mode
@@ -495,21 +495,21 @@ class MusePointings(SofPipe, PipeRecipes):
             select_list_pixtabs.sort()
             self.dict_pixtabs_in_pointings[pointing] = select_list_pixtabs
 
-    def _read_offset_table(self, name_offset_name=None, folder_offset_table=None):
+    def _read_offset_table(self, name_offset_table=None, folder_offset_table=None):
         """Reading the Offset Table
         If readable, the table is read and set in the offset_table attribute.
 
         Input
         -----
-        name_offset_name: str
+        name_offset_table: str
             Name of the offset table
             Default is None
         folder_offset_table: str
             Name of the folder to find the offset table
             Default is None
         """
-        self.name_offset_name = name_offset_name
-        if self.name_offset_name is None:
+        self.name_offset_table = name_offset_table
+        if self.name_offset_table is None:
             upipe.print_warning("No Offset table name given", pipe=self)
             self.offset_table = Table()
             return
@@ -520,33 +520,33 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             self.folder_offset_table = folder_offset_table
 
-        fullname_offset_name = joinpath(self.folder_offset_table,
-                                          self.name_offset_name)
-        if not os.path.isfile(fullname_offset_name):
+        fullname_offset_table = joinpath(self.folder_offset_table,
+                                          self.name_offset_table)
+        if not os.path.isfile(fullname_offset_table):
             upipe.print_error("Offset table [{0}] not found".format(
-                fullname_offset_name), pipe=self)
+                fullname_offset_table), pipe=self)
             self.offset_table = Table()
             return
 
         # Opening the offset table
-        self.offset_table = Table.read(fullname_offset_name)
+        self.offset_table = Table.read(fullname_offset_table)
 
-    def _check_offset_table(self, name_offset_name=None, folder_offset_table=None):
+    def _check_offset_table(self, name_offset_table=None, folder_offset_table=None):
         """Checking if DATE-OBS and MJD-OBS are in the OFFSET Table
 
         Input
         -----
-        name_offset_name: str
+        name_offset_table: str
             Name of the offset table
             Default is None
         folder_offset_table: str
             Name of the folder to find the offset table
             Default is None
         """
-        if name_offset_name is None:
+        if name_offset_table is None:
             return
 
-        self._read_offset_table(name_offset_name=name_offset_name,
+        self._read_offset_table(name_offset_table=name_offset_table,
                                 folder_offset_table=folder_offset_table)
 
         # getting the MJD and DATE from the OFFSET table
@@ -1037,10 +1037,10 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_all = kwargs.pop("prefix_all", "")
         prefix_all = self._add_targetname(prefix_all, asprefix)
 
-        if "name_offset_name" in kwargs:
-            name_offset_name = kwargs.pop("name_offset_name")
+        if "name_offset_table" in kwargs:
+            name_offset_table = kwargs.pop("name_offset_table")
             folder_offset_table = kwargs.pop("folder_offset_table", self.folder_offset_table)
-            self._check_offset_table(name_offset_name, folder_offset_table)
+            self._check_offset_table(name_offset_table, folder_offset_table)
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -1095,9 +1095,9 @@ class MusePointings(SofPipe, PipeRecipes):
             self._sofdict['OUTPUT_WCS'] = [joinpath(folder_ref_wcs, ref_wcs)]
 
         # Setting the default option of offset_list
-        if self.name_offset_name is not None:
+        if self.name_offset_table is not None:
             self._sofdict['OFFSET_LIST'] = [joinpath(self.folder_offset_table,
-                                                     self.name_offset_name)]
+                                                     self.name_offset_table)]
 
         pixtable_name = dict_listObject[expotype]
         self._sofdict[pixtable_name] = []
