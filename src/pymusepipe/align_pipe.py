@@ -38,13 +38,6 @@ from astropy.table import Table, Column
 from astropy import units as u
 from astropy.convolution import Gaussian2DKernel, convolve
 
-try :
-    import reproject
-    from reproject import reproject_interp as repro_interp
-    from reproject import reproject_exact as repro_exact
-except ImportError :
-    upipe.print_warning("If you wish t use reproject, please install "
-                        "it via: pip install reproject.")
 
 # Import mpdaf
 from mpdaf.obj import Image, WCS
@@ -59,6 +52,13 @@ from . import util_pipe as upipe
 from .config_pipe import mjd_names, date_names, tpl_names
 from .config_pipe import pointing_names, iexpo_names
 from .config_pipe import default_offset_table, dict_listObject
+try :
+    import reproject
+    from reproject import reproject_interp as repro_interp
+    from reproject import reproject_exact as repro_exact
+except ImportError :
+    upipe.print_warning("If you wish to use reproject, please install "
+                        "it via: pip install reproject.")
 
 # ================== Default units ======================== #
 # Define useful units
