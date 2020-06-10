@@ -769,7 +769,6 @@ class MusePointings(SofPipe, PipeRecipes):
 
         ref_wcs = kwargs.pop("ref_wcs", None)
         wcs_from_pointing = kwargs.pop("wcs_from_pointing", False)
-        print(ref_wcs, wcs_from_pointing)
 
         # Wcs_from_pointing
         # If true, use the reference pointing wcs

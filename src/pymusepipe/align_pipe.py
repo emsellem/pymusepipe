@@ -33,20 +33,26 @@ from scipy.odr import ODR, Model, RealData
 from astropy import wcs as awcs
 from astropy.io import fits as pyfits
 from astropy.modeling import models, fitting
-from astropy.stats import mad_std
+from astropy.stats import mad_std, sigma_clipped_stats, sigma_clip
 from astropy.table import Table, Column
 from astropy import units as u
 from astropy.convolution import Gaussian2DKernel, convolve
 
+try :
+    import reproject
+    from reproject import reproject_interp as repro_interp
+    from reproject import reproject_exact as repro_exact
+except ImportError :
+    upipe.print_warning("If you wish t use reproject, please install "
+                        "it via: pip install reproject.")
+
 # Import mpdaf
 from mpdaf.obj import Image, WCS
-
 
 def is_sequence(arg):
     return (not hasattr(arg, "strip") and
             hasattr(arg, "__getitem__") or
             hasattr(arg, "__iter__"))
-
 
 # Import needed modules from pymusepipe
 from . import util_pipe as upipe
@@ -209,8 +215,8 @@ def my_linear_model(B, x):
     return B[1] * (x + B[0])
 
 
-def get_image_norm_poly(data1, data2, chunk_size=15, 
-        threshold1=0., threshold2=0):
+def get_image_norm_poly(data1, data2, chunk_size=15, threshold1=0.,
+                        threshold2=0, percentiles=[0.,100.], sigclip=0):
     """Find the normalisation factor between two datasets.
 
     Including the background and slope. This uses the function
@@ -235,18 +241,18 @@ def get_image_norm_poly(data1, data2, chunk_size=15,
     pos = (med[0] > threshold1) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > threshold2)
     # Guess the slope from this selection
     guess_slope = 1.0
-#    guess_slope = np.abs(np.nanmedian(med[1][pos] / med[0][pos]))
 
     # Doing the regression itself
     result = regress_odr(x=med[0][pos], y=med[1][pos], sx=std[0][pos],
-                         sy=std[1][pos], beta0=[0., guess_slope])
+                         sy=std[1][pos], beta0=[0., guess_slope],
+                         percentiles=percentiles, sigclip=sigclip)
     result.med = med
     result.std = std
     result.selection = pos
     return result
 
 
-def regress_odr(x, y, sx, sy, beta0=[0., 1.]):
+def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0):
     """Return an ODR linear regression using scipy.odr.ODR
 
     Args:
@@ -255,14 +261,32 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.]):
         sx (np.array): Input nD arrays (as x,y) with standard deviations
         sy (np.array):
         beta0 (list of 2 floats): Initial guess for the constant and slope
+        percentiles: array of two numbers providing the percentiles
+        sigclip: sigma factor for sigma clipping. If 0, no sigma clipping
+            is performed
 
     Returns:
         result: result of the ODR analysis
 
     """
+    # Percentiles
+    xrav = x.ravel()
+    percentiles = np.percentile(xrav, percentiles)
+    sel = (xrav >= percentiles[0]) & (xrav <= percentiles[1])
+    xsel, ysel = xrav[sel], y.ravel()[sel]
+    sxsel, sysel = sx.ravel()[sel], sy.ravel()[sel]
     linear = Model(my_linear_model)
-    mydata = RealData(x.ravel(), y.ravel(), sx=sx.ravel(), sy=sy.ravel())
+    mydata = RealData(xsel, ysel, sx=sxsel, sy=sysel)
     result = ODR(mydata, linear, beta0=beta0)
+
+    if sigclip > 0:
+        diff = ysel - my_linear_model([result.beta[0], result.beta[1]], xsel)
+        filtered = sigma_clip(diff, sigma=sigclip)
+        xnsel, ynsel = xsel[~filtered.mask], ysel[~filtered.mask]
+        sxnsel, synsel = sxsel[~filtered.mask], sysel[~filtered.mask]
+        clipdata = RealData(xnsel, ynsel, sx=sxnsel, sy=synsel)
+        result = ODR(clipdata, linear, beta0=beta0)
+
     return result.run()
 
 def get_conversion_factor(input_unit, output_unit, filter_name="WFI"):
@@ -647,6 +671,13 @@ class AlignMusePointing(object):
         # Some input variables for the cross-correlation
         self.verbose = kwargs.pop("verbose", True)
         self.plot = kwargs.pop("plot", True)
+        # Using mpdaf or image_registration
+        self.use_mpdaf = kwargs.pop("use_mpdaf", True)
+        if self.use_mpdaf:
+            upipe.print_info("Will use mpdaf for image regridding.")
+        else:
+            upipe.print_info("Will use image_registration for image regridding.")
+
         self.border = np.int(border)
         self.chunk_size = np.int(chunk_size)
         self.subim_window = subim_window
@@ -742,6 +773,7 @@ class AlignMusePointing(object):
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
 
         self.extra_rotangles = np.zeros((self.nimages), dtype=np.float64)
+        self._diff_latpole = np.zeros_like(self.extra_rotangles)
 
         # RESET! all parameters
         self._reset_init_guess_values()
@@ -776,7 +808,7 @@ class AlignMusePointing(object):
 
         # Now doing the shifts and projections with the guess/input values
         for nima in range(self.nimages):
-            self.shift(nima)
+            self._apply_alignment(nima)
 
     def show_norm_factors(self):
         """Print some information about the normalisation factors.
@@ -875,8 +907,8 @@ class AlignMusePointing(object):
                 rotangle_exist = True
             if not rotangle_exist:
                 upipe.print_warning("Rotation angles not present in offset table."
-                                    "Please use argument 'rotation' in 'run' "
-                                    "to force a non zero value.")
+                                    " Please use argument 'extra_rotation' "
+                                    "in 'run' to force a non zero value.")
 
             # Loop over the images, using MJD
             for nima, mjd in enumerate(self.ima_mjdobs):
@@ -1210,7 +1242,7 @@ class AlignMusePointing(object):
         self.list_muse_hdu = [hdu[self.hdu_ext[1]] 
                               for hdu in self.list_hdulist_muse]
         # CHANGE to mpdaf WCS
-        self.list_wcs_muse = [WCS(hdu[1].header) 
+        self.list_wcs_muse = [WCS(hdu[self.hdu_ext[1]].header) 
                               for hdu in self.list_hdulist_muse]
         self.list_dec_muse = np.array([muse_wcs.get_crval2()
                               for muse_wcs in self.list_wcs_muse])
@@ -1311,8 +1343,8 @@ class AlignMusePointing(object):
         # Projecting the reference image onto the MUSE field
         tmphdr = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
                                             name_musehdr), overwrite=True)
-        hdu_target, proj_ref_hdu = self._align_reference_hdu(muse_hdu,
-                                                             target_rotation=rotation)
+        hdu_target, proj_ref_hdu, diff_angle  = self._align_reference_hdu(muse_hdu,
+                                                        target_rotation=rotation)
 
         # Cleaning the images
         if minflux is None:
@@ -1419,7 +1451,8 @@ class AlignMusePointing(object):
         return lperc, hperc
 
     def _align_hdu(self, hdu_target=None, hdu_to_align=None, target_rotation=0.0,
-                   to_align_rotation=0.0, conversion=False):
+                   to_align_rotation=0.0, conversion=False,
+                   check_referential=True):
         """Project the reference image onto the MUSE field
         Hidden function, as only used internally
 
@@ -1463,14 +1496,39 @@ class AlignMusePointing(object):
 
             # Aligning the reference image with the MUSE image using mpdaf
             # align_with_image
-            ima_aligned = ima_to_align.align_with_image(ima_target, flux=True)
-            hdu_aligned = ima_aligned.get_data_hdu()
+
+            if self.use_mpdaf:
+                ima_aligned = ima_to_align.align_with_image(ima_target, flux=True)
+                hdu_aligned = ima_aligned.get_data_hdu()
+                # Computing the differential reference
+                ra_target = WCS(hdu_target.header).to_header()['CRVAL1']
+                ra_aligned = ima_aligned.wcs.to_header()['CRVAL1']
+                dec_target = WCS(hdu_target.header).to_header()['CRVAL2']
+                dec_aligned = ima_aligned.wcs.to_header()['CRVAL2']
+                dra = ra_target - ra_aligned
+                diffang = np.rad2deg(np.arccos(np.cos(np.deg2rad(dra))
+                                        * (np.sin(np.deg2rad(dec_aligned)))**2
+                                        + (np.cos(np.deg2rad(dec_aligned)))**2))
+                upipe.print_warning(f"Differential angle for this comparison is "
+                                    f"{diffang}")
+            else:
+                # Change of area
+                newinc = ima_target.wcs.get_axis_increments(unit=u.deg)
+                oldinc = ima_to_align.wcs.get_axis_increments(unit=u.deg)
+                change_area = np.abs(newinc[0] / oldinc[0]) \
+                              * np.abs(newinc[1] / oldinc[1])
+                daligned = repro_interp(ima_to_align.get_data_hdu(),
+                                        ima_target.get_data_hdu().header,
+                                        return_footprint=False)
+                hdu_aligned = pyfits.PrimaryHDU(daligned * change_area)
+                diffang = 0.
 
         else:
             hdu_aligned = None
+            diffang = 0.
             print("Warning: please provide target HDU to allow reprojection")
 
-        return hdu_target, hdu_aligned
+        return hdu_target, hdu_aligned, diffang
 
     def _align_reference_hdu(self, hdu_target=None, target_rotation=0.0,
                              ref_rotation=0.0):
@@ -1544,9 +1602,9 @@ class AlignMusePointing(object):
             Index of image to consider
         """
         self._add_user_arc_offset(extra_arcsec, extra_rotation, nima)
-        self.shift(nima, **kwargs)
+        self._apply_alignment(nima, **kwargs)
 
-    def shift(self, nima=0, **kwargs):
+    def _apply_alignment(self, nima=0, **kwargs):
         """Create New HDU after shifting it with the right offset
         (only considering image with index nima)
          
@@ -1590,9 +1648,9 @@ class AlignMusePointing(object):
         upipe.print_info("Image {0:03d} Rotation of {1} will be applied".format(
                             nima, self._total_rotangles[nima]))
         # Reprojecting the Reference image onto the new MUSE frame
-        hdu_target, self.list_proj_refhdu[nima] = self._align_reference_hdu(
-                hdu_target=self.list_offmuse_hdu[nima],
-                target_rotation=self._total_rotangles[nima])
+        hdu_target, self.list_proj_refhdu[nima], self._diff_latpole[nima] = \
+            self._align_reference_hdu(hdu_target=self.list_offmuse_hdu[nima],
+                                      target_rotation=self._total_rotangles[nima])
         # Now reading the WCS and saving it in the list
         self.list_wcs_proj_refhdu[nima] = WCS(
                 self.list_proj_refhdu[nima].header)
@@ -1727,7 +1785,7 @@ class AlignMusePointing(object):
         museref = nima_museref is not None
         if museref:
             # Projecting the MUSE image onto the MUSE reference
-            musehduR, musehduC = self._align_hdu(hdu_to_align=self.list_offmuse_hdu[nima],
+            musehduR, musehduC, dlatval = self._align_hdu(hdu_to_align=self.list_offmuse_hdu[nima],
                                        target_rotation=self._total_rotangles[nima_museref],
                                        to_align_rotation=self._total_rotangles[nima],
                                        hdu_target=self.list_offmuse_hdu[nima_museref],
