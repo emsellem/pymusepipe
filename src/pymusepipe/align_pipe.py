@@ -773,7 +773,7 @@ class AlignMusePointing(object):
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
 
         self.extra_rotangles = np.zeros((self.nimages), dtype=np.float64)
-        self._diff_latpole = np.zeros_like(self.extra_rotangles)
+        self._diffra_angle = np.zeros_like(self.extra_rotangles)
 
         # RESET! all parameters
         self._reset_init_guess_values()
@@ -1343,7 +1343,7 @@ class AlignMusePointing(object):
         # Projecting the reference image onto the MUSE field
         tmphdr = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
                                             name_musehdr), overwrite=True)
-        hdu_target, proj_ref_hdu, diff_angle  = self._align_reference_hdu(muse_hdu,
+        hdu_target, proj_ref_hdu, diffra_angle  = self._align_reference_hdu(muse_hdu,
                                                         target_rotation=rotation)
 
         # Cleaning the images
@@ -1648,7 +1648,7 @@ class AlignMusePointing(object):
         upipe.print_info("Image {0:03d} Rotation of {1} will be applied".format(
                             nima, self._total_rotangles[nima]))
         # Reprojecting the Reference image onto the new MUSE frame
-        hdu_target, self.list_proj_refhdu[nima], self._diff_latpole[nima] = \
+        hdu_target, self.list_proj_refhdu[nima], self._diffra_angle[nima] = \
             self._align_reference_hdu(hdu_target=self.list_offmuse_hdu[nima],
                                       target_rotation=self._total_rotangles[nima])
         # Now reading the WCS and saving it in the list
