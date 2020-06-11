@@ -694,6 +694,8 @@ class MuseCube(Cube):
             out.unmask()
 
         out.mask_polygon(pol, unit_poly=None, inside=True)
+        out.data[out.mask] = np.nan
+        out.var[out.mask] = np.nan
 
         # Rewrite a new cube
         if save:
