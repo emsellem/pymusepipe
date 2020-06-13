@@ -1021,7 +1021,7 @@ class AlignMusePointing(object):
             Ascii file named via the filename input argument
 
         """
-        if folder_output_file is  None:
+        if folder_output_file is None:
             folder_output_file = self.folder_output_table
         fullname_file = joinpath(folder_output_file, filename)
         if os.path.isfile(fullname_file):
@@ -1033,7 +1033,7 @@ class AlignMusePointing(object):
                 upipe.print_warning("File exists but will be overwritten as"
                                     "overwrite is True.")
 
-        newf = open(joinpath(fullname_file), "w+")
+        newf = open(fullname_file, "w+")
         newf.write("#---- Offsets and normalisations ----#\n")
         newf.write("#    Name               OFFSETS  |ARCSEC|    X        "
                    "Y     |PIXEL|    X        Y     |ROT| (DEG) "
