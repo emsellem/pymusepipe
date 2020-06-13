@@ -1007,10 +1007,33 @@ class AlignMusePointing(object):
         for nima in range(self.nimages):
             upipe.print_info("{0:03d} - {1}".format(nima, self.list_muse_images[nima]))
 
-    def print_offsets_and_norms(self, filename="_temp.txt"):
-        """Print out the offset from the Alignment class
+    def print_offsets_and_norms(self, filename="_temp.txt",
+                                folder_output_file=None, overwrite=True):
+        """Save all offsets and norms into filename. By default, file will
+        be overwritten.
+
+        Args:
+            filename (str):
+            folder_output_file (str):
+            overwrite (bool): [True]
+
+        Creates:
+            Ascii file named via the filename input argument
+
         """
-        newf = open(filename, "w+")
+        if folder_output_file is  None:
+            folder_output_file = self.folder_output_table
+        fullname_file = joinpath(folder_output_file, filename)
+        if os.path.isfile(fullname_file):
+            if not overwrite:
+                upipe.print_warning("File exists and overwrite is False. "
+                                    "Aborting.")
+                return
+            else:
+                upipe.print_warning("File exists but will be overwritten as"
+                                    "overwrite is True.")
+
+        newf = open(joinpath(fullname_file), "w+")
         newf.write("#---- Offsets and normalisations ----#\n")
         newf.write("#    Name               OFFSETS  |ARCSEC|    X        "
                    "Y     |PIXEL|    X        Y     |ROT| (DEG) "
