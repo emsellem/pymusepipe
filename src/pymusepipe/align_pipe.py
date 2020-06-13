@@ -271,8 +271,11 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0):
     """
     # Percentiles
     xrav = x.ravel()
-    percentiles = np.percentile(xrav, percentiles)
-    sel = (xrav >= percentiles[0]) & (xrav <= percentiles[1])
+    if len(xrav) > 0:
+        percentiles = np.percentile(xrav, percentiles)
+        sel = (xrav >= percentiles[0]) & (xrav <= percentiles[1])
+    else:
+        sel = np.abs(xrav) > 0
     xsel, ysel = xrav[sel], y.ravel()[sel]
     sxsel, sysel = sx.ravel()[sel], sy.ravel()[sel]
     linear = Model(my_linear_model)
