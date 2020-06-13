@@ -1010,15 +1010,15 @@ class AlignMusePointing(object):
     def print_offsets_and_norms(self, filename="_temp.txt"):
         """Print out the offset from the Alignment class
         """
-        upipe.print_info("#---- Offsets and normalisations ----#")
-        upipe.print_info("#    Name               OFFSETS  |ARCSEC|   "
-                         "X        Y      |PIXEL|    X        Y     |ROT| (DEG) "
-                         "|NORM|      |BACKG|")
         newf = open(filename, "w+")
+        newf.write("#---- Offsets and normalisations ----#\n")
+        newf.write("#    Name               OFFSETS  |ARCSEC|    X        "
+                   "Y      |PIXEL|    X        Y     |ROT| (DEG) "
+                   "|NORM|      |BACKG|\n")
         for nima in range(self.nimages):
             newf.write("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
                              " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}  "
-                             "|NORM| {7:10.6e} |BACKG| {8:10.6e}".format(
+                             "|NORM| {7:10.6e} |BACKG| {8:10.6e}\n".format(
                              nima, self.list_muse_images[nima][-29:-5],
                              self._total_off_arcsec[nima][0],
                              self._total_off_arcsec[nima][1],
