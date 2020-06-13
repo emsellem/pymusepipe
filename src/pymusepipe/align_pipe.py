@@ -1013,8 +1013,8 @@ class AlignMusePointing(object):
         newf = open(filename, "w+")
         newf.write("#---- Offsets and normalisations ----#\n")
         newf.write("#    Name               OFFSETS  |ARCSEC|    X        "
-                   "Y      |PIXEL|    X        Y     |ROT| (DEG) "
-                   "|NORM|      |BACKG|\n")
+                   "Y     |PIXEL|    X        Y      |ROT| (DEG) "
+                   "   |NORM|              |BACKG|\n")
         for nima in range(self.nimages):
             newf.write("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
                              " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}  "
