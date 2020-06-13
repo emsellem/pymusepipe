@@ -973,7 +973,7 @@ class AlignMusePointing(object):
 
         return True, Table.read(name_table)
 
-    def print_offset_fromfits(self, name_table=None):
+    def show_offset_fromfits(self, name_table=None):
         """Print offset table from fits file
          
         Input
@@ -1007,7 +1007,29 @@ class AlignMusePointing(object):
         for nima in range(self.nimages):
             upipe.print_info("{0:03d} - {1}".format(nima, self.list_muse_images[nima]))
 
-    def print_offset(self):
+    def print_offsets_and_norms(self, filename="_temp.txt"):
+        """Print out the offset from the Alignment class
+        """
+        upipe.print_info("#---- Offsets and normalisations ----#")
+        upipe.print_info("#    Name               OFFSETS  |ARCSEC|   "
+                         "X        Y      |PIXEL|    X        Y     |ROT| (DEG) "
+                         "|NORM|      |BACKG|")
+        newf = open(filename, "w+")
+        for nima in range(self.nimages):
+            newf.write("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
+                             " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}  "
+                             "|NORM| {7:10.6e} |BACKG| {8:10.6e}".format(
+                             nima, self.list_muse_images[nima][-29:-5],
+                             self._total_off_arcsec[nima][0],
+                             self._total_off_arcsec[nima][1],
+                             self._total_off_pixel[nima][0],
+                             self._total_off_pixel[nima][1],
+                             self._total_rotangles[nima],
+                             self.ima_norm_factors[nima],
+                             self.ima_background[nima]))
+        newf.close()
+
+    def show_offsets(self):
         """Print out the offset from the Alignment class
         """
         upipe.print_info("#---- Offset recorded so far ----#")
