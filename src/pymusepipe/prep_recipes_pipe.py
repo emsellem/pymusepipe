@@ -1465,7 +1465,7 @@ class PipePrep(SofPipe) :
         offset_list = kwargs.pop("offset_list", True)
         folder_expo = self._get_fullpath_expo(expotype, stage)
         long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
-        if offset_list :
+        if offset_list:
             offset_list_tablename = kwargs.pop("offset_list_tablename", None)
             if offset_list_tablename is None:
                 offset_list_tablename = "{0}{1}_{2}_{3}_{4}.fits".format(

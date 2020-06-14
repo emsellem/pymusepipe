@@ -1048,15 +1048,17 @@ class MusePointings(SofPipe, PipeRecipes):
         list_pointings = self._check_pointings_list(list_pointings,
                                                     self.list_pointings)
 
-        # Abort if only one exposure is available
-        # exp_combine needs a minimum of 2
+        # If only 1 exposure, duplicate the pixtable
+        # as exp_combine needs at least 2 pixtables
         nexpo_tocombine = sum(len(self.dict_pixtabs_in_pointings[pointing])
                               for pointing in list_pointings)
         if nexpo_tocombine <= 1:
-            upipe.print_warning("All considered pointings only "
-                                "have one exposure: process aborted",
-                                pipe=self)
-            return
+            upipe.print_warning("All considered pointings have only one"
+                                " single exposure: it will be duplicated"
+                                " to make 'exp_combine' run", pipe=self)
+            for pointing in list_pointings:
+                self.dict_pixtabs_in_pointings[pointing].extend(
+                    self.dict_pixtabs_in_pointings[pointing])
 
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()

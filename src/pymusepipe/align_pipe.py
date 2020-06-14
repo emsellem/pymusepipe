@@ -1027,6 +1027,7 @@ class AlignMusePointing(object):
         if folder_output_file is None:
             folder_output_file = self.folder_output_table
         fullname_file = joinpath(folder_output_file, filename)
+
         if os.path.isfile(fullname_file):
             if not overwrite:
                 upipe.print_warning("File exists and overwrite is False. "
@@ -1472,7 +1473,7 @@ class AlignMusePointing(object):
         else:
             upipe.print_error("There are not yet any new hdu to save")
 
-    def _get_flux_range(self, data, low=10, high=99):
+    def _get_flux_range(self, data, low=2, high=98):
         """Get the range of fluxes within the array
         by looking at percentiles.
          
@@ -1493,8 +1494,11 @@ class AlignMusePointing(object):
 
         # Clean up the NaNs
         data = np.nan_to_num(data)
-        lperc = np.percentile(data[data > 0.], low)
-        hperc = np.percentile(data[data > 0.], high)
+        if data.size > 0:
+            lperc = np.percentile(data[data > 0.], low)
+            hperc = np.percentile(data[data > 0.], high)
+        else:
+            lperc, hperc = 0., 1.
 
         return lperc, hperc
 
