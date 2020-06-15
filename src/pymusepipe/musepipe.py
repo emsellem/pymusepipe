@@ -475,7 +475,7 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         upipe.print_info("Creating the astropy fits raw data table", pipe=self)
 
-        if reset or not hasattr(self, "Tables"):
+        if reset or not hasattr(self, "Tables.Rawfiles"):
             self._reset_tables()
 
         # Testing if raw table exists
