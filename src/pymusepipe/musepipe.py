@@ -475,7 +475,7 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         upipe.print_info("Creating the astropy fits raw data table", pipe=self)
 
-        if reset or not hasattr(self, "Tables.Rawfiles"):
+        if reset or not hasattr(self, "Tables"):
             self._reset_tables()
 
         # Testing if raw table exists
@@ -483,22 +483,23 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # ---- File exists - we READ it ------------------- #
         overwrite = kwargs.pop("overwrite", self._overwrite_astropy_table)
+        scan_raw = True
         if os.path.isfile(name_table):
             if overwrite:
                 upipe.print_warning("The raw-files table will be overwritten",
                                     pipe=self)
             else:
-                upipe.print_warning("The raw files table already exists",
-                                    pipe=self)
-                upipe.print_warning("If you wish to overwrite it, "
-                                    " please turn on the 'overwrite_astropy_table' option to 'True'",
-                                    pipe=self)
-                upipe.print_warning("In the meantime, the existing table will be read and used",
+                upipe.print_warning("The raw files table already exists.\n"
+                                    "If you wish to overwrite it, please turn "
+                                    "on the 'overwrite_astropy_table' option to "
+                                    "'True'.\n In the meantime, the existing "
+                                    "table will be read and used.",
                                     pipe=self)
                 self.Tables.Rawfiles = self.read_astropy_table('RAWFILES', "raw")
+                scan_raw = False
 
         # ---- File does not exist - we create it ---------- #
-        if overwrite:
+        if scan_raw:
             # Check the raw folder
             self.goto_folder(self.paths.rawfiles)
             # Get the list of files from the Raw data folder
