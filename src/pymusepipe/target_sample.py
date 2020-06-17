@@ -596,7 +596,6 @@ class MusePipeSample(object):
             # Creating the WCS reference frames. Full mosaic and individual
             # Pointings.
             upipe.print_info("=========== CREATION OF WCS MASKS ==============")
-            dict_exposures = kwargs.pop("dict_exposures", None)
             mosaic_wcs = kwargs.pop("mosaic_wcs", True)
             reference_cube = kwargs.pop("reference_cube", True)
             pointings_wcs = kwargs.pop("pointings_wcs", True)
