@@ -546,7 +546,7 @@ class PipePrep(SofPipe) :
 
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
-        for gtable in tpl_gtable.groups:
+        for ntable, gtable in enumerate(tpl_gtable.groups):
             self._add_calib_to_sofdict("BADPIX_TABLE", reset=True)
             self._add_calib_to_sofdict("LINE_CATALOG")
             # extract the tpl (string) and mean mjd (float) 
@@ -581,8 +581,12 @@ class PipePrep(SofPipe) :
             # Write the Processed files Table and save it
             # Note: always overwrite the table so that a fresh numbering is done
             gtable['iexpo'] = list_expo
-            self.save_expo_table(expotype, gtable, "processed", aggregate=False,
-                                 update=update)
+            if ntable == 0:
+                self.save_expo_table(expotype, gtable, "processed", aggregate=False,
+                                     overwrite=True)
+            else:
+                self.save_expo_table(expotype, gtable, "processed", aggregate=False,
+                                     update=True)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
@@ -1166,7 +1170,7 @@ class PipePrep(SofPipe) :
             self.save_expo_table(expotype, scipost_table, "reduced", 
                     "IMAGES_FOV{0}_{1}{2}_{3}_list_table.fits".format(
                         suffix, expotype, suffix_expo, tpl), 
-                        aggregate=False, update=True)
+                        aggregate=False, overwrite=True)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
