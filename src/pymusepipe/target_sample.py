@@ -550,7 +550,7 @@ class MusePipeSample(object):
                            create_expocubes=True, create_pixtables=True,
                            create_pointingcubes=True,
                            name_offset_table=None, folder_offset_table=None,
-                           dict_exposures=None,
+                           dict_exposures=None, list_pointings=None,
                            **kwargs):
         """Finalise the reduction steps by using the offset table, rotating the
         pixeltables, then reconstructing the PIXTABLE_REDUCED, produce reference
@@ -569,7 +569,6 @@ class MusePipeSample(object):
         Returns:
 
         """
-        list_pointings = kwargs.get("list_pointings", None)
         if rot_pixtab:
             # We first use the offset table to rotate the pixtables
             upipe.print_info("========== ROTATION OF PIXTABLES ===============")
@@ -634,7 +633,6 @@ class MusePipeSample(object):
         if create_pointingcubes:
             # Running the pointing cubes now with the same WCS reference
             upipe.print_info("========= CREATION OF POINTING CUBES ===========")
-            list_pointings = kwargs.get("list_pointings", None)
             self.combine_target_per_pointing(targetname=targetname,
                                              name_offset_table=name_offset_table,
                                              folder_offset_table=folder_offset_table,
