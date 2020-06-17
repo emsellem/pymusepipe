@@ -521,7 +521,7 @@ class PipePrep(SofPipe) :
             self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl, illum=illum)
 
     @print_my_function_name
-    def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL", illum=True):
+    def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL", illum=True, update=None):
         """Reducing the files of a certain category and creating the PIXTABLES
         Will run the esorex muse_scibasic 
 
@@ -582,7 +582,7 @@ class PipePrep(SofPipe) :
             # Note: always overwrite the table so that a fresh numbering is done
             gtable['iexpo'] = list_expo
             self.save_expo_table(expotype, gtable, "processed", aggregate=False,
-                                 update=False, overwrite=True)
+                                 update=update)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
