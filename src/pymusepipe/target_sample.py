@@ -633,10 +633,12 @@ class MusePipeSample(object):
         if create_pointingcubes:
             # Running the pointing cubes now with the same WCS reference
             upipe.print_info("========= CREATION OF POINTING CUBES ===========")
+            list_pointings = kwargs.get("list_pointings", None)
             self.combine_target_per_pointing(targetname=targetname,
                                              name_offset_table=name_offset_table,
                                              folder_offset_table=folder_offset_table,
                                              dict_exposures=dict_exposures,
+                                             list_pointings=list_pointings,
                                              filter_list=self._short_filter_list)
 
     def run_target_scipost_perexpo(self, targetname=None, list_pointings=None,
