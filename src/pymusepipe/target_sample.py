@@ -569,6 +569,7 @@ class MusePipeSample(object):
         Returns:
 
         """
+        list_pointings = kwargs.get("list_pointings", None)
         if rot_pixtab:
             # We first use the offset table to rotate the pixtables
             upipe.print_info("========== ROTATION OF PIXTABLES ===============")
@@ -590,6 +591,7 @@ class MusePipeSample(object):
                                             wcs_auto=False,
                                             norm_skycontinuum=norm_skycontinuum,
                                             dict_exposures=dict_exposures,
+                                            list_pointings=list_pointings,
                                             skymethod=skymethod)
 
         if create_wcs:
@@ -599,7 +601,6 @@ class MusePipeSample(object):
             mosaic_wcs = kwargs.pop("mosaic_wcs", True)
             reference_cube = kwargs.pop("reference_cube", True)
             pointings_wcs = kwargs.pop("pointings_wcs", True)
-            list_pointings = kwargs.get("list_pointings", None)
             refcube_name = kwargs.pop("refcube_name", None)
             full_ref_wcs = kwargs.pop("full_ref_wcs", None)
             default_comb_folder = self.targets[targetname].combcubes_path
