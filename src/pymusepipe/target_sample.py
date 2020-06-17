@@ -657,6 +657,7 @@ class MusePipeSample(object):
         """
         # Check if pointings are valid
         list_pointings = self._check_pointings_list(targetname, list_pointings)
+        upipe.print_info(f"List of pointings to be reduced: {list_pointings}")
         if len(list_pointings) == 0:
             return
 
