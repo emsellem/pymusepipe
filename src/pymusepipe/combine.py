@@ -1064,7 +1064,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 newpixtab_name = joinpath(head, f"dummy_{tail}")
                 os.system(f"cp {pixtab_name} {newpixtab_name}")
                 self.dict_pixtabs_in_pointings[pointing].extend(
-                    newpixtab_name)
+                    [newpixtab_name])
 
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
