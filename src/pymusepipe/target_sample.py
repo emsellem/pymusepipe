@@ -627,6 +627,7 @@ class MusePipeSample(object):
                                             save="cube",
                                             norm_skycontinuum=norm_skycontinuum,
                                             dict_exposures=dict_exposures,
+                                            list_pointings=list_pointings,
                                             skymethod=skymethod,
                                             **kwargs)
 
