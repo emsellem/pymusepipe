@@ -1053,18 +1053,23 @@ class MusePointings(SofPipe, PipeRecipes):
         nexpo_tocombine = sum(len(self.dict_pixtabs_in_pointings[pointing])
                               for pointing in list_pointings)
         if nexpo_tocombine <= 1:
-            upipe.print_warning("All considered pointings have only one"
-                                " single exposure: it will be duplicated"
-                                " to make 'exp_combine' run", pipe=self)
-            for pointing in list_pointings:
-                if len(self.dict_pixtabs_in_pointings[pointing]) < 1:
-                    continue
-                pixtab_name = self.dict_pixtabs_in_pointings[pointing][0]
-                head, tail = os.path.split(pixtab_name)
-                newpixtab_name = joinpath(head, f"dummy_{tail}")
-                os.system(f"cp {pixtab_name} {newpixtab_name}")
-                self.dict_pixtabs_in_pointings[pointing].extend(
-                    [newpixtab_name])
+            upipe.print_warning("All considered pointings have a total of"
+                                "only one single exposure: exp_combine"
+                                "will not run. Please use the individual"
+                                "reconstructed cube.", pipe=self)
+            return
+            # upipe.print_warning("All considered pointings have only one"
+            #                     " single exposure: it will be duplicated"
+            #                     " to make 'exp_combine' run", pipe=self)
+            # for pointing in list_pointings:
+            #     if len(self.dict_pixtabs_in_pointings[pointing]) < 1:
+            #         continue
+            #     pixtab_name = self.dict_pixtabs_in_pointings[pointing][0]
+            #     head, tail = os.path.split(pixtab_name)
+            #     newpixtab_name = joinpath(head, f"dummy_{tail}")
+            #     os.system(f"cp {pixtab_name} {newpixtab_name}")
+            #     self.dict_pixtabs_in_pointings[pointing].extend(
+            #         [newpixtab_name])
 
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
