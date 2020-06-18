@@ -607,9 +607,13 @@ class MusePipe(PipePrep, PipeRecipes):
             table_to_save = copy.copy(tpl_gtable)
 
         # If the file already exists
+        # If overwrite is True we just continue and overwrite the table
         if os.path.isfile(full_tablename):
+            if self._overwrite_astropy_table:
+                upipe.print_warning(f"Astropy Table {fits_tablename} "
+                                    f"exists and will be overwritten")
             # Check if we update
-            if self._update_astropy_table:
+            elif self._update_astropy_table:
                 # Reading the existing table
                 upipe.print_warning("Reading the existing Astropy table {0} "
                                     "in folder {1}".format(fits_tablename,
@@ -627,7 +631,7 @@ class MusePipe(PipePrep, PipeRecipes):
                     return
 
             # Check if we want to overwrite or add the line in
-            elif not self._overwrite_astropy_table:
+            else:
                 upipe.print_warning("Astropy Table {0} already exists, "
                                     " use overwrite_astropy_table to "
                                     "overwrite it".format(fits_tablename),
