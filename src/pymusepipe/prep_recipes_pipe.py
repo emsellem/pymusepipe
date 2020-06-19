@@ -518,11 +518,11 @@ class PipePrep(SofPipe) :
         """
         for expotype in list_object:
             sof_filename = 'scibasic_{0}'.format(expotype.lower())
-            self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl, illum=illum)
+            self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl, illum=illum,
 
     @print_my_function_name
     def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL", illum=True,
-                     update=None, overwrite=True):
+                     update=True, overwrite=True):
         """Reducing the files of a certain category and creating the PIXTABLES
         Will run the esorex muse_scibasic 
 
@@ -713,7 +713,7 @@ class PipePrep(SofPipe) :
         band filter
         """
         # First selecting the files via the grouped table
-        object_table = self._get_table_expo("OBJECT", "processed")
+       object_table = self._get_table_expo("OBJECT", "processed")
 
         # Filter used for the alignment
         filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
