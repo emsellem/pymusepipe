@@ -512,13 +512,15 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
-    def run_scibasic_all(self, list_object=['OBJECT', 'SKY', 'STD'], tpl="ALL", illum=True, **kwargs):
+    def run_scibasic_all(self, list_object=['OBJECT', 'SKY', 'STD'], tpl="ALL",
+                         illum=True, **kwargs):
         """Running scibasic for all objects in list_object
         Making different sof for each category
         """
         for expotype in list_object:
             sof_filename = 'scibasic_{0}'.format(expotype.lower())
-            self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl, illum=illum, **kwargs)
+            self.run_scibasic(sof_filename=sof_filename, expotype=expotype,
+                              tpl=tpl, illum=illum, **kwargs)
 
     @print_my_function_name
     def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL", illum=True,
@@ -593,7 +595,8 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
-    def run_standard(self, sof_filename='standard', tpl="ALL", update=None):
+    def run_standard(self, sof_filename='standard', tpl="ALL", update=None,
+                     overwrite=True):
         """Reducing the STD files after they have been obtained
         Running the muse_standard routine
 
@@ -632,13 +635,15 @@ class PipePrep(SofPipe) :
             self.recipe_std(self.current_sof, dir_std, name_std, mytpl)
 
         # Write the MASTER files Table and save it
-        self.save_expo_table("STD", std_table, "master", aggregate=False, update=update)
+        self.save_expo_table("STD", std_table, "master", aggregate=False,
+                             update=update, overwrite=overwrite)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
-    def run_sky(self, sof_filename='sky', tpl="ALL", fraction=0.8, update=None):
+    def run_sky(self, sof_filename='sky', tpl="ALL", fraction=0.8,
+                update=None, overwrite=True):
         """Reducing the SKY after they have been scibasic reduced
         Will run the esorex muse_create_sky routine
 
@@ -682,7 +687,8 @@ class PipePrep(SofPipe) :
             self.recipe_sky(self.current_sof, dir_sky, name_sky, mytpl, iexpo, fraction)
 
         # Write the MASTER files Table and save it
-        self.save_expo_table("SKY", sky_table, "processed", aggregate=False, update=update)
+        self.save_expo_table("SKY", sky_table, "processed", aggregate=False,
+                             update=update, overwrite=overwrite)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
