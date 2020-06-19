@@ -719,7 +719,7 @@ class PipePrep(SofPipe) :
         band filter
         """
         # First selecting the files via the grouped table
-       object_table = self._get_table_expo("OBJECT", "processed")
+        object_table = self._get_table_expo("OBJECT", "processed")
 
         # Filter used for the alignment
         filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
