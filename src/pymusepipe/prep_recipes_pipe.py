@@ -512,13 +512,13 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(addtolog=True)
 
     @print_my_function_name
-    def run_scibasic_all(self, list_object=['OBJECT', 'SKY', 'STD'], tpl="ALL", illum=True):
+    def run_scibasic_all(self, list_object=['OBJECT', 'SKY', 'STD'], tpl="ALL", illum=True, **kwargs):
         """Running scibasic for all objects in list_object
         Making different sof for each category
         """
         for expotype in list_object:
             sof_filename = 'scibasic_{0}'.format(expotype.lower())
-            self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl, illum=illum,
+            self.run_scibasic(sof_filename=sof_filename, expotype=expotype, tpl=tpl, illum=illum, **kwargs)
 
     @print_my_function_name
     def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL", illum=True,
