@@ -21,7 +21,7 @@ import numpy as np
 # pymusepipe modules
 from . import util_pipe as upipe
 from .create_sof import SofPipe
-from .align_pipe import create_offset_table
+from .align_pipe import create_offset_table, AlignMusePointing
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
 from .config_pipe import mjd_names,get_suffix_product
@@ -1383,7 +1383,7 @@ class PipePrep(SofPipe) :
         
     @print_my_function_name
     def get_align_group(self, name_ima_reference=None, list_expo=[], line=None, 
-            suffix="", bygroup=False):
+            suffix="", bygroup=False, **kwargs):
         """Extract the needed information for a set of exposures to be aligned
         """
         # Selecting the table with the right iexpo
