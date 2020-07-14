@@ -881,6 +881,7 @@ class MusePipeSample(object):
             wcs_prefix = ""
         ref_wcs = kwargs.pop("ref_wcs", "{0}{1}DATACUBE_FINAL.fits".format(
                                  default_prefix_wcs_mosaic, wcs_prefix))
+
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
                                                        folder_ref_wcs=folder_ref_wcs,
                                                        folder_cubes=folder_cubes,
@@ -888,7 +889,41 @@ class MusePipeSample(object):
                                                        list_suffix=list_pointing_names,
                                                        **kwargs)
 
-    def mosaic(self, targetname=None, list_pointings=None, **kwargs):
+    def convolve_mosaic_per_pointing(self, targetname=None, list_pointings=None,
+                                     dict_psf={}, target_fwhm=,
+                                     target_nmoffat=None,
+                                     target_function="gaussian", suffix="conv",
+                                     best_psf=True, **kwargs):
+        # Initialise
+        self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
+                         dict_psf=dict_psf, **kwargs)
+
+        # If best_psf is True, use smallest gaussian possible
+        # This overwrites the other parameters
+        if best_psf:
+            upipe.print_warning("Overwriting options for the target PSF as"
+                                "best_psf is set to True.")
+            target_function = "gaussian"
+            # set min fwhm to 0
+            best_fwhm = 0.
+            # now detect if there are larger values to account for
+            for key in dict_psf:
+                if dict_psf[key][1] > best_fwhm:
+                    best_fwhm = dict_psf[key][1]
+            upipe.print_info(f"Best target FWHM = {best_fwhm:.2f}")
+            target_fwhm = best_fwhm
+            suffix = f"copt_{best_fwhm:.2f}asec"
+
+        # Convolve
+        fakemode = kwargs.pop("fakemode", False)
+        if not fakemode:
+            self.pipes_mosaic[targetname].convolve_cubes(target_fwhm=target_fwhm,
+                                                         target_nmoffat=target_nmoffat,
+                                                         target_function=target_function,
+                                                         suffix=suffix)
+
+    def mosaic(self, targetname=None, list_pointings=None, init_mosaic=True,
+               **kwargs):
         """
 
         Args:
@@ -900,26 +935,33 @@ class MusePipeSample(object):
 
         """
 
-        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        # Initialise the mosaic or not
+        if init_mosaic:
+            self.init_mosaic(targetname=targetname,
+                             list_pointings=list_pointings,
+                             **kwargs)
+        else:
+            if targetname not in self.pipes_mosaic:
+                upipe.print_error(f"Targetname {targetname} not in "
+                                  f"self.pipes_mosaic. Please initialise the "
+                                  f"mosaic first with self.init_mosaic() or "
+                                  f"use init_mosaic=True when calling "
+                                  f"self.mosaic().")
+                return
+
+        # See if we build the cube and images
         build_cube = kwargs.pop("build_cube", True)
         build_images = kwargs.pop("build_images", True)
-        dict_expo = kwargs.pop("dict_exposures", None)
 
         # Doing the mosaic with mad
-        suffix = kwargs.pop("suffix", "WCS_Pall_mad")
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
 
         # defining the default cube name here to then define the output cube name
+        suffix = kwargs.pop("suffix", "WCS_Pall_mad")
         default_cube_name = "{0}_DATACUBE_FINAL_{1}.fits".format(targetname, suffix)
-        default_cube_name = joinpath(folder_cubes, default_cube_name)
         outcube_name = kwargs.pop("output_cube_name", default_cube_name)
         outcube_name = joinpath(folder_cubes, outcube_name)
-
-        # Initiliase the mosaic
-        self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
-                         add_targetname=add_targetname,
-                         dict_exposures=dict_expo, **kwargs)
 
         # Doing the MAD combination using mpdaf. Note the build_cube fakemode
         self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name,

@@ -93,12 +93,42 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
 
     return flux_cont
 
+class BasicPSF(object):
+    """Basic PSF function and parameters
+    """
+    def __init__(self, psf_fwhm=0.5, psf_nmoffat=2.8,
+                 psf_function="moffat", psf_b=-3.0e-5,
+                 psf_l=6483.58):
+
+        self.psf_function = psf_function
+        self.psf_fwhm = psf_fwhm
+        self.psf_nmoffat = psf_nmoffat
+        self.psf_b = psf_b
+        self.psf_l = psf_l
+
+    def _init_psf(self, val):
+
+
+class BasicFile(object):
+    """Basic file with just the name and some properties
+    to attach to that Cube
+    """
+    def __init__(self, filename, **kwargs):
+        self.filename = filename
+        for key in kwargs:
+            val = kwargs.get(key)
+            if key == "psf":
+                self._init_psf(val)
+            else:
+                setattr(self, key, val)
+
+
 class MuseCubeMosaic(CubeMosaic):
     def __init__(self, ref_wcs, folder_ref_wcs="", folder_cubes="",
                  prefix_cubes="DATACUBE_FINAL_WCS",
                  list_suffix=[], use_fixed_cubes=True,
                  prefix_fixed_cubes="tmask", verbose=False,
-                 dict_exposures=None):
+                 dict_exposures=None, dict_psf={}):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
@@ -113,12 +143,31 @@ class MuseCubeMosaic(CubeMosaic):
         self.prefix_fixed_cubes = prefix_fixed_cubes
         self.use_fixed_cubes = use_fixed_cubes
         self.dict_exposures = dict_exposures
+        self.dict_psf = dict_psf
 
         # Building the list of cubes
         self.build_list()
 
         # Initialise the super class
-        super(MuseCubeMosaic, self).__init__(self.list_cubes, full_wcs_name)
+        super(MuseCubeMosaic, self).__init__(self.cube_names, full_wcs_name)
+
+    @property
+    def cube_names(self):
+        return [c.filename for c in self.list_cubes]
+
+    @property
+    def ncubes(selfs):
+        return len(self.list_cubes)
+
+    @property
+    def list_cubes(self):
+        if not hasattr(self, _list_cubes):
+            self._list_cubes = []
+        return self._list_cubes
+
+    @list_cubes.setter
+    def list_cubes(self, val):
+        self._list_cubes = val
 
     def _check_folder(self):
         if not os.path.isdir(self.folder_cubes):
@@ -198,20 +247,32 @@ class MuseCubeMosaic(CubeMosaic):
                                         "Cube in the list {}".format(fixed_cube))
 
         # if the list of suffix is empty, just use all cubes
-        if len(self.list_suffix) == 0:
-            self.list_cubes = list_cubes
-        else:
+        if len(self.list_suffix) > 0:
             # Filtering out the ones that don't have any of the suffixes
-            self.list_cubes = []
+            temp_list_cubes = []
             for l in list_cubes:
                 if any([suff in l for suff in self.list_suffix]):
-                    self.list_cubes.append(l)
+                    temp_list_cubes.append(l)
+            list_cubes = temp_list_cubes
+
+        # Attach the other properties to the list of cubes (e.g. PSF)
+        self.list_cubes = []
+        for name in list_cubes:
+            self.list_cubes.append(BasicFile(name))
+            for key in self.dict_psf:
+                if key in name:
+                    psf = dist_psf[key]
+                    self.list_cubes[i].psf = BasicPSF(psf_function=psf[0],
+                                                      psf_fwhm=psf[1],
+                                                      psf_nmoffat=psf[2],
+                                                      psf_l=psf[3],
+                                                      psf_b=psf[4])
+                    break
 
         if self.verbose:
-            for i, name in enumerate(self.list_cubes):
-                upipe.print_info("Cube {0:03d}: {1}".format(i+1, name))
+            for i, c in enumerate(self.list_cubes):
+                upipe.print_info("Cube {0:03d}: {1}".format(i+1, c.filename))
 
-        self.ncubes = len(self.list_cubes)
         if self.ncubes == 0:
             upipe.print_error("Found 0 cubes in this folder with suffix"
                               " {}: please change suffix".format(
@@ -219,6 +280,38 @@ class MuseCubeMosaic(CubeMosaic):
         else:
             upipe.print_info("Found {} cubes to be processed".format(
                                  self.ncubes))
+
+    def convolve_cubes(self, target_fwhm, target_nmoffat=None,
+                        target_function="gaussian", suffix="conv", **kwargs):
+        """
+
+        Args:
+            target_fwhm:
+            target_nmoffat:
+            input_function:
+            target_function:
+            suffix:
+            **kwargs:
+
+        Returns:
+
+        """
+        # Convolving cube per cube
+        for i, c in enumerate(self.list_cubes):
+            name, extension = os.path.splitext(c.filename)
+            outcube_name = f"{name}_{suffix}{extension}"
+            cube = MuseCube(c.filename, psf_fwhm=c.psf_fwhm, psf_b=c.psf_b,
+                            psf_l=c.psf_l, psf_nmoffat=c.psf_nmoffat,
+                            psf_function=c.psf_function)
+            cube_folder, _ = cube.convolve_cube_to_psf(target_fwhm,
+                                      target_nmoffat=target_nmoffat,
+                                      target_function=target_function,
+                                      outcube_name=outcube_name, **kwargs)
+
+            # updating the convolved cube name
+            psf = BasicPSF(psf_function=target_function, psf_fwhm=target_fwhm,
+                           psf_nmoffat=target_nmoffat, psf_l=c.psf_l, psf_b=0.)
+            self.list_cubes[i] = BasicCube(outcube_name, psf=psf)
 
     def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",
                    fakemode=False, mad=True):
@@ -267,11 +360,7 @@ class MuseCube(Cube):
         self._debug = kwargs.pop("debug", False)
 
         # PSF for that Cube
-        self.psf_function = kwargs.pop("psf_function", "moffat")
-        self.psf_fwhm0 = kwargs.pop("psf_fwhm0", 0.5)
-        self.psf_l0 = kwargs.pop("psf_l0", 6483.58)
-        self.psf_nmoffat = kwargs.pop("psf_nmoffat", 2.8)
-        self.psf_b = kwargs.pop("psf_b", -3.0e-5)
+        self.psf = BasicPSF(**kwargs)
 
     def get_spectrum_from_cube(self, nx=None, ny=None, pixel_window=0, title="Spectrum"):
         """Get a spectrum from the cube with centre defined in pixels
@@ -427,7 +516,7 @@ class MuseCube(Cube):
         return out
 
     def convolve_cube_to_psf(self, target_fwhm, target_nmoffat=None,
-                             input_function='moffat', target_function="gaussian",
+                             target_function="gaussian",
                              outcube_name=None, factor_fwhm=3,
                              fft=True):
         """Convolve the cube for a target function 'gaussian' or 'moffat'
@@ -464,9 +553,9 @@ class MuseCube(Cube):
         shape = [self.shape[0], nspaxel, nspaxel]
 
         # Computing the kernel
-        kernel3d = cube_kernel(shape, self.wave.coord(), self.psf_fwhm0,
-                               target_fwhm, input_function, target_function,
-                               lambda0=self.psf_l0,
+        kernel3d = cube_kernel(shape, self.wave.coord(), self.psf_fwhm,
+                               target_fwhm, self.psf_function, target_function,
+                               lambda0=self.psf_l,
                                input_nmoffat=self.psf_nmoffat,
                                target_nmoffat=target_nmoffat, b=self.psf_b,
                                scale=scale_spaxel, compute_kernel='pypher')

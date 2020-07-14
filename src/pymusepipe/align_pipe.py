@@ -33,7 +33,7 @@ from scipy.odr import ODR, Model, RealData
 from astropy import wcs as awcs
 from astropy.io import fits as pyfits
 from astropy.modeling import models, fitting
-from astropy.stats import mad_std, sigma_clipped_stats, sigma_clip
+from astropy.stats import mad_std, sigma_clip
 from astropy.table import Table, Column
 from astropy import units as u
 from astropy.convolution import Gaussian2DKernel, convolve
