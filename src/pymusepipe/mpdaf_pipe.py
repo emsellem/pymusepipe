@@ -158,7 +158,7 @@ class MuseCubeMosaic(CubeMosaic):
 
     @property
     def list_cubes(self):
-        if not hasattr(self, _list_cubes):
+        if not hasattr(self, "_list_cubes"):
             self._list_cubes = []
         return self._list_cubes
 
