@@ -321,7 +321,7 @@ class MuseCubeMosaic(CubeMosaic):
 
             # updating the convolved cube name
             psf = BasicPSF(function=target_function, fwhm0=target_fwhm,
-                           nmoffat=target_nmoffat, l0=psf.l, b=0.)
+                           nmoffat=target_nmoffat, l0=psf.l0, b=0.)
             self.list_cubes[i] = BasicFile(outcube_name,
                                            psf=psf)
 
@@ -566,6 +566,8 @@ class MuseCube(Cube):
         shape = [self.shape[0], nspaxel, nspaxel]
 
         # Computing the kernel
+        print(self.psf.fwhm0, self.psf.function, self.psf.l0, self.psf.b,
+              self.psf.nmoffat)
         kernel3d = cube_kernel(shape, self.wave.coord(), self.psf.fwhm0,
                                target_fwhm, self.psf.function, target_function,
                                lambda0=self.psf.l0,
