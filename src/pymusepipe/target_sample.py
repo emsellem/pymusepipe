@@ -893,7 +893,8 @@ class MusePipeSample(object):
                                      dict_psf={}, target_fwhm=0.,
                                      target_nmoffat=None,
                                      target_function="gaussian", suffix="conv",
-                                     best_psf=True, min_dfwhm=0.2, **kwargs):
+                                     best_psf=True, min_dfwhm=0.2, fakemode=False,
+                                     **kwargs):
         """
 
         Args:
