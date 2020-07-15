@@ -115,7 +115,7 @@ class BasicPSF(object):
 
     @property
     def psf_array(self):
-        return [self.function, self.fwhm, self.nmoffat, self.l, self.b]
+        return [self.function, self.fwhm0, self.nmoffat, self.l0, self.b]
 
 class BasicFile(object):
     """Basic file with just the name and some properties
@@ -323,7 +323,7 @@ class MuseCubeMosaic(CubeMosaic):
             psf = BasicPSF(function=target_function, fwhm0=target_fwhm,
                            nmoffat=target_nmoffat, l0=psf.l, b=0.)
             self.list_cubes[i] = BasicFile(outcube_name,
-                                           psf=psf.psf_array)
+                                           psf=psf)
 
     def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",
                    fakemode=False, mad=True):
@@ -566,9 +566,9 @@ class MuseCube(Cube):
         shape = [self.shape[0], nspaxel, nspaxel]
 
         # Computing the kernel
-        kernel3d = cube_kernel(shape, self.wave.coord(), self.psf.fwhm,
+        kernel3d = cube_kernel(shape, self.wave.coord(), self.psf.fwhm0,
                                target_fwhm, self.psf.function, target_function,
-                               lambda0=self.psf.l,
+                               lambda0=self.psf.l0,
                                input_nmoffat=self.psf.nmoffat,
                                target_nmoffat=target_nmoffat, b=self.psf.b,
                                scale=scale_spaxel, compute_kernel='pypher')
