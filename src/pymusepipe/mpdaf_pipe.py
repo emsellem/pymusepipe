@@ -124,10 +124,7 @@ class BasicFile(object):
         self.filename = filename
         for key in kwargs:
             val = kwargs.get(key)
-            if key == "psf":
-                self._init_psf(val)
-            else:
-                setattr(self, key, val)
+            setattr(self, key, val)
 
 
 class MuseCubeMosaic(CubeMosaic):
