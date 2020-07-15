@@ -106,9 +106,6 @@ class BasicPSF(object):
         self.psf_b = psf_b
         self.psf_l = psf_l
 
-    def _init_psf(self, val):
-
-
 class BasicFile(object):
     """Basic file with just the name and some properties
     to attach to that Cube

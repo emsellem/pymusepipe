@@ -108,7 +108,7 @@ def update_calib_file(filename, subfolder="", folder_config=""):
 ####################################################
 # Defining Dictionary with running functions
 ####################################################
-class PipeDict(dict) :
+class PipeDict(dict):
     """Dictionary with extra attributes
     """
     def __init__(self, *args, **kwargs) :
