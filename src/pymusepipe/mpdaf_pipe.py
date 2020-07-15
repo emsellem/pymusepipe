@@ -131,6 +131,7 @@ class MuseCubeMosaic(CubeMosaic):
     def __init__(self, ref_wcs, folder_ref_wcs="", folder_cubes="",
                  prefix_cubes="DATACUBE_FINAL_WCS",
                  list_suffix=[], use_fixed_cubes=True,
+                 excluded_suffix=[],
                  prefix_fixed_cubes="tmask", verbose=False,
                  dict_exposures=None, dict_psf={},
                  list_cubes=None):
@@ -145,6 +146,7 @@ class MuseCubeMosaic(CubeMosaic):
 
         self.prefix_cubes = prefix_cubes
         self.list_suffix = list_suffix
+        self.excluded_suffix = excluded_suffix
         self.prefix_fixed_cubes = prefix_fixed_cubes
         self.use_fixed_cubes = use_fixed_cubes
         self.dict_exposures = dict_exposures
@@ -261,6 +263,14 @@ class MuseCubeMosaic(CubeMosaic):
                     if any([suff in l for suff in self.list_suffix]):
                         temp_list_cubes.append(l)
                 list_cubes = temp_list_cubes
+
+            # if the list of exclusion suffix is empty, just use all cubes
+            if len(self.excluded_suffix) > 0:
+                # Filtering out the ones that don't have any of the suffixes
+                temp_list_cubes = []
+                for l in list_cubes:
+                    if any([suff in l for suff in self.excluded_suffix]):
+                        _ = list_cubes.remove(l)
 
         # Attach the other properties to the list of cubes (e.g. PSF)
         self.list_cubes = []
