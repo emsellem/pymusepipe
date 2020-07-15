@@ -96,15 +96,26 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
 class BasicPSF(object):
     """Basic PSF function and parameters
     """
-    def __init__(self, psf_fwhm=0., psf_nmoffat=2.8,
-                 psf_function="gaussian", psf_b=0,
-                 psf_l=6483.58):
+    def __init__(self, fwhm0=0., nmoffat=2.8,
+                 function="gaussian", b=0,
+                 l0=6483.58, psf_array=None):
 
-        self.psf_function = psf_function
-        self.psf_fwhm = psf_fwhm
-        self.psf_nmoffat = psf_nmoffat
-        self.psf_b = psf_b
-        self.psf_l = psf_l
+        if psf_array is not None:
+            self.function = psf_array[0]
+            self.fwhm0 = psf_array[1]
+            self.nmoffat = psf_array[2]
+            self.b = psf_array[3]
+            self.l0 = psf_array[4]
+        else:
+            self.function = function
+            self.fwhm0 = fwhm0
+            self.nmoffat = nmoffat
+            self.b = b
+            self.l0 = l0
+
+    @property
+    def psf_array(self):
+        return [self.function, self.fwhm, self.nmoffat, self.l, self.b]
 
 class BasicFile(object):
     """Basic file with just the name and some properties
@@ -263,11 +274,7 @@ class MuseCubeMosaic(CubeMosaic):
                 keyword = f"{self.prefix_cubes}_P{np.int(key):02d}"
                 if keyword in name:
                     psf = self.dict_psf[key]
-                    self.list_cubes[-1].psf = BasicPSF(psf_function=psf[0],
-                                                      psf_fwhm=psf[1],
-                                                      psf_nmoffat=psf[2],
-                                                      psf_l=psf[3],
-                                                      psf_b=psf[4])
+                    self.list_cubes[-1].psf = BasicPSF(psf_array=psf)
                     found = True
             # If none correspond, set to the 0 FWHM Gaussian
             if not found:
@@ -306,19 +313,17 @@ class MuseCubeMosaic(CubeMosaic):
         for i, c in enumerate(self.list_cubes):
             name, extension = os.path.splitext(c.filename)
             outcube_name = f"{name}_{suffix}{extension}"
-            psf = c.psf
-            cube = MuseCube(c.filename, psf_fwhm=psf.psf_fwhm, psf_b=psf.psf_b,
-                            psf_l=psf.psf_l, psf_nmoffat=psf.psf_nmoffat,
-                            psf_function=psf.psf_function)
+            cube = MuseCube(c.filename, psf_array=c.psf.psf_array)
             cube_folder, _ = cube.convolve_cube_to_psf(target_fwhm,
                                       target_nmoffat=target_nmoffat,
                                       target_function=target_function,
                                       outcube_name=outcube_name, **kwargs)
 
             # updating the convolved cube name
-            psf = BasicPSF(psf_function=target_function, psf_fwhm=target_fwhm,
-                           psf_nmoffat=target_nmoffat, psf_l=psf.psf_l, psf_b=0.)
-            self.list_cubes[i] = BasicFile(outcube_name, psf=psf)
+            psf = BasicPSF(function=target_function, fwhm0=target_fwhm,
+                           nmoffat=target_nmoffat, l0=psf.l, b=0.)
+            self.list_cubes[i] = BasicFile(outcube_name,
+                                           psf=psf.psf_array)
 
     def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",
                    fakemode=False, mad=True):
@@ -358,6 +363,10 @@ class MuseCube(Cube):
     def __init__(self, source=None, verbose=False, **kwargs) :
         """Initialisation of the opening of a Cube
         """
+        # PSF for that Cube
+        psf_array = kwargs.pop("psf_array", None)
+        self.psf = BasicPSF(psf_array)
+
         if source is not None:
             self.__dict__.update(source.__dict__)
         else :
@@ -365,9 +374,6 @@ class MuseCube(Cube):
  
         self.verbose = verbose
         self._debug = kwargs.pop("debug", False)
-
-        # PSF for that Cube
-        self.psf = BasicPSF(**kwargs)
 
     def get_spectrum_from_cube(self, nx=None, ny=None, pixel_window=0, title="Spectrum"):
         """Get a spectrum from the cube with centre defined in pixels
@@ -560,11 +566,11 @@ class MuseCube(Cube):
         shape = [self.shape[0], nspaxel, nspaxel]
 
         # Computing the kernel
-        kernel3d = cube_kernel(shape, self.wave.coord(), self.psf_fwhm,
-                               target_fwhm, self.psf_function, target_function,
-                               lambda0=self.psf_l,
-                               input_nmoffat=self.psf_nmoffat,
-                               target_nmoffat=target_nmoffat, b=self.psf_b,
+        kernel3d = cube_kernel(shape, self.wave.coord(), self.psf.fwhm,
+                               target_fwhm, self.psf.function, target_function,
+                               lambda0=self.psf.l,
+                               input_nmoffat=self.psf.nmoffat,
+                               target_nmoffat=target_nmoffat, b=self.psf.b,
                                scale=scale_spaxel, compute_kernel='pypher')
 
         # Calling the local method using astropy convolution
