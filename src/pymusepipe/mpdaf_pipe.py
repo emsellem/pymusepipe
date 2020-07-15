@@ -96,8 +96,7 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
 class BasicPSF(object):
     """Basic PSF function and parameters
     """
-    def __init__(self, fwhm0=0., nmoffat=2.8,
-                 function="gaussian", b=0,
+    def __init__(self, fwhm0=0., nmoffat=2.8, function="gaussian", b=0.,
                  l0=6483.58, psf_array=None):
 
         if psf_array is not None:
@@ -313,6 +312,7 @@ class MuseCubeMosaic(CubeMosaic):
         for i, c in enumerate(self.list_cubes):
             name, extension = os.path.splitext(c.filename)
             outcube_name = f"{name}_{suffix}{extension}"
+            print("HERE array is ", c.psf.psf_array)
             cube = MuseCube(filename=c.filename, psf_array=c.psf.psf_array)
             cube_folder, _ = cube.convolve_cube_to_psf(target_fwhm,
                                       target_nmoffat=target_nmoffat,
@@ -321,7 +321,7 @@ class MuseCubeMosaic(CubeMosaic):
 
             # updating the convolved cube name
             psf = BasicPSF(function=target_function, fwhm0=target_fwhm,
-                           nmoffat=target_nmoffat, l0=psf.l0, b=0.)
+                           nmoffat=target_nmoffat, l0=c.psf.l0, b=0.)
             self.list_cubes[i] = BasicFile(outcube_name,
                                            psf=psf)
 
@@ -566,8 +566,6 @@ class MuseCube(Cube):
         shape = [self.shape[0], nspaxel, nspaxel]
 
         # Computing the kernel
-        print(self.psf.fwhm0, self.psf.function, self.psf.l0, self.psf.b,
-              self.psf.nmoffat)
         kernel3d = cube_kernel(shape, self.wave.coord(), self.psf.fwhm0,
                                target_fwhm, self.psf.function, target_function,
                                lambda0=self.psf.l0,
