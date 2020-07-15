@@ -306,9 +306,10 @@ class MuseCubeMosaic(CubeMosaic):
         for i, c in enumerate(self.list_cubes):
             name, extension = os.path.splitext(c.filename)
             outcube_name = f"{name}_{suffix}{extension}"
-            cube = MuseCube(c.filename, psf_fwhm=c.psf_fwhm, psf_b=c.psf_b,
-                            psf_l=c.psf_l, psf_nmoffat=c.psf_nmoffat,
-                            psf_function=c.psf_function)
+            psf = c.psf
+            cube = MuseCube(c.filename, psf_fwhm=psf.psf_fwhm, psf_b=psf.psf_b,
+                            psf_l=psf.psf_l, psf_nmoffat=psf.psf_nmoffat,
+                            psf_function=psf.psf_function)
             cube_folder, _ = cube.convolve_cube_to_psf(target_fwhm,
                                       target_nmoffat=target_nmoffat,
                                       target_function=target_function,
@@ -316,7 +317,7 @@ class MuseCubeMosaic(CubeMosaic):
 
             # updating the convolved cube name
             psf = BasicPSF(psf_function=target_function, psf_fwhm=target_fwhm,
-                           psf_nmoffat=target_nmoffat, psf_l=c.psf_l, psf_b=0.)
+                           psf_nmoffat=target_nmoffat, psf_l=psf.psf_l, psf_b=0.)
             self.list_cubes[i] = BasicFile(outcube_name, psf=psf)
 
     def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",

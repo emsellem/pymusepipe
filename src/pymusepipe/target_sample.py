@@ -940,7 +940,6 @@ class MusePipeSample(object):
                                 "best_psf is set to True.")
 
         # Convolve
-        fakemode = kwargs.pop("fakemode", False)
         if not fakemode:
             self.pipes_mosaic[targetname].convolve_cubes(target_fwhm=target_fwhm,
                                                          target_nmoffat=target_nmoffat,
