@@ -895,18 +895,25 @@ class MusePipeSample(object):
                                      target_function="gaussian", suffix="conv",
                                      best_psf=True, min_dfwhm=0.2, fakemode=False,
                                      **kwargs):
-        """
+        """Convolve the datacubes listed in a mosaic with some target function
+        and FWHM. It will try to homogeneise all individual cubes to that
+        target PSF.
 
         Args:
-            targetname:
-            list_pointings:
-            dict_psf:
-            target_fwhm:
-            target_nmoffat:
-            target_function:
-            suffix:
-            best_psf:
-            min_dfwhm:
+            targetname (str): name of the target
+            list_pointings (list): list of integers for the list of pointings
+                to consider
+            dict_psf (dict): dictionary providing individual PSFs per pointing
+            target_fwhm (float): target FWHM for the convolution [arcsec]
+            target_nmoffat (float): tail factor for the moffat function.
+            target_function (str): 'moffat' or 'gaussian' ['gaussian']
+            suffix (str): input string to be added
+            best_psf (bool): if True use the minimum overall possible value. If
+                True it will overwrite all the target parameters.
+            min_dfwhm (float): minimum difference to be added in quadrature
+                [in arcsec]
+            fakemode (bool): if True, will only initialise parameters but not
+                proceed with the convolution.
             **kwargs:
 
         Returns:
@@ -933,7 +940,7 @@ class MusePipeSample(object):
         if best_psf:
             target_function = "gaussian"
             target_fwhm = np.sqrt(best_fwhm**2 + min_dfwhm**2)
-            upipe.print_info(f"Best FWHM = {best_fwhm:.2f} and "
+            upipe.print_info(f"Minumum overall FWHM = {best_fwhm:.2f} and "
                              f"target FWHM will be {target_fwhm:.2f}")
             suffix = f"copt_{target_fwhm:.2f}asec"
             upipe.print_warning(f"Overwriting options for the target PSF as"

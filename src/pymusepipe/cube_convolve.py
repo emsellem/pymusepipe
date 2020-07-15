@@ -454,6 +454,15 @@ def cube_kernel(shape, wave, input_fwhm,  target_fwhm,
                        nmoffat=target_nmoffat, scale=scale)
 
     print('Creating the convolution kernel')
+    print("-----------------------------------------------------------")
+    print(f"Input function = {input_function}, Input FWHM = {input_fwhm}")
+    if input_function == "moffat":
+        print(f"Input N_moffat = {input_nmoffat}")
+    print(f"Wavelength variation given by lambda0={lambda0} and b={b}")
+    print("-----------------------------------------------------------")
+    print(f"Target function = {target_function}, target FWHM = {target_fwhm}")
+    if target_function == "moffat":
+        print(f"Target N_moffat = {target_nmoffat}")
     if compute_kernel == 'pypher':
         print('Building the convolution kernel via pypher')
         kernel = convolution_kernel(original_psf, target_psf, scale=0.2)

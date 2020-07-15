@@ -310,18 +310,23 @@ class MuseCubeMosaic(CubeMosaic):
         """
         # Convolving cube per cube
         for i, c in enumerate(self.list_cubes):
-            name, extension = os.path.splitext(c.filename)
+            # Removing the input folder
+            folder, filename = os.path.split(c.filename)
+            # Getting just the name and the extension
+            name, extension = os.path.splitext(filename)
             outcube_name = f"{name}_{suffix}{extension}"
             cube = MuseCube(filename=c.filename, psf_array=c.psf.psf_array)
-            cube_folder, _ = cube.convolve_cube_to_psf(target_fwhm,
+            cube_folder, outcube_name = cube.convolve_cube_to_psf(target_fwhm,
                                       target_nmoffat=target_nmoffat,
                                       target_function=target_function,
-                                      outcube_name=outcube_name, **kwargs)
+                                      outcube_name=outcube_name,
+                                      outcube_folder=folder,
+                                      **kwargs)
 
             # updating the convolved cube name
             psf = BasicPSF(function=target_function, fwhm0=target_fwhm,
                            nmoffat=target_nmoffat, l0=c.psf.l0, b=0.)
-            self.list_cubes[i] = BasicFile(outcube_name,
+            self.list_cubes[i] = BasicFile(joinpath(cube_folder,outcube_name),
                                            psf=psf)
 
     def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",
@@ -529,6 +534,7 @@ class MuseCube(Cube):
 
     def convolve_cube_to_psf(self, target_fwhm, target_nmoffat=None,
                              target_function="gaussian",
+                             outcube_folder=None,
                              outcube_name=None, factor_fwhm=3,
                              fft=True):
         """Convolve the cube for a target function 'gaussian' or 'moffat'
@@ -550,12 +556,17 @@ class MuseCube(Cube):
         """
         # Separate folder and name of file
         cube_folder, cube_name = os.path.split(self.filename)
+        if outcube_folder is None:
+            outcube_folder = cube_folder
 
         # Creating the outcube filename
         if outcube_name is None:
             outcube_name = "conv{0}_{1:.2f}{2}".format(target_function.lower()[0],
                                                        target_fwhm, cube_name)
-        upipe.print_info("The new cube will be named: {}".format(outcube_name))
+        else:
+            _, outcube_name = os.path.split(outcube_name)
+        upipe.print_info(f"The new cube will be named: {outcube_name}")
+        upipe.print_info(f"Products will be written in {outcube_folder}")
 
         # Getting the shape of the Kernel
         scale_spaxel = self.get_step(unit_wcs=u.arcsec)[1]
@@ -577,15 +588,15 @@ class MuseCube(Cube):
 
         # Write the output
         upipe.print_info("Writing up the derived cube")
-        conv_cube.write(joinpath(cube_folder, outcube_name))
+        conv_cube.write(joinpath(outcube_folder, outcube_name))
 
         # Write the kernel3D
         upipe.print_info("Writing up the used kernel")
         kercube = Cube(data=kernel3d)
-        kercube.write(joinpath(cube_folder, "ker3d_{}".format(outcube_name)))
+        kercube.write(joinpath(outcube_folder, "ker3d_{}".format(outcube_name)))
 
         # just provide the output name by folder+name
-        return cube_folder, outcube_name
+        return outcube_folder, outcube_name
 
     def create_reference_cube(self, lambdamin=4700, lambdamax=9400,
             step=1.25, outcube_name=None, filter_for_nan=False, **kwargs):
