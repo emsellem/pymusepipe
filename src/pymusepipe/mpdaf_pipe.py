@@ -133,7 +133,7 @@ class MuseCubeMosaic(CubeMosaic):
                  list_suffix=[], use_fixed_cubes=True,
                  prefix_fixed_cubes="tmask", verbose=False,
                  dict_exposures=None, dict_psf={},
-                 cube_names=None):
+                 list_cubes=None):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
@@ -151,10 +151,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.dict_psf = dict_psf
 
         # Building the list of cubes
-        if list_cubes is not None:
-            self.list_cubes = list_cubes
-        else:
-            self.build_list()
+        self.build_list(list_cubes)
 
         # Initialise the super class
         super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name)
@@ -188,7 +185,8 @@ class MuseCubeMosaic(CubeMosaic):
             return False
         return True
 
-    def build_list(self, folder_cubes=None, prefix_cubes=None, **kwargs):
+    def build_list(self, folder_cubes=None, prefix_cubes=None, list_cubes=None,
+                   **kwargs):
         """Building the list of cubes to process
 
         Args:
@@ -208,60 +206,61 @@ class MuseCubeMosaic(CubeMosaic):
         if prefix_cubes is not None:
             self.prefix_cubes = prefix_cubes
 
-        # get the list of cubes and return if 0 found
-        list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
-                                                     self.prefix_cubes))
+        if list_cubes == None:
+            # get the list of cubes and return if 0 found
+            list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
+                                                         self.prefix_cubes))
 
-        upipe.print_info("Found {} existing Cubes in this folder".format(
-                           len(list_existing_cubes)))
-        # Filter the list with the pointing dictionary if given
-        if self.dict_exposures is not None:
-            upipe.print_info("Will be using a dictionary for "
-                             "selecting the appropriate cubes")
-        list_cubes = filter_list_with_pdict(list_existing_cubes,
-                                            list_pointings=None,
-                                            dict_files=self.dict_exposures)
+            upipe.print_info("Found {} existing Cubes in this folder".format(
+                               len(list_existing_cubes)))
+            # Filter the list with the pointing dictionary if given
+            if self.dict_exposures is not None:
+                upipe.print_info("Will be using a dictionary for "
+                                 "selecting the appropriate cubes")
+            list_cubes = filter_list_with_pdict(list_existing_cubes,
+                                                list_pointings=None,
+                                                dict_files=self.dict_exposures)
 
-        # Take (or not) the fixed Cubes
-        if self.use_fixed_cubes:
-            upipe.print_warning("Using Fixed cubes with prefix {} "
-                                "when relevant".format(self.prefix_fixed_cubes))
-            prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
-                                                 self.prefix_cubes)
-            list_fixed_cubes = glob.glob("{0}{1}*fits".format(
-                                               self.folder_cubes,
-                                               prefix_to_consider))
-            upipe.print_info("Initial set of {:02d} fixed "
-                             "cubes found".format(len(list_fixed_cubes)))
+            # Take (or not) the fixed Cubes
+            if self.use_fixed_cubes:
+                upipe.print_warning("Using Fixed cubes with prefix {} "
+                                    "when relevant".format(self.prefix_fixed_cubes))
+                prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
+                                                     self.prefix_cubes)
+                list_fixed_cubes = glob.glob("{0}{1}*fits".format(
+                                                   self.folder_cubes,
+                                                   prefix_to_consider))
+                upipe.print_info("Initial set of {:02d} fixed "
+                                 "cubes found".format(len(list_fixed_cubes)))
 
-            # Looping over the existing fixed pixtables
-            for fixed_cube in list_fixed_cubes:
-                # Finding the name of the original one
-                orig_cube = fixed_cube.replace(prefix_to_consider,
-                                               self.prefix_cubes)
-                if orig_cube in list_cubes:
-                    # If it exists, remove it
-                    list_cubes.remove(orig_cube)
-                    # and add the fixed one
-                    list_cubes.append(fixed_cube)
-                    upipe.print_warning("Fixed Cube {} was included "
-                                        "in the list".format(fixed_cube))
-                    upipe.print_warning("and Cube {} was thus removed from "
-                                        "the list".format(orig_cube))
-                else:
-                    upipe.print_warning("Original Cube {} not "
-                                        "found".format(orig_cube))
-                    upipe.print_warning("Hence will not include fixed "
-                                        "Cube in the list {}".format(fixed_cube))
+                # Looping over the existing fixed pixtables
+                for fixed_cube in list_fixed_cubes:
+                    # Finding the name of the original one
+                    orig_cube = fixed_cube.replace(prefix_to_consider,
+                                                   self.prefix_cubes)
+                    if orig_cube in list_cubes:
+                        # If it exists, remove it
+                        list_cubes.remove(orig_cube)
+                        # and add the fixed one
+                        list_cubes.append(fixed_cube)
+                        upipe.print_warning("Fixed Cube {} was included "
+                                            "in the list".format(fixed_cube))
+                        upipe.print_warning("and Cube {} was thus removed from "
+                                            "the list".format(orig_cube))
+                    else:
+                        upipe.print_warning("Original Cube {} not "
+                                            "found".format(orig_cube))
+                        upipe.print_warning("Hence will not include fixed "
+                                            "Cube in the list {}".format(fixed_cube))
 
-        # if the list of suffix is empty, just use all cubes
-        if len(self.list_suffix) > 0:
-            # Filtering out the ones that don't have any of the suffixes
-            temp_list_cubes = []
-            for l in list_cubes:
-                if any([suff in l for suff in self.list_suffix]):
-                    temp_list_cubes.append(l)
-            list_cubes = temp_list_cubes
+            # if the list of suffix is empty, just use all cubes
+            if len(self.list_suffix) > 0:
+                # Filtering out the ones that don't have any of the suffixes
+                temp_list_cubes = []
+                for l in list_cubes:
+                    if any([suff in l for suff in self.list_suffix]):
+                        temp_list_cubes.append(l)
+                list_cubes = temp_list_cubes
 
         # Attach the other properties to the list of cubes (e.g. PSF)
         self.list_cubes = []
