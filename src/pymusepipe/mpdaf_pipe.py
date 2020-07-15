@@ -132,7 +132,8 @@ class MuseCubeMosaic(CubeMosaic):
                  prefix_cubes="DATACUBE_FINAL_WCS",
                  list_suffix=[], use_fixed_cubes=True,
                  prefix_fixed_cubes="tmask", verbose=False,
-                 dict_exposures=None, dict_psf={}):
+                 dict_exposures=None, dict_psf={},
+                 cube_names=None):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
@@ -150,7 +151,10 @@ class MuseCubeMosaic(CubeMosaic):
         self.dict_psf = dict_psf
 
         # Building the list of cubes
-        self.build_list()
+        if list_cubes is not None:
+            self.list_cubes = list_cubes
+        else:
+            self.build_list()
 
         # Initialise the super class
         super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name)
