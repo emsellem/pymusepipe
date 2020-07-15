@@ -96,8 +96,8 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
 class BasicPSF(object):
     """Basic PSF function and parameters
     """
-    def __init__(self, psf_fwhm=0.5, psf_nmoffat=2.8,
-                 psf_function="moffat", psf_b=-3.0e-5,
+    def __init__(self, psf_fwhm=0., psf_nmoffat=2.8,
+                 psf_function="gaussian", psf_b=0,
                  psf_l=6483.58):
 
         self.psf_function = psf_function
@@ -136,7 +136,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.ref_wcs = ref_wcs
         if not self._check_folder():
             return
-        full_wcs_name = joinpath(self.folder_ref_wcs, self.ref_wcs)
+        self.full_wcs_name = joinpath(self.folder_ref_wcs, self.ref_wcs)
 
         self.prefix_cubes = prefix_cubes
         self.list_suffix = list_suffix
@@ -149,7 +149,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.build_list()
 
         # Initialise the super class
-        super(MuseCubeMosaic, self).__init__(self.cube_names, full_wcs_name)
+        super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name)
 
     @property
     def cube_names(self):
@@ -259,15 +259,22 @@ class MuseCubeMosaic(CubeMosaic):
         self.list_cubes = []
         for name in list_cubes:
             self.list_cubes.append(BasicFile(name))
+            found = False
             for key in self.dict_psf:
-                if key in name:
+                if found: break
+                if f"{self.prefix_cubes}_P{np.int(key):02d}" in name:
                     psf = dist_psf[key]
                     self.list_cubes[i].psf = BasicPSF(psf_function=psf[0],
                                                       psf_fwhm=psf[1],
                                                       psf_nmoffat=psf[2],
                                                       psf_l=psf[3],
                                                       psf_b=psf[4])
-                    break
+                    found = True
+            # If none correspond, set to the 0 FWHM Gaussian
+            if not found:
+                upipe.print_warning(f"No PSF found for cube {name}. "
+                                    f"Using default")
+                self.list_cubes[i].psf = BasicPSF()
 
         if self.verbose:
             for i, c in enumerate(self.list_cubes):

@@ -850,7 +850,8 @@ class MusePipeSample(object):
                              list_ifu=None, angle=angle, fakemode=fakemode,
                              prefix=prefix, **kwargs)
 
-    def init_mosaic(self, targetname=None, list_pointings=None, **kwargs):
+    def init_mosaic(self, targetname=None, list_pointings=None,
+                    prefix_cubes="DATACUBE_FINAL_WCS", **kwargs):
         """Prepare the combination of targets
 
         Input
@@ -867,13 +868,12 @@ class MusePipeSample(object):
             return
 
         # Make a list for the masking of the cubes to take into account
-        list_pointing_names = ["P{0:02d}".format(np.int(pointing))
+        list_pointing_names = [f"P{np.int(pointing):02d}"
                                for pointing in list_pointings]
 
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
-        prefix_cubes = "DATACUBE_FINAL_WCS"
         if add_targetname:
             wcs_prefix = "{}_".format(targetname)
             prefix_cubes = "{0}_{1}".format(targetname, prefix_cubes)
@@ -890,29 +890,53 @@ class MusePipeSample(object):
                                                        **kwargs)
 
     def convolve_mosaic_per_pointing(self, targetname=None, list_pointings=None,
-                                     dict_psf={}, target_fwhm=,
+                                     dict_psf={}, target_fwhm=0.,
                                      target_nmoffat=None,
                                      target_function="gaussian", suffix="conv",
-                                     best_psf=True, **kwargs):
-        # Initialise
+                                     best_psf=True, min_dfwhm=0.2, **kwargs):
+        """
+
+        Args:
+            targetname:
+            list_pointings:
+            dict_psf:
+            target_fwhm:
+            target_nmoffat:
+            target_function:
+            suffix:
+            best_psf:
+            min_dfwhm:
+            **kwargs:
+
+        Returns:
+
+        """
+        # Initialise and filter with list of pointings
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
                          dict_psf=dict_psf, **kwargs)
 
-        # If best_psf is True, use smallest gaussian possible
-        # This overwrites the other parameters
+        # Use the mosaic to determine the lambda range
+        l_range = self.pipes_mosaic[targetname].wave.get_range()
+
+        # Calculate the worst psf
+        # Detect if there are larger values to account for
+        # Using the wavelength dependent FWHM
+        if len(dict_psf) > 0:
+            best_fwhm = 0.
+            for key in dict_psf:
+                psf = dict_psf[key]
+                fwhm_wave = np.max(psf[4] * (l_range - psf[3]) + psf[1])
+                if fwhm_wave > best_fwhm:
+                    best_fwhm = fwhm_wave
+
         if best_psf:
+            target_function = "gaussian"
+            target_fwhm = np.sqrt(best_fwhm**2 + min_dfwhm**2)
+            upipe.print_info(f"Best FWHM = {best_fwhm:.2f} and "
+                             f"target FWHM will be {target_fwhm:.2f}")
+            suffix = f"copt_{target_fwhm:.2f}asec"
             upipe.print_warning("Overwriting options for the target PSF as"
                                 "best_psf is set to True.")
-            target_function = "gaussian"
-            # set min fwhm to 0
-            best_fwhm = 0.
-            # now detect if there are larger values to account for
-            for key in dict_psf:
-                if dict_psf[key][1] > best_fwhm:
-                    best_fwhm = dict_psf[key][1]
-            upipe.print_info(f"Best target FWHM = {best_fwhm:.2f}")
-            target_fwhm = best_fwhm
-            suffix = f"copt_{best_fwhm:.2f}asec"
 
         # Convolve
         fakemode = kwargs.pop("fakemode", False)
