@@ -313,7 +313,7 @@ class MuseCubeMosaic(CubeMosaic):
         for i, c in enumerate(self.list_cubes):
             name, extension = os.path.splitext(c.filename)
             outcube_name = f"{name}_{suffix}{extension}"
-            cube = MuseCube(c.filename, psf_array=c.psf.psf_array)
+            cube = MuseCube(filename=c.filename, psf_array=c.psf.psf_array)
             cube_folder, _ = cube.convolve_cube_to_psf(target_fwhm,
                                       target_nmoffat=target_nmoffat,
                                       target_function=target_function,
@@ -371,7 +371,7 @@ class MuseCube(Cube):
             self.__dict__.update(source.__dict__)
         else :
             Cube.__init__(self, **kwargs)
- 
+
         self.verbose = verbose
         self._debug = kwargs.pop("debug", False)
 
