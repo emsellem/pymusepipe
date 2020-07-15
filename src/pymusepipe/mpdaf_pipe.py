@@ -153,7 +153,7 @@ class MuseCubeMosaic(CubeMosaic):
         return [c.filename for c in self.list_cubes]
 
     @property
-    def ncubes(selfs):
+    def ncubes(self):
         return len(self.list_cubes)
 
     @property
@@ -258,10 +258,12 @@ class MuseCubeMosaic(CubeMosaic):
             self.list_cubes.append(BasicFile(name))
             found = False
             for key in self.dict_psf:
-                if found: break
-                if f"{self.prefix_cubes}_P{np.int(key):02d}" in name:
-                    psf = dist_psf[key]
-                    self.list_cubes[i].psf = BasicPSF(psf_function=psf[0],
+                if found:
+                    break
+                keyword = f"{self.prefix_cubes}_P{np.int(key):02d}"
+                if keyword in name:
+                    psf = self.dict_psf[key]
+                    self.list_cubes[-1].psf = BasicPSF(psf_function=psf[0],
                                                       psf_fwhm=psf[1],
                                                       psf_nmoffat=psf[2],
                                                       psf_l=psf[3],
@@ -271,7 +273,7 @@ class MuseCubeMosaic(CubeMosaic):
             if not found:
                 upipe.print_warning(f"No PSF found for cube {name}. "
                                     f"Using default")
-                self.list_cubes[i].psf = BasicPSF()
+                self.list_cubes[-1].psf = BasicPSF()
 
         if self.verbose:
             for i, c in enumerate(self.list_cubes):
@@ -315,7 +317,7 @@ class MuseCubeMosaic(CubeMosaic):
             # updating the convolved cube name
             psf = BasicPSF(psf_function=target_function, psf_fwhm=target_fwhm,
                            psf_nmoffat=target_nmoffat, psf_l=c.psf_l, psf_b=0.)
-            self.list_cubes[i] = BasicCube(outcube_name, psf=psf)
+            self.list_cubes[i] = BasicFile(outcube_name, psf=psf)
 
     def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",
                    fakemode=False, mad=True):
