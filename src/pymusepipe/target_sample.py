@@ -936,8 +936,9 @@ class MusePipeSample(object):
             upipe.print_info(f"Best FWHM = {best_fwhm:.2f} and "
                              f"target FWHM will be {target_fwhm:.2f}")
             suffix = f"copt_{target_fwhm:.2f}asec"
-            upipe.print_warning("Overwriting options for the target PSF as"
-                                "best_psf is set to True.")
+            upipe.print_warning(f"Overwriting options for the target PSF as"
+                                f" best_psf is set to True. \n"
+                                f"Suffix for convolved cubes = {suffix}")
 
         # Convolve
         if not fakemode:
