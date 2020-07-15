@@ -314,6 +314,7 @@ class MuseCubeMosaic(CubeMosaic):
             outcube_name = f"{name}_{suffix}{extension}"
             print("HERE array is ", c.psf.psf_array)
             cube = MuseCube(filename=c.filename, psf_array=c.psf.psf_array)
+            print("HERE 2 - ", cube.psf.fwhm0)
             cube_folder, _ = cube.convolve_cube_to_psf(target_fwhm,
                                       target_nmoffat=target_nmoffat,
                                       target_function=target_function,
