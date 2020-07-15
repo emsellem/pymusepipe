@@ -213,6 +213,13 @@ class MuseCubeMosaic(CubeMosaic):
             list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                          self.prefix_cubes))
 
+            # if the list of exclusion suffix is empty, just use all cubes
+            if len(self.excluded_suffix) > 0:
+                # Filtering out the ones that don't have any of the suffixes
+                for l in list_existing_cubes:
+                    if any([suff in l for suff in self.excluded_suffix]):
+                        _ = list_existing_cubes.remove(l)
+
             upipe.print_info("Found {} existing Cubes in this folder".format(
                                len(list_existing_cubes)))
             # Filter the list with the pointing dictionary if given
@@ -263,14 +270,6 @@ class MuseCubeMosaic(CubeMosaic):
                     if any([suff in l for suff in self.list_suffix]):
                         temp_list_cubes.append(l)
                 list_cubes = temp_list_cubes
-
-            # if the list of exclusion suffix is empty, just use all cubes
-            if len(self.excluded_suffix) > 0:
-                # Filtering out the ones that don't have any of the suffixes
-                temp_list_cubes = []
-                for l in list_cubes:
-                    if any([suff in l for suff in self.excluded_suffix]):
-                        _ = list_cubes.remove(l)
 
         # Attach the other properties to the list of cubes (e.g. PSF)
         self.list_cubes = []
