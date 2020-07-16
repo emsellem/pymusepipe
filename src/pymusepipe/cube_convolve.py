@@ -346,7 +346,7 @@ def convolution_kernel_gaussian(fwhm_wave, target_fwhm, target_psf,
 
     return conv_kernel
 
-def cube_convolve(data, kernel, variance=None, fft=True):
+def cube_convolve(data, kernel, variance=None, fft=True, fill_value=np.nan):
     """Convolve a 3D datacube
 
     Args:
@@ -381,8 +381,9 @@ def cube_convolve(data, kernel, variance=None, fft=True):
                                       psf_pad=True,
                                       fft_pad=False,
                                       boundary='fill',
-                                      fill_value=0,
-                                      normalize_kernel=False)
+                                      fill_value=fill_value,
+                                      normalize_kernel=False,
+                                      preserve_nan=True)
 
     if variance is not None:
         for i in range(variance.shape[0]):
@@ -393,8 +394,9 @@ def cube_convolve(data, kernel, variance=None, fft=True):
                                               psf_pad=True,
                                               fft_pad=False,
                                               boundary='fill',
-                                              fill_value=0,
-                                              normalize_kernel=False)
+                                              fill_value=fill_value,
+                                              normalize_kernel=False,
+                                              preserve_nan=True)
     # else:
     #     print("Convolution using 3D convolve in astropy")
     #     data = conv_function(data, norm_kernel, allow_huge=True,
