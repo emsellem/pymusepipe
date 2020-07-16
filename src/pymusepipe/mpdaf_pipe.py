@@ -309,8 +309,8 @@ class MuseCubeMosaic(CubeMosaic):
                     upipe.print_warning(f"No PSF found for cube {name}. "
                                         f"Using default")
                     self.list_cubes[-1].psf = BasicPSF()
-             else:
-                 self.list_cubes[-1].psf = BasicPSF()
+            else:
+                self.list_cubes[-1].psf = BasicPSF()
 
         if self.verbose:
             for i, c in enumerate(self.list_cubes):
