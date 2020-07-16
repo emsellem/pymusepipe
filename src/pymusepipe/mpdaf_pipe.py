@@ -294,20 +294,23 @@ class MuseCubeMosaic(CubeMosaic):
         self.list_cubes = []
         for name in list_cubes:
             self.list_cubes.append(BasicFile(name))
-            found = False
-            for key in self.dict_psf:
-                if found:
-                    break
-                keyword = f"{self.prefix_cubes}_P{np.int(key):02d}"
-                if keyword in name:
-                    psf = self.dict_psf[key]
-                    self.list_cubes[-1].psf = BasicPSF(psf_array=psf)
-                    found = True
-            # If none correspond, set to the 0 FWHM Gaussian
-            if not found:
-                upipe.print_warning(f"No PSF found for cube {name}. "
-                                    f"Using default")
-                self.list_cubes[-1].psf = BasicPSF()
+            if len(self.dict_psf) > 0:
+                found = False
+                for key in self.dict_psf:
+                    if found:
+                        break
+                    keyword = f"{self.prefix_cubes}_P{np.int(key):02d}"
+                    if keyword in name:
+                        psf = self.dict_psf[key]
+                        self.list_cubes[-1].psf = BasicPSF(psf_array=psf)
+                        found = True
+                # If none correspond, set to the 0 FWHM Gaussian
+                if not found:
+                    upipe.print_warning(f"No PSF found for cube {name}. "
+                                        f"Using default")
+                    self.list_cubes[-1].psf = BasicPSF()
+             else:
+                 self.list_cubes[-1].psf = BasicPSF()
 
         if self.verbose:
             for i, c in enumerate(self.list_cubes):

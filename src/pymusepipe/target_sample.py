@@ -1010,7 +1010,7 @@ class MusePipeSample(object):
                 upipe.print_info("Filter = {}".format(filter))
                 ima = cube.get_filter_image(filter_name=filter)
                 ima_name = "{0}_IMAGE_FOV_{1}_{2}.fits".format(targetname, filter,
-                                                               suffix)
+                                                               suffixout)
                 ima.write(joinpath(folder_cubes, ima_name))
 
     def init_combine(self, targetname=None, list_pointings=None,
