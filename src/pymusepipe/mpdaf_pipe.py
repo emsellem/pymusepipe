@@ -132,6 +132,7 @@ class MuseCubeMosaic(CubeMosaic):
                  prefix_cubes="DATACUBE_FINAL_WCS",
                  list_suffix=[], use_fixed_cubes=True,
                  excluded_suffix=[],
+                 included_suffix=[],
                  prefix_fixed_cubes="tmask", verbose=False,
                  dict_exposures=None, dict_psf={},
                  list_cubes=None):
@@ -147,6 +148,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.prefix_cubes = prefix_cubes
         self.list_suffix = list_suffix
         self.excluded_suffix = excluded_suffix
+        self.included_suffix = inccluded_suffix
         self.prefix_fixed_cubes = prefix_fixed_cubes
         self.use_fixed_cubes = use_fixed_cubes
         self.dict_exposures = dict_exposures
@@ -212,6 +214,13 @@ class MuseCubeMosaic(CubeMosaic):
             # get the list of cubes and return if 0 found
             list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                          self.prefix_cubes))
+
+            # if the list of exclusion suffix is empty, just use all cubes
+            if len(self.included_suffix) > 0:
+                # Filtering out the ones that don't have any of the suffixes
+                for l in list_existing_cubes:
+                    if any([suff not in l for suff in self.included_suffix]):
+                        _ = list_existing_cubes.remove(l)
 
             # if the list of exclusion suffix is empty, just use all cubes
             if len(self.excluded_suffix) > 0:
