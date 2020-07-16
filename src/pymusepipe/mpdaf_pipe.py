@@ -19,6 +19,7 @@ from numpy import ma
 import os
 from os.path import join as joinpath
 import glob
+import copy
 
 # Importing mpdaf
 try :
