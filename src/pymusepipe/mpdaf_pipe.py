@@ -225,6 +225,8 @@ class MuseCubeMosaic(CubeMosaic):
                 # Filtering out the ones that don't have any of the suffixes
                 temp_list = copy.copy(list_existing_cubes)
                 for l in temp_list:
+                    # HERE TEST
+                    print(l, any([suff not in l for suff in self.included_suffix]))
                     if any([suff not in l for suff in self.included_suffix]):
                         _ = list_existing_cubes.remove(l)
 
