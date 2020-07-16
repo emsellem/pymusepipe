@@ -148,7 +148,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.prefix_cubes = prefix_cubes
         self.list_suffix = list_suffix
         self.excluded_suffix = excluded_suffix
-        self.included_suffix = inccluded_suffix
+        self.included_suffix = included_suffix
         self.prefix_fixed_cubes = prefix_fixed_cubes
         self.use_fixed_cubes = use_fixed_cubes
         self.dict_exposures = dict_exposures
