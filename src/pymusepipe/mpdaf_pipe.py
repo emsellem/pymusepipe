@@ -215,8 +215,12 @@ class MuseCubeMosaic(CubeMosaic):
             list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                          self.prefix_cubes))
 
+            upipe.print_info("Found {} existing Cubes in this folder".format(
+                len(list_existing_cubes)))
             # if the list of exclusion suffix is empty, just use all cubes
             if len(self.included_suffix) > 0:
+                upipe.print_info(f"Using suffixes {self.included_suffix} "
+                                 f"as an inclusive condition")
                 # Filtering out the ones that don't have any of the suffixes
                 for l in list_existing_cubes:
                     if any([suff not in l for suff in self.included_suffix]):
@@ -224,17 +228,19 @@ class MuseCubeMosaic(CubeMosaic):
 
             # if the list of exclusion suffix is empty, just use all cubes
             if len(self.excluded_suffix) > 0:
+                upipe.print_info(f"Using suffixes {self.excluded_suffix} "
+                                 f"as an exclusive condition")
                 # Filtering out the ones that don't have any of the suffixes
                 for l in list_existing_cubes:
                     if any([suff in l for suff in self.excluded_suffix]):
                         _ = list_existing_cubes.remove(l)
 
-            upipe.print_info("Found {} existing Cubes in this folder".format(
-                               len(list_existing_cubes)))
+            upipe.print_info("Found {} Cubes after suffix filtering".format(
+                len(list_existing_cubes)))
             # Filter the list with the pointing dictionary if given
             if self.dict_exposures is not None:
                 upipe.print_info("Will be using a dictionary for "
-                                 "selecting the appropriate cubes")
+                                 "further selecting the appropriate cubes")
             list_cubes = filter_list_with_pdict(list_existing_cubes,
                                                 list_pointings=None,
                                                 dict_files=self.dict_exposures)
