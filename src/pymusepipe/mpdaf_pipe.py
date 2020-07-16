@@ -222,7 +222,8 @@ class MuseCubeMosaic(CubeMosaic):
                 upipe.print_info(f"Using suffixes {self.included_suffix} "
                                  f"as an inclusive condition")
                 # Filtering out the ones that don't have any of the suffixes
-                for l in list_existing_cubes:
+                temp_list = copy.copy(list_existing_cubes)
+                for l in temp_list:
                     if any([suff not in l for suff in self.included_suffix]):
                         _ = list_existing_cubes.remove(l)
 
@@ -231,7 +232,8 @@ class MuseCubeMosaic(CubeMosaic):
                 upipe.print_info(f"Using suffixes {self.excluded_suffix} "
                                  f"as an exclusive condition")
                 # Filtering out the ones that don't have any of the suffixes
-                for l in list_existing_cubes:
+                temp_list = copy.copy(list_existing_cubes)
+                for l in temp_list:
                     if any([suff in l for suff in self.excluded_suffix]):
                         _ = list_existing_cubes.remove(l)
 
@@ -262,7 +264,8 @@ class MuseCubeMosaic(CubeMosaic):
                     # Finding the name of the original one
                     orig_cube = fixed_cube.replace(prefix_to_consider,
                                                    self.prefix_cubes)
-                    if orig_cube in list_cubes:
+                    temp_list = copy.copy(list_cubes)
+                    if orig_cube in temp_list:
                         # If it exists, remove it
                         list_cubes.remove(orig_cube)
                         # and add the fixed one
