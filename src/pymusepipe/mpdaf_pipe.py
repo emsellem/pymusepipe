@@ -167,8 +167,9 @@ class MuseCubeMosaic(CubeMosaic):
 
     def print_cube_names(self):
         lnames = copy.copy(self.cube_names)
+        lnames.sort()
         print("Mosaic Cubes ==========================")
-        for i, name in enumerate(lnames.sort()):
+        for i, name in enumerate(lnames):
             print(f"#{i:02d} - name")
         print("=======================================")
 
