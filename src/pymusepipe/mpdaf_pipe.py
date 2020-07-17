@@ -170,7 +170,7 @@ class MuseCubeMosaic(CubeMosaic):
         lnames.sort()
         print("Mosaic Cubes ==========================")
         for i, name in enumerate(lnames):
-            print(f"#{i:02d} - name")
+            print(f"#{i:02d} - {name}")
         print("=======================================")
 
     @property
