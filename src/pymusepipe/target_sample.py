@@ -949,6 +949,7 @@ class MusePipeSample(object):
 
         # Convolve
         if not fakemode:
+            self.pipes_mosaic[targetname].print_cube_names()
             self.pipes_mosaic[targetname].convolve_cubes(target_fwhm=target_fwhm,
                                                          target_nmoffat=target_nmoffat,
                                                          target_function=target_function,
@@ -995,6 +996,7 @@ class MusePipeSample(object):
                 return
 
         # Doing the MAD combination using mpdaf. Note the build_cube fakemode
+        self.pipes_mosaic[targetname].print_cube_names()
         self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name,
                                                  fakemode=not build_cube)
 

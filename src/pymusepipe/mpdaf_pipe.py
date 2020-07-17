@@ -165,6 +165,13 @@ class MuseCubeMosaic(CubeMosaic):
     def cube_names(self):
         return [c.filename for c in self.list_cubes]
 
+    def print_cube_names(self):
+        lnames = copy.copy(self.cube_names).sort()
+        print("Mosaic Cubes ==========================")
+        for i, name in enumerate(lnames):
+            print(f"#{i:02d} - name")
+        print("=======================================")
+
     @property
     def ncubes(self):
         return len(self.list_cubes)
