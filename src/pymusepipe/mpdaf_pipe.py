@@ -163,12 +163,11 @@ class MuseCubeMosaic(CubeMosaic):
 
     @property
     def cube_names(self):
-        return [c.filename for c in self.list_cubes]
+        return [c.filename for c in self.list_cubes].sort()
 
     def print_cube_names(self):
-        lnames = copy.copy(self.cube_names).sort()
         print("Mosaic Cubes ==========================")
-        for i, name in enumerate(lnames):
+        for i, name in enumerate(self.cube_names):
             print(f"#{i:02d} - name")
         print("=======================================")
 
