@@ -912,6 +912,8 @@ class MusePipeSample(object):
                 True it will overwrite all the target parameters.
             min_dfwhm (float): minimum difference to be added in quadrature
                 [in arcsec]
+            filter_list (list): list of filters to be used for reconstructing
+                images
             fakemode (bool): if True, will only initialise parameters but not
                 proceed with the convolution.
             **kwargs:
@@ -919,6 +921,10 @@ class MusePipeSample(object):
         Returns:
 
         """
+        # Filter list for the convolved exposures
+        filter_list = (kwargs.pop("filter_list",
+                                  self._short_filter_list)).split(',')
+
         # Initialise and filter with list of pointings
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
                          dict_psf=dict_psf, **kwargs)
@@ -940,7 +946,7 @@ class MusePipeSample(object):
         if best_psf:
             target_function = "gaussian"
             target_fwhm = np.sqrt(best_fwhm**2 + min_dfwhm**2)
-            upipe.print_info(f"Minumum overall FWHM = {best_fwhm:.2f} and "
+            upipe.print_info(f"Minimum overall FWHM = {best_fwhm:.2f} and "
                              f"target FWHM will be {target_fwhm:.2f}")
             suffix = f"copt_{target_fwhm:.2f}asec"
             upipe.print_warning(f"Overwriting options for the target PSF as"
@@ -949,11 +955,20 @@ class MusePipeSample(object):
 
         # Convolve
         if not fakemode:
+            # Printing the names of the selected cubes
             self.pipes_mosaic[targetname].print_cube_names()
+            # Convolving
             self.pipes_mosaic[targetname].convolve_cubes(target_fwhm=target_fwhm,
                                                          target_nmoffat=target_nmoffat,
                                                          target_function=target_function,
                                                          suffix=suffix)
+
+            mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
+            # Building the images
+            cube = MuseCube(filename=mosaic_name)
+            cube.build_filterlist_images(filter_list=filter_list,
+                                         prefix=f"{targetname}_IMAGE_FOV",
+                                         suffix=suffix)
 
     def mosaic(self, targetname=None, list_pointings=None, init_mosaic=True,
                build_cube=True, build_images=True, **kwargs):
@@ -1007,13 +1022,10 @@ class MusePipeSample(object):
                                   "Aborting Image reconstruction".format(mosaic_name))
                 return
             cube = MuseCube(filename=mosaic_name)
-            upipe.print_info("Building images for each filter in the list")
-            for filter in filter_list:
-                upipe.print_info("Filter = {}".format(filter))
-                ima = cube.get_filter_image(filter_name=filter)
-                ima_name = "{0}_IMAGE_FOV_{1}_{2}.fits".format(targetname, filter,
-                                                               suffixout)
-                ima.write(joinpath(folder_cubes, ima_name))
+            cube.build_filterlist_images(filter_list=filter_list,
+                                         prefix=f"{targetname}_IMAGE_FOV",
+                                         suffix=suffixout,
+                                         folder=folder_cubes)
 
     def init_combine(self, targetname=None, list_pointings=None,
                      folder_offset_table=None, name_offset_table=None,

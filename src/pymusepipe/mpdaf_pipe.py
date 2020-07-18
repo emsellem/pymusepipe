@@ -38,7 +38,7 @@ from astropy import units as u
 
 import pymusepipe
 from . import util_pipe as upipe
-from .config_pipe import default_wave_wcs, AO_mask_lambda, dict_extra_filters
+from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
 from .util_pipe import filter_list_with_pdict
 from .cube_convolve import cube_kernel, cube_convolve
 
@@ -56,7 +56,7 @@ def get_sky_spectrum(specname) :
     spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
     return spec
 
-def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
+def integrate_spectrum(spectrum, wave_filter, throughput_filter, ao_mask=False):
     """Integrate a spectrum using a certain Muse Filter file.
 
     Input
@@ -75,8 +75,8 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, AO_mask=False):
     specdata = spectrum.data
 
     # If we have an AO mask, we interpolate the spectrum within that range
-    if AO_mask:
-        outside_AO = (specwave < AO_mask_lambda[0]) | (specwave > AO_mask_lambda[1])
+    if ao_mask:
+        outside_AO = (specwave < ao_mask_lambda[0]) | (specwave > ao_mask_lambda[1])
         good_spectrum = np.interp(specwave, specwave[outside_AO],
                                   specdata[outside_AO])
         # Replacing the interval with interpolated spectrum
@@ -170,7 +170,7 @@ class MuseCubeMosaic(CubeMosaic):
         lnames.sort()
         print("Mosaic Cubes ==========================")
         for i, name in enumerate(lnames):
-            print(f"#{i:02d} - {name}")
+            print(f"#{i+1:02d} - {name}")
         print("=======================================")
 
     @property
@@ -501,7 +501,7 @@ class MuseCube(Cube):
 
         Parameters
         ----------
-        fn : callable
+        fft : boolean
             The convolution function to use, chosen from:
 
             - `astropy.convolution.convolve_fft'
@@ -568,6 +568,10 @@ class MuseCube(Cube):
         # Calling the external function now
         out._data, out._var = cube_convolve(out._data, kernel,
                                             variance=out._var, fft=fft)
+        # Put back nan in the data and var
+        if masked:
+            out._data[out._mask] = np.nan
+            out._var[out._mask] = np.nan
 
         return out
 
@@ -581,7 +585,6 @@ class MuseCube(Cube):
         Args:
             target_fwhm (float): target FWHM in arcsecond
             target_nmoffat: target n if Moffat function
-            input_function (str): 'gaussian' or 'moffat' ['moffat']
             target_function (str): 'gaussian' or 'moffat' ['gaussian']
             factor_fwhm (float): number of FWHM for size of Kernel
             fft (bool): use FFT to convolve or not [False]
@@ -611,7 +614,8 @@ class MuseCube(Cube):
         scale_spaxel = self.get_step(unit_wcs=u.arcsec)[1]
         nspaxel = np.int(factor_fwhm * target_fwhm / scale_spaxel)
         # Make nspaxel odd to have a PSF centred at the centre of the frame
-        if nspaxel % 2 == 0: nspaxel += 1
+        if nspaxel % 2 == 0:
+            nspaxel += 1
         shape = [self.shape[0], nspaxel, nspaxel]
 
         # Computing the kernel
@@ -742,6 +746,32 @@ class MuseCube(Cube):
         return MuseImage(self.select_lambda(lmin, lmax).sum(axis=0), 
                 title="{0} map".format(line))
 
+    def build_filterlist_images(self, filter_list, prefix="IMAGE_FOV",
+                              suffix="", folder=None, **kwargs):
+        """
+
+        Args:
+            filter_list:
+            prefix:
+            suffix:
+            folder:
+            **kwargs:
+
+        Returns:
+
+        """
+        upipe.print_info("Building images for each filter in given list")
+        cube_folder, cube_name = os.path.split(self.filename)
+        if folder is None:
+            folder = cube_folder
+
+        for filter in filter_list:
+            upipe.print_info(f"Filter = {filter}")
+            ima = self.get_filter_image(filter_name=filter, **kwargs)
+            ima_name = f"{prefix}_{filter}{suffix}.fits"
+            upipe.print_info(f"Writing image {ima_name}")
+            ima.write(joinpath(folder, ima_name))
+
     def get_filter_image(self, filter_name=None, own_filter_file=None, filter_folder="",
             dict_filters=None):
         """Get an image given by a filter. If the filter belongs to
@@ -850,11 +880,11 @@ class MuseCube(Cube):
 
         # Rewrite a new cube
         if save:
-            suffix_out = kwargs.pop("suffix_out", "tmask")
+            prefix = kwargs.pop("prefix", "tmask")
             use_folder = kwargs.pop("use_folder", True)
 
             cube_folder, cube_name = os.path.split(self.filename)
-            trailcube_name = "{0}{1}".format(suffix_out, cube_name)
+            trailcube_name = "{0}{1}".format(prefix, cube_name)
             if use_folder:
                 trailcube_name = joinpath(cube_folder, trailcube_name)
 
@@ -891,7 +921,7 @@ class MuseSkyContinuum(object):
         wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=u.angstrom)
         self.spec = Spectrum(wave=wavein, data=data)
 
-    def integrate(self, muse_filter, AO_mask=False):
+    def integrate(self, muse_filter, ao_mask=False):
         """Integrate a sky continuum spectrum using a certain filter file.
         If the file is a fits file, use it as the MUSE filter list.
         Otherwise use it as an ascii file
@@ -905,7 +935,7 @@ class MuseSkyContinuum(object):
         muse_filter.flux_cont = integrate_spectrum(self.spec, 
                                                    muse_filter.wave, 
                                                    muse_filter.throughput,
-                                                   AO_mask=AO_mask)
+                                                   ao_mask=ao_mask)
         setattr(self, muse_filter.filter_name, muse_filter)
 
     def get_normfactor(self, background, filter_name="Cousins_R"):
