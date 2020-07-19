@@ -963,12 +963,12 @@ class MusePipeSample(object):
                                                          target_function=target_function,
                                                          suffix=suffix)
 
-            mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
-            # Building the images
-            cube = MuseCube(filename=mosaic_name)
-            cube.build_filterlist_images(filter_list=filter_list,
-                                         prefix=f"{targetname}_IMAGE_FOV",
-                                         suffix=suffix)
+            for name in self.pipes_mosaic[targetname].cube_names:
+                # Building the images
+                cube = MuseCube(filename=name)
+                cube.build_filterlist_images(filter_list=filter_list,
+                                             prefix=f"{targetname}_IMAGE_FOV",
+                                             suffix=suffix)
 
     def mosaic(self, targetname=None, list_pointings=None, init_mosaic=True,
                build_cube=True, build_images=True, **kwargs):
@@ -991,8 +991,8 @@ class MusePipeSample(object):
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
 
         # defining the default cube name here to then define the output cube name
-        suffixout = kwargs.pop("suffixout", "WCS_Pall_mad")
-        default_cube_name = "{0}_DATACUBE_FINAL_{1}.fits".format(targetname, suffixout)
+        suffixout = kwargs.pop("suffixout", "_WCS_Pall_mad")
+        default_cube_name = "{0}_DATACUBE_FINAL{1}.fits".format(targetname, suffixout)
         outcube_name = kwargs.pop("outcube_name", default_cube_name)
         outcube_name = joinpath(folder_cubes, outcube_name)
 
