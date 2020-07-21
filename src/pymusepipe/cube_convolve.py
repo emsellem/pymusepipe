@@ -395,7 +395,7 @@ def cube_convolve(data, kernel, variance=None, fft=True, fill_value=0.):
                                               fft_pad=True,
                                               boundary='fill',
                                               fill_value=fill_value,
-                                              normalize_kernel=True,
+                                              normalize_kernel=False
                                               preserve_nan=True)
     # else:
     #     print("Convolution using 3D convolve in astropy")

@@ -36,6 +36,9 @@ from mpdaf.drs import PixTable
 from astropy.io import fits as pyfits
 from astropy import units as u
 
+# Scipy erosion
+from scipy import ndimage as ndi
+
 import pymusepipe
 from . import util_pipe as upipe
 from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
@@ -579,7 +582,7 @@ class MuseCube(Cube):
                              target_function="gaussian",
                              outcube_folder=None,
                              outcube_name=None, factor_fwhm=3,
-                             fft=True):
+                             fft=True, erode_edges=True, npixels_erosion=2):
         """Convolve the cube for a target function 'gaussian' or 'moffat'
 
         Args:
@@ -628,6 +631,15 @@ class MuseCube(Cube):
 
         # Calling the local method using astropy convolution
         conv_cube = self.astropy_convolve(other=kernel3d, fft=fft)
+
+        # Erode by npixels in case erode is True
+        if erode_edges:
+            nmask = ~ndi.binary_erosion(~np.isnan(conv_cube._data), 
+                                        mask=~conv_cube._mask, 
+                                        iterations=npixels_erosion)
+            conv_cube._data[nmask] = np.nan 
+            conv_cube._var[nmask] = np.nan 
+            conv_cube._mask = nmask
 
         # Write the output
         upipe.print_info("Writing up the derived cube")
