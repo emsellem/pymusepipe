@@ -581,7 +581,7 @@ class MuseCube(Cube):
     def convolve_cube_to_psf(self, target_fwhm, target_nmoffat=None,
                              target_function="gaussian",
                              outcube_folder=None,
-                             outcube_name=None, factor_fwhm=3,
+                             outcube_name=None, factor_fwhm=5,
                              fft=True, erode_edges=True, npixels_erosion=2):
         """Convolve the cube for a target function 'gaussian' or 'moffat'
 
