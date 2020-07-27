@@ -30,6 +30,7 @@ from .align_pipe import rotate_pixtables
 from .mpdaf_pipe import MuseCubeMosaic, MuseCube
 from .prep_recipes_pipe import dict_products_scipost
 from .version import __version__ as version_pack
+from .util_pipe import add_underscore
 
 from astropy.table import Table
 
@@ -952,6 +953,8 @@ class MusePipeSample(object):
             upipe.print_warning(f"Overwriting options for the target PSF as"
                                 f" best_psf is set to True. \n"
                                 f"Suffix for convolved cubes = {suffix}")
+            self.pipes_mosaic[targetname].copt_suffix = suffix
+            self.pipes_mosaic[targetname].copt_fwhm = target_fwhm
 
         # Convolve
         if not fakemode:
@@ -966,9 +969,9 @@ class MusePipeSample(object):
             for name in self.pipes_mosaic[targetname].cube_names:
                 # Building the images
                 cube = MuseCube(filename=name)
+                prefix = (name.replace("DATACUBE_FINAL", "IMAGE_FOV")).split(add_string(suffix))[0]
                 cube.build_filterlist_images(filter_list=filter_list,
-                                             prefix=f"{targetname}_IMAGE_FOV",
-                                             suffix=suffix)
+                                             prefix=prefix, suffix=suffix)
 
     def mosaic(self, targetname=None, list_pointings=None, init_mosaic=True,
                build_cube=True, build_images=True, **kwargs):
@@ -991,7 +994,8 @@ class MusePipeSample(object):
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
 
         # defining the default cube name here to then define the output cube name
-        suffixout = kwargs.pop("suffixout", "_WCS_Pall_mad")
+        suffixout = kwargs.pop("suffixout", "WCS_Pall_mad")
+        suffixout = add_underscore(suffixout)
         default_cube_name = "{0}_DATACUBE_FINAL{1}.fits".format(targetname, suffixout)
         outcube_name = kwargs.pop("outcube_name", default_cube_name)
         outcube_name = joinpath(folder_cubes, outcube_name)

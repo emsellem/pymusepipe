@@ -95,19 +95,6 @@ class PipeObject(object):
         self._info = info
 
 
-def lower_rep(text):
-    """Lower the text and return it after removing all underscores
-
-    Args:
-        text (str): text to treat
-
-    Returns:
-        updated text (with removed underscores and lower-cased)
-
-    """
-    return text.replace("_", "").lower()
-
-
 class MusePipe(PipePrep, PipeRecipes):
     """Main Class to define and run the MUSE pipeline, given a certain galaxy
     name. This is the main class used throughout the running of the pipeline

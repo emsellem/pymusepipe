@@ -124,6 +124,34 @@ def print_error(text, **kwargs):
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
 #-----------  END PRINTING FUNCTIONS -----------------------
+def add_string(text, word="_", loc=0):
+    """Adding underscore for string which are not empty
+    in case they don't start with one already
+    """
+    if len(text) > 0:
+        if loc is None:
+            text = f"{text}{word}"
+        else:
+            try:
+                if text[loc] != "_":
+                    text = f"{text[:loc]}{word}{text[loc:]}"
+
+            except:
+                print(f"String index [{loc}] out of range [{len(text)}] in add_string")
+
+    return text
+
+def lower_rep(text):
+    """Lower the text and return it after removing all underscores
+
+    Args:
+        text (str): text to treat
+
+    Returns:
+        updated text (with removed underscores and lower-cased)
+
+    """
+    return text.replace("_", "").lower()
 
 def lower_allbutfirst_letter(mystring):
     """Lowercase all letters except the first one
@@ -480,8 +508,7 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
             out_name = ima_name.replace(in_suffix, out_suffix)
     else:
         name, extension = os.path.splitext(ima_name)
-        if out_suffix != "":
-            out_suffix = "_{}".format(out_suffix)
+        out_suffix = add_underscore(out_suffix)
         out_name = "{0}{1}{2}".format(name, out_suffix, extension)
 
     # write output
