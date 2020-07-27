@@ -125,8 +125,19 @@ def print_error(text, **kwargs):
 
 #-----------  END PRINTING FUNCTIONS -----------------------
 def add_string(text, word="_", loc=0):
-    """Adding underscore for string which are not empty
-    in case they don't start with one already
+    """Adding string at given location
+    Default is underscore for string which are not empty.
+
+    Input
+    ----
+    text (str): input text
+    word (str): input word to be added
+    loc (int): location in 'text'. [Default is 0=start]
+               If None, will be added at the end.
+
+    Returns
+    ------
+    Updated text
     """
     if len(text) > 0:
         if loc is None:
@@ -508,7 +519,7 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
             out_name = ima_name.replace(in_suffix, out_suffix)
     else:
         name, extension = os.path.splitext(ima_name)
-        out_suffix = add_underscore(out_suffix)
+        out_suffix = add_string(out_suffix)
         out_name = "{0}{1}{2}".format(name, out_suffix, extension)
 
     # write output

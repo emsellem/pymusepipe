@@ -30,7 +30,7 @@ from .align_pipe import rotate_pixtables
 from .mpdaf_pipe import MuseCubeMosaic, MuseCube
 from .prep_recipes_pipe import dict_products_scipost
 from .version import __version__ as version_pack
-from .util_pipe import add_underscore
+from .util_pipe import add_string
 
 from astropy.table import Table
 
@@ -995,7 +995,7 @@ class MusePipeSample(object):
 
         # defining the default cube name here to then define the output cube name
         suffixout = kwargs.pop("suffixout", "WCS_Pall_mad")
-        suffixout = add_underscore(suffixout)
+        suffixout = add_string(suffixout)
         default_cube_name = "{0}_DATACUBE_FINAL{1}.fits".format(targetname, suffixout)
         outcube_name = kwargs.pop("outcube_name", default_cube_name)
         outcube_name = joinpath(folder_cubes, outcube_name)
