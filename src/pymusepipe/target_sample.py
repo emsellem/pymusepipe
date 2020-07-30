@@ -971,7 +971,7 @@ class MusePipeSample(object):
                 cube = MuseCube(filename=name)
                 prefix = (name.replace("DATACUBE_FINAL", "IMAGE_FOV")).split(add_string(suffix))[0]
                 cube.build_filterlist_images(filter_list=filter_list,
-                                             prefix=prefix, suffix=add_string(suffix))
+                                             prefix=prefix, suffix=suffix)
 
     def mosaic(self, targetname=None, list_pointings=None, init_mosaic=True,
                build_cube=True, build_images=True, **kwargs):

@@ -280,17 +280,16 @@ class MuseCubeMosaic(CubeMosaic):
                     if orig_cube in temp_list:
                         # If it exists, remove it
                         list_cubes.remove(orig_cube)
-                        # and add the fixed one
-                        list_cubes.append(fixed_cube)
-                        upipe.print_warning("Fixed Cube {} was included "
-                                            "in the list".format(fixed_cube))
-                        upipe.print_warning("and Cube {} was thus removed from "
-                                            "the list".format(orig_cube))
+                        upipe.print_warning(f"Cube {orig_cube} was removed from "
+                                            f"the list (fixed one will be used)")
                     else:
-                        upipe.print_warning("Original Cube {} not "
-                                            "found".format(orig_cube))
-                        upipe.print_warning("Hence will not include fixed "
-                                            "Cube in the list {}".format(fixed_cube))
+                        upipe.print_warning(f"Original Cube {orig_cube} not "
+                                            f"found (but fixed cube will :"
+                                            f"be used nevertheless)")
+                    # and add the fixed one
+                    list_cubes.append(fixed_cube)
+                    upipe.print_warning(f"Fixed Cube {fixed_cube} has been included "
+                                        f"in the list")
 
             # if the list of suffix is empty, just use all cubes
             if len(self.list_suffix) > 0:
@@ -776,6 +775,8 @@ class MuseCube(Cube):
         cube_folder, cube_name = os.path.split(self.filename)
         if folder is None:
             folder = cube_folder
+
+        suffix = add_string(suffix)
 
         for filter in filter_list:
             upipe.print_info(f"Filter = {filter}")
