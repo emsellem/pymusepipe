@@ -42,7 +42,7 @@ from scipy import ndimage as ndi
 import pymusepipe
 from . import util_pipe as upipe
 from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
-from .util_pipe import filter_list_with_pdict
+from .util_pipe import filter_list_with_pdict, add_string
 from .cube_convolve import cube_kernel, cube_convolve
 
 def get_sky_spectrum(specname) :
@@ -284,7 +284,7 @@ class MuseCubeMosaic(CubeMosaic):
                                             f"the list (fixed one will be used)")
                     else:
                         upipe.print_warning(f"Original Cube {orig_cube} not "
-                                            f"found (but fixed cube will :"
+                                            f"found (but fixed cube will "
                                             f"be used nevertheless)")
                     # and add the fixed one
                     list_cubes.append(fixed_cube)
