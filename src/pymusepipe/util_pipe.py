@@ -697,7 +697,7 @@ def filter_list_with_suffix_list(list_names, included_suffix_list=[],
 
     # if the list of exclusion suffix is empty, just use all cubes
     if len(excluded_suffix_list) > 0:
-            upipe.print_info(f"Using suffixes {excluded_suffix_list} "
+        upipe.print_info(f"Using suffixes {excluded_suffix_list} "
                          f"as an exclusive condition {add_message}")
         # Filtering out the ones that have any of the suffixes
         temp_list = copy.copy(list_names)
