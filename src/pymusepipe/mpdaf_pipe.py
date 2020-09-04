@@ -235,10 +235,6 @@ class MuseCubeMosaic(CubeMosaic):
                 len(list_existing_cubes)))
 
             # if the list of exclusion suffix is empty, just use all cubes
-            list_existing_cubes = filter_list_suffix_toinclude(list_existing_cubes,
-                                                      self.included_suffix)
-
-            # if the list of exclusion suffix is empty, just use all cubes
             list_existing_cubes = filter_list_with_suffix_list(list_existing_cubes,
                                                     self.included_suffix,
                                                     self.excluded_suffix,
