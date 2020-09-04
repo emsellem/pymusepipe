@@ -667,3 +667,42 @@ def filter_list_with_pdict(input_list, list_pointings=None,
                                                 len(selected_list),
                                                 nfiles_input_list))
     return selected_list
+
+def filter_list_with_suffix_list(list_names, included_suffix_list=[],
+                                 excluded_suffix_list=[], name_list=""):
+    """
+
+    Args:
+        list_names (list of str):
+        included_suffix_list (list of str):
+        excluded_suffix_list (list of str):
+
+    Returns:
+
+    """
+    if name_list is not None:
+        add_message = f"for list {name_list}"
+    else:
+        add_message = ""
+
+    # if the list of inclusion suffix is empty, just use all cubes
+    if len(included_suffix_list) > 0:
+        upipe.print_info(f"Using suffixes {included_suffix_list} "
+                         f"as an inclusive condition {add_message}")
+        # Filtering out the ones that don't have any of the suffixes
+        temp_list = copy.copy(list_names)
+        for l in temp_list:
+            if any([suff not in l for suff in included_suffix_list]):
+                _ = list_names.remove(l)
+
+    # if the list of exclusion suffix is empty, just use all cubes
+    if len(excluded_suffix_list) > 0:
+            upipe.print_info(f"Using suffixes {excluded_suffix_list} "
+                         f"as an exclusive condition {add_message}")
+        # Filtering out the ones that have any of the suffixes
+        temp_list = copy.copy(list_names)
+        for l in temp_list:
+            if any([suff in l for suff in excluded_suffix_list]):
+                _ = list_names.remove(l)
+
+    return list_names

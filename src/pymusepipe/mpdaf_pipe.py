@@ -42,7 +42,8 @@ from scipy import ndimage as ndi
 import pymusepipe
 from . import util_pipe as upipe
 from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
-from .util_pipe import filter_list_with_pdict, add_string
+from .util_pipe import (filter_list_with_pdict, filter_list_with_suffix_list,\
+                       add_string)
 from .cube_convolve import cube_kernel, cube_convolve
 
 def get_sky_spectrum(specname) :
@@ -229,28 +230,20 @@ class MuseCubeMosaic(CubeMosaic):
 
             upipe.print_info("Found {} existing Cubes in this folder".format(
                 len(list_existing_cubes)))
-            # if the list of exclusion suffix is empty, just use all cubes
-            if len(self.included_suffix) > 0:
-                upipe.print_info(f"Using suffixes {self.included_suffix} "
-                                 f"as an inclusive condition")
-                # Filtering out the ones that don't have any of the suffixes
-                temp_list = copy.copy(list_existing_cubes)
-                for l in temp_list:
-                    if any([suff not in l for suff in self.included_suffix]):
-                        _ = list_existing_cubes.remove(l)
-
-            # if the list of exclusion suffix is empty, just use all cubes
-            if len(self.excluded_suffix) > 0:
-                upipe.print_info(f"Using suffixes {self.excluded_suffix} "
-                                 f"as an exclusive condition")
-                # Filtering out the ones that don't have any of the suffixes
-                temp_list = copy.copy(list_existing_cubes)
-                for l in temp_list:
-                    if any([suff in l for suff in self.excluded_suffix]):
-                        _ = list_existing_cubes.remove(l)
 
             upipe.print_info("Found {} Cubes after suffix filtering".format(
                 len(list_existing_cubes)))
+
+            # if the list of exclusion suffix is empty, just use all cubes
+            list_existing_cubes = filter_list_suffix_toinclude(list_existing_cubes,
+                                                      self.included_suffix)
+
+            # if the list of exclusion suffix is empty, just use all cubes
+            list_existing_cubes = filter_list_with_suffix_list(list_existing_cubes,
+                                                    self.included_suffix,
+                                                    self.excluded_suffix,
+                                                    name_list="Existing Cubes")
+
             # Filter the list with the pointing dictionary if given
             if self.dict_exposures is not None:
                 upipe.print_info("Will be using a dictionary for "
@@ -270,6 +263,12 @@ class MuseCubeMosaic(CubeMosaic):
                                                    prefix_to_consider))
                 upipe.print_info("Initial set of {:02d} fixed "
                                  "cubes found".format(len(list_fixed_cubes)))
+
+                # if the list of exclusion suffix is empty, just use all cubes
+                list_fixed_cubes = filter_list_with_suffix_list(list_fixed_cubes,
+                                                          self.included_suffix,
+                                                          self.excluded_suffix,
+                                                          name_list="Fixed Cubes")
 
                 # Looping over the existing fixed pixtables
                 for fixed_cube in list_fixed_cubes:
