@@ -118,7 +118,9 @@ dict_extra_filters = {
         # Broad band filter
         "WFI_NB": "data/Filters/LaSilla_WFI_ESO856p.txt",
         # DUPONT R filter
-	    "DUPONT_R": "data/Filters/LCO_SITe3_rp.txt"
+	    "DUPONT_R": "data/Filters/LCO_SITe3_rp.txt",
+        "LCO-HA663": "Ha663BP6.Data.txt",
+        "LCO-HA657": "Ha657BP6.Data.txt"
         }
 
 # Default hard-coded fits files - Calibration Tables

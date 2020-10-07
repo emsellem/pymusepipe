@@ -773,10 +773,14 @@ class MuseCube(Cube):
 
         suffix = add_string(suffix)
 
-        for filter in filter_list:
+        for filtername in filter_list:
             upipe.print_info(f"Filter = {filter}")
-            ima = self.get_filter_image(filter_name=filter, **kwargs)
-            ima_name = f"{prefix}_{filter}{suffix}.fits"
+            ima = self.get_filter_image(filter_name=filtername, **kwargs)
+            if ima is None:
+                upipe.print_error(f"Could not reconstruct Image with Filter {filtername}")
+                continue
+
+            ima_name = f"{prefix}_{filtername}{suffix}.fits"
             upipe.print_info(f"Writing image {ima_name}")
             ima.write(joinpath(folder, ima_name))
 
@@ -818,7 +822,7 @@ class MuseCube(Cube):
                     upipe.print_error("[mpdaf_pipe / get_filter_image] "
                                       "No extra filter dictionary and "
                                       "the private filter file is not set - Aborting")
-                    return
+                    return None
                 else:
                     filter_file = own_filter_file
             # Now reading the filter data
