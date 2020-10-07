@@ -119,8 +119,8 @@ dict_extra_filters = {
         "WFI_NB": "data/Filters/LaSilla_WFI_ESO856p.txt",
         # DUPONT R filter
 	    "DUPONT_R": "data/Filters/LCO_SITe3_rp.txt",
-        "LCO-HA663": "data/Filters/Ha663BP6.Data.txt",
-        "LCO-HA657": "data/Filters/Ha657BP6.Data.txt"
+        "LCO-HA663": "data/Filters/Ha663BP6_AA.txt",
+        "LCO-HA657": "data/Filters/Ha657BP6_AA.txt"
         }
 
 # Default hard-coded fits files - Calibration Tables
