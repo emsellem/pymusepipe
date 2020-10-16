@@ -105,13 +105,13 @@ class BasicPSF(object):
                  l0=6483.58, psf_array=None):
 
         if psf_array is not None:
-            self.function = psf_array[0]
+            self.function = psf_array[0].lower()
             self.fwhm0 = psf_array[1]
             self.nmoffat = psf_array[2]
             self.b = psf_array[3]
             self.l0 = psf_array[4]
         else:
-            self.function = function
+            self.function = function.lower()
             self.fwhm0 = fwhm0
             self.nmoffat = nmoffat
             self.b = b

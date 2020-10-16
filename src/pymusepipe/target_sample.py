@@ -893,7 +893,7 @@ class MusePipeSample(object):
     def convolve_mosaic_per_pointing(self, targetname=None, list_pointings=None,
                                      dict_psf={}, target_fwhm=0.,
                                      target_nmoffat=None,
-                                     target_function="gaussian", suffix="conv",
+                                     target_function="gaussian", suffix=None,
                                      best_psf=True, min_dfwhm=0.2, fakemode=False,
                                      **kwargs):
         """Convolve the datacubes listed in a mosaic with some target function
@@ -955,6 +955,9 @@ class MusePipeSample(object):
                                 f"Suffix for convolved cubes = {suffix}")
             self.pipes_mosaic[targetname].copt_suffix = suffix
             self.pipes_mosaic[targetname].copt_fwhm = target_fwhm
+
+        if suffix is None
+            suffix = "conv{0}_{1:.2f}".format(target_function.lower()[:4], target_fwhm)
 
         # Convolve
         if not fakemode:
@@ -1022,9 +1025,10 @@ class MusePipeSample(object):
         if build_images:
             mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name
             if not os.path.isfile(mosaic_name):
-                upipe.print_error("Mosaic cube file does not exist = {} \n"
-                                  "Aborting Image reconstruction".format(mosaic_name))
+                upipe.print_error(f"Mosaic cube file does not exist = {mosaic_name} \n"
+                                  f"Aborting Image reconstruction")
                 return
+            upipe.print_info(f"Using mosaic cube {mosaic_name}")
             cube = MuseCube(filename=mosaic_name)
             cube.build_filterlist_images(filter_list=filter_list,
                                          prefix=f"{targetname}_IMAGE_FOV",
