@@ -956,7 +956,7 @@ class MusePipeSample(object):
             self.pipes_mosaic[targetname].copt_suffix = suffix
             self.pipes_mosaic[targetname].copt_fwhm = target_fwhm
 
-        if suffix is None
+        if suffix is None:
             suffix = "conv{0}_{1:.2f}".format(target_function.lower()[:4], target_fwhm)
 
         # Convolve
