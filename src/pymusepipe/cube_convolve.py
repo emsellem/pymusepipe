@@ -460,7 +460,10 @@ def cube_kernel(shape, wave, input_fwhm,  target_fwhm,
     print(f"Input function = {input_function}, Input FWHM = {input_fwhm}")
     if input_function == "moffat":
         print(f"Input N_moffat = {input_nmoffat}")
-    print(f"Wavelength variation given by lambda0={lambda0} and b={b}")
+    if b == 0:
+        print(f"No Wavelength variation (b=0)")
+    else:
+        print(f"Wavelength variation given by lambda0={lambda0} and b={b}")
     print("-----------------------------------------------------------")
     print(f"Target function = {target_function}, target FWHM = {target_fwhm}")
     if target_function == "moffat":

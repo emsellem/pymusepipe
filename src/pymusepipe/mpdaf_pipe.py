@@ -101,7 +101,7 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, ao_mask=False):
 class BasicPSF(object):
     """Basic PSF function and parameters
     """
-    def __init__(self, fwhm0=0., nmoffat=2.8, function="gaussian", b=0.,
+    def __init__(self, function="gaussian", fwhm0=0., nmoffat=2.8, b=0.,
                  l0=6483.58, psf_array=None):
 
         if psf_array is not None:
@@ -163,7 +163,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.build_list(list_cubes)
 
         # Initialise the super class
-        super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name)
+        super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name, unit=self.unit)
 
     @property
     def cube_names(self):
@@ -201,6 +201,24 @@ class MuseCubeMosaic(CubeMosaic):
                               "- Aborting".format(self.folder_ref_wcs))
             return False
         return True
+
+    def _get_unit(self):
+        list_units = []
+        for name in self.cube_names:
+            try:
+                unit = list_units.append(pyfits.getheader(name)['BUNIT'])
+                list_unit.append(unit)
+            except:
+                pass
+
+        u_units = np.unique(list_unique)
+        if len(u_units) == 0:
+            self.unit = None
+        elif len(u_units) == 1:
+            self.unit = u_units[0]
+        else:
+            self.unit = u_units[0]
+            print("Warning: units are not all the same for all input Cubes. Selecting the first encountered")
 
     def build_list(self, folder_cubes=None, prefix_cubes=None, list_cubes=None,
                    **kwargs):
@@ -328,6 +346,8 @@ class MuseCubeMosaic(CubeMosaic):
         else:
             upipe.print_info("Found {} cubes to be processed".format(
                                  self.ncubes))
+
+        self._get_unit()
 
     def convolve_cubes(self, target_fwhm, target_nmoffat=None,
                         target_function="gaussian", suffix="conv", **kwargs):

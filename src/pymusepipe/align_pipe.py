@@ -675,9 +675,11 @@ class AlignMusePointing(object):
         self.verbose = kwargs.pop("verbose", True)
         self.plot = kwargs.pop("plot", True)
         # Using mpdaf or image_registration
-        self.use_mpdaf = kwargs.pop("use_mpdaf", True)
+        self.use_mpdaf = kwargs.pop("use_mpdaf", False)
         if self.use_mpdaf:
             upipe.print_info("Will use mpdaf for image regridding.")
+            upipe.print_info("WARNING: when using mpdaf, a potential extra rotation \n"
+                             "has to be applied to redefine the reference grid.")
         else:
             upipe.print_info("Will use image_registration for image regridding.")
 
@@ -1045,13 +1047,14 @@ class AlignMusePointing(object):
         for nima in range(self.nimages):
             newf.write("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
                              " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}  "
-                             "|NORM| {7:10.6e} |BACKG| {8:10.6e}\n".format(
+                             "|DRA|{7:8.4f}  |NORM| {8:10.6e} |BACKG| {9:10.6e}\n".format(
                              nima, self.list_muse_images[nima][-29:-5],
                              self._total_off_arcsec[nima][0],
                              self._total_off_arcsec[nima][1],
                              self._total_off_pixel[nima][0],
                              self._total_off_pixel[nima][1],
-                             self._total_rotangles[nima],
+                             self._total_rotangles[nima]-self._diffra_rotangles[nima],
+                             self._diffra_rotangles[nima],
                              self.ima_norm_factors[nima],
                              self.ima_background[nima]))
         newf.close()
@@ -1064,13 +1067,14 @@ class AlignMusePointing(object):
                          "X        Y     |PIXEL|    X        Y      |ROT| (DEG)")
         for nima in range(self.nimages):
             upipe.print_info("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
-                             " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}".format(
+                             " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}  |DRA|{6:8.4f}".format(
                              nima, self.list_muse_images[nima][-29:-5],
                              self._total_off_arcsec[nima][0],
                              self._total_off_arcsec[nima][1],
                              self._total_off_pixel[nima][0],
                              self._total_off_pixel[nima][1],
-                             self._total_rotangles[nima]))
+                             self._total_rotangles[nima]-self._diffra_rotangles[nima],
+                             self._diffra_rotangles[nima]))
 
     def save_fits_offset_table(self, name_output_table=None, 
             folder_output_table=None,
@@ -1149,7 +1153,8 @@ class AlignMusePointing(object):
             fits_table['FLUX_SCALE'] = 1.0
         if save_other_params:
             fits_table['BACKGROUND'] = self.ima_background
-            fits_table['ROTANGLE'] = self._total_rotangles
+            fits_table['ROTANGLE'] = self._total_rotangles - self._diffra_rotangles
+            fits_table['DIFANGLE'] = self._diffra_rotangles
 
         # Deal with RA_OFFSET_ORIG if needed
         if exist_ra_offset:
@@ -1537,6 +1542,7 @@ class AlignMusePointing(object):
                 wcs_to_align.rotate(-to_align_rotation)
             ima_to_align = Image(data=hdu_to_align.data * conversion_factor,
                                  wcs=wcs_to_align)
+            ra_to_align = ima_to_align.wcs.to_header()['CRVAL1']
 
             # Getting the MUSE image data and WCS
             wcs_target = WCS(hdr=hdu_target.header)
@@ -1563,6 +1569,7 @@ class AlignMusePointing(object):
                                         + (np.cos(np.deg2rad(dec_aligned)))**2))
                 upipe.print_warning(f"Differential angle for this comparison is "
                                     f"{diffang}")
+                print(f"ra_aligned: {ra_aligned} / ra_to: {ra_to_align} / ra_target: {ra_target}")
             else:
                 # Change of area
                 newinc = ima_target.wcs.get_axis_increments(unit=u.deg)
