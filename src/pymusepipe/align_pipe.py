@@ -1047,7 +1047,7 @@ class AlignMusePointing(object):
         for nima in range(self.nimages):
             newf.write("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
                              " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}  "
-                             "|DRA|{7:8.4f}  |NORM| {8:10.6e} |BACKG| {9:10.6e}\n".format(
+                             "|NORM| {7:10.6e} |BACKG| {8:10.6e}\n".format(
                              nima, self.list_muse_images[nima][-29:-5],
                              self._total_off_arcsec[nima][0],
                              self._total_off_arcsec[nima][1],
@@ -1066,7 +1066,7 @@ class AlignMusePointing(object):
                          "X        Y     |PIXEL|    X        Y      |ROT| (DEG)")
         for nima in range(self.nimages):
             upipe.print_info("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
-                             " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}  |DRA|{6:8.4f}".format(
+                             " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}".format(
                              nima, self.list_muse_images[nima][-29:-5],
                              self._total_off_arcsec[nima][0],
                              self._total_off_arcsec[nima][1],
