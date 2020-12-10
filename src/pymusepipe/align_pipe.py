@@ -1539,12 +1539,27 @@ class AlignMusePointing(object):
                 wcs_to_align.rotate(-to_align_rotation)
             ima_to_align = Image(data=hdu_to_align.data * conversion_factor,
                                  wcs=wcs_to_align)
-            ra_to_align = ima_to_align.wcs.to_header()['CRVAL1']
+
+            # Apply differential RA if using MPDAF to fix the reference
+            # Problem existing when using align_with_image
+            if self.use_mpdaf:
+                ra_target = WCS(hdu_target.header).to_header()['CRVAL1']
+                ra_to_align = ima_to_align.wcs.to_header()['CRVAL1']
+                dec_to_align = ima_aligned.wcs.to_header()['CRVAL2']
+                dra = ra_target - ra_to_align
+                diffang = np.rad2deg(np.arccos(np.cos(np.deg2rad(dra))
+                                        * (np.sin(np.deg2rad(dec_to_align)))**2
+                                        + (np.cos(np.deg2rad(dec_to_align)))**2))
+                upipe.print_warning(f"Differential angle for this comparison is "
+                                    f"{diffang} (using mpdaf needs that fix)")
+            else:
+                diffang = 0.
 
             # Getting the MUSE image data and WCS
             wcs_target = WCS(hdr=hdu_target.header)
-            if target_rotation != 0.:
-                wcs_target.rotate(-target_rotation)
+            fixed_target_rotation = target_rotation - diffang
+            if fixed_target_rotation != 0.:
+                wcs_target.rotate(-(fixed_target_rotation))
             ima_target = Image(data=np.nan_to_num(hdu_target.data),
                                wcs=wcs_target)
             hdu_target = ima_target.get_data_hdu()
@@ -1556,17 +1571,10 @@ class AlignMusePointing(object):
                 ima_aligned = ima_to_align.align_with_image(ima_target, flux=True)
                 hdu_aligned = ima_aligned.get_data_hdu()
                 # Computing the differential reference
-                ra_target = WCS(hdu_target.header).to_header()['CRVAL1']
                 ra_aligned = ima_aligned.wcs.to_header()['CRVAL1']
-                dec_target = WCS(hdu_target.header).to_header()['CRVAL2']
                 dec_aligned = ima_aligned.wcs.to_header()['CRVAL2']
-                dra = ra_target - ra_aligned
-                diffang = np.rad2deg(np.arccos(np.cos(np.deg2rad(dra))
-                                        * (np.sin(np.deg2rad(dec_aligned)))**2
-                                        + (np.cos(np.deg2rad(dec_aligned)))**2))
-                upipe.print_warning(f"Differential angle for this comparison is "
-                                    f"{diffang}")
-                print(f"ra_aligned: {ra_aligned} / ra_to: {ra_to_align} / ra_target: {ra_target}")
+                print(f"DEC: {dec_aligned} / {dec_to_align}")
+                print(f"RA: {ra_aligned} / {ra_to_align}")
             else:
                 # Change of area
                 newinc = ima_target.wcs.get_axis_increments(unit=u.deg)
@@ -1577,7 +1585,6 @@ class AlignMusePointing(object):
                                         ima_target.get_data_hdu().header,
                                         return_footprint=False)
                 hdu_aligned = pyfits.PrimaryHDU(daligned * change_area)
-                diffang = 0.
 
         else:
             hdu_aligned = None
