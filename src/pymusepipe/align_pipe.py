@@ -1545,7 +1545,7 @@ class AlignMusePointing(object):
             if self.use_mpdaf:
                 ra_target = WCS(hdu_target.header).to_header()['CRVAL1']
                 ra_to_align = ima_to_align.wcs.to_header()['CRVAL1']
-                dec_to_align = ima_aligned.wcs.to_header()['CRVAL2']
+                dec_to_align = ima_to_align.wcs.to_header()['CRVAL2']
                 dra = ra_target - ra_to_align
                 diffang = np.rad2deg(np.arccos(np.cos(np.deg2rad(dra))
                                         * (np.sin(np.deg2rad(dec_to_align)))**2
