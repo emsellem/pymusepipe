@@ -1053,8 +1053,7 @@ class AlignMusePointing(object):
                              self._total_off_arcsec[nima][1],
                              self._total_off_pixel[nima][0],
                              self._total_off_pixel[nima][1],
-                             self._total_rotangles[nima]-self._diffra_rotangles[nima],
-                             self._diffra_rotangles[nima],
+                             self._total_rotangles[nima],
                              self.ima_norm_factors[nima],
                              self.ima_background[nima]))
         newf.close()
@@ -1073,8 +1072,7 @@ class AlignMusePointing(object):
                              self._total_off_arcsec[nima][1],
                              self._total_off_pixel[nima][0],
                              self._total_off_pixel[nima][1],
-                             self._total_rotangles[nima]-self._diffra_rotangles[nima],
-                             self._diffra_rotangles[nima]))
+                             self._total_rotangles[nima]))
 
     def save_fits_offset_table(self, name_output_table=None, 
             folder_output_table=None,
@@ -1153,8 +1151,7 @@ class AlignMusePointing(object):
             fits_table['FLUX_SCALE'] = 1.0
         if save_other_params:
             fits_table['BACKGROUND'] = self.ima_background
-            fits_table['ROTANGLE'] = self._total_rotangles - self._diffra_rotangles
-            fits_table['DIFANGLE'] = self._diffra_rotangles
+            fits_table['ROTANGLE'] = self._total_rotangles
 
         # Deal with RA_OFFSET_ORIG if needed
         if exist_ra_offset:
