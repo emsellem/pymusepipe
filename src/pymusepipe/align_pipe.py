@@ -1551,13 +1551,20 @@ class AlignMusePointing(object):
                                         * (np.sin(np.deg2rad(dec_to_align)))**2
                                         + (np.cos(np.deg2rad(dec_to_align)))**2))
                 upipe.print_warning(f"Differential angle for this comparison is "
-                                    f"{diffang} (using mpdaf needs that fix)")
+                                    f"{diffang:.4f} (using mpdaf needs that fix)")
             else:
                 diffang = 0.
 
             # Getting the MUSE image data and WCS
             wcs_target = WCS(hdr=hdu_target.header)
+
+            # Fixing the differential angle when using mpdaf
+            # For repro, the initial value is correct. For mpdaf it needs
+            # the correction as the reference RA is different when projecting
+            # - namely = keeping the original RA as a reference -
             fixed_target_rotation = target_rotation - diffang
+
+            # Doing the rotation
             if fixed_target_rotation != 0.:
                 wcs_target.rotate(-(fixed_target_rotation))
             ima_target = Image(data=np.nan_to_num(hdu_target.data),
@@ -1570,11 +1577,6 @@ class AlignMusePointing(object):
             if self.use_mpdaf:
                 ima_aligned = ima_to_align.align_with_image(ima_target, flux=True)
                 hdu_aligned = ima_aligned.get_data_hdu()
-                # Computing the differential reference
-                ra_aligned = ima_aligned.wcs.to_header()['CRVAL1']
-                dec_aligned = ima_aligned.wcs.to_header()['CRVAL2']
-                print(f"DEC: {dec_aligned} / {dec_to_align}")
-                print(f"RA: {ra_aligned} / {ra_to_align}")
             else:
                 # Change of area
                 newinc = ima_target.wcs.get_axis_increments(unit=u.deg)
