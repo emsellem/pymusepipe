@@ -163,7 +163,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.build_list(list_cubes)
 
         # Initialise the super class
-        super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name, unit=self.unit)
+        super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name)
 
     @property
     def cube_names(self):
