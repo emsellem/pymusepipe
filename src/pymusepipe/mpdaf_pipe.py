@@ -211,7 +211,7 @@ class MuseCubeMosaic(CubeMosaic):
             except:
                 pass
 
-        u_units = np.unique(list_unique)
+        u_units = np.unique(list_units)
         if len(u_units) == 0:
             self.unit = None
         elif len(u_units) == 1:
