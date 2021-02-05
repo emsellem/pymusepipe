@@ -494,6 +494,52 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
+    def rebin_spatial(self, factor, mean=False, inplace=False, **kwargs):
+        """Combine neighboring pixels to reduce the size of a cube by integer factors along each axis.
+
+        Each output pixel is the mean of n pixels, where n is the product of the 
+        reduction factors in the factor argument.
+        Uses mpdaf rebin function, but add a normalisation factor if mean=False (sum).
+        It also updates the unit by just copying the old one.
+
+        Input
+        -----
+        factor (int or (int,int)): factor by which the spatial dimensions are reduced
+        mean (bool): if True, taking the mean, if False (default) summing
+        inplace (bool): if True replacing the cube by the result. If not 
+             returning a new cube. False by default.
+        """
+        # We copy it to keep the unit :-(
+        res = self.copy()
+
+        # Use the same reduction factor for all dimensions?
+        # Copy from the mpdaf _rebin (in data.py)
+        facarr = np.ones((res.ndim), dtype=int)
+        if isinstance(factor, np.int):
+            facarr[1:] *= factor
+        elif len(factor) == 2:
+            facarr[1:] = np.asarray(f)
+        elif len(factor) == 3:
+            facarr = np.asarray(f)
+        else:
+            print("Factor should be an integer or list/array of 2 or 3 integers")
+
+        # Do the rebin using the rebin method from mpdaf Cube
+        res.rebin(facarr, inplace=True, **kwargs)
+
+        # Copy the unit !
+        res.unit = self.unit
+
+        # Transfering the headers
+
+        # Mean or Sum
+        if mean:
+            norm_factor = 1.
+        else:
+            norm_factor = facarr[1] * facarr[2]
+
+        return res * norm_factor
+
     def astropy_convolve(self, other, fft=True, inplace=False):
         """Convolve a DataArray with an array of the same number of dimensions
         using a specified convolution function.
@@ -794,7 +840,7 @@ class MuseCube(Cube):
         suffix = add_string(suffix)
 
         for filtername in filter_list:
-            upipe.print_info(f"Filter = {filter}")
+            upipe.print_info(f"Filter = {filtername}")
             ima = self.get_filter_image(filter_name=filtername, **kwargs)
             if ima is None:
                 upipe.print_error(f"Could not reconstruct Image with Filter {filtername}")

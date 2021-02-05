@@ -721,6 +721,11 @@ class AlignMusePointing(object):
         self.header_folder_name = joinpath(self.folder_muse_images, header_folder_name)
         upipe.safely_create_folder(self.header_folder_name, verbose=self.verbose)
 
+        # Creating the Figure folder if needed
+        figures_folder_name = kwargs.pop("figures_folder_name", "AlignFigures")
+        self.figures_folder_name = joinpath(self.folder_muse_images, figures_folder_name)
+        upipe.safely_create_folder(self.figures_folder_name, verbose=self.verbose)
+
         # Getting the names
         self.name_musehdr = kwargs.pop("name_musehdr", "muse")
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
@@ -1830,6 +1835,8 @@ class AlignMusePointing(object):
             automatically derived from percentiles, but will
             not necessarily be the same (which can bring
             confusion but may sometimes be useful).
+        savefig (bool): False
+            If True, will save the figure into a png
         nima_museref
         
         Makes a maximum of 4 figures
@@ -1910,6 +1917,7 @@ class AlignMusePointing(object):
         # Preparing the figure
         current_fig = start_nfig
         self.list_figures = []
+        foldfig = self.figures_folder_name
 
         # Starting the plotting
         if shownormalise:
@@ -1923,6 +1931,9 @@ class AlignMusePointing(object):
             ax.plot(x, my_linear_model(polypar.beta, x), 'k')
             # ax.plot([np.min(x), np.max(x)], [np.min(x), np.max(x)], 'r')
             plt.tight_layout()
+            if savefig:
+                namefig = joinpath(foldfig, f"align_norm_scatter_{nima:03d}.png")
+                plt.savefig(namefig)
 
             self.list_figures.append(current_fig)
             current_fig += 1
@@ -1962,6 +1973,9 @@ class AlignMusePointing(object):
             if nima is not None:
                 plt.title("Image #{0:03d}".format(nima))
             plt.tight_layout()
+            if savefig:
+                namefig = joinpath(foldfig, f"align_contours_{nima:03d}.png")
+                plt.savefig(namefig)
 
             self.list_figures.append(current_fig)
             current_fig += 1
@@ -1980,6 +1994,10 @@ class AlignMusePointing(object):
             ax.set_xlabel("[pixels]", fontsize=20)
             ax.set_ylabel("[%]", fontsize=20)
             plt.tight_layout()
+            if savefig:
+                namefig = joinpath(foldfig, f"align_cuts_{nima:03d}.png")
+                plt.savefig(namefig)
+
             self.list_figures.append(current_fig)
             current_fig += 1
 
@@ -1988,6 +2006,10 @@ class AlignMusePointing(object):
             ratio = 100. * (refdata - musedata) / (musedata + 1.e-12)
             im = ax.imshow(ratio, vmin=-percentage, vmax=percentage)
             cbar = fig.colorbar(im, shrink=0.8)
+            if savefig:
+                namefig = joinpath(foldfig, f"align_diff_{nima:03d}.png")
+                plt.savefig(namefig)
+
             plt.tight_layout()
             self.list_figures.append(current_fig)
             current_fig += 1
@@ -2027,6 +2049,9 @@ class AlignMusePointing(object):
             if nima is not None:
                 plt.title("Image #{0:03d} / #{1:03d}".format(nima, nima_museref))
             plt.tight_layout()
+            if savefig:
+                namefig = joinpath(foldfig, f"align_museref{nima_museref:03d}_{nima:03d}.png")
+                plt.savefig(namefig)
 
             self.list_figures.append(current_fig)
             current_fig += 1
