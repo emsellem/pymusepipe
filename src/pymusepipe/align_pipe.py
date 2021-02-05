@@ -1844,6 +1844,7 @@ class AlignMusePointing(object):
         threshold_muse = kwargs.pop("threshold_muse", self.threshold_muse[nima])
         border = kwargs.pop("border", self.border)
         chunk_size = kwargs.pop("chunk_size", self.chunk_size)
+        savefig = kwargs.pop("savefig", True)
 
         # Getting the data
         musedata, refdata = self.get_image_normfactor(nima=nima, 
