@@ -210,7 +210,7 @@ class MuseCubeMosaic(CubeMosaic):
         list_units = []
         for name in self.cube_names:
             try:
-                list_unit.append(Cube(name).unit)
+                list_units.append(Cube(name).unit)
             except:
                 pass
 
