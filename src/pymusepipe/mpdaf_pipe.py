@@ -165,6 +165,10 @@ class MuseCubeMosaic(CubeMosaic):
         # Initialise the super class
         super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name)
 
+        # Check unit
+        if self.unit == u.dimensionless_unscaled:
+            self._get_unit()
+
     @property
     def cube_names(self):
         return [c.filename for c in self.list_cubes]
@@ -206,19 +210,20 @@ class MuseCubeMosaic(CubeMosaic):
         list_units = []
         for name in self.cube_names:
             try:
-                unit = list_units.append(pyfits.getheader(name)['BUNIT'])
-                list_unit.append(unit)
+                list_unit.append(Cube(name).unit)
             except:
                 pass
 
         u_units = np.unique(list_units)
         if len(u_units) == 0:
-            self.unit = None
-        elif len(u_units) == 1:
-            self.unit = u_units[0]
+            print("Warning: no unit found in input cubes, will set dimensionless one")
+            self.unit = u.dimensionless_unscaled
         else:
             self.unit = u_units[0]
-            print("Warning: units are not all the same for all input Cubes. Selecting the first encountered")
+            if len(u_units) != 1:
+                print("Warning: units are not all the same for all input Cubes. "
+                      "  Selecting the first encountered")
+            print(f"Unit of mosaiced Cube = {self.unit.to_string()}")
 
     def build_list(self, folder_cubes=None, prefix_cubes=None, list_cubes=None,
                    **kwargs):
@@ -346,8 +351,6 @@ class MuseCubeMosaic(CubeMosaic):
         else:
             upipe.print_info("Found {} cubes to be processed".format(
                                  self.ncubes))
-
-        self._get_unit()
 
     def convolve_cubes(self, target_fwhm, target_nmoffat=None,
                         target_function="gaussian", suffix="conv", **kwargs):
@@ -691,6 +694,8 @@ class MuseCube(Cube):
 
         # Calling the local method using astropy convolution
         conv_cube = self.astropy_convolve(other=kernel3d, fft=fft)
+        # Copying the unit from the original to the convolved cube
+        conv_cube.unit = copy.copy(self.unit)
 
         # Erode by npixels in case erode is True
         if erode_edges:
