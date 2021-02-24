@@ -895,10 +895,17 @@ class MuseCube(Cube):
             path_filter = joinpath(filter_folder, filter_file)
             filter_wave, filter_sensitivity = np.loadtxt(path_filter, unpack=True)
             upipe.print_info("Building Image with filter {}".format(filter_name))
+            # using mpdaf bandpass_image to build the image
             refimage = self.bandpass_image(filter_wave, filter_sensitivity,
                                            interpolation='linear')
+
+            # Adding FILTER NAME to the primary header
             key = 'HIERARCH ESO DRS MUSE FILTER NAME'
             refimage.primary_header[key] = (filter_name, 'filter name used')
+
+            # Copying the unit from the cube
+            refimage.unit = copy.copy(self.unit)
+
             add_mpdaf_method_keywords(refimage.primary_header, 
                     "cube.bandpass_image", ['name'], 
                     [filter_name], ['filter name used'])
