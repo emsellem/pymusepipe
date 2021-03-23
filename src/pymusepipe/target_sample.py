@@ -220,7 +220,7 @@ class MusePipeSample(object):
         # Initialisation of targets
         self.init_pipes = kwargs.pop("init_pipes", True)
         self.add_targetname = kwargs.pop("add_targetname", True)
-        self._init_targets()
+        self._init_targets(**kwargs)
 
     def _init_calib_files(self):
         """Initialise the calibration files with the new
@@ -281,7 +281,7 @@ class MusePipeSample(object):
 
         return folder_config, rc_filename_target, cal_filename_target
 
-    def _init_targets(self):
+    def _init_targets(self, **kwargs_init):
         """Initialise the targets using the dictionary
         Returning self.targets with the pointings to consider
         """
@@ -326,7 +326,7 @@ class MusePipeSample(object):
             self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
 
             if self.init_pipes:
-                self.set_pipe_target(targetname)
+                self.set_pipe_target(targetname, **kwargs_init)
 
     def _check_pointings_list(self, targetname, list_pointings):
         """Check if pointing is in the list of pointings
