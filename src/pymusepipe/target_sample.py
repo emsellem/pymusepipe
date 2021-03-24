@@ -787,8 +787,7 @@ class MusePipeSample(object):
             kwargs_recipe[key] = kwargs.pop(key, default)
 
         # Initialise the pipe if needed
-        if not self.pipes[targetname]._initialised  \
-            or "first_recipe" in kwargs or "last_recipe" in kwargs:
+        if not self.pipes[targetname]._initialised :
             self.set_pipe_target(targetname=targetname, list_pointings=list_pointings, **kwargs)
 
         # Check if pointings are valid
