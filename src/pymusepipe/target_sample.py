@@ -785,6 +785,9 @@ class MusePipeSample(object):
         for key, default in zip(['fraction', 'skymethod', 'illum'],
                                 [0.8, "model", True]):
             kwargs_recipe[key] = kwargs.pop(key, default)
+        for key in ['first_recipe', 'last_recipe']:
+            if key in kwargs:
+                kwargs_recipe[key] = kwargs.pop(key)
 
         # Initialise the pipe if needed
         if not self.pipes[targetname]._initialised :
