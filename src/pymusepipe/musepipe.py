@@ -177,6 +177,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Use time dependent geo_table
         self._time_astrometry = kwargs.pop("time_astrometry", False)
+        upipe.print_info(f"Time_astrometry option will now be set to {self._time_astrometry}")
 
         # Set alignment saving option
         self._save_alignment_images = kwargs.pop("save_alignment_images", True)
