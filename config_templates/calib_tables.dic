@@ -1,5 +1,5 @@
 # Muse calibration files (common to all)
-geo_table geometry_table_wfm.fits,
+geo_table geometry_table_wfm.fits
 # Calibration files (specific to OBs)
 astro_table astrometry_wcs_wfm.fits
 # Raw Data files

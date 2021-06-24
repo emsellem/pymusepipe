@@ -52,6 +52,8 @@ src/pymusepipe.egg-info/dependency_links.txt
 src/pymusepipe.egg-info/not-zip-safe
 src/pymusepipe.egg-info/requires.txt
 src/pymusepipe.egg-info/top_level.txt
+src/pymusepipe/data/Filters/Ha657BP6_AA.txt
+src/pymusepipe/data/Filters/Ha663BP6_AA.txt
 src/pymusepipe/data/Filters/LCO_SITe3_rp.txt
 src/pymusepipe/data/Filters/LaSilla_WFI_ESO844p.txt
 src/pymusepipe/data/Filters/LaSilla_WFI_ESO856p.txt

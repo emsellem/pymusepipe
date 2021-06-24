@@ -122,11 +122,11 @@ from pymusepipe import musepipe
 
 # define the names of the configuration files
 rcfile = "/my_data/MUSE/Config/rc.dic"
-calfile = "my_data_MUSE/Config/calib_table.dic"
+calfile = "my_data_MUSE/Config/calib_tables.dic"
 
 # Initialisation of the python - MusePipe Class - structure
 mypipe = musepipe.MusePipe(targetname="NGCXXXX", pointing=1, rc_filename=rcfile,
-                          cal_filename=calfile, logfile="NGCXXXX_version01.log",
+                          cal_filename=calfile, log_filename="NGCXXXX_version01.log",
                           fakemode=False, overwrite_astropy_table=True, 
                           filter_list="white,Cousins_R",
                           filter_for_alignment="Cousins_R")
@@ -189,7 +189,7 @@ It contains 3 lines, with: *musecalib*, *musecalib_time* and *root*.
    (the correspondence between observing run dates and specific 
    files are given in the dic_geo_astrowcs_table in musepipe.py).
 
-#### calib_table configuration file
+#### calib_tables configuration file
 It contains a series of given fits files which will be used by the pipeline. Most names are self-explantory. That includes:
    * *geo_table* and *astro_table*: only used if you don't rely on the default time dependent geometry files (see rc file).
    * *badpix_table*, *vignetting_mask*, *std_flux_table*, *extinct_table*, *line_catalog* all usually provided with the MUSE pipeline.
