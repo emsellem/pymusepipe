@@ -132,7 +132,7 @@ mypipe = musepipe.MusePipe(targetname="NGCXXXX", pointing=1, rc_filename=rcfile,
                           filter_for_alignment="Cousins_R")
 
 # Launching the pipeline
-mypipe.run_all_recipes()
+mypipe.run_recipes()
 ```
 Some explanation may be needed to understand what is happening:
    * "targetname": is just the name of the target, used to decided where the data will be
