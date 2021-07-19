@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pymusepipe
-Version: 2.9.9.post36
+Version: 2.9.9.post37
 Summary: python module to reduce MUSE Raw data and combine them
 Home-page: https://github.com/emsellem/pymusepipe
 Author: Eric Emsellem
@@ -141,7 +141,7 @@ Description: # pymusepipe
                                   filter_for_alignment="Cousins_R")
         
         # Launching the pipeline
-        mypipe.run_all_recipes()
+        mypipe.run_recipes()
         ```
         Some explanation may be needed to understand what is happening:
            * "targetname": is just the name of the target, used to decided where the data will be

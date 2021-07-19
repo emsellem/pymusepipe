@@ -198,7 +198,8 @@ class PipePrep(SofPipe) :
                              'scibasic_all': {'illum': illum},
                              'sky': {'fraction': fraction},
                              'prep_align': {'skymethod': skymethod},
-                             'scipost_per_expo': {'skymethod': skymethod}
+                             'scipost_per_expo': {'skymethod': skymethod},
+                             'scipost': {'skymethod': skymethod}
                              }
 
         dict_kwargs_recipes = kwargs.pop("param_recipes", {})
