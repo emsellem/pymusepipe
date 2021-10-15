@@ -28,6 +28,7 @@ import numpy as np
 import scipy.ndimage as nd
 from scipy.signal import correlate
 from scipy.odr import ODR, Model, RealData
+import skimage
 from skimage.registration import phase_cross_correlation
 
 # Astropy
