@@ -43,6 +43,18 @@ from astropy.convolution import Gaussian2DKernel, convolve
 from mpdaf.obj import Image, WCS
 
 def is_sequence(arg):
+    """Test if sequence and return the boolean result
+
+    Parameters
+    ----------
+    arg : input argument
+
+
+    Returns
+    -------
+    boolean result (False/True)
+
+    """
     return (not hasattr(arg, "strip") and
             hasattr(arg, "__getitem__") or
             hasattr(arg, "__iter__"))
@@ -76,15 +88,25 @@ def create_offset_table(image_names=[], table_folder="",
     these keywords is stored in the dictionary default_offset_table from
     config_pipe.py
 
-    Args:
-        image_names (list of str): List of image names to be considered.
-        table_folder (str): folder of the table
-        table_name (str): name of the table to save ['dummy_offset_table.fits']
-        overwrite (bool): if the table exists, it will be overwritten if set
-            to True only. [False]
+    Parameters
+    ----------
+    image_names : list of str
+        List of image names to be considered. (Default value = [])
+    table_folder : str
+        folder of the table (Default value = "")
+    table_name : str
+        name of the table to save ['dummy_offset_table.fits']
+        (Default value = "dummy_offset_table.fits")
+    overwrite : bool
+        if the table exists, it will be overwritten if set
+        to True only. (Default value = False)
+    overwrite : bool
+        if the table exists, it will be overwritten if set
+        to True only. (Default value = False)
 
-    Creates:
-        A fits table with the output given name.
+    Returns
+    -------
+        A fits table with the output given name. (Default value = False)
     """
 
     # Check if table exists and see if overwrite is set up
@@ -137,12 +159,17 @@ def open_new_wcs_figure(nfig, mywcs=None):
     """Open a new figure (with number nfig) with given wcs.
     If not WCS is provided, just opens a subplot in that figure.
 
-    Args:
-        nfig (int): number of the Figure to consider
-        mywcs (astropy.wcs.WCS): Input WCS to open a new figure
+    Parameters
+    ----------
+    nfig : int
+        number of the Figure to consider
+    mywcs : astropy.wcs.WCS
+        Input WCS to open a new figure (Default value = None)
 
-    Returns:
-        fig, subplot: Figure itself with the subplots with the wcs projection
+    Returns
+    -------
+    fig, subplot
+        Figure itself with the subplots using the wcs projection
 
     """
 
@@ -161,14 +188,18 @@ def chunk_stats(list_data, chunk_size=15):
     """Cut the datasets in 2d chunks and take the median
     Return the set of medians for all chunks.
 
-    Args:
-        list_data (list of np.arrays): List of arrays with the same sizes/shapes
-        chunk_size (int): number of pixel (one D of a 2D chunk)
-           of the chunk to consider
+    Parameters
+    ----------
+    list_data : list of np.arrays
+        List of arrays with the same sizes/shapes
+    chunk_size : int
+        number of pixel (one D of a 2D chunk)
+        of the chunk to consider (Default value = 15)
 
-    Returns:
-        median, standard: 2 arrays of the medians and
-            standard deviations for the given datasets analysed in chunks.
+    Returns
+    -------
+    median, standard: 2 arrays of the medians and standard deviations
+        for the given datasets analysed in chunks.
 
     """
 
@@ -204,9 +235,12 @@ def chunk_stats(list_data, chunk_size=15):
 def my_linear_model(B, x):
     """Linear function for the regression.
      
-    Args
-        B (1D array of 2): Input 1D polynomial parameters (0=constant, 1=slope)
-        x (array): Array which will be multiplied by the polynomial
+    Parameters
+    ----------
+    B : 1D np.array of 2 floats
+        Input 1D polynomial parameters (0=constant, 1=slope)
+    x : np.array
+        Array which will be multiplied by the polynomial
     
     Returns
     -------
@@ -222,18 +256,29 @@ def get_image_norm_poly(data1, data2, chunk_size=15, threshold1=0.,
     Including the background and slope. This uses the function
     regress_odr which is included in align_pipe.py and itself
     makes use of ODR in scipy.odr.ODR.
-     
-    Args
-        data1 (array):
-        data2 (array): 2 arrays (2D) of identical shapes
-        chunk_size (int): Size of the chunk to bin the images
-        threshold1 (float):
-        threshold2 (float): 2 floats defining the lower threshold for filtering
-    
+
+    Parameters
+    ----------
+    data1 : 2D np.array
+    data2 : 2D np.array
+        2 arrays (2D) of identical shapes
+
+    chunk_size : int (Default value = 15)
+    threshold1 : float
+        Lower threshold for data1 (Default value = 0.)
+    threshold2 : float
+        Lower threshold for data2 (Default value = 0)
+    percentiles : list of 2 floats
+        Percentiles (Default value = [0., 100.])
+    sigclip : float
+        Sigma clipping factor (Default value = 0)
+
     Returns
-        result: python structure
-                Result of the regression (ODR)
+    -------
+    result: python structure
+        Result of the regression (ODR)
     """
+
     # proceeds by splitting the data arrays in chunks of chunk_size
     med, std = chunk_stats([data1, data2], chunk_size=chunk_size)
 
@@ -755,6 +800,7 @@ class AlignMusePointing(object):
             self.conversion_factor = 1.0
 
         # Initialise the parameters for the first guess
+        self.phase_corr = kwargs.pop("phase_corr", True)
         self.firstguess = kwargs.pop("firstguess", "crosscorr")
         self.folder_offset_table = kwargs.pop("folder_offset_table",
                                               self.folder_muse_images)
@@ -1397,7 +1443,7 @@ class AlignMusePointing(object):
         ypix_cross: x and y pixel coordinates of the cross-correlation peak
         """
         # Projecting the reference image onto the MUSE field
-        tmphdr = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
+        _ = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
                                             name_musehdr), overwrite=True)
         hdu_target, proj_ref_hdu, diffra_angle  = self._align_reference_hdu(muse_hdu,
                                                         target_rotation=rotation)
@@ -1418,43 +1464,48 @@ class AlignMusePointing(object):
             self._temp_input_origmuse_cc = muse_hdu.data * 1.0
             self._temp_input_origref_cc = proj_ref_hdu.data * 1.0
 
-        # Cross-correlate the images
-        ccor = correlate(ima_ref, ima_muse, mode='full', method='auto')
-        if self._debug:
-            self._temp_ima_muse_tocc = ima_muse * 1.0
-            self._temp_ima_ref_tocc = ima_ref * 1.0
-            self._temp_cc = ccor * 1.0
+        if self.phase_corr:
+            shifts, shift_errors, phasediff = phase_cross_correlation(imare, ima_muse)
+            xpix_cross = shifts[1]
+            ypix_cross = shifts[0]
+        else:
+            # Cross-correlate the images
+            ccor = correlate(ima_ref, ima_muse, mode='full', method='auto')
+            if self._debug:
+                self._temp_ima_muse_tocc = ima_muse * 1.0
+                self._temp_ima_ref_tocc = ima_ref * 1.0
+                self._temp_cc = ccor * 1.0
 
-        # Find peak of cross-correlation
-        maxy, maxx = np.unravel_index(np.argmax(ccor),
-                                      ccor.shape)
+            # Find peak of cross-correlation
+            maxy, maxx = np.unravel_index(np.argmax(ccor),
+                                          ccor.shape)
 
-        # Extract a window around it
-        window = self.subim_window
-        y, x = np.ix_(np.arange(-window + maxy, window + 1 + maxy),
-                      np.arange(-window + maxx, window + 1 + maxx))
-        subim = ccor[y % ccor.shape[0], x % ccor.shape[1]]
-        subim -= subim.min()
-        mx = np.max(subim)
-        smaxy, smaxx = np.unravel_index(np.argmax(subim),
-                                        subim.shape)
+            # Extract a window around it
+            window = self.subim_window
+            y, x = np.ix_(np.arange(-window + maxy, window + 1 + maxy),
+                          np.arange(-window + maxx, window + 1 + maxx))
+            subim = ccor[y % ccor.shape[0], x % ccor.shape[1]]
+            subim -= subim.min()
+            mx = np.max(subim)
+            smaxy, smaxx = np.unravel_index(np.argmax(subim),
+                                            subim.shape)
 
-        # Fit a 2D Gaussian to that peak
-        gauss_init = models.Gaussian2D(amplitude=mx,
-                                       x_mean=x[0, smaxx],
-                                       y_mean=y[smaxy, 0],
-                                       x_stddev=2,
-                                       y_stddev=2,
-                                       theta=0)
-        fitter = fitting.LevMarLSQFitter()
-        params = fitter(gauss_init, x * np.ones_like(y),
-                        y * np.ones_like(x),
-                        subim)
+            # Fit a 2D Gaussian to that peak
+            gauss_init = models.Gaussian2D(amplitude=mx,
+                                           x_mean=x[0, smaxx],
+                                           y_mean=y[smaxy, 0],
+                                           x_stddev=2,
+                                           y_stddev=2,
+                                           theta=0)
+            fitter = fitting.LevMarLSQFitter()
+            params = fitter(gauss_init, x * np.ones_like(y),
+                            y * np.ones_like(x),
+                            subim)
 
-        # Update Astrometry
-        # Beware, the sign was changed here and is now ok
-        xpix_cross = ccor.shape[1]//2 - params.x_mean
-        ypix_cross = ccor.shape[0]//2 - params.y_mean
+            # Update Astrometry
+            # Beware, the sign was changed here and is now ok
+            xpix_cross = ccor.shape[1]//2 - params.x_mean
+            ypix_cross = ccor.shape[0]//2 - params.y_mean
 
         return xpix_cross, ypix_cross
 

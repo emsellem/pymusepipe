@@ -36,9 +36,6 @@ except ImportError :
 # =======================================================
 # List of recipes
 # =======================================================
-list_recipes = ['bias', 'flat', 'wave', 'lsf', 
-        'twilight', 'scibasic_all', 'std', 'sky']
-        
 dict_files_iexpo_products = {
         'ALIGN': ['SOURCE_LIST']
         }
@@ -129,7 +126,6 @@ class PipePrep(SofPipe) :
         """
         SofPipe.__init__(self)
 #        super(PipePrep, self).__init__()
-        self.list_recipes = deepcopy(list_recipes)
         self.first_recipe = first_recipe
         if last_recipe is None:
             self.last_recipe = np.max(list(dict_recipes_per_num.keys()))
@@ -172,7 +168,6 @@ class PipePrep(SofPipe) :
     def print_recipes():
         """Printing the list of recipes
         """
-        # for recipe in self.list_recipes:
         upipe.print_info("=============================================")
         upipe.print_info("The dictionary of recipes which can be run is")
         for key in dict_recipes_per_num:
