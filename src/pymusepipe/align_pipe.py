@@ -1468,7 +1468,7 @@ class AlignMusePointing(object):
 
         if self.phase_corr:
             shifts, shift_errors, phasediff = phase_cross_correlation(ima_ref, ima_muse,
-                                                                   self.phase_subsamp)
+                                                                   upsample_factor=self.phase_subsamp)
             xpix_cross = shifts[1]
             ypix_cross = shifts[0]
         else:
