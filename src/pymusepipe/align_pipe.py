@@ -28,8 +28,7 @@ import numpy as np
 import scipy.ndimage as nd
 from scipy.signal import correlate
 from scipy.odr import ODR, Model, RealData
-import skimage
-from skimage.feature import register_translation
+from skimage.registration import phase_cross_correlation
 
 # Astropy
 from astropy import wcs as awcs
@@ -803,6 +802,7 @@ class AlignMusePointing(object):
 
         # Initialise the parameters for the first guess
         self.phase_corr = kwargs.pop("phase_corr", True)
+        self.phase_subsamp = kwargs.pop("phase_subsamp", 10)
         self.firstguess = kwargs.pop("firstguess", "crosscorr")
         self.folder_offset_table = kwargs.pop("folder_offset_table",
                                               self.folder_muse_images)
@@ -1467,7 +1467,8 @@ class AlignMusePointing(object):
             self._temp_input_origref_cc = proj_ref_hdu.data * 1.0
 
         if self.phase_corr:
-            shifts, shift_errors, phasediff = register_translation(ima_ref, ima_muse)
+            shifts, shift_errors, phasediff = phase_cross_correlation(ima_ref, ima_muse,
+                                                                   self.phase_subsamp)
             xpix_cross = shifts[1]
             ypix_cross = shifts[0]
         else:
