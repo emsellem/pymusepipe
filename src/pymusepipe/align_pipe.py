@@ -28,6 +28,7 @@ import numpy as np
 import scipy.ndimage as nd
 from scipy.signal import correlate
 from scipy.odr import ODR, Model, RealData
+from skimage.registration import phase_cross_correlation
 
 # Astropy
 from astropy import wcs as awcs
@@ -1465,7 +1466,7 @@ class AlignMusePointing(object):
             self._temp_input_origref_cc = proj_ref_hdu.data * 1.0
 
         if self.phase_corr:
-            shifts, shift_errors, phasediff = phase_cross_correlation(imare, ima_muse)
+            shifts, shift_errors, phasediff = phase_cross_correlation(ima_ref, ima_muse)
             xpix_cross = shifts[1]
             ypix_cross = shifts[0]
         else:
