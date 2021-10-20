@@ -200,7 +200,7 @@ class MusePipe(PipePrep, PipeRecipes):
         self.musemode = musemode
         # Checking if mode is correct
         self.checkmode = checkmode
-        # Checking if mode is correct also for BIAS & DARK
+        # Checking if mode is correct also for BIAS & DARK and also ILLUM!
         self.strong_checkmode = strong_checkmode
         # End of parameter settings #########################
 
@@ -670,7 +670,7 @@ class MusePipe(PipePrep, PipeRecipes):
         try:
             return getattr(self._dict_tables[stage], self._get_attr_expo(expotype))
         except AttributeError:
-            upipe.print_error("No attributed table with expotype {0} and stage {1}".format(expotype, stage))
+            upipe.print_error(f"No attributed table with expotype {expotype} and stage {stage}")
             return Table()
 
     def _read_offset_table(self, name_offset_table=None, folder_offset_table=None):

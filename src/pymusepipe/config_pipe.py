@@ -73,7 +73,8 @@ listexpo_files = {
         "TPLNO":  ['tplno', 'ESO TPL EXPNO', np.int, 'J']
          }
 
-exclude_list_checkmode = ['BIAS', 'DARK']
+# Excluding files from the checking of their MUSE mode (AO, noAO, N/E etc)
+exclude_list_checkmode = ['BIAS', 'DARK', 'ILLUM']
 
 # Suffix for the pre/post-alignment files. Will be part of the output names
 suffix_prealign = "_prealign"
