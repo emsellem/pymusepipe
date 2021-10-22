@@ -74,7 +74,12 @@ listexpo_files = {
          }
 
 # Excluding files from the checking of their MUSE mode (AO, noAO, N/E etc)
-exclude_list_checkmode = ['BIAS', 'DARK', 'ILLUM']
+list_exclude_checkmode = ['BIAS', 'DARK', 'GEOMETRY']
+list_fieldspecific_checkmode = ['ILLUM', 'ASTROMETRY']
+
+# List of modes allowed for MUSE
+list_musemodes = ['WFM-AO-N', 'WFM-AO-E', 'WFM-NOAO-E', 'WFM-NOAO-N', 'NFM-AO-N']
+dict_musemodes = {'field': 0, 'ao': 1, 'lrange': 2}
 
 # Suffix for the pre/post-alignment files. Will be part of the output names
 suffix_prealign = "_prealign"

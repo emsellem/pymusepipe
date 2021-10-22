@@ -124,6 +124,29 @@ def print_error(text, **kwargs):
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
 #-----------  END PRINTING FUNCTIONS -----------------------
+
+def analyse_musemode(musemode, field, delimiter='-'):
+    """Extract the named field from the musemode
+    """
+    if field not in dict_musemodes:
+        upipe.error(f"Cannot find such a field ({field}) in the dict_musemodes")
+        return ""
+
+    index = dict_musemodes[field]
+    try:
+        val = musemode.split(delimiter)[index])
+    except KeyError:
+        upipe.print_error(f"No such field {field} in dictionary {dict_musemodes.keys()}")
+        return ""
+    except IndexError:
+        upipe.print_error(f"Musemode {musemode} does not include ")
+        return ""
+    else:
+        upipe.print_error(f"Error in analyse_musemode. Cannot analyse {musemode}")
+        return ""
+
+    return val.lower()
+
 def add_string(text, word="_", loc=0):
     """Adding string at given location
     Default is underscore for string which are not empty.

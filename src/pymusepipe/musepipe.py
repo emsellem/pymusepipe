@@ -66,8 +66,8 @@ from .prep_recipes_pipe import PipePrep
 from . import util_pipe as upipe
 from .config_pipe import (suffix_rawfiles, suffix_prealign, suffix_checkalign,
     listexpo_files, dict_listObject, dict_listMaster, dict_listMasterObject,
-    dict_expotypes, dict_geo_astrowcs_table, exclude_list_checkmode,
-    dict_astrogeo, )
+    dict_expotypes, dict_geo_astrowcs_table, list_exclude_checkmode,
+    list_fieldspecific_checkmode, dict_astrogeo, list_musemodes, dict_musemodes, )
 
 __version__ = '2.0.2 (25/09/2019)'
 
@@ -197,7 +197,11 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Further reduction options =====================================
         # Mode of the observations
-        self.musemode = musemode
+        self._list_musemodes = list_musemodes
+        self._musemode = musemode
+        # Printing the muse mode which also serves as a test to see if allowed
+        upipe.print_info(f"Input MUSE mode = {self.musemode}")
+
         # Checking if mode is correct
         self.checkmode = checkmode
         # Checking if mode is correct also for BIAS & DARK and also ILLUM!
@@ -285,6 +289,40 @@ class MusePipe(PipePrep, PipeRecipes):
             self._raw_table_initialised = False
         self.read_all_astro_tables()
 
+    def _print_musemodes(self):
+        """Print out the list of allowed muse modes
+        """
+        upipe.print_warning(f"List of allowed Musemodes = {self._list_musemodes}")
+
+    @property
+    def musemode(self):
+        """Mode for MUSE
+        """
+        if self.musemode.upper() not in self._list_musemodes:
+            upipe.print_error("Provided musemode {self.musemode.upper()} not supported")
+            self._print_musemodes()
+            return None
+
+        return self._musemode
+
+    @property
+    def _fieldmode(self):
+        """Property to return the field mode for MUSE
+        """
+        return analyse_musemode(self.musemode, 'field')
+
+    @property
+    def _aomode(self):
+        """Property to return the AO mode for MUSE
+        """
+        return analyse_musemode(self.musemode, 'ao')
+
+    @property
+    def _lrangemode(self):
+        """Property to return the lambda range (N or E) mode for MUSE
+        """
+        return analyse_musemode(self.musemode, 'lrange')
+
     def _init_geoastro_dates(self):
         """Initialise the dictionary for the geo and astrometry files
         Transforms the dates into datetimes
@@ -297,7 +335,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                "%Y-%m-%d").date()
             self._dict_geoastro[name] = [startd, endd]
 
-    def retrieve_geoastro_name(self, date_str, filetype='geo', mode='wfm'):
+    def retrieve_geoastro_name(self, date_str, filetype='geo', fieldmode='wfm'):
         """Retrieving the astrometry or geometry fits file name
 
         Parameters
@@ -306,7 +344,7 @@ class MusePipe(PipePrep, PipeRecipes):
             Date as a string (DD/MM/YYYY)
         filetype: str
             'geo' or 'astro', type of the needed file
-        mode: str
+        fieldmode: str
             'wfm' or 'nfm' - MUSE mode
         """
         dict_pre = {'geo': 'geometry_table',
@@ -647,8 +685,11 @@ class MusePipe(PipePrep, PipeRecipes):
             try:
                 mask = (self.Tables.Rawfiles['type'] == dict_expotypes[expotype])
                 if self.checkmode:
-                    maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
-                    if (expotype.upper() not in exclude_list_checkmode) or self.strong_checkmode:
+                    if expotype.upper() in list_fieldspecific_checkmode:
+                        maskmode = [self._fieldmode == analyse_musemode(value, 'field') 
+                                        for value in self.Tables.Rawfiles['mode']]
+                    elif (expotype.upper() not in list_exclude_checkmode) or self.strong_checkmode:
+                        maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
                         mask = maskmode & mask
                 setattr(self.Tables.Raw, self._get_attr_expo(expotype),
                         self.Tables.Rawfiles[mask])

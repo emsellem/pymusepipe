@@ -142,7 +142,7 @@ class SofPipe(object) :
         """
         if self._time_astrometry :
             calfolder = self.pipe_params.musecalib_time
-            geofile = self.retrieve_geoastro_name(tpls, filetype='geo')
+            geofile = self.retrieve_geoastro_name(tpls, filetype='geo', fieldmode=self._fielmode)
         else:
             expo_table = self._get_table_expo("GEOMETRY", "raw")
             if len(expo_table) > 0:
@@ -164,7 +164,7 @@ class SofPipe(object) :
         """
         if self._time_astrometry :
             calfolder = self.pipe_params.musecalib_time
-            astrofile = self.retrieve_geoastro_name(tpls, filetype='astro')
+            astrofile = self.retrieve_geoastro_name(tpls, filetype='astro', fieldmode=self._fielmode)
         else :
             expo_table = self._get_table_expo("ASTROMETRY", "raw")
             if len(expo_table) > 0:
