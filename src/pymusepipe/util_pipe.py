@@ -134,7 +134,7 @@ def analyse_musemode(musemode, field, delimiter='-'):
 
     index = dict_musemodes[field]
     try:
-        val = musemode.split(delimiter)[index])
+        val = musemode.split(delimiter)[index]
     except KeyError:
         upipe.print_error(f"No such field {field} in dictionary {dict_musemodes.keys()}")
         return ""
