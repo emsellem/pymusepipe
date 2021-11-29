@@ -64,7 +64,7 @@ from .init_musepipe import InitMuseParameters
 from .recipes_pipe import PipeRecipes
 from .prep_recipes_pipe import PipePrep
 from . import util_pipe as upipe
-from util_pipe import analyse_musemode
+from .util_pipe import analyse_musemode
 from .config_pipe import (suffix_rawfiles, suffix_prealign, suffix_checkalign,
     listexpo_files, dict_listObject, dict_listMaster, dict_listMasterObject,
     dict_expotypes, dict_geo_astrowcs_table, list_exclude_checkmode,
