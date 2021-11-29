@@ -24,8 +24,8 @@ from .create_sof import SofPipe
 from .align_pipe import create_offset_table, AlignMusePointing
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
-from .config_pipe import mjd_names,get_suffix_product
-from .config_pipe import dict_recipes_per_num, dict_recipes_per_name
+from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
+                          dict_recipes_per_num, dict_recipes_per_name)
 
 try :
     import astropy as apy

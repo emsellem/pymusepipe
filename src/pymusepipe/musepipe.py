@@ -677,6 +677,18 @@ class MusePipe(PipePrep, PipeRecipes):
 
     def sort_raw_tables(self, checkmode=None, strong_checkmode=None):
         """Provide lists of exposures with types defined in the dictionary
+        after excluding those with the wrong MUSE mode if checkmode is set up.
+
+        Input
+        -----
+        checkmode: boolean
+            Checking the MUSE mode or not. Default to None, namely it won't use
+            the value set here but the value predefined in self.checkmode.
+        strong_checkmode: boolean
+            Strong check, namely in case you still wish to force the MUSE mode
+            even for files which are not mode specific (e.g., BIAS). 
+            Default to None, namely it uses the self.strong_checkmode which was
+            already set up at start.
         """
         if checkmode is not None:
             self.checkmode = checkmode
