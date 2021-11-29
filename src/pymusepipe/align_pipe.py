@@ -3,8 +3,9 @@
 """MUSE-PHANGS alignement module. This module can be used to align MUSE
 reconstructed images either with each others or using a reference background
 image. It spits the results out in a Fits table which can then be used
-to process and mosaic Muse PIXTABLES. It includes a normalisation factor,
-an estimate of the background, as well as any potential rotation. Fine tuning
+to process and mosaic Muse PIXTABLES via the MUSE ESO pipeline. 
+It includes a normalisation factor, an estimate of the background, 
+as well as any potential rotation. Fine tuning
 can be done by hand by the user, using a set of reference plots.
 """
 
@@ -53,7 +54,7 @@ def is_sequence(arg):
 
     Returns
     -------
-    boolean result (False/True)
+    result: boolean
 
     """
     return (not hasattr(arg, "strip") and
@@ -163,7 +164,7 @@ def open_new_wcs_figure(nfig, mywcs=None):
     Parameters
     ----------
     nfig : int
-        number of the Figure to consider
+        Figure number to consider
     mywcs : astropy.wcs.WCS
         Input WCS to open a new figure (Default value = None)
 
@@ -176,8 +177,10 @@ def open_new_wcs_figure(nfig, mywcs=None):
 
     # get the figure
     fig = plt.figure(nfig)
+
     # Clean the figure
     plt.clf()
+
     # Adding axes with WCS
     if mywcs is None:
         return fig, fig.add_subplot(1, 1, 1)
@@ -302,13 +305,18 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0):
     """Return an ODR linear regression using scipy.odr.ODR
 
     Args:
-        x (np.array): Input nD arrays with signal
-        y (np.array):
-        sx (np.array): Input nD arrays (as x,y) with standard deviations
-        sy (np.array):
-        beta0 (list of 2 floats): Initial guess for the constant and slope
-        percentiles: array of two numbers providing the percentiles
-        sigclip: sigma factor for sigma clipping. If 0, no sigma clipping
+        x : numpy.array 
+        y : numpy.array
+            Input array with signal
+        sx : numpy.array 
+        sy : numpy.array
+            Input array (as x,y) with standard deviations
+        beta0 : list of 2 floats
+            Initial guess for the constant and slope
+        percentiles: numpy.array
+            array of two numbers providing the percentiles
+        sigclip: float
+            sigma factor for sigma clipping. If 0, no sigma clipping
             is performed
 
     Returns:

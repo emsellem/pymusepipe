@@ -127,6 +127,20 @@ def print_error(text, **kwargs):
 
 def analyse_musemode(musemode, field, delimiter='-'):
     """Extract the named field from the musemode
+
+    Input
+    -----
+    musemode: str
+        Mode of the MUSE data to be analysed
+    field: str
+        Field to analyse ('ao', 'field', 'lambda_range')
+    delimiter: str
+        Character to delimit the fields to analyse
+
+    Returns
+    -------
+    val: str
+        Value of the field which was analysed (e.g., 'AO' or 'NOAO')
     """
     if field not in dict_musemodes:
         upipe.error(f"Cannot find such a field ({field}) in the dict_musemodes")
