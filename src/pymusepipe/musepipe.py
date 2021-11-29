@@ -199,7 +199,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # Further reduction options =====================================
         # Mode of the observations
         self._list_musemodes = list_musemodes
-        self._musemode = musemode
+        self.musemode = musemode
         # Printing the muse mode which also serves as a test to see if allowed
         upipe.print_info(f"Input MUSE mode = {self.musemode}")
 
@@ -291,7 +291,7 @@ class MusePipe(PipePrep, PipeRecipes):
             self._raw_table_initialised = False
         self.read_all_astro_tables()
 
-    def _print_musemodes(self):
+    def print_musemodes(self):
         """Print out the list of allowed muse modes
         """
         upipe.print_warning(f"List of allowed Musemodes = {self._list_musemodes}")
@@ -300,12 +300,17 @@ class MusePipe(PipePrep, PipeRecipes):
     def musemode(self):
         """Mode for MUSE
         """
-        if self.musemode.upper() not in self._list_musemodes:
-            upipe.print_error("Provided musemode {self.musemode.upper()} not supported")
-            self._print_musemodes()
+        umuse = self._musemode.upper()
+        if umuse not in self._list_musemodes:
+            upipe.print_error("Provided musemode {umuse} not supported")
+            self.print_musemodes()
             return None
 
         return self._musemode
+
+    @musemode.setter
+    def musemode(self, val):
+        self._musemode = val
 
     @property
     def _fieldmode(self):
