@@ -689,6 +689,12 @@ class MusePipe(PipePrep, PipeRecipes):
             return
 
         # Sorting alphabetically (thus by date)
+        if self.checkmode:
+            upipe.print_warning(f"Checkmode is True: the MUSE Mode will be checked.\n"
+                                f"All Raw files which do have musemode = {self.musemode}"
+                                f"and are mode specific (e.g., Flat field) will be masked.\n"
+                                f"If you wish otherwise, set checkmode to False."
+                                f"[but this may impact the data reduction].")
         for expotype in dict_expotypes:
             try:
                 mask = (self.Tables.Rawfiles['type'] == dict_expotypes[expotype])
@@ -698,10 +704,6 @@ class MusePipe(PipePrep, PipeRecipes):
                                         for value in self.Tables.Rawfiles['mode']]
                     elif (expotype.upper() not in list_exclude_checkmode) or self.strong_checkmode:
                         maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
-                        upipe.print_warning(f"Masking out all Raw files which do not "
-                                            f"have a MuseMode = {self.musemode}.\n"
-                                            f"If you wish otherwise, set checkmode to False."
-                                            f"[this may impact the data reduction].")
                         mask = maskmode & mask
                 setattr(self.Tables.Raw, self._get_attr_expo(expotype),
                         self.Tables.Rawfiles[mask])
