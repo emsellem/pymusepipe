@@ -147,18 +147,14 @@ def analyse_musemode(musemode, field, delimiter='-'):
         return ""
 
     index = dict_musemodes[field]
-    try:
-        val = musemode.split(delimiter)[index]
-    except KeyError:
-        upipe.print_error(f"No such field {field} in dictionary {dict_musemodes.keys()}")
-        return ""
-    except IndexError:
-        upipe.print_error(f"Musemode {musemode} does not include ")
-        return ""
-    else:
-        upipe.print_error(f"Error in analyse_musemode. Cannot analyse {musemode}")
-        return ""
+    sval = musemode.split(delimiter)
 
+    if len(sval) < index+1:
+        upipe.print_error(f"Error in analyse_musemode. Cannot access field {index} "
+                          f"After splitting the musemode {musemode} = sval")
+        val = ""
+    else:
+        val = musemode.split(delimiter)[index]
     return val.lower()
 
 def add_string(text, word="_", loc=0):
