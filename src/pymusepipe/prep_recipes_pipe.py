@@ -210,7 +210,7 @@ class PipePrep(SofPipe) :
                              'scibasic_all': {'illum': defval.illum},
                              'sky': {'fraction': defval.fraction},
                              'prep_align': {'skymethod': defval.skymethod, 
-                                            'filter_for_alignment': defval.filter_for_alignment
+                                            'filter_for_alignment': defval.filter_for_alignment,
                                             'line': defval.line,
                                             'lambda_window': defval.lambda_window
                                             },
