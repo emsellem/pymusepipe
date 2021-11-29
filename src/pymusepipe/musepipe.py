@@ -67,7 +67,8 @@ from . import util_pipe as upipe
 from .config_pipe import (suffix_rawfiles, suffix_prealign, suffix_checkalign,
     listexpo_files, dict_listObject, dict_listMaster, dict_listMasterObject,
     dict_expotypes, dict_geo_astrowcs_table, list_exclude_checkmode,
-    list_fieldspecific_checkmode, dict_astrogeo, list_musemodes, dict_musemodes, )
+    list_fieldspecific_checkmode, dict_astrogeo, list_musemodes, dict_musemodes, 
+    dict_default_for_recipes,)
 
 __version__ = '2.0.2 (25/09/2019)'
 
@@ -214,7 +215,8 @@ class MusePipe(PipePrep, PipeRecipes):
         init_raw_table = kwargs.pop("init_raw_table", True)
 
         # Filter for alignment
-        self.filter_for_alignment = kwargs.pop("filter_for_alignment", "Cousins_R")
+        self.filter_for_alignment = kwargs.pop("filter_for_alignment", 
+                                               dict_default_for_recipes['filter_for_alignment'])
         self.filter_list = kwargs.pop("filter_list", "white")
         # Init of the subclasses
         PipePrep.__init__(self, first_recipe=first_recipe,

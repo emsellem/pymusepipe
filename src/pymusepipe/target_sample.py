@@ -23,7 +23,8 @@ from .config_pipe import (PHANGS_reduc_config,
                           default_short_filter_list,
                           default_filter_list,
                           default_prefix_wcs,
-                          default_prefix_wcs_mosaic)
+                          default_prefix_wcs_mosaic,
+                          dict_default_for_recipes)
 from .init_musepipe import InitMuseParameters
 from .combine import MusePointings
 from .align_pipe import rotate_pixtables
@@ -721,10 +722,11 @@ class MusePipeSample(object):
         upipe.print_info("---- Starting the Recipe {0} for Target={1} "
                          "----".format(recipe_name, targetname))
 
+        # Sorting out the kwargs specific for the MUSE recipes
         kwargs_recipe = {}
-        for key, default in zip(['fraction', 'skymethod', 'illum'],
-                                [0.8, "model", True]):
-            kwargs_recipe[key] = kwargs.pop(key, default)
+        for kw in kwargs:
+            if kw in dict_default_for_recipes.keys():
+                kwargs_recipe[key] = kwargs.pop(key, dict_default_for_recipes[kw])
 
         # Initialise the pipe if needed
         self.set_pipe_target(targetname=targetname, list_pointings=list_pointings,
@@ -782,9 +784,10 @@ class MusePipeSample(object):
         # Get the parameters for the recipes
         param_recipes = kwargs.pop("param_recipes", {})
         kwargs_recipe = {}
-        for key, default in zip(['fraction', 'skymethod', 'illum'],
-                                [0.8, "model", True]):
-            kwargs_recipe[key] = kwargs.pop(key, default)
+        for kw in kwargs:
+            if kw in dict_default_for_recipes.keys():
+                kwargs_recipe[key] = kwargs.pop(key, dict_default_for_recipes[kw])
+
         for key in ['first_recipe', 'last_recipe']:
             if key in kwargs:
                 kwargs_recipe[key] = kwargs.pop(key)

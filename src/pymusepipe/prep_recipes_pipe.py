@@ -175,7 +175,7 @@ class PipePrep(SofPipe) :
         upipe.print_info("=============================================")
 
     @print_my_function_name
-    def run_recipes(self, fraction=0.8, skymethod="model", illum=True, **kwargs):
+    def run_recipes(self, **kwargs):
         """Running all recipes in one shot
 
         Input
@@ -187,14 +187,35 @@ class PipePrep(SofPipe) :
             Default is True (use illumination during twilight calibration)
         skymethod: str
             Default is "model".
+        filter_for_alignment: str
+            Default is defined in config_pipe
+        line: str
+            Default is None as defined in config_pipe
+        lambda_window: float
+            Default is 10.0 as defined in config_pipe
         """
+        class DefVal(object):
+            def __init__(self):
+                pass
+
+        defval = DefVal()
+        for key in dict_default_for_recipes:
+            setattr(defval, key, kwargs.get(key, dict_default_for_recipes[key]))
+
+        # We overwrite filter_for_alignment as it can be already set
+        defval.filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+
         # Dictionary of arguments for each recipe
-        default_dict_kwargs_recipes = {'twilight': {'illum': illum},
-                             'scibasic_all': {'illum': illum},
-                             'sky': {'fraction': fraction},
-                             'prep_align': {'skymethod': skymethod},
-                             'scipost_per_expo': {'skymethod': skymethod},
-                             'scipost': {'skymethod': skymethod}
+        default_dict_kwargs_recipes = {'twilight': {'illum': defval.illum},
+                             'scibasic_all': {'illum': defval.illum},
+                             'sky': {'fraction': defval.fraction},
+                             'prep_align': {'skymethod': defval.skymethod, 
+                                            'filter_for_alignment': defval.filter_for_alignment
+                                            'line': defval.line,
+                                            'lambda_window': defval.lambda_window
+                                            },
+                             'scipost_per_expo': {'skymethod': defval.skymethod},
+                             'scipost': {'skymethod': defval.skymethod}
                              }
 
         dict_kwargs_recipes = kwargs.pop("param_recipes", {})

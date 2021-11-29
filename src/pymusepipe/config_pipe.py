@@ -311,6 +311,15 @@ dict_recipes_per_num = {1:'bias', 2:'flat', 3:'wave',
                11:'align_bygroup', 12:'scipost_perexpo',
                13:'scipost_sky', 14:'combine_pointing'}
 
+# Value by default for certain fixed parameters in recipes
+dict_default_for_recipes = {'fraction': 0.8, 
+                            'skymethod': 'model',
+                            'illum': True,
+                            'filter_for_alignment': 'Cousins_R',
+                            'line': None,
+                            'lambda_window': 10.0 
+                            }
+
 # and creating the inverse dictionary
 dict_recipes_per_name = {}
 for key in dict_recipes_per_num:
