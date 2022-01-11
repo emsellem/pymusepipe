@@ -513,8 +513,8 @@ class MuseCube(Cube):
              returning a new cube. False by default.
         """
         # We copy it to keep the unit :-(
-        res = self.copy()
-
+        res = self if inplace else self.copy()
+        
         # Use the same reduction factor for all dimensions?
         # Copy from the mpdaf _rebin (in data.py)
         facarr = np.ones((res.ndim), dtype=int)
@@ -530,21 +530,13 @@ class MuseCube(Cube):
         # Do the rebin using the rebin method from mpdaf Cube
         res.rebin(facarr, inplace=True, **kwargs)
 
-        # Copy the unit !
-        res.unit = self.unit
-
-        # Transfering the headers
-
         # Mean or Sum
         if mean:
             norm_factor = 1.
         else:
             norm_factor = facarr[1] * facarr[2]
 
-        if inplace:
-            self = res * norm_factor
-        else:
-            return res * norm_factor
+        return res * norm_factor
 
     def astropy_convolve(self, other, fft=True, inplace=False):
         """Convolve a DataArray with an array of the same number of dimensions
