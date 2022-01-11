@@ -541,7 +541,10 @@ class MuseCube(Cube):
         else:
             norm_factor = facarr[1] * facarr[2]
 
-        return res * norm_factor
+        if inplace:
+            self = res * norm_factor
+        else:
+            return res * norm_factor
 
     def astropy_convolve(self, other, fft=True, inplace=False):
         """Convolve a DataArray with an array of the same number of dimensions
