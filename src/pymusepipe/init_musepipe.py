@@ -67,9 +67,9 @@ class InitMuseParameters(object) :
 
         if rc_filename is None :
             if not os.path.isfile(default_rc_filename):
-                upipe.print_warning(("No filename or {default_rc} file "
+                upipe.print_warning(f"No filename or {default_rc_filename} file "
                      "to initialise from. We will use the default hardcoded " 
-                     "in the init_musepipe.py module").format(default_rc=default_rc_filename))
+                     "in the config_pipe.py module")
                 self.init_default_param(dict_user_folders)
 
             else :
@@ -96,10 +96,16 @@ class InitMuseParameters(object) :
 
     def init_default_param(self, dict_param) :
         """Initialise the parameters as defined in the input dictionary
-        Hardcoded in init_musepipe.py
+        Hardcoded in config_pipe.py
+
+        Input
+        -----
+        dict_param: dict
+            Input dictionary defining the attributes
         """
         for key in dict_param:
-            upipe.print_info("Default initialisation of attribute {0}".format(key), pipe=self)
+            upipe.print_info(f"Default initialisation of attribute {key}", 
+                             pipe=self)
             setattr(self, key, dict_param[key])
 
     def read_param_file(self, filename, dict_param) :
@@ -107,10 +113,16 @@ class InitMuseParameters(object) :
         """
         # Testing existence of filename
         if not os.path.isfile(filename) :
-            upipe.print_error(("Input parameter {inputname} cannot be found. "
+            upipe.print_error((f"Input parameter {filename} cannot be found. "
                     "We will use the default hardcoded in the "
-                    "init_musepipe.py module").format(inputname=filename))
-            return
+                    "config_pipe.py module"))
+            # Now relying on the default file but first checking it's there
+            if not os.path.isfile(default_rc_filename):
+                upipe.print_error(f"Default rc file as defined in config_pipe.py "
+                                  f"could not be found ({default_rc_filename}).")
+                return
+            else:
+                filename = default_rc_filename
 
         # If it exists, open and read it
         f_param = open(filename)
@@ -137,5 +149,5 @@ class InitMuseParameters(object) :
         for key in noninit_dict_param:
             upipe.print_warning(("Parameter {param} not initialised "
                    "We will use the default hardcoded value from "
-                   "init_musepipe.py").format(param=key))
+                   "config_pipe.py").format(param=key))
             setattr(self, key, dict_param[key])

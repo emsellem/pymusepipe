@@ -521,9 +521,9 @@ class MuseCube(Cube):
         if isinstance(factor, np.int):
             facarr[1:] *= factor
         elif len(factor) == 2:
-            facarr[1:] = np.asarray(f)
+            facarr[1:] = np.asarray(factor)
         elif len(factor) == 3:
-            facarr = np.asarray(f)
+            facarr = np.asarray(factor)
         else:
             print("Factor should be an integer or list/array of 2 or 3 integers")
 

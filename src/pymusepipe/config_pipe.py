@@ -102,11 +102,11 @@ suffix_rawfiles = ['fits.fz', 'fits']
 dict_user_folders = {
         # values provide the folder and whether or not this should be attempted to create
             # Muse calibration files (common to all)
-            "musecalib": "/home/mcelroy/reflex/install/calib/muse-2.2/cal/'",
+            "musecalib": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/soft/muse-pipelines/calib/'",
             # Time varying calibrations
-            "musecalib_time": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/LP_131117/astrocal/",
+            "musecalib_time": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/time_calibrations/",
             # Calibration files (specific to OBs)
-            "root" : "/mnt/fhgfs/PHANGS/MUSE/LP_131117/",
+            "root" : "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/live/"
             }
 
 # Default initialisation file

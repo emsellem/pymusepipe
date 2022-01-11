@@ -34,6 +34,7 @@ from skimage.registration import phase_cross_correlation
 # Astropy
 from astropy import wcs as awcs
 from astropy.io import fits as pyfits
+from astropy.io import ascii
 from astropy.modeling import models, fitting
 from astropy.stats import mad_std, sigma_clip
 from astropy.table import Table, Column
@@ -43,6 +44,7 @@ from astropy.convolution import Gaussian2DKernel, convolve
 
 # Import mpdaf
 from mpdaf.obj import Image, WCS
+
 
 def is_sequence(arg):
     """Test if sequence and return the boolean result
@@ -1100,24 +1102,28 @@ class AlignMusePointing(object):
                 upipe.print_warning("File exists but will be overwritten as"
                                     "overwrite is True.")
 
-        newf = open(fullname_file, "w+")
-        newf.write("#---- Offsets and normalisations ----#\n")
-        newf.write("#    Name               OFFSETS  |ARCSEC|    X        "
-                   "Y     |PIXEL|    X        Y     |ROT| (DEG) "
-                   "   |NORM|              |BACKG|\n")
-        for nima in range(self.nimages):
-            newf.write("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
-                             " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}  "
-                             "|NORM| {7:10.6e} |BACKG| {8:10.6e}\n".format(
-                             nima, self.list_muse_images[nima][-29:-5],
-                             self._total_off_arcsec[nima][0],
-                             self._total_off_arcsec[nima][1],
-                             self._total_off_pixel[nima][0],
-                             self._total_off_pixel[nima][1],
-                             self._total_rotangles[nima],
-                             self.ima_norm_factors[nima],
-                             self.ima_background[nima]))
-        newf.close()
+        toff_arc = self._total_off_arcsec
+        toff_pix = self._total_off_pixel
+        trot = self._total_off_rotangles
+        data = {'nb': arange(self.nimages) + 1, 
+                'name': [name[-29:-5] for name in self.list_muse_images],
+                'xarc': toff_arc[:,0],
+                'yarc': toff_arc[:,1],
+                'xpix': toff_pix[:,0],
+                'ypix': toff_pix[:,1],
+                'rot': trot,
+                'norm': self.ima_norm_factors,
+                'backg': self.ima_background
+                }
+
+        ascii.write(data, fullname_file,
+                    formats={'nb': '%03d', 'name': '%s>26',
+                             'xarc': '%8.4f', 'yarc': '%8.4f',
+                             'xpix': '%8.4f', 'ypix': '%8.4f',
+                             'rot': '%8.4f', 'norm': '%10.6e',
+                             'backg': '%10.6e'
+                            }, 
+                    format='fixed_width', overwrite=True)
 
     def show_offsets(self):
         """Print out the offset from the Alignment class
