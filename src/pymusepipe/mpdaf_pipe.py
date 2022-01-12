@@ -515,7 +515,7 @@ class MuseCube(Cube):
         Cube: rebinned cube
         """
         # We copy it to keep the unit :-(
-        res = self if inplace else self.copy()
+        res = self.copy()
         
         # Use the same reduction factor for all dimensions?
         # Copy from the mpdaf _rebin (in data.py)
