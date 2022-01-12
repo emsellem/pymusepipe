@@ -497,7 +497,7 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
-    def rebin_spatial(self, factor, mean=False, inplace=False, **kwargs):
+    def rebin_spatial(self, factor, mean=False, **kwargs):
         """Combine neighboring pixels to reduce the size of a cube by integer factors along each axis.
 
         Each output pixel is the mean of n pixels, where n is the product of the 
@@ -509,8 +509,10 @@ class MuseCube(Cube):
         -----
         factor (int or (int,int)): factor by which the spatial dimensions are reduced
         mean (bool): if True, taking the mean, if False (default) summing
-        inplace (bool): if True replacing the cube by the result. If not 
-             returning a new cube. False by default.
+
+        Returns
+        -------
+        Cube: rebinned cube
         """
         # We copy it to keep the unit :-(
         res = self if inplace else self.copy()
@@ -528,7 +530,7 @@ class MuseCube(Cube):
             print("Factor should be an integer or list/array of 2 or 3 integers")
 
         # Do the rebin using the rebin method from mpdaf Cube
-        res.rebin(facarr, inplace=True, **kwargs)
+        res = res.rebin(facarr, inplace=True, **kwargs)
 
         # Mean or Sum
         if mean:
@@ -537,8 +539,8 @@ class MuseCube(Cube):
             norm_factor = facarr[1] * facarr[2]
 
         # Now scaling the data and variances
-        res._data = res.data * norm_factor
-        res._var = res.var * norm_factor*2
+        res._data *= norm_factor
+        res._var *= norm_factor**2
 
         return res
 
