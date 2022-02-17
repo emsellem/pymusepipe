@@ -497,7 +497,7 @@ class MuseCube(Cube):
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
 
-    def rebin_spatial(self, factor, mean=False, inplace=False, **kwargs):
+    def rebin_spatial(self, factor, mean=False, inplace=False, full_covariance=False, **kwargs):
         """Combine neighboring pixels to reduce the size of a cube by integer factors along each axis.
 
         Each output pixel is the mean of n pixels, where n is the product of the 
@@ -513,6 +513,10 @@ class MuseCube(Cube):
             If True, taking the mean, if False (default) summing
         inplace : bool
             If False (default) making a copy. Otherwise using the present cube.
+        full_covariance: bool
+            If True, will assume that spaxels are fully covariant. This means that
+            the variance will be normalised by sqrt(N) where N is the number of 
+            summed spaxels. Default is False
 
         Returns
         -------
@@ -521,30 +525,40 @@ class MuseCube(Cube):
         # We copy it to keep the unit :-(
         res = self if inplace else self.copy()
         
-        # Use the same reduction factor for all dimensions?
-        # Copy from the mpdaf _rebin (in data.py)
-        facarr = np.ones((res.ndim), dtype=int)
-        if isinstance(factor, np.int):
-            facarr[1:] *= factor
-        elif len(factor) == 2:
-            facarr[1:] = np.asarray(factor)
-        elif len(factor) == 3:
-            facarr = np.asarray(factor)
-        else:
-            print("Factor should be an integer or list/array of 2 or 3 integers")
-
         # Do the rebin using the rebin method from mpdaf Cube
         res = res.rebin(facarr, inplace=True, **kwargs)
+
+        # Use the same reduction factor for all dimensions?
+        # Copy from the mpdaf _rebin (in data.py)
+        nfacarr = np.ones((res.ndim), dtype=int)
+        if isinstance(factor, np.int):
+            nfacarr[1:] *= factor
+        elif len(factor) == 2:
+            nfacarr[1:] = np.asarray(factor)
+        elif len(factor) == 3:
+            nfacarr = np.asarray(factor)
+        else:
+            print("Factor should be an integer or list/array of 2 or 3 integers")
+        spafactor = nfacarr[1] * nfacarr[2]
 
         # Mean or Sum
         if mean:
             norm_factor = 1.
         else:
-            norm_factor = facarr[1] * facarr[2]
+            norm_factor = spafactor
 
         # Now scaling the data and variances
         res._data *= norm_factor
         res._var *= norm_factor**2
+
+        # If full covariance, the S/N does not change.
+        # Hence by summing ns spaxels, the S/N should in principle increase by sqrt(ns)
+        # 1- If not mean, it recovers the right factor for the surface
+        #    Namely : data * norm_factor, var * norm_factor**2
+        # 2- If full_covariance, the S/N does not change so we need to multiply the variance
+        #    to compensate. Since the S/N increased by sqrt(ns), we multiply var * ns
+        if full_covariance:
+            res._var *= spafactor
 
         return res
 
