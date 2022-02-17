@@ -558,6 +558,7 @@ class MuseCube(Cube):
         # 2- If full_covariance, the S/N does not change so we need to multiply the variance
         #    to compensate. Since the S/N increased by sqrt(ns), we multiply var * ns
         if full_covariance:
+            print("Warning: Full Covariance option is ON")
             res._var *= spafactor
 
         return res
