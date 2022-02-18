@@ -524,9 +524,6 @@ class MuseCube(Cube):
         """
         # We copy it to keep the unit :-(
         res = self if inplace else self.copy()
-        
-        # Do the rebin using the rebin method from mpdaf Cube
-        res = res.rebin(facarr, inplace=True, **kwargs)
 
         # Use the same reduction factor for all dimensions?
         # Copy from the mpdaf _rebin (in data.py)
@@ -540,6 +537,9 @@ class MuseCube(Cube):
         else:
             print("Factor should be an integer or list/array of 2 or 3 integers")
         spafactor = nfacarr[1] * nfacarr[2]
+       
+        # Do the rebin using the rebin method from mpdaf Cube
+        res = res.rebin(nfacarr, inplace=True, **kwargs)
 
         # Mean or Sum
         if mean:
