@@ -103,8 +103,8 @@ def _get_combine_products(filter_list='white', prefix_all=""):
     for prod in dict_products_scipost['cube']:
         if prod == "IMAGE_FOV":
             for i, value in enumerate(filter_list.split(','), start=1):
-                suffix_products.append("_{0:04d}".format(i))
-                suffix_prefinalnames.append("_{0}".format(value))
+                suffix_products.append(f"_{i:04d}")
+                suffix_prefinalnames.append(f"_{value}")
                 name_products.append(prod)
                 prefix_products.append(prefix_all)
         else :

@@ -56,10 +56,9 @@ class PipeRecipes(object) :
 
     @property
     def esorex(self):
-        return ("{likwid}{list_cpu} {nocache} esorex --output-dir={outputdir} {checksum}" 
-                    " --log-dir={logdir}").format(likwid=self.likwid, 
-                    list_cpu=self.list_cpu, nocache=self.nocache, outputdir=self.paths.pipe_products, 
-                    checksum=self.checksum, logdir=self.paths.esorex_log)
+        return (f"{self.likwid}{self.list_cpu} {self.nocache} esorex "
+                f"--output-dir={self.paths.pipe_products} {self.checksum}" 
+                f" --log-dir={self.paths.esorex_log}")
 
     @property
     def checksum(self):
@@ -146,14 +145,13 @@ class PipeRecipes(object) :
     def recipe_flat(self, sof, dir_flat, name_flat, dir_trace, name_trace, tpl):
         """Running the esorex muse_flat recipe
         """
-        self.run_oscommand(("{esorex} --log-file=flat_{tpl}.log muse_flat " 
-                "--nifu={nifu} {merge} {sof}").format(esorex=self.esorex, 
-                    nifu=self.nifu, merge=self.merge, sof=sof, tpl=tpl))
+        self.run_oscommand((f"{self.esorex} --log-file=flat_{tpl}.log muse_flat " 
+                            f"--nifu={self.nifu} {self.merge} {sof}")
         # Moving the MASTER FLAT and TRACE_TABLE
-        self.run_oscommand("{nocache} mv {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
-            namein=self.joinprod(name_flat), nameout=joinpath(dir_flat, name_flat), tpl=tpl))
-        self.run_oscommand("{nocache} mv {namein}.fits {nameout}_{tpl}.fits".format(nocache=self.nocache, 
-            namein=self.joinprod(name_trace), nameout=joinpath(dir_trace, name_trace), tpl=tpl))
+        self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_flat)}.fits "
+                           f"{joinpath(dir_flat, name_flat)}_{tpl}.fits")
+        self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_trace)}.fits "
+                           f"{joinpath(dir_trace, name_trace)}_{tpl}.fits")
 
     def recipe_wave(self, sof, dir_wave, name_wave, tpl):
         """Running the esorex muse_wavecal recipe
@@ -308,7 +306,7 @@ class PipeRecipes(object) :
 
     def recipe_combine(self, sof, dir_products, name_products, tpl, expotype,
             suffix_products=[""], suffix_prefinalnames=[""], 
-            save='cube', pixfrac=0.6, suffix="", 
+            prefix_products=[""], save='cube', pixfrac=0.6, suffix="", 
             format_out='Cube', filter_list='white',
             lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for one single pointing
@@ -321,15 +319,12 @@ class PipeRecipes(object) :
                    pixfrac=pixfrac, form=format_out, filt=filter_list, sof=sof, 
                    tpl=tpl, expotype=expotype, lmin=lambdamin, lmax=lambdamax))
 
-        for name_prod, suff_prod, suff_pre in zip(name_products, suffix_products, 
-                suffix_prefinalnames):
+        for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products, 
+                suffix_prefinalnames, prefix_products):
 
-            self.run_oscommand("{nocache} mv {name_imain}.fits "
-                '{name_imaout}{suffix}{suff_pre}_{pointing}_{tpl}.fits'.format(nocache=self.nocache,
-                name_imain=self.joinprod(name_prod+suff_prod), 
-                name_imaout=joinpath(dir_products, name_prod),
-                suff_pre=suff_pre, suffix=suffix, 
-                tpl=tpl, pointing="P{0:02d}".format(self.pointing)))
+            self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod+suff_prod)}.fits "
+                               f"{joinpath(dir_products, pre_prod+name_prod)}"
+                               f"{suffix}{suff_pre}_{'{self.pointing:02d}'}_{tpl}.fits")
 
     def recipe_combine_pointings(self, sof, dir_products, name_products,
             suffix_products=[""], suffix_prefinalnames=[""], 
@@ -338,26 +333,17 @@ class PipeRecipes(object) :
             lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for pointings
         """
-        self.run_oscommand("{esorex}  --log-file=exp_combine_pointings.log "
-               " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
-               "--format={form} --filter={filt} "
-               "--lambdamin={lmin} --lambdamax={lmax} "
-               "{sof}".format(esorex=self.esorex, 
-                   save=save, pixfrac=pixfrac, form=format_out, 
-                   filt=filter_list, sof=sof, 
-                   lmin=lambdamin, lmax=lambdamax))
+        self.run_oscommand(f"{self.esorex}  --log-file=exp_combine_pointings.log "
+                           f" muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
+                           f"--format={format_out} --filter={filter_list} "
+                           f"--lambdamin={lambdamin} --lambdamax={lambdamax} "
+                           f"{sof}")
 
         for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products, 
                 suffix_prefinalnames, prefix_products):
 
-            name_imaout = "{name_imaout}{suffix}{suff_pre}.fits".format(
-                         name_imaout=joinpath(dir_products, pre_prod+name_prod),
-                         suff_pre=suff_pre, suffix=suffix)
-            self.run_oscommand("{nocache} mv {name_imain}.fits "
-                              "{name_imaout}".format(
-                                  nocache=self.nocache, 
-                                  name_imain=self.joinprod(name_prod+suff_prod), 
-                                  name_imaout=name_imaout))
+            name_imaout = f"{joinpath(dir_products, pre_prod+name_prod)}{suffix}{suff_pre}.fits"
+            self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod+suff_prod)}.fits "
+                               f"{name_imaout}")
             if "DATACUBE" in name_imaout:
                 self._combined_cube_name = name_imaout
-
