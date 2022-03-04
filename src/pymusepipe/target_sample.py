@@ -726,7 +726,7 @@ class MusePipeSample(object):
         kwargs_recipe = {}
         for kw in kwargs:
             if kw in dict_default_for_recipes.keys():
-                kwargs_recipe[key] = kwargs.pop(kw, dict_default_for_recipes[kw])
+                kwargs_recipe[kw] = kwargs.pop(kw, dict_default_for_recipes[kw])
 
         # Initialise the pipe if needed
         self.set_pipe_target(targetname=targetname, list_pointings=list_pointings,
@@ -786,7 +786,7 @@ class MusePipeSample(object):
         kwargs_recipe = {}
         for kw in kwargs:
             if kw in dict_default_for_recipes.keys():
-                kwargs_recipe[key] = kwargs.pop(kw, dict_default_for_recipes[kw])
+                kwargs_recipe[kw] = kwargs.pop(kw, dict_default_for_recipes[kw])
 
         for key in ['first_recipe', 'last_recipe']:
             if key in kwargs:
