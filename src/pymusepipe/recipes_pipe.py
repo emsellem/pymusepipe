@@ -145,8 +145,8 @@ class PipeRecipes(object) :
     def recipe_flat(self, sof, dir_flat, name_flat, dir_trace, name_trace, tpl):
         """Running the esorex muse_flat recipe
         """
-        self.run_oscommand((f"{self.esorex} --log-file=flat_{tpl}.log muse_flat " 
-                            f"--nifu={self.nifu} {self.merge} {sof}")
+        self.run_oscommand(f"{self.esorex} --log-file=flat_{tpl}.log muse_flat " 
+                           f"--nifu={self.nifu} {self.merge} {sof}")
         # Moving the MASTER FLAT and TRACE_TABLE
         self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_flat)}.fits "
                            f"{joinpath(dir_flat, name_flat)}_{tpl}.fits")
