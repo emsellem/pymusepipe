@@ -1525,7 +1525,6 @@ class PipePrep(SofPipe) :
                 suffix_prefinalnames=suffix_prefinalnames,
                 prefix_products=prefix_products,
                 lambdamin=lambdamin, lambdamax=lambdamax,
-                filter_for_alignment=filter_for_alignment,
                 save=save, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
