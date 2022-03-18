@@ -324,7 +324,7 @@ class PipeRecipes(object) :
 
             self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod+suff_prod)}.fits "
                                f"{joinpath(dir_products, pre_prod+name_prod)}"
-                               f"{suffix}{suff_pre}_{self.pointing:02d}_{tpl}.fits")
+                               f"{suffix}{suff_pre}_P{self.pointing:02d}_{tpl}.fits")
 
     def recipe_combine_pointings(self, sof, dir_products, name_products,
             suffix_products=[""], suffix_prefinalnames=[""], 
