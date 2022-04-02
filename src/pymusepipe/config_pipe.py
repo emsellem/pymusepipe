@@ -324,3 +324,16 @@ dict_default_for_recipes = {'fraction': 0.8,
 dict_recipes_per_name = {}
 for key in dict_recipes_per_num:
     dict_recipes_per_name[dict_recipes_per_num[key]] = key
+
+#======================================================================#
+# BEGIN
+#           Printing name configuration
+#======================================================================#
+# Formatting the output name for pointing / OBs
+# E.g., nint_mf = '02' means that 10 will be represented by '10' and 1
+# as '01' (always two digits for an integer)
+# The following  nint_mf = '02' and str_mf='P' will give
+# P01, P02, P03 etc as suffixes for the naming convention
+nint_mf = '03'
+str_mf = 'B'
+#-- END ---------------------------------------------------------------#
