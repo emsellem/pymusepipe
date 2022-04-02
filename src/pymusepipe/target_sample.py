@@ -784,7 +784,7 @@ class MusePipeSample(object):
         # Get the parameters for the recipes
         param_recipes = kwargs.pop("param_recipes", {})
         kwargs_recipe = {}
-        list_keys = copy.copy(kwargs.keys())
+        list_keys = list(kwargs.keys())
         for kw in list_keys:
             if kw in dict_default_for_recipes.keys():
                 kwargs_recipe[kw] = kwargs.pop(kw, dict_default_for_recipes[kw])
