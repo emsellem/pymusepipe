@@ -337,16 +337,10 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0, 
     xsel, ysel = xrav[sel], y.ravel()[sel]
     sxsel, sysel = sx.ravel()[sel], sy.ravel()[sel]
     linear = Model(my_linear_model)
-    # First we get a guess for the ratio 
-    # By moving all x data to positive values
-    if guess_ratio:
-        minx = np.min(xsel)
-        mydata_int = RealData(xsel+minx, ysel, sx=sxsel, sy=sysel)
-        result_int = ODR(mydata_int, linear, beta0=beta0)
-        r_int = result_int.run()
-        beta0[1] = r_int.beta[1]
 
-    mydata = RealData(xsel, ysel, sx=sxsel, sy=sysel)
+    # We introduce the minimum of x to avoid negative values
+    minx = np.min(xsel)
+    mydata = RealData(xsel + minx, ysel, sx=sxsel, sy=sysel)
     result = ODR(mydata, linear, beta0=beta0)
 
     if sigclip > 0:
@@ -357,7 +351,12 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0, 
         clipdata = RealData(xnsel, ynsel, sx=sxnsel, sy=synsel)
         result = ODR(clipdata, linear, beta0=beta0)
 
-    return result.run()
+    # Running the ODR
+    r = result.run()
+    # Offset from the min of x
+    r.beta[0] += minx
+
+    return r
 
 def get_conversion_factor(input_unit, output_unit, filter_name="WFI"):
     """ Conversion of units from an input one
