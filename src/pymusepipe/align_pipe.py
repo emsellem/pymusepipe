@@ -303,7 +303,7 @@ def get_image_norm_poly(data1, data2, chunk_size=15, threshold1=0.,
     return result
 
 
-def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0, guess_ratio=True):
+def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0):
     """Return an ODR linear regression using scipy.odr.ODR
 
     Args:
@@ -340,7 +340,7 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0, 
 
     # We introduce the minimum of x to avoid negative values
     minx = np.min(xsel)
-    mydata = RealData(xsel + minx, ysel, sx=sxsel, sy=sysel)
+    mydata = RealData(xsel - minx, ysel, sx=sxsel, sy=sysel)
     result = ODR(mydata, linear, beta0=beta0)
 
     if sigclip > 0:
@@ -354,7 +354,7 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0, 
     # Running the ODR
     r = result.run()
     # Offset from the min of x
-    r.beta[0] += minx
+    r.beta[0] -= minx
 
     return r
 
