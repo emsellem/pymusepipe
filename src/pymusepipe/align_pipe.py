@@ -303,7 +303,7 @@ def get_image_norm_poly(data1, data2, chunk_size=15, threshold1=0.,
     return result
 
 
-def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0):
+def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0, guess_ratio=True):
     """Return an ODR linear regression using scipy.odr.ODR
 
     Args:
@@ -332,9 +332,20 @@ def regress_odr(x, y, sx, sy, beta0=[0., 1.], percentiles=[0.,100.], sigclip=0):
         sel = (xrav >= percentiles[0]) & (xrav <= percentiles[1])
     else:
         sel = np.abs(xrav) > 0
+
+
     xsel, ysel = xrav[sel], y.ravel()[sel]
     sxsel, sysel = sx.ravel()[sel], sy.ravel()[sel]
     linear = Model(my_linear_model)
+    # First we get a guess for the ratio 
+    # By moving all x data to positive values
+    if guess_ratio:
+        minx = np.min(xsel)
+        mydata_int = RealData(xsel+minx, ysel, sx=sxsel, sy=sysel)
+        result_int = ODR(mydata_int, linear, beta0=beta0)
+        r_int = result_int.run()
+        beta0[1] = r_int.beta[1]
+
     mydata = RealData(xsel, ysel, sx=sxsel, sy=sysel)
     result = ODR(mydata, linear, beta0=beta0)
 

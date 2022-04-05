@@ -88,6 +88,33 @@ suffix_checkalign = "_checkalign"
 # List of suffix you wish to have scanned
 suffix_rawfiles = ['fits.fz', 'fits']
 
+# List of names from the products
+dict_files_iexpo_products = {
+        'ALIGN': ['SOURCE_LIST']
+        }
+
+dict_files_products = {
+        'STD': ['DATACUBE_STD', 'STD_FLUXES',
+            'STD_RESPONSE', 'STD_TELLURIC'],
+        'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
+        'SKY': ['SKY_MASK', 'SKY_IMAGE', 'SKY_LINES', 'SKY_SPECTRUM',
+            'SKY_CONTINUUM'],
+        'ALIGN': ['OFFSET_LIST']
+        }
+
+dict_products_scipost = {
+        'cube': ['DATACUBE_FINAL', 'IMAGE_FOV'],
+        'individual': ['PIXTABLE_REDUCED'],
+        'stacked': ['OBJECT_RESAMPLED'],
+        'positioned': ['PIXTABLE_POSITIONED'],
+        'combined': ['PIXTABLE_COMBINED'],
+        'skymodel': ['SKY_MASK', 'SKY_SPECTRUM',
+            'SKY_LINES', 'SKY_IMAGE'],
+        'raman': ['RAMAN_IMAGES'],
+        'autocal': ['AUTOCAL_FACTORS']
+        }
+
+
 #-- END ---------------------------------------------------------------#
 #======================================================================#
 # BEGIN

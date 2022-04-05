@@ -25,41 +25,15 @@ from .align_pipe import create_offset_table, AlignMusePointing
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
-                          dict_recipes_per_num, dict_recipes_per_name)
+                          dict_recipes_per_num, dict_recipes_per_name,
+                          dict_files_iexpo_products, dict_files_products,
+                          dict_products_scipost)
 
 try :
     import astropy as apy
     from astropy.io import fits as pyfits
 except ImportError :
     raise Exception("astropy is required for this module")
-
-# =======================================================
-# List of recipes
-# =======================================================
-dict_files_iexpo_products = {
-        'ALIGN': ['SOURCE_LIST']
-        }
-
-dict_files_products = {
-        'STD': ['DATACUBE_STD', 'STD_FLUXES', 
-            'STD_RESPONSE', 'STD_TELLURIC'],
-        'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
-        'SKY': ['SKY_MASK', 'SKY_IMAGE', 'SKY_LINES', 'SKY_SPECTRUM', 
-            'SKY_CONTINUUM'],
-        'ALIGN': ['OFFSET_LIST']
-        }
-
-dict_products_scipost = {
-        'cube': ['DATACUBE_FINAL', 'IMAGE_FOV'],
-        'individual': ['PIXTABLE_REDUCED'],
-        'stacked': ['OBJECT_RESAMPLED'],
-        'positioned': ['PIXTABLE_POSITIONED'],
-        'combined': ['PIXTABLE_COMBINED'],
-        'skymodel': ['SKY_MASK', 'SKY_SPECTRUM', 
-            'SKY_LINES', 'SKY_IMAGE'],
-        'raman': ['RAMAN_IMAGES'],
-        'autocal': ['AUTOCAL_FACTORS']
-        }
 
 # =======================================================
 # Few useful functions
