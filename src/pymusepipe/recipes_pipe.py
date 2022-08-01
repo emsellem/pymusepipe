@@ -278,12 +278,12 @@ class PipeRecipes(object) :
             # and copying it in the Alignment folder
             if self._save_alignment_images and self._suffix_prealign in fitsname_out \
                 and dict_products_scipost['cube'][1] in fitsname_out:
-                name_imageout_align = ("{name_imaout}{suffix}_P{pointing:02d}_{myfilter}"
+                name_imageout_align = ("{name_imaout}{suffix}_{obname}_{myfilter}"
                                       "_{tpl}{suff_post}.fits".format(
                                       name_imaout=joinpath(self.paths.alignment,
                                                            prefix_all+"IMAGE_FOV"),
                                       myfilter=filter_for_alignment, suff_post=suff_post, 
-                                      tpl=tpl, suffix=suffix, pointing=self.pointing))
+                                      tpl=tpl, suffix=suffix, obname=self._get_obname()))
                 self.run_oscommand("{nocache} cp {fitsname} {nameima_out}".format(
                                    nocache=self.nocache, fitsname=fitsname_out,
                                    nameima_out=name_imageout_align))
@@ -326,7 +326,7 @@ class PipeRecipes(object) :
 
             self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod+suff_prod)}.fits "
                                f"{joinpath(dir_products, pre_prod+name_prod)}"
-                               f"{suffix}{suff_pre}_P{self.pointing:02d}_{tpl}.fits")
+                               f"{suffix}{suff_pre}_{self._get_obname()}_{tpl}.fits")
 
     def recipe_combine_pointings(self, sof, dir_products, name_products,
             suffix_products=[""], suffix_prefinalnames=[""], 

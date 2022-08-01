@@ -43,7 +43,7 @@ import pymusepipe
 from . import util_pipe as upipe
 from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
 from .util_pipe import (filter_list_with_pdict, filter_list_with_suffix_list,\
-                       add_string)
+                       add_string, default_strob, default_nob)
 from .cube_convolve import cube_kernel, cube_convolve
 
 def get_sky_spectrum(specname) :
@@ -320,6 +320,9 @@ class MuseCubeMosaic(CubeMosaic):
 
         # Attach the other properties to the list of cubes (e.g. PSF)
         self.list_cubes = []
+        # Names for the OBs
+        strob = kwargs.pop("strob", default_strob)
+        nob = kwargs.pop("nob", default_nob)
         for name in list_cubes:
             self.list_cubes.append(BasicFile(name))
             if len(self.dict_psf) > 0:
@@ -327,7 +330,7 @@ class MuseCubeMosaic(CubeMosaic):
                 for key in self.dict_psf:
                     if found:
                         break
-                    keyword = f"{self.prefix_cubes}_P{np.int(key):02d}"
+                    keyword = f"{self.prefix_cubes}_{get_obname(strob, nob, np.int(key))}"
                     if keyword in name:
                         psf = self.dict_psf[key]
                         self.list_cubes[-1].psf = BasicPSF(psf_array=psf)

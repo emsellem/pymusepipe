@@ -13,6 +13,7 @@ import os
 import time
 from os.path import join as joinpath
 import copy
+from collections import OrderedDict
 
 # Numpy
 import numpy as np
@@ -21,14 +22,14 @@ from astropy import constants as const
 from astropy.io import fits as pyfits
 
 # Import package modules
-from .emission_lines import list_emission_lines
-from .emission_lines import full_muse_wavelength_range
-from .config_pipe import default_filter_list, dict_musemodes
+from .emission_lines import list_emission_lines, full_muse_wavelength_range
+from .config_pipe import (default_filter_list, dict_musemodes,
+                          default_nob, default_strob)
 from . import util_pipe as upipe
 
+# MPDAF
 from mpdaf.obj import Image, Cube
 
-from collections import OrderedDict
 
 ############    PRINTING FUNCTIONS #########################
 HEADER = '\033[95m'
@@ -184,6 +185,9 @@ def add_string(text, word="_", loc=0):
                 print(f"String index [{loc}] out of range [{len(text)}] in add_string")
 
     return text
+
+def get_obname(strob=default_strob, nob=default_nob, pointing=1):
+    return f"{strob}{int(pointing):0{int(nob)}}"
 
 def lower_rep(text):
     """Lower the text and return it after removing all underscores

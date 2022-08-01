@@ -1289,7 +1289,7 @@ class PipePrep(SofPipe) :
             suffix += "_{0}".format(line)
 
         # Use the pointing as a suffix for the names
-        pointing = "P{0:02d}".format(self.pointing)
+        obname = self._get_obname()
 
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()
@@ -1308,11 +1308,11 @@ class PipePrep(SofPipe) :
 
         # Write the SOF
         self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}_{3}".format(
-                       long_suffix, expotype, pointing, tpl), new=True)
+                       long_suffix, expotype, obname, tpl), new=True)
         dir_align = self._get_fullpath_expo('OBJECT', "processed")
         namein_align = deepcopy(dict_files_products['ALIGN'])
         nameout_align = [name + "{0}_{1}_{2}_{3}".format(
-                         long_suffix, expotype, pointing, tpl) 
+                         long_suffix, expotype, obname, tpl)
                              for name in deepcopy(dict_files_products['ALIGN'])]
         for iter_file in dict_files_iexpo_products['ALIGN']:
             for i, row in enumerate(align_table):
@@ -1322,12 +1322,12 @@ class PipePrep(SofPipe) :
 
         # Find the alignment - Note that Pointing is used and tpl reflects the given selection
         self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, 
-                tpl, pointing, **kwargs)
+                tpl, obname, **kwargs)
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, align_table, "reduced", 
                 "ALIGNED_IMAGES_BYPOINTING_{0}{1}_{2}_{3}_list_table.fits".format(expotype, 
-                long_suffix, pointing, tpl), aggregate=False, update=True)
+                long_suffix, obname, tpl), aggregate=False, update=True)
         
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
@@ -1450,7 +1450,7 @@ class PipePrep(SofPipe) :
         prefix_all = kwargs.pop("prefix_all", "")
 
         # Use the pointing as a suffix for the names
-        pointing = "P{0:02d}".format(self.pointing)
+        obname = self._get_obname()
         # Save option
         save = kwargs.pop("save", "cube,combined")
 
@@ -1472,7 +1472,7 @@ class PipePrep(SofPipe) :
             if offset_list_tablename is None:
                 offset_list_tablename = "{0}{1}_{2}_{3}_{4}.fits".format(
                         dict_files_products['ALIGN'][0], long_suffix,
-                        expotype, pointing, tpl)
+                        expotype, obname, tpl)
             if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
                 upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
                         offset_list_tablename, folder_expo), pipe=self)

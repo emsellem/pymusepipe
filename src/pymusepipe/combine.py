@@ -36,12 +36,13 @@ from .recipes_pipe import PipeRecipes
 from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
-from .util_pipe import filter_list_with_pdict
+from .util_pipe import filter_list_with_pdict, get_obname
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
                           dict_combined_folders, default_prefix_wcs,
                           default_prefix_mask, prefix_mosaic, dict_listObject,
-                          lambdaminmax_for_wcs, lambdaminmax_for_mosaic)
+                          lambdaminmax_for_wcs, lambdaminmax_for_mosaic,
+                          default_strob, default_nob)
 from .mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -96,7 +97,8 @@ def get_list_targets(period_path=""):
     upipe.print_info("Potential Targets -- list: {0}".format(str(list_targets)))
     return list_targets
 
-def build_dict_exposures(target_path=""):
+def build_dict_exposures(target_path="", strob=default_strob,
+                         nob=default_nob):
     """
 
     Parameters
@@ -109,17 +111,18 @@ def build_dict_exposures(target_path=""):
         Dictionary of exposures in each pointing
 
     """
-    list_pointings = get_list_pointings(target_path)
+    list_pointings = get_list_pointings(target_path, strob, nob)
     dict_expos = {}
     for pointing in list_pointings:
-        name_pointing = "P{:02d}".format(pointing)
-        upipe.print_info("For pointing {0}".format(name_pointing))
+        name_pointing = get_obname(strob, nob, pointing)
+        upipe.print_info(f"For pointing {pointing}")
         dict_p = get_list_exposures(joinpath(target_path, name_pointing))
         dict_expos[pointing] = [(tpl, dict_p[tpl]) for tpl in dict_p]
 
     return dict_expos
 
-def get_list_pointings(target_path=""):
+def get_list_pointings(target_path="", strob=default_strob,
+                       nob=default_nob):
     """Getting a list of existing pointings
     for a given path
 
@@ -132,7 +135,9 @@ def get_list_pointings(target_path=""):
     list_pointings: list of int
     """
     # Done by scanning the target path
-    list_folders = glob.glob(target_path + "/P??")
+    all_folders = glob.glob(target_path + f"/{strob}*")
+    r = re.compile(f"{strob}\d{{{nob}}}$")
+    list_folders = [f for f in all_folders if r.match(f)]
     list_pointings = []
     for folder in list_folders:
         list_pointings.append(np.int(folder[-2:]))
@@ -182,7 +187,8 @@ def get_list_exposures(pointing_path=""):
 
     return dict_expos
 
-def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
+def get_pixtable_list(target_path="", list_pointings=None, suffix="",
+                      strob=default_strob, nob=default_nob):
     """Provide a list of reduced pixtables
 
     Input
@@ -208,10 +214,10 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix=""):
     # Looping over the pointings
     for pointing in list_pointings:
         # get the path of the pointing
-        path_pointing = joinpath(target_path, "P{0:02d}".format(np.int(pointing)))
+        path_pointing = joinpath(target_path, get_obname(strob, nob, pointing))
         # List existing pixtabs, using the given suffix
-        list_pixtabs = glob.glob(path_pointing + "/Object/" +
-                                 "{0}{1}*fits".format(pixtable_suffix, suffix))
+        list_pixtabs = glob.glob(path_pointing +
+                                 f"/Object/{pixtable_suffix}{suffix}*fits")
 
         # Reset the needed temporary dictionary
         dict_tpl = {}
@@ -444,7 +450,7 @@ class MusePointings(SofPipe, PipeRecipes):
             # get the path
             if self._pixtab_in_comb_folder:
                 path_pixtables = self.paths.cubes
-                pointing_suffix = "_P{0:02d}".format(np.int(pointing))
+                pointing_suffix = self.get_obname()
             else:
                 path_pointing = getattr(self.paths, self.dict_name_pointings[pointing])
                 path_pixtables = path_pointing + self.pipe_params.object
@@ -1053,9 +1059,9 @@ class MusePointings(SofPipe, PipeRecipes):
         nexpo_tocombine = sum(len(self.dict_pixtabs_in_pointings[pointing])
                               for pointing in list_pointings)
         if nexpo_tocombine <= 1:
-            upipe.print_warning("All considered pointings have a total of"
-                                "only one single exposure: exp_combine"
-                                "will not run. Please use the individual"
+            upipe.print_warning("All considered pointings have a total of "
+                                "only one single exposure: exp_combine "
+                                "will not run. Please use the individual "
                                 "reconstructed cube.", pipe=self)
             return
             # upipe.print_warning("All considered pointings have only one"

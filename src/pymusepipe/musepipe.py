@@ -68,8 +68,8 @@ from .util_pipe import analyse_musemode
 from .config_pipe import (suffix_rawfiles, suffix_prealign, suffix_checkalign,
     listexpo_files, dict_listObject, dict_listMaster, dict_listMasterObject,
     dict_expotypes, dict_geo_astrowcs_table, list_exclude_checkmode,
-    list_fieldspecific_checkmode, dict_astrogeo, list_musemodes, dict_musemodes, 
-    dict_default_for_recipes,)
+    list_fieldspecific_checkmode, dict_astrogeo, list_musemodes,
+    dict_default_for_recipes, default_strob, default_nob)
 
 __version__ = '2.0.2 (25/09/2019)'
 
@@ -233,7 +233,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                               cal_filename=cal_filename, verbose=verbose)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
-        self.pipe_params.data = "{0}/P{1:02d}/".format(self.targetname, self.pointing)
+        self.pipe_params.data = (f"{self.targetname}/{self._get_obname()}")
 
         # Create full path folder 
         self.set_fullpath_names()
@@ -291,6 +291,15 @@ class MusePipe(PipePrep, PipeRecipes):
         else:
             self._raw_table_initialised = False
         self.read_all_astro_tables()
+
+    def _get_obname(self, pointing=None):
+        """Reporting the _get_obname from the InitMuseParam
+        class
+
+        pointing : int
+            pointing number. Default is None.
+        """
+        return self.pipe_params._get_obname(pointing)
 
     def print_musemodes(self):
         """Print out the list of allowed muse modes

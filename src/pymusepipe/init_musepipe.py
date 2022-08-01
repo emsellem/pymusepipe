@@ -20,7 +20,8 @@ import copy
 from . import util_pipe as upipe
 from .config_pipe import (dict_user_folders, default_rc_filename,
                           dict_extra_filters, dict_calib_tables, dict_input_folders,
-                          dict_folders, dict_folders_target, )
+                          dict_folders, dict_folders_target,
+                          default_strob, default_nob)
 
 ############################################################
 # Some fixed parameters for the structure
@@ -130,8 +131,8 @@ class InitMuseParameters(object) :
 
         # Dummy dictionary to see which items are not initialised
         noninit_dict_param = copy.copy(dict_param)
-        for line in lines :
-            if line[0] in ["#", "%"] : continue 
+        for line in lines:
+            if line[0] in ["#", "%"]: continue
 
             sline = re.split(r'(\s+)', line)
             keyword_name = sline[0]
@@ -142,7 +143,7 @@ class InitMuseParameters(object) :
                 setattr(self, keyword_name, keyword) 
                 # Here we drop the item which was initialised
                 val = noninit_dict_param.pop(keyword_name)
-            else :
+            else:
                 continue
 
         # Listing them as warning and using the hardcoded default
@@ -151,3 +152,8 @@ class InitMuseParameters(object) :
                    "We will use the default hardcoded value from "
                    "config_pipe.py").format(param=key))
             setattr(self, key, dict_param[key])
+
+    def _get_obname(self, pointing=None):
+        if pointing is None:
+            pointing = self.pointing
+        return get_obname(self.strob, self.nob, pointing)
