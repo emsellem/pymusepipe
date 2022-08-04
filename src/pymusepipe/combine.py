@@ -455,9 +455,9 @@ class MusePointings(SofPipe, PipeRecipes):
             # get the path
             if self._pixtab_in_comb_folder:
                 path_pixtables = self.paths.cubes
-                pointing_suffix = get_obname(self.pipe_params.strob, 
-                                             self.pipe_params.nob,
-                                             pointing)
+                pointing_suffix = get_obname(pointing,
+                                             self.pipe_params.strob, 
+                                             self.pipe_params.nob)
             else:
                 path_pointing = getattr(self.paths, self.dict_name_pointings[pointing])
                 path_pixtables = path_pointing + self.pipe_params.object
