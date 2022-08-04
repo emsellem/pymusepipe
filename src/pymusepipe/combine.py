@@ -210,7 +210,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix="",
     # Defining the pointing list if not provided
     # Done by scanning the target path
     if list_pointings is None:
-        list_pointings = get_list_pointings(target_path)
+        list_pointings = get_list_pointings(target_path, nob=nob, strob=strob)
 
     # Looping over the pointings
     for pointing in list_pointings:
@@ -384,8 +384,8 @@ class MusePointings(SofPipe, PipeRecipes):
 
     @property
     def full_pointings_list(self):
-        return get_list_pointings( joinpath(self.pipe_params.root,
-                                            self.targetname))
+        return get_list_pointings(joinpath(self.pipe_params.root, self.targetname),
+                                  nob=self.nob, strob=self.strob)
 
     def _check_pointings_list(self, list_pointings=None, default_list=None):
         """set the list pointings to self
@@ -404,11 +404,11 @@ class MusePointings(SofPipe, PipeRecipes):
             return default_list
         else:
             checked_list_pointings = []
+            upipe.print_info(f"Wished pointing list = {list_pointings}")
+            upipe.print_warning(f"Target default pointing list = {default_list}")
             for pointing in list_pointings:
                 if pointing not in default_list:
                     upipe.print_warning(f"No pointing {pointing} for the given target")
-                    upipe.print_warning(f"Target pointing list = {list_pointings}")
-                    upipe.print_warning(f"Target default pointing list = {default_list}")
                 else:
                     checked_list_pointings.append(pointing)
 
