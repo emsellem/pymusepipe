@@ -121,8 +121,7 @@ def build_dict_exposures(target_path="", strob=default_strob,
 
     return dict_expos
 
-def get_list_pointings(target_path="", strob=default_strob,
-                       nob=default_nob):
+def get_list_pointings(target_path="", strob=default_strob, nob=default_nob):
     """Getting a list of existing pointings
     for a given path
 
@@ -456,7 +455,9 @@ class MusePointings(SofPipe, PipeRecipes):
             # get the path
             if self._pixtab_in_comb_folder:
                 path_pixtables = self.paths.cubes
-                pointing_suffix = self.get_obname()
+                pointing_suffix = get_obname(self.pipe_params.strob, 
+                                             self.pipe_params.nob,
+                                             pointing)
             else:
                 path_pointing = getattr(self.paths, self.dict_name_pointings[pointing])
                 path_pixtables = path_pointing + self.pipe_params.object
