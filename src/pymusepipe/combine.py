@@ -407,6 +407,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 if pointing not in default_list:
                     upipe.print_warning(f"No pointing {pointing} for the given target")
                     upipe.print_warning(f"Target pointing list = {list_pointings}")
+                    upipe.print_warning(f"Target default pointing list = {default_list}")
                 else:
                     checked_list_pointings.append(pointing)
 
