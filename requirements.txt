@@ -1,5 +1,5 @@
 astropy==4.0
 mpdaf==3.2
-numpy==1.19
+numpy==1.22
 scipy==1.4.1
 matplotlib==3.0.0
