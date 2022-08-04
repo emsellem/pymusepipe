@@ -686,7 +686,7 @@ class MusePipeSample(object):
 
         # Running the scipost_perexpo for all pointings individually
         for pointing in list_pointings:
-            obname = self.pipes[targetname][pointing]._get_obname()
+            obname = self.pipes[targetname][pointing]._get_obname(pointing)
             if wcs_auto:
                 ref_wcs = f"{wcs_suffix}_{obname}.fits"
             if ref_wcs is not None:

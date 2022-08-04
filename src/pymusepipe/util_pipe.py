@@ -186,7 +186,20 @@ def add_string(text, word="_", loc=0):
 
     return text
 
-def get_obname(strob=default_strob, nob=default_nob, pointing=1):
+def get_obname(pointing=1, strob=default_strob, nob=default_nob):
+    """Formatting for the OB names using the pointing number and
+    the given nob and strob 
+
+    Input
+    -----
+    pointing: int
+    strob: str
+    nob: int
+
+    Returns
+    -------
+    string for the OB name prefix
+    """
     return f"{strob}{int(pointing):0{int(nob)}}"
 
 def lower_rep(text):

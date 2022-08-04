@@ -108,7 +108,7 @@ class MusePipe(PipePrep, PipeRecipes):
     described.
     """
 
-    def __init__(self, targetname=None, pointing=0, folder_config="Config/",
+    def __init__(self, targetname=None, pointing=1, folder_config="Config/",
                  rc_filename=None, cal_filename=None, log_filename="MusePipe.log",
                  verbose=True, musemode="WFM-NOAO-N", checkmode=True,
                  strong_checkmode=False, **kwargs):
@@ -188,7 +188,6 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Setting the default attibutes #####################
         self.targetname = targetname
-        self.pointing = pointing
         self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
@@ -224,13 +223,17 @@ class MusePipe(PipePrep, PipeRecipes):
                           last_recipe=last_recipe)
         PipeRecipes.__init__(self, **kwargs)
 
+        # pointing
+        self.pointing = pointing
+
         # =========================================================== #
         # Setting up the folders and names for the data reduction
         # Can be initialised by either an rc_file, 
         # or a default rc_file or harcoded defaults.
         self.pipe_params = InitMuseParameters(folder_config=folder_config,
                                               rc_filename=rc_filename,
-                                              cal_filename=cal_filename, verbose=verbose)
+                                              cal_filename=cal_filename, 
+                                              verbose=verbose)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = (f"{self.targetname}/{self._get_obname()}")
@@ -291,15 +294,6 @@ class MusePipe(PipePrep, PipeRecipes):
         else:
             self._raw_table_initialised = False
         self.read_all_astro_tables()
-
-    def _get_obname(self, pointing=None):
-        """Reporting the _get_obname from the InitMuseParam
-        class
-
-        pointing : int
-            pointing number. Default is None.
-        """
-        return self.pipe_params._get_obname(pointing)
 
     def print_musemodes(self):
         """Print out the list of allowed muse modes
@@ -460,6 +454,15 @@ class MusePipe(PipePrep, PipeRecipes):
         for name in self.pipe_params._dict_folders_target:
             setattr(self.paths, name, joinpath(self.paths.target,
                                                self.pipe_params._dict_folders_target[name]))
+
+    def _get_obname(self, pointing=None):
+        """Reporting the _get_obname from the InitMuseParam
+        class
+
+        pointing : int
+            pointing number. Default is None.
+        """
+        return self.pipe_params._get_obname(pointing)
 
     def _reset_tables(self):
         """Reseting the astropy Tables for expotypes

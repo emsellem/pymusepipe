@@ -18,6 +18,7 @@ import re
 import copy
 
 from . import util_pipe as upipe
+from .util_pipe import get_obname
 from .config_pipe import (dict_user_folders, default_rc_filename,
                           dict_extra_filters, dict_calib_tables, dict_input_folders,
                           dict_folders, dict_folders_target,
@@ -154,6 +155,18 @@ class InitMuseParameters(object) :
             setattr(self, key, dict_param[key])
 
     def _get_obname(self, pointing=None):
+        """Reporting the _get_obname from the InitMuseParam
+        class
+
+        pointing : int
+            pointing number. Default is None.
+        """
         if pointing is None:
-            pointing = self.pointing
-        return get_obname(self.strob, self.nob, pointing)
+            if hasattr(self, "pointing"):
+                pointing = self.pointing
+            else:
+                upipe.print_error("No pointing number provided")
+                return "NONAME"
+        return get_obname(pointing, self.strob, self.nob)
+
+

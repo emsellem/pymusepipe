@@ -330,7 +330,7 @@ class MuseCubeMosaic(CubeMosaic):
                 for key in self.dict_psf:
                     if found:
                         break
-                    keyword = f"{self.prefix_cubes}_{get_obname(strob, nob, np.int(key))}"
+                    keyword = f"{self.prefix_cubes}_{get_obname(np.int(key), strob, nob)}"
                     if keyword in name:
                         psf = self.dict_psf[key]
                         self.list_cubes[-1].psf = BasicPSF(psf_array=psf)
