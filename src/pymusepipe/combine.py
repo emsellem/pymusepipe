@@ -114,7 +114,7 @@ def build_dict_exposures(target_path="", strob=default_strob,
     list_pointings = get_list_pointings(target_path, strob, nob)
     dict_expos = {}
     for pointing in list_pointings:
-        name_pointing = get_obname(strob, nob, pointing)
+        name_pointing = get_obname(pointing, strob, nob)
         upipe.print_info(f"For pointing {pointing}")
         dict_p = get_list_exposures(joinpath(target_path, name_pointing))
         dict_expos[pointing] = [(tpl, dict_p[tpl]) for tpl in dict_p]
@@ -218,7 +218,7 @@ def get_pixtable_list(target_path="", list_pointings=None, suffix="",
     # Looping over the pointings
     for pointing in list_pointings:
         # get the path of the pointing
-        path_pointing = joinpath(target_path, get_obname(strob, nob, pointing))
+        path_pointing = joinpath(target_path, get_obname(pointing, strob, nob))
         # List existing pixtabs, using the given suffix
         list_pixtabs = glob.glob(path_pointing +
                                  f"/Object/{pixtable_suffix}{suffix}*fits")

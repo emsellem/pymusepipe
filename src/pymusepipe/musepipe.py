@@ -455,14 +455,11 @@ class MusePipe(PipePrep, PipeRecipes):
             setattr(self.paths, name, joinpath(self.paths.target,
                                                self.pipe_params._dict_folders_target[name]))
 
-    def _get_obname(self, pointing=None):
+    def _get_obname(self):
         """Reporting the _get_obname from the InitMuseParam
         class
-
-        pointing : int
-            pointing number. Default is None.
         """
-        return self.pipe_params._get_obname(pointing)
+        return self.pipe_params._get_obname(self.pointing)
 
     def _reset_tables(self):
         """Reseting the astropy Tables for expotypes
