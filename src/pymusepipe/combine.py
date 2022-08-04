@@ -145,7 +145,7 @@ def get_list_pointings(target_path="", strob=default_strob,
     upipe.print_info(f"All good folder names  = {good_strob}")
     list_pointings = []
     for folder in good_strob:
-        list_pointings.append(np.int(folder[-{nob}:]))
+        list_pointings.append(np.int(folder[-int(nob):]))
 
     list_pointings.sort()
     upipe.print_info("Pointings list: {0}".format(str(list_pointings)))
