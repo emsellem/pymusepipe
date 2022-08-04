@@ -138,7 +138,7 @@ def get_list_pointings(target_path="", strob=default_strob,
     upipe.print_info(f"Searching pointings in {target_path} with {strob} prefix") 
     all_folders = glob.glob(f"{target_path}/{strob}*")
     upipe.print_info(f"All folder names  = {all_folders}")
-    all_strob = [os.path.strip(s)[-1] for s in all_folders]
+    all_strob = [os.path.split(s)[-1] for s in all_folders]
     upipe.print_info(f"All detected folder names  = {all_strob}")
     r = re.compile(f"{strob}\d{{{nob}}}$")
     good_strob = [f for f in all_strob if r.match(f)]
