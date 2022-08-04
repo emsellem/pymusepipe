@@ -356,7 +356,7 @@ class MusePipeSample(object):
             # Check they exist
             for pointing in list_pointings:
                 if pointing not in target_pointings:
-                    upipe.print_warning(f"No pointing {pointing} for the given target")
+                    upipe.print_warning(f"No pointing [{pointing}] for the given target")
                     upipe.print_warning(f"Target pointing list is {target_pointings}")
                 else:
                     checked_pointings_list.append(pointing)
