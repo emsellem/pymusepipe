@@ -385,7 +385,7 @@ class MusePointings(SofPipe, PipeRecipes):
     @property
     def full_pointings_list(self):
         return get_list_pointings(joinpath(self.pipe_params.root, self.targetname),
-                                  nob=self.nob, strob=self.strob)
+                                  nob=self.pipe_params.nob, strob=self.pipe_params.strob)
 
     def _check_pointings_list(self, list_pointings=None, default_list=None):
         """set the list pointings to self
