@@ -37,8 +37,8 @@ try:
 except ImportError:
     upipe.print_warning("If you wish to use skimage for image registration, " 
                         "please install "
-                        "it via: pip install skimage. "
-                        "or via: conda install skimage.")
+                        "it via: pip install scikit-image "
+                        "or via: conda install scikit-image")
 
 
 # Astropy
