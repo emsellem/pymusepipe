@@ -1,12 +1,12 @@
 Metadata-Version: 2.1
 Name: pymusepipe
-Version: 2.10.5
+Version: 2.10.6
 Summary: python module to reduce MUSE Raw data and combine them
 Home-page: https://github.com/emsellem/pymusepipe
+Download-URL: https://github.com/emsellem/pymusepipe/archive/v2.9.6.beta.tar.gz
 Author: Eric Emsellem
 Author-email: eric.emsellem@eso.org
 License: MIT
-Download-URL: https://github.com/emsellem/pymusepipe/archive/v2.9.6.beta.tar.gz
 Keywords: MUSE,DATAREDUCTION
 Platform: any
 Classifier: Programming Language :: Python :: 3
@@ -277,5 +277,3 @@ data reduction at the early stages of the development of this package,
 and Francesco Santoro who has significantly contributed 
 in the testing, debugging of the code (version 1), and proposed dedicated python lines 
 to be integrated in pymusepipe (e.g., alignment module).
-
-

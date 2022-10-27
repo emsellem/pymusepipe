@@ -1,6 +1,7 @@
 .gitignore
 AUTHORS.rst
 CHANGELOG.rst
+HOWTO.txt
 LICENSE.txt
 MANIFEST.in
 README.md
@@ -12,6 +13,7 @@ setup.py
 .idea/modules.xml
 .idea/pymusepipe.iml
 .idea/vcs.xml
+.idea/codeStyles/codeStyleConfig.xml
 .idea/inspectionProfiles/profiles_settings.xml
 .spyproject/codestyle.ini
 .spyproject/encoding.ini
