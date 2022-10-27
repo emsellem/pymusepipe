@@ -22,7 +22,7 @@ from .util_pipe import get_dataset_name
 from .config_pipe import (dict_user_folders, default_rc_filename,
                           dict_extra_filters, dict_calib_tables, dict_input_folders,
                           dict_folders, dict_folders_target,
-                          default_strob, default_nob)
+                          default_strds, default_nds)
 
 ############################################################
 # Some fixed parameters for the structure
@@ -167,6 +167,6 @@ class InitMuseParameters(object) :
             else:
                 upipe.print_error("No dataset number provided")
                 return "NONAME"
-        return get_dataset_name(dataset, self.strob, self.nob)
+        return get_dataset_name(dataset, self.strds, self.nds)
 
 

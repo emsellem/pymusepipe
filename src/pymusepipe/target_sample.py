@@ -852,9 +852,9 @@ class MusePipeSample(object):
             pointing = row['POINTING_OBS']
             tpls = row['TPL_START']
             angle = row['ROTANGLE']
-            nob = int(self.pipes[targetname][list_datasets[0]].pipe_params.nob)
+            nds = int(self.pipes[targetname][list_datasets[0]].pipe_params.nds)
             upipe.print_info(f"Rotation ={angle} Deg for "
-                             f"Pointing={pointing:{nob}d}, "
+                             f"Pointing={pointing:{nds}d}, "
                              f"TPLS={tpls} - Expo {iexpo:02d}")
             folder_expos = self._get_path_files(targetname, pointing)
             name_suffix = "{0}_{1:04d}".format(tpls, iexpo)
