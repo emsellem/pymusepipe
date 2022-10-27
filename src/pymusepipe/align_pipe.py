@@ -29,7 +29,17 @@ import numpy as np
 import scipy.ndimage as nd
 from scipy.signal import correlate
 from scipy.odr import ODR, Model, RealData
-from skimage.registration import phase_cross_correlation
+
+# Skimage if you have it
+try:
+    import skimage
+    from skimage.registration import phase_cross_correlation
+except ImportError:
+    upipe.print_warning("If you wish to use skimage for image registration, " 
+                        "please install "
+                        "it via: pip install skimage. "
+                        "or via: conda install skimage.")
+
 
 # Astropy
 from astropy import wcs as awcs
