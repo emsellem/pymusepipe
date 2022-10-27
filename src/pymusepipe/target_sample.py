@@ -26,7 +26,7 @@ from .config_pipe import (PHANGS_reduc_config,
                           default_prefix_wcs_mosaic,
                           dict_default_for_recipes)
 from .init_musepipe import InitMuseParameters
-from .combine import MusePointings
+from .combine import MuseFields
 from .align_pipe import rotate_pixtables
 from .mpdaf_pipe import MuseCubeMosaic, MuseCube
 from .prep_recipes_pipe import dict_products_scipost
@@ -318,7 +318,7 @@ class MusePipeSample(object):
             self.pipes[targetname].root_path = init_params_target.root
             self.pipes[targetname].data_path = joinpath(init_params_target.root, targetname)
 
-            init_comb_target = MusePointings(targetname=targetname,
+            init_comb_target = MuseFields(targetname=targetname,
                                              list_datasets=list_datasets,
                                              rc_filename=rc_filename,
                                              cal_filename=cal_filename,
