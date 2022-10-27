@@ -24,14 +24,14 @@ from astropy.io import fits as pyfits
 # Import package modules
 from .emission_lines import list_emission_lines, full_muse_wavelength_range
 from .config_pipe import (default_filter_list, dict_musemodes,
-                          default_nob, default_strob)
+                          default_nd, default_strds)
 from . import util_pipe as upipe
 
 # MPDAF
 from mpdaf.obj import Image, Cube
 
 
-############    PRINTING FUNCTIONS #########################
+#  PRINTING FUNCTIONS #
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
 OKGREEN = '\033[92m'
@@ -186,21 +186,24 @@ def add_string(text, word="_", loc=0):
 
     return text
 
-def get_obname(pointing=1, strob=default_strob, nob=default_nob):
-    """Formatting for the OB names using the pointing number and
-    the given nob and strob 
+def get_dataset_name(dataset=1, str_dataset=default_strds, ndigits=default_nds):
+    """Formatting for the dataset/field names using the number and
+    the number of digits and prefix string
 
     Input
     -----
-    pointing: int
-    strob: str
-    nob: int
+    dataset: int
+       Dataset (or Field) number
+    str_dataset: str
+        Prefix representing the dataset (or field)
+    ndigits: int
+        Number of digits to be used for formatting
 
     Returns
     -------
-    string for the OB name prefix
+    string for the dataset/field name prefix
     """
-    return f"{strob}{int(pointing):0{int(nob)}}"
+    return f"{str_dataset}{int(dataset):0{int(ndigits)}}"
 
 def lower_rep(text):
     """Lower the text and return it after removing all underscores
@@ -478,21 +481,21 @@ def reconstruct_filter_images(cubename, filter_list=default_filter_list,
                   filter_list, cubename, filter_fits_file)
     os.system(command)
 
-def add_key_pointing_expo(imaname, iexpo, pointing):
-    """Add pointing and expo number to image
+def add_key_dataset_expo(imaname, iexpo, dataset):
+    """Add dataset and expo number to image
 
     Input
     -----
     imaname: str
     iexpo: int
-    pointing: int
+    dataset: int
     """
-    # Writing the pointing and iexpo in the IMAGE_FOV
+    # Writing the dataset and iexpo in the IMAGE_FOV
     this_image = pyfits.open(imaname, mode='update')
-    this_image[0].header['MUSEPIPE_POINTING'] = (pointing, "Pointing number")
+    this_image[0].header['MUSEPIPE_DATASET'] = (dataset, "Dataset number")
     this_image[0].header['MUSEPIPE_IEXPO'] = (iexpo, "Exposure number")
     this_image.flush()
-    print_info("Keywords MUSEPIPE_POINTING/EXPO updated for image {}".format(
+    print_info("Keywords MUSEPIPE_DATASET/EXPO updated for image {}".format(
         imaname))
 
 def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
@@ -661,11 +664,11 @@ def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
     final_rot_cube.write(joinpath(outwcs_folder, out_name))
     return outwcs_folder, out_name
 
-def filter_list_with_pdict(input_list, list_pointings=None,
+def filter_list_with_pdict(input_list, list_datasets=None,
                            dict_files=None,
                            verbose=True):
     """Filter out exposures (pixtab or cube namelist) using a dictionary which
-    has a list of pointings and for each pointing a list of exposure number.
+    has a list of datasets and for each dataset a list of exposure number.
 
     Args:
         input_list (list of str):  input list to filter
@@ -684,18 +687,18 @@ def filter_list_with_pdict(input_list, list_pointings=None,
         selected_list = []
         # this is the list of exposures to consider
 
-        if list_pointings is None:
-            list_pointings = dict_files.keys()
-        elif not isinstance(list_pointings, list):
-            upipe.print_error("Cannot recognise input pointing(s)")
+        if list_datasets is None:
+            list_datasets = dict_files.keys()
+        elif not isinstance(list_datasets, list):
+            upipe.print_error("Cannot recognise input dataset(s)")
             return selected_list
 
-        for pointing in list_pointings:
-            if pointing not in dict_files:
-                upipe.print_warning("Pointing {} not in dictionary "
-                                    "- skipping".format(pointing))
+        for dataset in list_datasets:
+            if dataset not in dict_files:
+                upipe.print_warning("Dataset {} not in dictionary "
+                                    "- skipping".format(dataset))
             else:
-                list_expo = dict_files[pointing]
+                list_expo = dict_files[dataset]
                 # We loop on that list
                 for expotuple in list_expo:
                     tpl, nexpo = expotuple[0], expotuple[1]
@@ -712,8 +715,8 @@ def filter_list_with_pdict(input_list, list_pointings=None,
                                 break
 
     if verbose:
-        upipe.print_info("Pointings {0} - Selected {1}/{2} files after "
-                         "dictionary filtering".format(list_pointings,
+        upipe.print_info("Datasets {0} - Selected {1}/{2} files after "
+                         "dictionary filtering".format(list_datasets,
                                                 len(selected_list),
                                                 nfiles_input_list))
     return selected_list

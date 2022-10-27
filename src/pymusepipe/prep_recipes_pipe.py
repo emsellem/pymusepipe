@@ -21,7 +21,7 @@ import numpy as np
 # pymusepipe modules
 from . import util_pipe as upipe
 from .create_sof import SofPipe
-from .align_pipe import create_offset_table, AlignMusePointing
+from .align_pipe import create_offset_table, AlignMuseField
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
@@ -1251,7 +1251,7 @@ class PipePrep(SofPipe) :
         self.goto_prevfolder(addtolog=True)
         
     @print_my_function_name
-    def run_align_bypointing(self, sof_filename='exp_align_bypointing', expotype="OBJECT", 
+    def run_align_bydataset(self, sof_filename='exp_align_bydataset', expotype="OBJECT",
             list_expo=[], stage="processed", line=None, suffix="",
             tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
@@ -1273,10 +1273,10 @@ class PipePrep(SofPipe) :
         # Stop the process if only 1 or fewer exposures are retrieved
         if len(align_table) <= 1:
             if self.verbose:
-                upipe.print_warning("Pointing = {0}".format(self.pointing),
+                upipe.print_warning("Dataset = {0}".format(self.dataset),
                         pipe=self)
                 upipe.print_warning("No derived OFFSET LIST as only "
-                                    "1 exposure retrieved in this Pointing",
+                                    "1 exposure retrieved in this Dataset",
                         pipe=self)
             return
         
@@ -1288,7 +1288,7 @@ class PipePrep(SofPipe) :
         if line is not None:
             suffix += "_{0}".format(line)
 
-        # Use the pointing as a suffix for the names
+        # Use the dataset as a suffix for the names
         obname = self._get_obname()
 
         # Now creating the SOF file, first reseting it
@@ -1317,16 +1317,16 @@ class PipePrep(SofPipe) :
         for iter_file in dict_files_iexpo_products['ALIGN']:
             for i, row in enumerate(align_table):
                 namein_align.append('{0}_{1:04d}'.format(iter_file, i+1))
-                nameout_align.append('{0}_bypointing{1}_{2}_{3:04d}'.format(
+                nameout_align.append('{0}_bydataset{1}_{2}_{3:04d}'.format(
                     iter_file, long_suffix, row['tpls'], row['iexpo']))
 
-        # Find the alignment - Note that Pointing is used and tpl reflects the given selection
+        # Find the alignment - Note that Field is used and tpl reflects the given selection
         self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, 
                 tpl, obname, **kwargs)
 
         # Write the MASTER files Table and save it
         self.save_expo_table(expotype, align_table, "reduced", 
-                "ALIGNED_IMAGES_BYPOINTING_{0}{1}_{2}_{3}_list_table.fits".format(expotype, 
+                "ALIGNED_IMAGES_BYDATASET_{0}{1}_{2}_{3}_list_table.fits".format(expotype,
                 long_suffix, obname, tpl), aggregate=False, update=True)
         
         # Go back to original folder
@@ -1334,7 +1334,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def save_fine_alignment(self, name_offset_table=None):
-        """ Save the fine pointing alignment
+        """ Save the fine dataset alignment
         """
         if name_offset_table is None:
             name_offset_table = "XX"
@@ -1346,7 +1346,7 @@ class PipePrep(SofPipe) :
     @print_my_function_name
     def run_fine_alignment(self, name_ima_reference=None, nexpo=1, list_expo=[],
                            line=None, bygroup=False, reset=False, **kwargs):
-        """Run the alignment on this pointing using or not a reference image
+        """Run the alignment on this dataset using or not a reference image
         """
         # If not yet initialised, build the dictionary
         if not hasattr(self, "dict_alignments"):
@@ -1402,7 +1402,8 @@ class PipePrep(SofPipe) :
                 list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                     'IMAGE_FOV{0}_{1:04d}.fits'.format(long_suffix, iexpo)) 
                     for iexpo in list_group_expo]
-                self.align_group.append(AlignMusePointing(name_ima_reference, list_names_muse, flag="mytpl"))
+                self.align_group.append(AlignMuseField(name_ima_reference, list_names_muse,
+                                                   flag="mytpl"))
         # If not by group
         else:
             long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
@@ -1412,17 +1413,17 @@ class PipePrep(SofPipe) :
             # Giving a reference image name, doing the alignment w.r.t. to that specific image
             if name_ima_reference is None:
                 upipe.print_warning("Using the first MUSE exposure as a reference")
-                self.align_group.append(AlignMusePointing(list_names_muse[0], 
+                self.align_group.append(AlignMuseField(list_names_muse[0],
                     list_names_muse[1:], flag="mytpl"))
             else:
-                self.align_group.append(AlignMusePointing(name_ima_reference, 
+                self.align_group.append(AlignMuseField(name_ima_reference,
                     list_names_muse, flag="mytpl"))
 
     @print_my_function_name
-    def run_combine_pointing(self, sof_filename='exp_combine', expotype="OBJECT", 
+    def run_combine_dataset(self, sof_filename='exp_combine', expotype="OBJECT",
             list_expo=[], stage="processed", tpl="ALL", 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
-        """Produce a cube from all frames in the pointing
+        """Produce a cube from all frames in the dataset
         list_expo or tpl specific arguments can still reduce the selection if needed
         """
         # Selecting the table with the right iexpo
@@ -1437,7 +1438,7 @@ class PipePrep(SofPipe) :
         # exp_combine needs a minimum of 2
         if len(list_expo) <= 1:
             if self.verbose:
-                upipe.print_warning("The combined pointing has only one exposure: process aborted",
+                upipe.print_warning("The combined dataset has only one exposure: process aborted",
                         pipe=self)
             return
 
@@ -1449,7 +1450,7 @@ class PipePrep(SofPipe) :
         filter_list = kwargs.pop("filter_list", self.filter_list)
         prefix_all = kwargs.pop("prefix_all", "")
 
-        # Use the pointing as a suffix for the names
+        # Use the dataset as a suffix for the names
         obname = self._get_obname()
         # Save option
         save = kwargs.pop("save", "cube,combined")

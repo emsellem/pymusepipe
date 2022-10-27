@@ -114,8 +114,23 @@ dict_products_scipost = {
         'autocal': ['AUTOCAL_FACTORS']
         }
 
+# -- END ---------------------------------------------------------------#
+
+# ======================================================================#
+# BEGIN
+#           Printing name configuration
+# ======================================================================#
+# Formatting the output name for dataset (e.g., OBs)
+# E.g., nint_mf = '02' means that 10 will be represented by '10' and 1
+# as '01' (always two digits for an integer)
+# The following  nint_mf = '02' and str_mf='P' will give
+# P01, P02, P03 etc as suffixes for the naming convention
+default_nds = 3
+default_strds = 'OB'
+default_strfield = 'P'
 
 # -- END ---------------------------------------------------------------#
+
 # ======================================================================#
 # BEGIN
 #           DEFAULT PATHS for the Muse pipeline
@@ -134,10 +149,12 @@ dict_user_folders = {
             "musecalib_time": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/time_calibrations/",
             # Calibration files (specific to OBs)
             "root": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/live/",
-            # Default prefix for Blocks
-            "strob": "B",
+            # Default prefix for Datasets
+            "str_dataset": default_strds,
+            # Default prefix for Fields
+            "str_field": default_strfield,
             # Default number of digits for Blocks
-            "nob": 3
+            "ndigits": default_nds
             }
 
 # Default initialisation file
@@ -311,13 +328,13 @@ mjd_names = {'table': "MJD_OBS", 'image': "MJD-OBS"}
 date_names = {'table': "DATE_OBS", 'image': "DATE-OBS"}
 tpl_names = {'table': "TPL_START", 'image': "HIERARCH ESO TPL START"}
 iexpo_names = {'table': "IEXPO_OBS", 'image': "MUSEPIPE_IEXPO"}
-pointing_names = {'table': "POINTING_OBS", 'image': "MUSEPIPE_POINTING"}
+field_names = {'table': "FIELD_OBS", 'image': "MUSEPIPE_FIELD"}
 
 default_offset_table = {'date': [date_names['table'], 'S23', ""],
                         'mjd': [mjd_names['table'], 'f8', 0.0],
                         'tpls': [tpl_names['table'], 'S19', ""],
                         'iexpo': [iexpo_names['table'], 'i4', 0],
-                        'pointing': [iexpo_names['table'], 'i4', 0],
+                        'field': [iexpo_names['table'], 'i4', 0],
                         'ora': ["RA_OFFSET", 'f8', 0.0],
                         'odec': ["DEC_OFFSET", 'f8', 0.0],
                         'scale': ["FLUX_SCALE", 'f8', 1.0]}
@@ -350,11 +367,11 @@ dict_recipes_per_num = {1: 'bias',
                         7: 'standard',
                         8: 'sky',
                         9: 'prep_align',
-                        10: 'align_bypointing',
+                        10: 'align_bydataset',
                         11: 'align_bygroup',
                         12: 'scipost_perexpo',
                         13: 'scipost_sky',
-                        14: 'combine_pointing'
+                        14: 'combine_field'
                         }
 
 # Value by default for certain fixed parameters in recipes
@@ -371,16 +388,3 @@ dict_recipes_per_name = {}
 for key in dict_recipes_per_num:
     dict_recipes_per_name[dict_recipes_per_num[key]] = key
 
-# ======================================================================#
-# BEGIN
-#           Printing name configuration
-# ======================================================================#
-# Formatting the output name for pointing / OBs
-# E.g., nint_mf = '02' means that 10 will be represented by '10' and 1
-# as '01' (always two digits for an integer)
-# The following  nint_mf = '02' and str_mf='P' will give
-# P01, P02, P03 etc as suffixes for the naming convention
-default_nob = 3
-default_strob = 'B'
-
-# -- END ---------------------------------------------------------------#

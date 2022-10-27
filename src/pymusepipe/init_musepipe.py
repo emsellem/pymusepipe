@@ -18,7 +18,7 @@ import re
 import copy
 
 from . import util_pipe as upipe
-from .util_pipe import get_obname
+from .util_pipe import get_dataset_name
 from .config_pipe import (dict_user_folders, default_rc_filename,
                           dict_extra_filters, dict_calib_tables, dict_input_folders,
                           dict_folders, dict_folders_target,
@@ -154,19 +154,19 @@ class InitMuseParameters(object) :
                    "config_pipe.py").format(param=key))
             setattr(self, key, dict_param[key])
 
-    def _get_obname(self, pointing=None):
-        """Reporting the _get_obname from the InitMuseParam
+    def _get_dataset_name(self, dataset=None):
+        """Reporting the _get_dataset_name from the InitMuseParam
         class
 
-        pointing : int
-            pointing number. Default is None.
+        dataset : int
+            dataset number. Default is None.
         """
-        if pointing is None:
-            if hasattr(self, "pointing"):
-                pointing = self.pointing
+        if dataset is None:
+            if hasattr(self, "dataset"):
+                dataset = self.dataset
             else:
-                upipe.print_error("No pointing number provided")
+                upipe.print_error("No dataset number provided")
                 return "NONAME"
-        return get_obname(pointing, self.strob, self.nob)
+        return get_dataset_name(dataset, self.strob, self.nob)
 
 

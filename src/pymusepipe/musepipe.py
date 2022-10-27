@@ -66,10 +66,10 @@ from .prep_recipes_pipe import PipePrep
 from . import util_pipe as upipe
 from .util_pipe import analyse_musemode
 from .config_pipe import (suffix_rawfiles, suffix_prealign, suffix_checkalign,
-    listexpo_files, dict_listObject, dict_listMaster, dict_listMasterObject,
-    dict_expotypes, dict_geo_astrowcs_table, list_exclude_checkmode,
-    list_fieldspecific_checkmode, dict_astrogeo, list_musemodes,
-    dict_default_for_recipes, default_strob, default_nob)
+                          listexpo_files, dict_listObject, dict_listMaster,
+                          dict_listMasterObject, dict_expotypes, dict_geo_astrowcs_table,
+                          list_exclude_checkmode, list_fieldspecific_checkmode, dict_astrogeo,
+                          list_musemodes, dict_default_for_recipes)
 
 __version__ = '2.0.2 (25/09/2019)'
 
@@ -108,7 +108,7 @@ class MusePipe(PipePrep, PipeRecipes):
     described.
     """
 
-    def __init__(self, targetname=None, pointing=1, folder_config="Config/",
+    def __init__(self, targetname=None, dataset=1, folder_config="Config/",
                  rc_filename=None, cal_filename=None, log_filename="MusePipe.log",
                  verbose=True, musemode="WFM-NOAO-N", checkmode=True,
                  strong_checkmode=False, **kwargs):
@@ -118,7 +118,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         Args:
             targetname (str): Name of the target (e.g., 'NGC1208').
-            pointing (int): Number of the pointing to consider
+            dataset (int): dataset number to consider
             folder_config (str): Folder name for the configuration files
             rc_filename (str): Name of the input configuration file with
                 the root folders
@@ -223,8 +223,8 @@ class MusePipe(PipePrep, PipeRecipes):
                           last_recipe=last_recipe)
         PipeRecipes.__init__(self, **kwargs)
 
-        # pointing
-        self.pointing = pointing
+        # dataset
+        self.dataset = dataset
 
         # =========================================================== #
         # Setting up the folders and names for the data reduction
@@ -236,7 +236,7 @@ class MusePipe(PipePrep, PipeRecipes):
                                               verbose=verbose)
 
         # Setting up the relative path for the data, using Galaxy Name + Pointing
-        self.pipe_params.data = (f"{self.targetname}/{self._get_obname()}")
+        self.pipe_params.data = f"{self.targetname}/{self._get_dataset_name()}"
 
         # Create full path folder 
         self.set_fullpath_names()
@@ -253,23 +253,27 @@ class MusePipe(PipePrep, PipeRecipes):
         # ==============================================
         # Creating the extra pipeline folder structure
         for folder in self.pipe_params._dict_input_folders:
-            upipe.safely_create_folder(self.pipe_params._dict_input_folders[folder], verbose=verbose)
+            upipe.safely_create_folder(self.pipe_params._dict_input_folders[folder],
+                                       verbose=verbose)
 
         # ==============================================
         # Creating the folder structure itself if needed
         for folder in self.pipe_params._dict_folders:
-            upipe.safely_create_folder(self.pipe_params._dict_folders[folder], verbose=verbose)
+            upipe.safely_create_folder(self.pipe_params._dict_folders[folder],
+                                       verbose=verbose)
 
         # ==============================================
         # Init the Master exposure flag dictionary
         self.Master = {}
         for mastertype in dict_listMaster:
-            upipe.safely_create_folder(self._get_path_expo(mastertype, "master"), verbose=verbose)
+            upipe.safely_create_folder(self._get_path_expo(mastertype, "master"),
+                                       verbose=verbose)
             self.Master[mastertype] = False
 
         # Init the Object folder
         for objecttype in dict_listObject:
-            upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"), verbose=verbose)
+            upipe.safely_create_folder(self._get_path_expo(objecttype, "processed"),
+                                       verbose=verbose)
 
         self._dict_listMasterObject = dict_listMasterObject
 
@@ -359,7 +363,7 @@ class MusePipe(PipePrep, PipeRecipes):
             'wfm' or 'nfm' - MUSE mode
         """
         dict_pre = {'geo': 'geometry_table',
-                   'astro': 'astrometry_wcs'}
+                    'astro': 'astrometry_wcs'}
         if filetype not in dict_pre:
             upipe.print_error("Could not decipher the filetype option "
                               "in retrieve_geoastro")
@@ -375,14 +379,16 @@ class MusePipe(PipePrep, PipeRecipes):
         ga_suffix = near[min(near.keys())]
         # Build the name with the prefix, suffix and mode
         ga_name = "{0}_{1}_{2}.fits".format(dict_pre[filetype],
-                                            mode, ga_suffix)
+                                            fieldmode, ga_suffix)
         return ga_name
 
     def _set_option_astropy_table(self, overwrite=None, update=None):
         """Set the options for overwriting or updating the astropy tables
         """
-        if overwrite is not None: self._overwrite_astropy_table = overwrite
-        if update is not None: self._update_astropy_table = update
+        if overwrite is not None:
+            self._overwrite_astropy_table = overwrite
+        if update is not None:
+            self._update_astropy_table = update
 
     def goto_origfolder(self, addtolog=False):
         """Go back to original folder
@@ -408,6 +414,8 @@ class MusePipe(PipePrep, PipeRecipes):
 
         Parameters
         ----------
+        newpath: str
+            Path where to go to
         addtolog: bool [False]
             Adding the folder move to the log file
         """
@@ -455,11 +463,11 @@ class MusePipe(PipePrep, PipeRecipes):
             setattr(self.paths, name, joinpath(self.paths.target,
                                                self.pipe_params._dict_folders_target[name]))
 
-    def _get_obname(self):
-        """Reporting the _get_obname from the InitMuseParam
+    def _get_dataset_name(self):
+        """Reporting the _get_dataset_name from the InitMuseParam
         class
         """
-        return self.pipe_params._get_obname(self.pointing)
+        return self.pipe_params._get_dataset_name(self.dataset)
 
     def _reset_tables(self):
         """Reseting the astropy Tables for expotypes
@@ -722,10 +730,10 @@ class MusePipe(PipePrep, PipeRecipes):
                 if self.checkmode:
                     if expotype.upper() in list_fieldspecific_checkmode:
                         maskmode = [self._fieldmode == analyse_musemode(value, 'field') 
-                                        for value in self.Tables.Rawfiles['mode']]
+                                    for value in self.Tables.Rawfiles['mode']]
                     elif (expotype.upper() not in list_exclude_checkmode) or self.strong_checkmode:
                         maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
-                        mask = maskmode & mask
+                    mask = maskmode & mask
                 setattr(self.Tables.Raw, self._get_attr_expo(expotype),
                         self.Tables.Rawfiles[mask])
             except AttributeError:
@@ -774,7 +782,7 @@ class MusePipe(PipePrep, PipeRecipes):
             self.folder_offset_table = folder_offset_table
 
         fullname_offset_table = joinpath(self.folder_offset_table,
-                                          self.name_offset_table)
+                                         self.name_offset_table)
         if not os.path.isfile(fullname_offset_table):
             upipe.print_error("Offset table [{0}] not found".format(
                 fullname_offset_table))

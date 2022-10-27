@@ -47,7 +47,7 @@ from mpdaf.obj import Image, WCS
 # Import needed modules from pymusepipe
 from . import util_pipe as upipe  # noqua: E402
 from .config_pipe import mjd_names, date_names, tpl_names
-from .config_pipe import pointing_names, iexpo_names
+from .config_pipe import field_names, iexpo_names
 from .config_pipe import default_offset_table, dict_listObject
 
 try:
@@ -130,7 +130,7 @@ def create_offset_table(image_names, table_folder="",
         return
 
     # Gather the values of DATE and MJD from the images
-    date, mjd, tpls, iexpo, pointing = [], [], [], [], []
+    date, mjd, tpls, iexpo, field = [], [], [], [], []
     for ima in image_names:
         if not os.path.isfile(ima):
             upipe.print_warning("[create_offset] Image {0} does not exists".format(ima))
@@ -141,7 +141,7 @@ def create_offset_table(image_names, table_folder="",
         mjd.append(head[mjd_names['image']])
         tpls.append(head[tpl_names['image']])
         iexpo.append(head[iexpo_names['image']])
-        pointing.append(head[pointing_names['image']])
+        field.append(head[field_names['image']])
 
     nlines = len(date)
 
@@ -156,7 +156,7 @@ def create_offset_table(image_names, table_folder="",
     offset_table[mjd_names['table']] = mjd
     offset_table[tpl_names['table']] = tpls
     offset_table[iexpo_names['table']] = iexpo
-    offset_table[pointing_names['table']] = pointing
+    offset_table[field_names['table']] = field
 
     # Write the table
     offset_table.write(table_fullname, overwrite=overwrite)
@@ -193,13 +193,13 @@ def open_new_wcs_figure(nfig, mywcs=None):
         return fig, fig.add_subplot(1, 1, 1, projection=mywcs)
 
 
-def chunk_stats(list_data, chunk_size=15):
+def chunk_stats(list_arrays, chunk_size=15):
     """Cut the datasets in 2d chunks and take the median
     Return the set of medians for all chunks.
 
     Parameters
     ----------
-    list_data : list of np.arrays
+    list_arrays : list of np.arrays
         List of arrays with the same sizes/shapes
     chunk_size : int
         number of pixel (one D of a 2D chunk)
@@ -212,33 +212,34 @@ def chunk_stats(list_data, chunk_size=15):
 
     """
 
-    ndatasets = len(list_data)
+    narrays = len(list_arrays)
 
-    nchunk_x = np.int(list_data[0].shape[0] // chunk_size - 1)
-    nchunk_y = np.int(list_data[0].shape[1] // chunk_size - 1)
-    # Check that all datasets have the same size
-    med_data = np.zeros((ndatasets, nchunk_x * nchunk_y), dtype=np.float64)
-    std_data = np.zeros_like(med_data)
+    nchunk_x = np.int(list_arrays[0].shape[0] // chunk_size - 1)
+    nchunk_y = np.int(list_arrays[0].shape[1] // chunk_size - 1)
+    # Check that all arrays have the same size
+    med_array = np.zeros((narrays, nchunk_x * nchunk_y), dtype=np.float64)
+    std_array = np.zeros_like(med_array)
 
-    if not all([d.size for d in list_data]):
+    if not all([d.size for d in list_arrays]):
         upipe.print_error("Datasets are not of the same "
                           "size in median_compare")
     else:
         for i in range(0, nchunk_x):
             for j in range(0, nchunk_y):
-                for k in range(ndatasets):
-                    # Taking the median
-                    med_data[k, i * nchunk_y + j] = np.nanmedian(
-                        list_data[k][i * chunk_size:(i + 1) * chunk_size,
+                for k in range(narrays):
+                    # Taking the median of all arrays
+                    med_array[k, i * nchunk_y + j] = np.nanmedian(
+                        list_arrays[k][i * chunk_size:(i + 1) * chunk_size,
                         j * chunk_size:(j + 1) * chunk_size])
-                    std_data[k, i * nchunk_y + j] = mad_std(
-                        list_data[k][i * chunk_size:(i + 1) * chunk_size,
+                    # Taking the std deviation of all arrays
+                    std_array[k, i * nchunk_y + j] = mad_std(
+                        list_arrays[k][i * chunk_size:(i + 1) * chunk_size,
                         j * chunk_size:(j + 1) * chunk_size], ignore_nan=True)
 
     # Cleaning in case of Nan
-    med_data = np.nan_to_num(med_data)
-    std_data = np.nan_to_num(std_data)
-    return med_data, std_data
+    med_array = np.nan_to_num(med_array)
+    std_array = np.nan_to_num(std_array)
+    return med_array, std_array
 
 
 def my_linear_model(B, x):
@@ -258,9 +259,9 @@ def my_linear_model(B, x):
     return B[1] * (x + B[0])
 
 
-def get_image_norm_poly(data1, data2, chunk_size=15, threshold1=0.,
+def get_image_norm_poly(array1, array2, chunk_size=15, threshold1=0.,
                         threshold2=0, percentiles=(0., 100.), sigclip=0):
-    """Find the normalisation factor between two datasets.
+    """Find the normalisation factor between two arrays.
 
     Including the background and slope. This uses the function
     regress_odr which is included in align_pipe.py and itself
@@ -268,15 +269,16 @@ def get_image_norm_poly(data1, data2, chunk_size=15, threshold1=0.,
 
     Parameters
     ----------
-    data1 : 2D np.array
-    data2 : 2D np.array
+    array1 : 2D np.array
+    array2 : 2D np.array
         2 arrays (2D) of identical shapes
 
-    chunk_size : int (Default value = 15)
+    chunk_size : int
+        Default value = 15
     threshold1 : float
-        Lower threshold for data1 (Default value = 0.)
+        Lower threshold for array1 (Default value = 0.)
     threshold2 : float
-        Lower threshold for data2 (Default value = 0)
+        Lower threshold for array2 (Default value = 0)
     percentiles : list of 2 floats
         Percentiles (Default value = [0., 100.])
     sigclip : float
@@ -289,7 +291,7 @@ def get_image_norm_poly(data1, data2, chunk_size=15, threshold1=0.,
     """
 
     # proceeds by splitting the data arrays in chunks of chunk_size
-    med, std = chunk_stats([data1, data2], chunk_size=chunk_size)
+    med, std = chunk_stats([array1, array2], chunk_size=chunk_size)
 
     # Selecting where data is supposed to be good
     pos = (med[0] > threshold1) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > threshold2)
@@ -509,7 +511,7 @@ def crop_data(data, border=10):
         return data
 
 
-def filtermed_image(data, border=0, filter_size=2.0):
+def filtermed_image(data, border=0, filter_size=2):
     """Process image by removing the borders
     and filtering it via a median filter
      
@@ -657,7 +659,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
 # ================== END Useful functions ===================== #
 #################################################################
 # Main alignment Class
-class AlignMusePointing(object):
+class AlignMuseField(object):
     """Class to align MUSE images onto a reference image.
     """
 
@@ -877,7 +879,7 @@ class AlignMusePointing(object):
         self.ima_mjdobs = [None] * self.nimages
         self.ima_tplstart = [None] * self.nimages
         self.ima_iexpo = [None] * self.nimages
-        self.ima_pointing = [None] * self.nimages
+        self.ima_field = [None] * self.nimages
 
         # Which extension to be used for the ref and muse images
         self.hdu_ext = hdu_ext
@@ -1225,7 +1227,7 @@ class AlignMusePointing(object):
         fits_table[mjd_names['table']] = self.ima_mjdobs
         fits_table[tpl_names['table']] = self.ima_tplstart
         fits_table[iexpo_names['table']] = self.ima_iexpo
-        fits_table[pointing_names['table']] = self.ima_pointing
+        fits_table[field_names['table']] = self.ima_field
 
         # Saving the final values
         fits_table['RA_OFFSET'] = self._total_off_arcsec[:, 0] / 3600. \
@@ -1406,10 +1408,10 @@ class AlignMusePointing(object):
                 self.ima_iexpo[nima] = None
             else:
                 self.ima_iexpo[nima] = hdu[0].header[iexpo_names['image']]
-            if pointing_names['image'] not in hdu[0].header:
-                self.ima_pointing[nima] = None
+            if field_names['image'] not in hdu[0].header:
+                self.ima_field[nima] = None
             else:
-                self.ima_pointing[nima] = hdu[0].header[pointing_names['image']]
+                self.ima_field[nima] = hdu[0].header[field_names['image']]
 
             if self.list_muse_hdu[nima].data is None:
                 return 0
