@@ -1,0 +1,7 @@
+# On local
+git add .
+git commit -m "comment"
+git push
+
+# On remote
+git pull origin master

@@ -24,7 +24,7 @@ from astropy.io import fits as pyfits
 # Import package modules
 from .emission_lines import list_emission_lines, full_muse_wavelength_range
 from .config_pipe import (default_filter_list, dict_musemodes,
-                          default_nd, default_strds)
+                          default_nds, default_strds)
 from . import util_pipe as upipe
 
 # MPDAF
