@@ -24,7 +24,7 @@ from astropy.io import fits as pyfits
 # Import package modules
 from .emission_lines import list_emission_lines, full_muse_wavelength_range
 from .config_pipe import (default_filter_list, dict_musemodes,
-                          default_nds, default_strds)
+                          default_ndigits, default_str_dataset)
 from . import util_pipe as upipe
 
 # MPDAF
@@ -186,22 +186,22 @@ def add_string(text, word="_", loc=0):
 
     return text
 
-def get_dataset_name(dataset=1, str_dataset=default_strds, ndigits=default_nds):
-    """Formatting for the dataset/field names using the number and
+def get_dataset_name(dataset=1, str_dataset=default_str_dataset, ndigits=default_ndigits):
+    """Formatting for the dataset/pointing names using the number and
     the number of digits and prefix string
 
     Input
     -----
     dataset: int
-       Dataset (or Field) number
+       Dataset (or Pointing) number
     str_dataset: str
-        Prefix representing the dataset (or field)
+        Prefix representing the dataset (or pointing)
     ndigits: int
         Number of digits to be used for formatting
 
     Returns
     -------
-    string for the dataset/field name prefix
+    string for the dataset/pointing name prefix
     """
     return f"{str_dataset}{int(dataset):0{int(ndigits)}}"
 

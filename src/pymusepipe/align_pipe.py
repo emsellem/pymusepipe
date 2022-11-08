@@ -57,7 +57,7 @@ from mpdaf.obj import Image, WCS
 # Import needed modules from pymusepipe
 from . import util_pipe as upipe  # noqua: E402
 from .config_pipe import mjd_names, date_names, tpl_names
-from .config_pipe import field_names, iexpo_names
+from .config_pipe import dataset_names, iexpo_names
 from .config_pipe import default_offset_table, dict_listObject
 
 try:
@@ -140,7 +140,7 @@ def create_offset_table(image_names, table_folder="",
         return
 
     # Gather the values of DATE and MJD from the images
-    date, mjd, tpls, iexpo, field = [], [], [], [], []
+    date, mjd, tpls, iexpo, dataset = [], [], [], [], []
     for ima in image_names:
         if not os.path.isfile(ima):
             upipe.print_warning("[create_offset] Image {0} does not exists".format(ima))
@@ -151,7 +151,7 @@ def create_offset_table(image_names, table_folder="",
         mjd.append(head[mjd_names['image']])
         tpls.append(head[tpl_names['image']])
         iexpo.append(head[iexpo_names['image']])
-        field.append(head[field_names['image']])
+        dataset.append(head[dataset_names['image']])
 
     nlines = len(date)
 
@@ -166,7 +166,7 @@ def create_offset_table(image_names, table_folder="",
     offset_table[mjd_names['table']] = mjd
     offset_table[tpl_names['table']] = tpls
     offset_table[iexpo_names['table']] = iexpo
-    offset_table[field_names['table']] = field
+    offset_table[dataset_names['table']] = dataset
 
     # Write the table
     offset_table.write(table_fullname, overwrite=overwrite)
@@ -669,7 +669,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
 # ================== END Useful functions ===================== #
 #################################################################
 # Main alignment Class
-class AlignMuseField(object):
+class AlignMuseDataset(object):
     """Class to align MUSE images onto a reference image.
     """
 
@@ -889,7 +889,7 @@ class AlignMuseField(object):
         self.ima_mjdobs = [None] * self.nimages
         self.ima_tplstart = [None] * self.nimages
         self.ima_iexpo = [None] * self.nimages
-        self.ima_field = [None] * self.nimages
+        self.ima_dataset = [None] * self.nimages
 
         # Which extension to be used for the ref and muse images
         self.hdu_ext = hdu_ext
@@ -1237,7 +1237,7 @@ class AlignMuseField(object):
         fits_table[mjd_names['table']] = self.ima_mjdobs
         fits_table[tpl_names['table']] = self.ima_tplstart
         fits_table[iexpo_names['table']] = self.ima_iexpo
-        fits_table[field_names['table']] = self.ima_field
+        fits_table[dataset_names['table']] = self.ima_dataset
 
         # Saving the final values
         fits_table['RA_OFFSET'] = self._total_off_arcsec[:, 0] / 3600. \
@@ -1418,10 +1418,10 @@ class AlignMuseField(object):
                 self.ima_iexpo[nima] = None
             else:
                 self.ima_iexpo[nima] = hdu[0].header[iexpo_names['image']]
-            if field_names['image'] not in hdu[0].header:
-                self.ima_field[nima] = None
+            if dataset_names['image'] not in hdu[0].header:
+                self.ima_dataset[nima] = None
             else:
-                self.ima_field[nima] = hdu[0].header[field_names['image']]
+                self.ima_dataset[nima] = hdu[0].header[dataset_names['image']]
 
             if self.list_muse_hdu[nima].data is None:
                 return 0
@@ -1488,7 +1488,7 @@ class AlignMuseField(object):
         xpix_cross
         ypix_cross: x and y pixel coordinates of the cross-correlation peak
         """
-        # Projecting the reference image onto the MUSE field
+        # Projecting the reference image onto the MUSE dataset
         _ = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
                                                 name_musehdr), overwrite=True)
         hdu_target, proj_ref_hdu, diffra_angle = self._align_reference_hdu(muse_hdu,
@@ -1609,7 +1609,7 @@ class AlignMuseField(object):
 
     def _align_hdu(self, hdu_target=None, hdu_to_align=None, target_rotation=0.0,
                    to_align_rotation=0.0, conversion=False):
-        """Project the reference image onto the MUSE field
+        """Project the reference image onto the MUSE dataset
         Hidden function, as only used internally
 
         Input
@@ -1699,7 +1699,7 @@ class AlignMuseField(object):
 
     def _align_reference_hdu(self, hdu_target=None, target_rotation=0.0,
                              ref_rotation=0.0):
-        """Project the reference image onto the MUSE field
+        """Project the reference image onto the MUSE dataset
         Hidden function, as only used internally
          
         Input

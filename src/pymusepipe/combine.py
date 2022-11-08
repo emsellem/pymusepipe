@@ -42,7 +42,7 @@ from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
                           dict_combined_folders, default_prefix_wcs,
                           default_prefix_mask, prefix_mosaic, dict_listObject,
                           lambdaminmax_for_wcs, lambdaminmax_for_mosaic,
-                          default_strds, default_nds)
+                          default_str_dataset, default_ndigits)
 from .mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -50,6 +50,7 @@ from .align_pipe import mjd_names, date_names
 prefix_final_cube = prep_recipes_pipe.dict_products_scipost['cube'][0]
 
 __version__ = '0.1.0 (5 Aug 2022)'
+# 0.1.1 07 Nov, 2022: Change Field to Pointing (so now it is Dataset - for an OB, and Pointing)
 # 0.1.0 05 Aug, 2022: Change for Field and Dataset
 # 0.0.2 28 Feb, 2019: trying to make it work
 # 0.0.1 21 Nov, 2017 : just setting up the scene
@@ -98,8 +99,8 @@ def get_list_targets(folder=""):
     upipe.print_info("Potential Targets -- list: {0}".format(str(list_targets)))
     return list_targets
 
-def build_dict_exposures(target_path="", str_dataset=default_strds,
-                         ndigits=default_nds):
+def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
+                         ndigits=default_ndigits):
     """Build a dictionary of exposures using the list of datasets found for the
     given dataset path
 
@@ -128,8 +129,8 @@ def build_dict_exposures(target_path="", str_dataset=default_strds,
 
     return dict_expos
 
-def get_list_datasets(target_path="", str_dataset=default_strds,
-                      ndigits=default_nds):
+def get_list_datasets(target_path="", str_dataset=default_str_dataset,
+                      ndigits=default_ndigits):
     """Getting the list of existing datasets for a given target path
 
     Input
@@ -204,7 +205,7 @@ def get_list_exposures(dataset_path=""):
     return dict_expos
 
 def get_list_pixtables(target_path="", list_datasets=None, suffix="",
-                      str_dataset=default_strds, ndigits=default_nds):
+                      str_dataset=default_str_dataset, ndigits=default_ndigits):
     """Provide a list of reduced pixtables
 
     Input
@@ -263,12 +264,12 @@ def get_list_pixtables(target_path="", list_datasets=None, suffix="",
 
     return dict_pixtables
 
-class MuseFields(SofPipe, PipeRecipes):
-    """Class for a set of MUSE Fields = Pointings which can be covering several
+class MusePointings(SofPipe, PipeRecipes):
+    """Class for a set of MUSE Pointings which can be covering several
     datasets. This provides a set of rules and methods to access the data and
     process them.
     """
-    def __init__(self, targetname=None, list_fields=None,
+    def __init__(self, targetname=None, list_pointings=None,
                  dict_exposures=None,
                  prefix_masked_pixtables="tmask",
                  folder_config="",
@@ -278,13 +279,13 @@ class MuseFields(SofPipe, PipeRecipes):
                  folder_offset_table=None,
                  log_filename="MusePipeCombine.log",
                  verbose=True, debug=False, **kwargs):
-        """Initialisation of class MuseFields
+        """Initialisation of class MusePointings
 
         Input
         -----
         targetname: string (e.g., 'NGC1208'). default is None.
-        list_fields: list of int
-            List of field numbers to consider
+        list_pointingw: list of int
+            List of pointing numbers to consider
         rc_filename: str
             filename to initialise folders
         cal_filename: str
@@ -359,14 +360,14 @@ class MuseFields(SofPipe, PipeRecipes):
                                               cal_filename=cal_filename,
                                               verbose=verbose)
 
-        # Setting up the relative path for the data, using Galaxy Name + Field
+        # Setting up the relative path for the data, using Galaxy Name + Pointing
         self.pipe_params.data = "{0}/{1}/".format(self.targetname,
                                                   self.combined_folder_name)
 
         self.pipe_params.init_default_param(dict_combined_folders)
         self._dict_combined_folders = dict_combined_folders
 
-        self.list_fields = self._check_fields_list(list_fields)
+        self.list_pointings = self._check_pointings_list(list_pointings)
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
@@ -683,14 +684,14 @@ class MuseFields(SofPipe, PipeRecipes):
         for name in self.pipe_params._dict_folders_target:
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dict_folders_target[name]))
 
-    def create_reference_wcs(self, fields_wcs=True, mosaic_wcs=True,
+    def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True,
                              reference_cube=True, refcube_name=None,
                              **kwargs):
-        """Create the WCS reference files, for all individual fields and for
+        """Create the WCS reference files, for all individual pointings and for
         the mosaic.
 
-        fields_wcs: bool [True]
-            Will run the individual fields WCS
+        pointings_wcs: bool [True]
+            Will run the individual pointings WCS
         mosaic_wcs: bool [True]
             Will run the combined WCS
         lambdaminmax: [float, float]
@@ -720,12 +721,12 @@ class MuseFields(SofPipe, PipeRecipes):
                                           self._add_targetname(cube_suffix))
             wcs_refcube_name = joinpath(self.paths.cubes, cube_name)
 
-        if fields_wcs:
+        if pointings_wcs:
             # Creating the full mosaic WCS first with a narrow lambda range
-            # Then creating the mask WCS for each field
+            # Then creating the mask WCS for each pointing
             upipe.print_info("@@@@@@@@ Start creating the individual "
-                             "Fields Masks @@@@@@@@")
-            self.create_all_fields_wcs(lambdaminmax_mosaic=lambdaminmax,
+                             "Pointings Masks @@@@@@@@")
+            self.create_all_pointings_wcs(lambdaminmax_mosaic=lambdaminmax,
                                           **kwargs)
 
         if mosaic_wcs:
@@ -737,57 +738,57 @@ class MuseFields(SofPipe, PipeRecipes):
                                         lambdaminmax_wcs=lambdaminmax_for_mosaic,
                                         refcube_name=wcs_refcube_name)
 
-    def run_combine_all_single_fields(self, add_suffix="",
-                                      sof_filename='fields_combine',
-                                      list_fields=None,
+    def run_combine_all_single_pointings(self, add_suffix="",
+                                      sof_filename='pointings_combine',
+                                      list_pointings=None,
                                       **kwargs):
-        """Run for all fields individually, provided in the
-        list of fields, by just looping over the fields.
+        """Run for all pointings individually, provided in the
+        list of pointings, by just looping over the pointings.
 
         Input
         -----
-        list_fields: list of int
-            By default to None (using the default self.list_fields).
-            Otherwise a list of fields you wish to conduct
-            a combine but for each individual field.
+        list_pointings: list of int
+            By default to None (using the default self.list_pointings).
+            Otherwise a list of pointings you wish to conduct
+            a combine but for each individual pointing.
         add_suffix: str
-            Additional suffix. 'PXX' where XX is the field number
+            Additional suffix. 'PXX' where XX is the pointing number
             will be automatically added to that add_suffix for 
-            each individual field.
+            each individual pointing.
         sof_filename: str
             Name (suffix only) of the sof file for this combine.
-            By default, it is set to 'fields_combine'.
+            By default, it is set to 'pointings_combine'.
         lambdaminmax: list of 2 floats [in Angstroems]
             Minimum and maximum lambda values to consider for the combine.
             Default is 4000 and 10000 for the lower and upper limits, resp.
         """
-        # If list_fields is None using the initially set up one
-        list_fields = self._check_fields_list(list_fields,
-                                               self.list_fields)
+        # If list_pointings is None using the initially set up one
+        list_pointings = self._check_pointings_list(list_pointings,
+                                               self.list_pointings)
 
         # Additional suffix if needed
-        for field in list_fields:
-            upipe.print_info("Combining single fields - Field {0:02d}".format(
-                             np.int(field)))
-            self.run_combine_single_field(field, add_suffix=add_suffix,
+        for pointing in list_pointings:
+            upipe.print_info("Combining single pointings - Pointing {0:02d}".format(
+                             np.int(pointing)))
+            self.run_combine_single_pointing(pointing, add_suffix=add_suffix,
                                           sof_filename=sof_filename,
                                           **kwargs)
 
-    def run_combine_single_field(self, field, add_suffix="",
-                                    sof_filename='field_combine',
+    def run_combine_single_pointing(self, pointing, add_suffix="",
+                                    sof_filename='pointing_combine',
                                     **kwargs):
-        """Running the combine routine on just one single field
+        """Running the combine routine on just one single pointing
 
         Input
         =====
-        field: int
-            Field number. No default: must be provided.
+        pointing: int
+            Pointing number. No default: must be provided.
         add_suffix: str
-            Additional suffix. 'PXX' where XX is the field number
+            Additional suffix. 'PXX' where XX is the pointing number
             will be automatically added to that add_suffix.
         sof_filename: str
             Name (suffix only) of the sof file for this combine.
-            By default, it is set to 'fields_combine'.
+            By default, it is set to 'pointings_combine'.
         lambdaminmax: list of 2 floats [in Angstroems]
             Minimum and maximum lambda values to consider for the combine.
             Default is 4000 and 10000 for the lower and upper limits, resp.
@@ -798,16 +799,16 @@ class MuseFields(SofPipe, PipeRecipes):
 
         # getting the suffix with the additional PXX
         ### ICI ICI ICI
-        suffix = "{0}_P{1:02d}".format(add_suffix, np.int(field))
+        suffix = "{0}_P{1:02d}".format(add_suffix, np.int(pointing))
 
         ref_wcs = kwargs.pop("ref_wcs", None)
-        wcs_from_field = kwargs.pop("wcs_from_field", False)
+        wcs_from_pointing = kwargs.pop("wcs_from_pointing", False)
 
-        # Wcs_from_field
-        # If true, use the reference field wcs
-        if wcs_from_field:
+        # Wcs_from_pointing
+        # If true, use the reference pointing wcs
+        if wcs_from_pointing:
             if ref_wcs is not None:
-                upipe.print_warning("wcs_from_field is set to True. "
+                upipe.print_warning("wcs_from_pointing is set to True. "
                                     "but will not overwrite ref_wcs as it was"
                                     "specifically provided")
             else:
@@ -816,18 +817,18 @@ class MuseFields(SofPipe, PipeRecipes):
                 prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
                 ref_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
                                                         prefix_final_cube,
-                                                        np.int(field))
+                                                        np.int(pointing))
 
-        # Running the combine for that single field
-        self.run_combine(list_fields=[np.int(field)], suffix=suffix,
+        # Running the combine for that single pointing
+        self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix,
                          sof_filename=sof_filename,
                          ref_wcs=ref_wcs,
                          **kwargs)
 
-    def create_all_fields_wcs(self, filter_list="white",
-                                 list_fields=None, **kwargs):
-        """Create all field masks one by one
-        as well as the wcs for each individual fields. Using the grid
+    def create_all_pointings_wcs(self, filter_list="white",
+                                 list_pointings=None, **kwargs):
+        """Create all pointing masks one by one
+        as well as the wcs for each individual pointings. Using the grid
         from the global WCS of the mosaic but restricting it to the 
         range of non-NaN.
         Hence this needs a global WCS mosaic as a reference to work.
@@ -837,33 +838,33 @@ class MuseFields(SofPipe, PipeRecipes):
         filter_list = list of str
             List of filter names to be used. 
         """
-        # If list_fields is None using the initially set up one
-        list_fields = self._check_field_list(list_fields,
-                                               self.list_fields)
+        # If list_pointings is None using the initially set up one
+        list_pointings = self._check_pointing_list(list_pointings,
+                                               self.list_pointings)
 
         # Additional suffix if needed
-        for field in list_fields:
+        for pointing in list_pointings:
             upipe.print_info("Making WCS Mask for "
-                             "field {0:02d}".format(np.int(field)))
-            _ = self.create_field_wcs(field=field,
+                             "pointing {0:02d}".format(np.int(pointing)))
+            _ = self.create_pointing_wcs(pointing=pointing,
                                          filter_list=filter_list, **kwargs)
 
-    def create_field_wcs(self, field,
+    def create_pointing_wcs(self, pointing,
             lambdaminmax_mosaic=lambdaminmax_for_mosaic,
             filter_list="white", **kwargs):
-        """Create the mask of a given field
+        """Create the mask of a given pointing
         And also a WCS file which can then be used to compute individual
-        fields with a fixed WCS.
+        pointings with a fixed WCS.
 
         Input
         -----
-        field: int
-            Number of the field
+        pointing: int
+            Number of the pointing
         filter_list = list of str
             List of filter names to be used.
 
         Creates:
-            Field mask WCS cube
+            pointing mask WCS cube
 
         Returns:
             Name of the created WCS cube
@@ -877,9 +878,9 @@ class MuseFields(SofPipe, PipeRecipes):
 
         # Running combine with the ref WCS with only 2 spectral pixels
         # Limit the maximum lambda to the wcs ones
-        self.run_combine_single_field(field=field,
+        self.run_combine_single_pointing(pointing=pointing,
                                       filter_list=filter_list,
-                                      sof_filename="field_mask",
+                                      sof_filename="pointing_mask",
                                       add_targetname=self.add_targetname,
                                       prefix_all=prefix_mask,
                                       lambdaminmax=lambdaminmax_for_wcs,
@@ -896,17 +897,17 @@ class MuseFields(SofPipe, PipeRecipes):
         # ICI ICI ICI
         name_mask = "{0}{1}_P{2:02d}.fits".format(prefix_mask,
                                                   prefix_final_cube,
-                                                  np.int(field))
+                                                  np.int(pointing))
         finalname_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
                                                prefix_final_cube,
-                                               np.int(field))
+                                               np.int(pointing))
 
         # First create a subcube without all the Nan
         mask_cube = MuseCube(filename=joinpath(dir_mask, name_mask))
 
         # Creating the new cube
         upipe.print_info("Now creating the Reference WCS cube "
-                         "for field {0}".format(np.int(field)))
+                         "for pointing {0}".format(np.int(pointing)))
         cfolder, cname = mask_cube.create_reference_cube(
                 lambdamin=lambdaminmax_mosaic[0],
                 lambdamax=lambdaminmax_mosaic[1], 
@@ -1035,9 +1036,9 @@ class MuseFields(SofPipe, PipeRecipes):
         upipe.print_info("...Done")
         return combined_wcs_name
 
-    def run_combine(self, sof_filename='fields_combine',
+    def run_combine(self, sof_filename='pointings_combine',
                     lambdaminmax=[4000., 10000.],
-                    list_fields=None,
+                    list_pointings=None,
                     suffix="", **kwargs):
         """MUSE Exp_combine treatment of the reduced pixtables
         Will run the esorex muse_exp_combine routine
@@ -1078,30 +1079,30 @@ class MuseFields(SofPipe, PipeRecipes):
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
 
-        # If list_fields is None using the initially set up one
-        list_fields = self._check_fields_list(list_fields, self.list_fields)
+        # If list_pointings is None using the initially set up one
+        list_pointings = self._check_pointings_list(list_pointings, self.list_pointings)
 
         # If only 1 exposure, duplicate the pixtable
         # as exp_combine needs at least 2 pixtables
-        nexpo_tocombine = sum(len(self.dict_pixtabs_in_fields[field])
-                              for field in list_fields)
+        nexpo_tocombine = sum(len(self.dict_pixtabs_in_pointings[pointing])
+                              for pointing in list_pointings)
         if nexpo_tocombine <= 1:
-            upipe.print_warning("All considered fields have a total of "
+            upipe.print_warning("All considered pointings have a total of "
                                 "only one single exposure: exp_combine "
                                 "will not run. Please use the individual "
                                 "reconstructed cube.", pipe=self)
             return
-            # upipe.print_warning("All considered fields have only one"
+            # upipe.print_warning("All considered pointings have only one"
             #                     " single exposure: it will be duplicated"
             #                     " to make 'exp_combine' run", pipe=self)
-            # for field in list_fields:
-            #     if len(self.dict_pixtabs_in_fields[field]) < 1:
+            # for pointing in list_pointings:
+            #     if len(self.dict_pixtabs_in_pointings[pointing]) < 1:
             #         continue
-            #     pixtab_name = self.dict_pixtabs_in_fields[field][0]
+            #     pixtab_name = self.dict_pixtabs_in_pointings[pointing][0]
             #     head, tail = os.path.split(pixtab_name)
             #     newpixtab_name = joinpath(head, f"dummy_{tail}")
             #     os.system(f"cp {pixtab_name} {newpixtab_name}")
-            #     self.dict_pixtabs_in_fields[field].extend(
+            #     self.dict_pixtabs_in_pointings[pointing].extend(
             #         [newpixtab_name])
 
         # Now creating the SOF file, first reseting it
@@ -1133,7 +1134,7 @@ class MuseFields(SofPipe, PipeRecipes):
                 upipe.print_error("Reference WCS file {0} does not exist".format(
                     full_ref_wcs))
                 upipe.print_error("Consider using the create_combined_wcs recipe"
-                                  " if you wish to create field masks. Else"
+                                  " if you wish to create pointing masks. Else"
                                   " just check that the WCS reference file exists.")
                 return
 
@@ -1146,8 +1147,8 @@ class MuseFields(SofPipe, PipeRecipes):
 
         pixtable_name = dict_listObject[expotype]
         self._sofdict[pixtable_name] = []
-        for field in list_fields:
-            self._sofdict[pixtable_name] += self.dict_pixtabs_in_fields[field]
+        for pointing in list_pointings:
+            self._sofdict[pixtable_name] += self.dict_pixtabs_in_pointings[pointing]
 
         self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename,
                                                         self.targetname,
@@ -1160,7 +1161,7 @@ class MuseFields(SofPipe, PipeRecipes):
                                                     prefix_all=prefix_all)
 
         # Combine the exposures 
-        self.recipe_combine_fields(self.current_sof, dir_products, name_products,
+        self.recipe_combine_pointings(self.current_sof, dir_products, name_products,
                                       suffix_products=suffix_products,
                                       suffix_prefinalnames=suffix_prefinalnames,
                                       prefix_products=prefix_products,
