@@ -21,7 +21,7 @@ import numpy as np
 # pymusepipe modules
 from . import util_pipe as upipe
 from .create_sof import SofPipe
-from .align_pipe import create_offset_table, AlignMuseField
+from .align_pipe import create_offset_table, AlignMuseDataset
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
@@ -1402,7 +1402,7 @@ class PipePrep(SofPipe) :
                 list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
                     'IMAGE_FOV{0}_{1:04d}.fits'.format(long_suffix, iexpo)) 
                     for iexpo in list_group_expo]
-                self.align_group.append(AlignMuseField(name_ima_reference, list_names_muse,
+                self.align_group.append(AlignMuseDataset(name_ima_reference, list_names_muse,
                                                    flag="mytpl"))
         # If not by group
         else:
@@ -1413,10 +1413,10 @@ class PipePrep(SofPipe) :
             # Giving a reference image name, doing the alignment w.r.t. to that specific image
             if name_ima_reference is None:
                 upipe.print_warning("Using the first MUSE exposure as a reference")
-                self.align_group.append(AlignMuseField(list_names_muse[0],
+                self.align_group.append(AlignMuseDataset(list_names_muse[0],
                     list_names_muse[1:], flag="mytpl"))
             else:
-                self.align_group.append(AlignMuseField(name_ima_reference,
+                self.align_group.append(AlignMuseDataset(name_ima_reference,
                     list_names_muse, flag="mytpl"))
 
     @print_my_function_name
