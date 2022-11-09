@@ -783,6 +783,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                         for filename in input_list:
                             ftpl, fnexpo = get_tpl_expo(filename)
 #                            if (suffix_expo in filename) and (tpl in filename):
+                            upipe.print_info(f"filename {ftpl} / {fnexpo} ---- {tpl} / {nexpo}")
                             if (nexpo == fnexpo) & (ftpl == tpl):
                                 # We select the file
                                 selected_filename_list.append(filename)
