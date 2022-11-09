@@ -739,12 +739,12 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     nfiles_input_list = len(input_list)
     if dict_files is None:
         selected_filename_list = input_list
-        exposure_list_per_pointing = {1: input_list}
+        list_exposures_per_pointing = {1: input_list}
 
     # Otherwise use the ones which are given via their expo numbers
     else:
         selected_filename_list = []
-        exposure_list_per_pointing = {}
+        list_exposures_per_pointing = {}
         # this is the list of exposures to consider
 
         if list_datasets is None:
