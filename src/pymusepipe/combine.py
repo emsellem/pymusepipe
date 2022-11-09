@@ -481,7 +481,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.dict_allpixtabs_in_datasets = {}
         self.pointing_dict_pixtabs = {}
         # Loop on Datasets
-        print(f"TEST = {self.list_dataset}")
+        print(f"TEST = {self.list_datasets}")
         for dataset in self.list_datasets:
             # get the path
             if self._pixtab_in_comb_folder:
