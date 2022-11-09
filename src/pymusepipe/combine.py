@@ -36,7 +36,8 @@ from .recipes_pipe import PipeRecipes
 from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
-from .util_pipe import filter_list_with_pdict, get_dataset_name, get_tpl_nexpo
+from .util_pipe import (filter_list_with_pdict, get_dataset_name, 
+                        get_tpl_nexpo, merge_dict)
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
                           dict_combined_folders, default_prefix_wcs,
