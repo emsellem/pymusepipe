@@ -530,6 +530,7 @@ class MusePointings(SofPipe, PipeRecipes):
             self.dict_allpixtabs_in_datasets[dataset] = full_list
 
             # Filter the list with the dataset dictionary if given
+            print(list_pixtabs)
             select_list_pixtabs, tempp_dict_pixtabs = filter_list_with_pdict(list_pixtabs,
                                                          [dataset],
                                                          self.dict_exposures,

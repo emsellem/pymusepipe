@@ -722,8 +722,7 @@ class ExposureInfo(object):
 
 
 def filter_list_with_pdict(input_list, list_datasets=None,
-                           dict_files=None,
-                           verbose=True):
+                           dict_files=None, verbose=True):
     """Filter out exposures (pixtab or cube namelist) using a dictionary which
     has a list of datasets and for each dataset a list of exposure number.
 
@@ -781,7 +780,6 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                         # Check whether this exists in the our cube list
 #                        suffix_expo = "_{0:04d}".format(nexpo)
                         for filename in input_list:
-                            print(filename)
                             ftpl, fnexpo = get_tpl_expo(filename)
 #                            if (suffix_expo in filename) and (tpl in filename):
                             upipe.print_info(f"filename {ftpl} / {fnexpo} ---- {tpl} / {nexpo}")
