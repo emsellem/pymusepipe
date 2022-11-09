@@ -36,7 +36,7 @@ from .recipes_pipe import PipeRecipes
 from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
-from .util_pipe import filter_list_with_pdict, get_dataset_name
+from .util_pipe import filter_list_with_pdict, get_dataset_name, get_tpl_nexpo
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
                           dict_combined_folders, default_prefix_wcs,
@@ -179,8 +179,8 @@ def get_list_exposures(dataset_path=""):
     list_files = glob.glob(f"{dataset_path}/Object/{prefix_final_cube}*_????.fits")
     list_expos = []
     for name in list_files:
-        [(tpl, lint)] = re.findall(r'\_(\S{19})\_(\d{4}).fits', name)
-        if len(lint) > 0:
+        tpl, lint = get_tpl_nexpo(name)
+        if lint > 0:
             list_expos.append((tpl, np.int(lint)))
 
     # Making it unique and sort
@@ -204,8 +204,9 @@ def get_list_exposures(dataset_path=""):
 
     return dict_expos
 
-def get_list_pixtables(target_path="", list_datasets=None, suffix="", pixtable_prefix=None,
-                      str_dataset=default_str_dataset, ndigits=default_ndigits):
+def get_list_reduced_pixtables(target_path="", list_datasets=None, 
+                               suffix="", str_dataset=default_str_dataset, 
+                               ndigits=default_ndigits):
     """Provide a list of reduced pixtables
 
     Input
@@ -214,14 +215,11 @@ def get_list_pixtables(target_path="", list_datasets=None, suffix="", pixtable_p
         Path for the target folder
     list_datasets: list of int
         List of integers, providing the list of datasets to consider
-    pixtable_prefix: str
-        Optional. If specified, is the prefix used for searching PIXTABLES
     suffix: str
         Additional suffix, if needed, for the names of the PixTables.
     """
     # Getting the pieces of the names to be used for pixtabs
-    if pixtable_prefix is None:
-        pixtable_prefix = prep_recipes_pipe.dict_products_scipost['individual'][0]
+    pixtable_prefix = prep_recipes_pipe.dict_products_scipost['individual'][0]
     upipe.print_info(f"Will be looking for PIXTABLES with suffix {pixtable_prefix}")
 
     # Initialise the dictionary of pixtabs to be found in each dataset
@@ -372,7 +370,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.init_default_param(dict_combined_folders)
         self._dict_combined_folders = dict_combined_folders
 
-        self.list_datasets = self._check_datasets_list(list_datasets)
+        self.list_datasets = self._check_list_datasets(list_datasets)
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
@@ -396,7 +394,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Checking input datasets and pixtables
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
-        self._get_list_pixtables(dict_exposures)
+        self._get_list_reduced_pixtables(dict_exposures)
 
         # Checking input offset table and corresponding pixtables
         self._check_offset_table(name_offset_table, folder_offset_table)
@@ -462,7 +460,7 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             return name
 
-    def _get_list_pixtables(self, dict_exposures=None):
+    def _get_list_reduced_pixtables(self, dict_exposures=None):
         """Check if datasets and dictionary are compatible
         """
         # Dictionary of exposures to select per dataset
@@ -476,6 +474,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Initialise the dictionary of pixtabs to be found in each dataset
         self.dict_pixtabs_in_datasets = {}
         self.dict_allpixtabs_in_datasets = {}
+        self.pointing_dict_pixtabs = {}
         # Loop on Datasets
         for dataset in self.list_datasets:
             # get the path
@@ -526,11 +525,12 @@ class MusePointings(SofPipe, PipeRecipes):
             self.dict_allpixtabs_in_datasets[dataset] = full_list
 
             # Filter the list with the dataset dictionary if given
-            select_list_pixtabs = filter_list_with_pdict(list_pixtabs,
+            select_list_pixtabs, tempp_dict_pixtabs = filter_list_with_pdict(list_pixtabs,
                                                          [dataset],
                                                          self.dict_exposures,
                                                          verbose=self.verbose)
 
+            self.pointing_dict_pixtabs = merge_dict(self.pointing_dict_pixtabs, tempp_dict_pixtabs)
             select_list_pixtabs.sort()
             self.dict_pixtabs_in_datasets[dataset] = select_list_pixtabs
 
@@ -744,9 +744,9 @@ class MusePointings(SofPipe, PipeRecipes):
                                         refcube_name=wcs_refcube_name)
 
     def run_combine_all_single_pointings(self, add_suffix="",
-                                      sof_filename='pointings_combine',
-                                      list_pointings=None,
-                                      **kwargs):
+                                         sof_filename='pointings_combine',
+                                         list_pointings=None,
+                                         **kwargs):
         """Run for all pointings individually, provided in the
         list of pointings, by just looping over the pointings.
 
@@ -769,7 +769,7 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         # If list_pointings is None using the initially set up one
         list_pointings = self._check_pointings_list(list_pointings,
-                                               self.list_pointings)
+                                                    self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
@@ -844,13 +844,13 @@ class MusePointings(SofPipe, PipeRecipes):
             List of filter names to be used. 
         """
         # If list_pointings is None using the initially set up one
-        list_pointings = self._check_pointing_list(list_pointings,
-                                               self.list_pointings)
+        list_pointings = self._check_pointings_list(list_pointings,
+                                                    self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Making WCS Mask for "
-                             "pointing {0:02d}".format(np.int(pointing)))
+                             "Pointing {0:02d}".format(np.int(pointing)))
             _ = self.create_pointing_wcs(pointing=pointing,
                                          filter_list=filter_list, **kwargs)
 

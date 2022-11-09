@@ -14,6 +14,7 @@ import time
 from os.path import join as joinpath
 import copy
 from collections import OrderedDict
+import re
 
 # Numpy
 import numpy as np
@@ -186,6 +187,29 @@ def add_string(text, word="_", loc=0):
 
     return text
 
+def get_tpl_nexpo(filename):
+    """Get the tpl and nexpo from a filename assuming it is at the end
+    of the filename
+
+    Input
+    -----
+    filename: str
+       Input filename
+
+    Returns
+    -------
+    tpl, nexpo: str, int
+    """
+    basestr, ext = os.path.splitext(filename)
+    try:
+        [(tpl, nexpo)] = re.findall(r'\_(\S{19})\_(\d{4})', basestr)
+        if len(nexpo) > 0:
+            return tpl, int(nexpo)
+        else:
+            return "", -1
+    except ValueError:
+        return "", -1
+
 def get_dataset_name(dataset=1, str_dataset=default_str_dataset, ndigits=default_ndigits):
     """Formatting for the dataset/pointing names using the number and
     the number of digits and prefix string
@@ -248,6 +272,27 @@ class TimeStampDict(OrderedDict):
         """Delete a key in the dictionary
         """
         _ = self.pop(tstamp)
+
+def merge_dict(dict1, dict2):
+    """Merging two dictionaries by appending
+    keys which are duplicated
+
+    Input
+    -----
+    dict1: dict
+    dict2: dict
+
+    Returns
+    -------
+    dict1 : dict
+        merged dictionary
+    """
+    for key, value in dict2.items():
+        if key in dict1:
+            dict1[key].extend(value)
+        else:
+            dict1[key] = value
+    return dict1
 
 def create_time_name() :
     """Create a time-link name for file saving purposes
@@ -664,6 +709,18 @@ def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
     final_rot_cube.write(joinpath(outwcs_folder, out_name))
     return outwcs_folder, out_name
 
+
+class ExposureInfo(object):
+    def __init__(self, targername, dataset, tpl, nexpo):
+        """A dummy class to just store temporarily
+        the various basic info about a Muse exposure
+        """
+        self.targetname = targetname
+        self.dataset = dataset
+        self.tpl = tpl
+        self.nexpo = nexpo
+
+
 def filter_list_with_pdict(input_list, list_datasets=None,
                            dict_files=None,
                            verbose=True):
@@ -675,40 +732,63 @@ def filter_list_with_pdict(input_list, list_datasets=None,
         dict_files (dict):  dictionary used to filter
 
     Returns:
-        selected_list: selected list of files
+        selected_filename_list: selected list of files
+        exposure_list_per_pointing: selected list of files for each pointing
 
     """
     nfiles_input_list = len(input_list)
     if dict_files is None:
-          selected_list = input_list
+        selected_filename_list = input_list
+        exposure_list_per_pointing = {1: input_list}
 
     # Otherwise use the ones which are given via their expo numbers
     else:
-        selected_list = []
+        selected_filename_list = []
+        exposure_list_per_pointing = {}
         # this is the list of exposures to consider
 
         if list_datasets is None:
             list_datasets = dict_files.keys()
         elif not isinstance(list_datasets, list):
             upipe.print_error("Cannot recognise input dataset(s)")
-            return selected_list
+            return selected_filename_list
 
         for dataset in list_datasets:
             if dataset not in dict_files:
                 upipe.print_warning("Dataset {} not in dictionary "
                                     "- skipping".format(dataset))
             else:
-                list_expo = dict_files[dataset]
-                # We loop on that list
-                for expotuple in list_expo:
-                    tpl, nexpo = expotuple[0], expotuple[1]
-                    for expo in nexpo:
+                list_tpltuple = dict_files[dataset]
+                # We loop on that list which should contain the list of tpl associated
+                # with a list of exposure numbers
+                for expotuple in list_tpltuple:
+                    # We get the tpl, and then the list of expo numbers
+                    tpl, list_expo = expotuple[0], expotuple[1]
+                    # For each list of expo numbers, check if this is just a number
+                    # or also a pointing association
+                    for expo in list_expo:
+                        # By default we assign the dataset as pointing number
+                        if type(expo) in [str, int]:
+                            nexpo = int(expo)
+                            pointing = int(dataset)
+                        elif len(expo) == 2:
+                            nexpo = int(expo[0])
+                            pointing = int(expo[1])
+                        else:
+                            upipe.print_warning(f"Dictionary entry {expotuple} ignored")
+                            break
+
                         # Check whether this exists in the our cube list
-                        suffix_expo = "_{0:04d}".format(np.int(expo))
+#                        suffix_expo = "_{0:04d}".format(nexpo)
                         for filename in input_list:
-                            if (suffix_expo in filename) and (tpl in filename):
+                            ftpl, fnexpo = get_tpl_expo(filename)
+#                            if (suffix_expo in filename) and (tpl in filename):
+                            if (nexpo == fnexpo) & (ftpl == tpl):
                                 # We select the file
-                                selected_list.append(filename)
+                                selected_filename_list.append(filename)
+                                if pointing not in list_exposures_per_pointing:
+                                    list_exposures_per_pointing[pointing] = {}
+                                list_exposures_per_pointing[pointing].append(filename)
                                 # And remove it from the list
                                 input_list.remove(filename)
                                 # We break out of the cube for loop
@@ -717,9 +797,13 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     if verbose:
         upipe.print_info("Datasets {0} - Selected {1}/{2} files after "
                          "dictionary filtering".format(list_datasets,
-                                                len(selected_list),
+                                                len(selected_filename_list),
                                                 nfiles_input_list))
-    return selected_list
+
+        for pointing in list_exposures_per_pointing:
+            upipe.print_info(f"Pointing {pointing}:"
+                             f" {list_exposures_per_pointing[pointing]}")
+    return selected_filename_list, list_exposures_per_pointing
 
 def filter_list_with_suffix_list(list_names, included_suffix_list=[],
                                  excluded_suffix_list=[], name_list=""):
