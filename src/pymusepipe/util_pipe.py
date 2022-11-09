@@ -758,6 +758,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                                     "- skipping".format(dataset))
             else:
                 list_tpltuple = dict_files[dataset]
+                print(f"TEST - list_tpltuple {list_tpltuple}")
                 # We loop on that list which should contain the list of tpl associated
                 # with a list of exposure numbers
                 for expotuple in list_tpltuple:
