@@ -273,7 +273,8 @@ class MusePointings(SofPipe, PipeRecipes):
     datasets. This provides a set of rules and methods to access the data and
     process them.
     """
-    def __init__(self, targetname=None, list_datasets=None,
+    def __init__(self, targetname=None, 
+                 list_datasets=None, list_pointings=None,
                  dict_exposures=None,
                  prefix_masked_pixtables="tmask",
                  folder_config="",
@@ -371,6 +372,9 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.init_default_param(dict_combined_folders)
         self._dict_combined_folders = dict_combined_folders
 
+        # List of pointings to process
+        self.list_pointings = list_pointings
+        # List of datasets to process
         self.list_datasets = self._check_list_datasets(list_datasets)
         # Setting all the useful paths
         self.set_fullpath_names()

@@ -292,12 +292,12 @@ class MusePipeSample(object):
         self.pipes_mosaic = {}
         for targetname in self.targetnames:
             subfolder = self.sample[targetname][0]
-            lpoints = self.sample[targetname][1]
+            ldatasets = self.sample[targetname][1]
             # Finding out which datasets should be included
             list_datasets = []
-            for lp in lpoints:
-                if lpoints[lp] == 1:
-                    list_datasets.append(lp)
+            for lds in ldatasets:
+                if ldatasets[lds] == 1:
+                    list_datasets.append(lds)
             # Defining the MusePipe for that target - which datasets
             self.targets[targetname] = MusePipeTarget(targetname=targetname,
                                                       subfolder=subfolder,
@@ -1048,7 +1048,7 @@ class MusePipeSample(object):
                                          suffix=suffixout,
                                          folder=folder_cubes)
 
-    def init_combine(self, targetname=None, list_pointings=None,
+    def init_combine(self, targetname=None, list_pointings=None, list_datasets=None
                      folder_offset_table=None, name_offset_table=None,
                      **kwargs):
         """Prepare the combination of targets
@@ -1065,6 +1065,7 @@ class MusePipeSample(object):
         log_filename = kwargs.pop("log_filename", "{0}_combine_{1}.log".format(targetname, version_pack))
         self.pipes_combine[targetname] = MusePointings(targetname=targetname,
                                                     list_pointings=list_pointings,
+                                                    list_datasets=list_datasets,
                                                     rc_filename=self.targets[targetname].rc_filename,
                                                     cal_filename=self.targets[targetname].cal_filename,
                                                     folder_config=self.targets[targetname].folder_config,
