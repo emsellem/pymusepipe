@@ -737,7 +737,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     """
     nfiles_input_list = len(input_list)
     if dict_files is None:
-        print("TEST: dict_files is None?")
+        print(f"TEST: dict_files is None?")
         selected_filename_list = input_list
         dict_exposures_per_pointing = {0: input_list}
 

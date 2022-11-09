@@ -324,7 +324,7 @@ class MusePipeSample(object):
                                              rc_filename=rc_filename,
                                              cal_filename=cal_filename,
                                              folder_config=folder_config,
-                                             verbose=False)
+                                             verbose=True)
             self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
 
             if self.init_pipes:
