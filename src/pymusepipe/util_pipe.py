@@ -739,12 +739,12 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     if dict_files is None:
         print("TEST: dict_files is None?")
         selected_filename_list = input_list
-        list_exposures_per_pointing = {0: input_list}
+        dict_exposures_per_pointing = {0: input_list}
 
     # Otherwise use the ones which are given via their expo numbers
     else:
         selected_filename_list = []
-        list_exposures_per_pointing = {}
+        dict_exposures_per_pointing = {}
         # this is the list of exposures to consider
 
         if list_datasets is None:
@@ -789,9 +789,9 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             if (nexpo == fnexpo) & (ftpl == tpl):
                                 # We select the file
                                 selected_filename_list.append(filename)
-                                if pointing not in list_exposures_per_pointing:
-                                    list_exposures_per_pointing[pointing] = []
-                                list_exposures_per_pointing[pointing].append(filename)
+                                if pointing not in dict_exposures_per_pointing:
+                                    dict_exposures_per_pointing[pointing] = []
+                                dict_exposures_per_pointing[pointing].append(filename)
                                 # And remove it from the list
                                 input_list.remove(filename)
                                 # We break out of the cube for loop
@@ -803,10 +803,10 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                                                 len(selected_filename_list),
                                                 nfiles_input_list))
 
-        for pointing in list_exposures_per_pointing:
+        for pointing in dict_exposures_per_pointing:
             upipe.print_info(f"Pointing {pointing}:"
-                             f" {list_exposures_per_pointing[pointing]}")
-    return selected_filename_list, list_exposures_per_pointing
+                             f" {dict_exposures_per_pointing[pointing]}")
+    return selected_filename_list, dict_exposures_per_pointing
 
 def filter_list_with_suffix_list(list_names, included_suffix_list=[],
                                  excluded_suffix_list=[], name_list=""):
