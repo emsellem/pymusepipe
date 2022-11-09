@@ -204,7 +204,7 @@ def get_list_exposures(dataset_path=""):
 
     return dict_expos
 
-def get_list_pixtables(target_path="", list_datasets=None, suffix="",
+def get_list_pixtables(target_path="", list_datasets=None, suffix="", pixtable_prefix=None,
                       str_dataset=default_str_dataset, ndigits=default_ndigits):
     """Provide a list of reduced pixtables
 
@@ -214,12 +214,15 @@ def get_list_pixtables(target_path="", list_datasets=None, suffix="",
         Path for the target folder
     list_datasets: list of int
         List of integers, providing the list of datasets to consider
+    pixtable_prefix: str
+        Optional. If specified, is the prefix used for searching PIXTABLES
     suffix: str
         Additional suffix, if needed, for the names of the PixTables.
     """
     # Getting the pieces of the names to be used for pixtabs
-    pixtable_suffix = prep_recipes_pipe.dict_products_scipost['individual'][0]
-    upipe.print_warning(f"Will be looking for PIXTABLES with suffix {pixtable_suffix}")
+    if pixtable_prefix is None:
+        pixtable_prefix = prep_recipes_pipe.dict_products_scipost['individual'][0]
+    upipe.print_info(f"Will be looking for PIXTABLES with suffix {pixtable_prefix}")
 
     # Initialise the dictionary of pixtabs to be found in each dataset
     dict_pixtables = {}
@@ -235,14 +238,14 @@ def get_list_pixtables(target_path="", list_datasets=None, suffix="",
         path_dataset = joinpath(target_path, get_dataset_name(dataset, str_dataset, ndigits))
         # List existing pixtabs, using the given suffix
         list_pixtabs = glob.glob(path_dataset +
-                                 f"/Object/{pixtable_suffix}{suffix}*fits")
+                                 f"/Object/{pixtable_prefix}{suffix}*fits")
 
         # Reset the needed temporary dictionary
         dict_tpl = {}
         # Loop over the pixtables for that dataset
         for pixtab in list_pixtabs:
             # Split over the PIXTABLE_REDUCED string
-            sl = pixtab.split(pixtable_suffix + "_")
+            sl = pixtab.split(pixtable_prefix + "_")
             # Find the expo number
             nf = len(".fits")
             expo = sl[1][-int(nf+4):-int(nf)]
