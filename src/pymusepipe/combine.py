@@ -544,6 +544,7 @@ class MusePointings(SofPipe, PipeRecipes):
             self.pointing_dict_pixtabs = merge_dict(self.pointing_dict_pixtabs, tempp_dict_pixtabs)
             select_list_pixtabs.sort()
             self.dict_pixtabs_in_datasets[dataset] = select_list_pixtabs
+            print(f"TEST SORT = {self.dict_pixtabs_in_datasets}")
 
     def _read_offset_table(self, name_offset_table=None, folder_offset_table=None):
         """Reading the Offset Table
