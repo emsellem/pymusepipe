@@ -1048,7 +1048,7 @@ class MusePipeSample(object):
                                          suffix=suffixout,
                                          folder=folder_cubes)
 
-    def init_combine(self, targetname=None, list_pointings=None, list_datasets=None
+    def init_combine(self, targetname=None, list_pointings=None, list_datasets=None,
                      folder_offset_table=None, name_offset_table=None,
                      **kwargs):
         """Prepare the combination of targets
