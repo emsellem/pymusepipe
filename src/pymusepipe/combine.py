@@ -486,11 +486,15 @@ class MusePointings(SofPipe, PipeRecipes):
             # get the path
             if self._pixtab_in_comb_folder:
                 path_pixtables = self.paths.cubes
+                print(f"TEST SUFF = {dataset}")
                 dataset_suffix = get_dataset_name(dataset,
                                                   self.pipe_params.str_dataset,
                                                   self.pipe_params.ndigits)
+                print(f"TEST SUFF = {dataset}")
             else:
+                print(f"TEST SUFF = {dataset}")
                 path_dataset = getattr(self.paths, self.dict_name_datasets[dataset])
+                print(f"TEST SUFF = {dataset}")
                 path_pixtables = path_dataset + self.pipe_params.object
                 dataset_suffix = ""
 
@@ -533,13 +537,17 @@ class MusePointings(SofPipe, PipeRecipes):
 
             full_list = copy.copy(list_pixtabs)
             full_list.sort()
+            print(f"TEST all = {dataset}")
             self.dict_allpixtabs_in_datasets[dataset] = full_list
+            print(f"TEST all = {dataset}")
 
             # Filter the list with the dataset dictionary if given
+            print(f"TEST pdict = {dataset}")
             select_list_pixtabs, tempp_dict_pixtabs = filter_list_with_pdict(list_pixtabs,
                                                          list_datasets=(dataset),
                                                          dict_files=self.dict_exposures,
                                                          verbose=self.verbose)
+            print(f"TEST pdict = {dataset}")
 
             self.pointing_dict_pixtabs = merge_dict(self.pointing_dict_pixtabs, tempp_dict_pixtabs)
             select_list_pixtabs.sort()
