@@ -37,7 +37,7 @@ from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
 from .util_pipe import (filter_list_with_pdict, get_dataset_name, 
-                        get_tpl_nexpo, merge_dict)
+                        get_tpl_nexpo, merge_dict, add_string)
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
                           dict_combined_folders, default_prefix_wcs,
@@ -493,11 +493,15 @@ class MusePointings(SofPipe, PipeRecipes):
                 path_dataset = getattr(self.paths, self.dict_name_datasets[dataset])
                 path_pixtables = path_dataset + self.pipe_params.object
                 dataset_suffix = ""
+
+            # Process the strings to add "_" if needed
+            dataset_suffix = add_string(dataset_suffix)
+            suffix = add_string(self.suffix)
             # List existing pixtabs, using the given suffix
             list_pixtabs = glob.glob(path_pixtables + "{0}{1}{2}*fits".format(
-                                     pixtable_suffix, self.suffix,
+                                     pixtable_suffix, suffix,
                                      dataset_suffix))
-            print(f"TEST PIXTABS = {path_pixtables} / {pixtable_suffix} / {self.suffix} / {dataset_suffix}")
+            print(f"TEST PIXTABS = {path_pixtables} / {pixtable_suffix} / {suffix} / {dataset_suffix}")
 
             # Take (or not) the masked pixtables
             if self.use_masked_pixtables:
@@ -506,7 +510,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 list_masked_pixtabs = glob.glob(path_pixtables +
                                                "{0}{1}{2}*fits".format(
                                                    prefix_to_consider,
-                                                   self.suffix,
+                                                   suffix,
                                                    dataset_suffix))
 
                 # Looping over the existing masked pixtables

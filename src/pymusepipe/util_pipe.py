@@ -702,7 +702,7 @@ def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
     else:
         name, extension = os.path.splitext(cube_name)
         if out_suffix != "":
-            out_suffix = "_{}".format(out_suffix)
+            out_suffix = add_string(out_suffix)
         out_name = "{0}{1}{2}".format(name, out_suffix, extension)
 
     # write output
