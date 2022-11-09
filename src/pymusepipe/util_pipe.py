@@ -791,7 +791,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                                 selected_filename_list.append(filename)
                                 if pointing not in list_exposures_per_pointing:
                                     list_exposures_per_pointing[pointing] = {}
-                                list_exposures_per_pointing[pointing].append(filename)
+                                list_exposures_per_pointing[pointing].extend(filename)
                                 # And remove it from the list
                                 input_list.remove(filename)
                                 # We break out of the cube for loop
