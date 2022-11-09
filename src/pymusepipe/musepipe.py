@@ -731,9 +731,10 @@ class MusePipe(PipePrep, PipeRecipes):
                     if expotype.upper() in list_fieldspecific_checkmode:
                         maskmode = [self._fieldmode == analyse_musemode(value, 'field') 
                                     for value in self.Tables.Rawfiles['mode']]
+                        mask = maskmode & mask
                     elif (expotype.upper() not in list_exclude_checkmode) or self.strong_checkmode:
                         maskmode = (self.Tables.Rawfiles['mode'] == self.musemode)
-                    mask = maskmode & mask
+                        mask = maskmode & mask
                 setattr(self.Tables.Raw, self._get_attr_expo(expotype),
                         self.Tables.Rawfiles[mask])
             except AttributeError:

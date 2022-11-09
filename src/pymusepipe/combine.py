@@ -243,7 +243,8 @@ def get_list_pixtables(target_path="", list_datasets=None, suffix="",
             # Split over the PIXTABLE_REDUCED string
             sl = pixtab.split(pixtable_suffix + "_")
             # Find the expo number
-            expo = sl[1][-9:-5]
+            nf = len(".fits")
+            expo = sl[1][-int(nf+4):-int(nf)]
             # Find the tpl
             tpl = sl[1].split("_" + expo)[0]
             # If not already there, add it
@@ -269,7 +270,7 @@ class MusePointings(SofPipe, PipeRecipes):
     datasets. This provides a set of rules and methods to access the data and
     process them.
     """
-    def __init__(self, targetname=None, list_pointings=None,
+    def __init__(self, targetname=None, list_datasets=None,
                  dict_exposures=None,
                  prefix_masked_pixtables="tmask",
                  folder_config="",
@@ -284,8 +285,8 @@ class MusePointings(SofPipe, PipeRecipes):
         Input
         -----
         targetname: string (e.g., 'NGC1208'). default is None.
-        list_pointingw: list of int
-            List of pointing numbers to consider
+        list_datasets: list of int
+            List of datasets numbers to consider
         rc_filename: str
             filename to initialise folders
         cal_filename: str
@@ -360,14 +361,14 @@ class MusePointings(SofPipe, PipeRecipes):
                                               cal_filename=cal_filename,
                                               verbose=verbose)
 
-        # Setting up the relative path for the data, using Galaxy Name + Pointing
+        # Setting up the relative path for the data, using Galaxy Name + Dataset
         self.pipe_params.data = "{0}/{1}/".format(self.targetname,
                                                   self.combined_folder_name)
 
         self.pipe_params.init_default_param(dict_combined_folders)
         self._dict_combined_folders = dict_combined_folders
 
-        self.list_pointings = self._check_pointings_list(list_pointings)
+        self.list_datasets = self._check_datasets_list(list_datasets)
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)

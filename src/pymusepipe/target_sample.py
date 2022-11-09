@@ -293,11 +293,12 @@ class MusePipeSample(object):
         for targetname in self.targetnames:
             subfolder = self.sample[targetname][0]
             lpoints = self.sample[targetname][1]
+            # Finding out which datasets should be included
             list_datasets = []
             for lp in lpoints:
                 if lpoints[lp] == 1:
                     list_datasets.append(lp)
-            # Defining the MusePipe for that target
+            # Defining the MusePipe for that target - which datasets
             self.targets[targetname] = MusePipeTarget(targetname=targetname,
                                                       subfolder=subfolder,
                                                       list_datasets=list_datasets)
