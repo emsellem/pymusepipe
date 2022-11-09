@@ -551,7 +551,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
             self.pointing_dict_pixtabs = merge_dict(self.pointing_dict_pixtabs, tempp_dict_pixtabs)
             select_list_pixtabs.sort()
-            print(f"TEST SORT = {dataset}")
+            print(f"TEST SORT = {dataset}/{self.dict_pixtabs_in_datasets}")
             self.dict_pixtabs_in_datasets[dataset] = select_list_pixtabs
             print(f"TEST SORT = {dataset}/{self.dict_pixtabs_in_datasets}")
 
