@@ -783,7 +783,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                         # Check whether this exists in the our cube list
 #                        suffix_expo = "_{0:04d}".format(nexpo)
                         for filename in input_list:
-                            ftpl, fnexpo = get_tpl_expo(filename)
+                            ftpl, fnexpo = get_tpl_nexpo(filename)
 #                            if (suffix_expo in filename) and (tpl in filename):
                             upipe.print_info(f"filename {ftpl} / {fnexpo} ---- {tpl} / {nexpo}")
                             if (nexpo == fnexpo) & (ftpl == tpl):
