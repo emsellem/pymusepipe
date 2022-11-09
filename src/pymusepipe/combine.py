@@ -497,7 +497,7 @@ class MusePointings(SofPipe, PipeRecipes):
             list_pixtabs = glob.glob(path_pixtables + "{0}{1}{2}*fits".format(
                                      pixtable_suffix, self.suffix,
                                      dataset_suffix))
-            print(f"TEST PIXTABS = {pixtable_suffix} / {self.suffix} / {dataset_suffix}")
+            print(f"TEST PIXTABS = {path_pixtables} / {pixtable_suffix} / {self.suffix} / {dataset_suffix}")
 
             # Take (or not) the masked pixtables
             if self.use_masked_pixtables:
