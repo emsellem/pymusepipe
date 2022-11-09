@@ -776,6 +776,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                         else:
                             upipe.print_warning(f"Dictionary entry {expotuple} ignored")
                             break
+                        print(f"TEST - expo {expo} / {nexpo} / {pointing}")
 
                         # Check whether this exists in the our cube list
 #                        suffix_expo = "_{0:04d}".format(nexpo)
