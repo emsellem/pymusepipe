@@ -219,6 +219,7 @@ def get_list_pixtables(target_path="", list_datasets=None, suffix="",
     """
     # Getting the pieces of the names to be used for pixtabs
     pixtable_suffix = prep_recipes_pipe.dict_products_scipost['individual'][0]
+    upipe.print_warning(f"Will be looking for PIXTABLES with suffix {pixtable_suffix}")
 
     # Initialise the dictionary of pixtabs to be found in each dataset
     dict_pixtables = {}
