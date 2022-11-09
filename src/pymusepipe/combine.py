@@ -537,8 +537,8 @@ class MusePointings(SofPipe, PipeRecipes):
 
             # Filter the list with the dataset dictionary if given
             select_list_pixtabs, tempp_dict_pixtabs = filter_list_with_pdict(list_pixtabs,
-                                                         [dataset],
-                                                         self.dict_exposures,
+                                                         list_datasets=[dataset],
+                                                         dict_files=self.dict_exposures,
                                                          verbose=self.verbose)
 
             self.pointing_dict_pixtabs = merge_dict(self.pointing_dict_pixtabs, tempp_dict_pixtabs)
