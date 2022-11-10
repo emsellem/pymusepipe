@@ -744,6 +744,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     else:
         selected_filename_list = []
         dict_exposures_per_pointing = {}
+        dict_tplexpo_per_pointing = {}
         # this is the list of exposures to consider
 
         if list_datasets is None:
@@ -790,21 +791,25 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                                     selected_filename_list.append(filename)
                                     if pointing not in dict_exposures_per_pointing:
                                         dict_exposures_per_pointing[pointing] = []
+                                        dict_tplexpo_per_pointing[pointing] = []
                                     dict_exposures_per_pointing[pointing].append(filename)
+                                    dict_tplexpo_per_pointing[pointing].append([tpl, nexpo])
                                     # And remove it from the list
                                     input_list.remove(filename)
                                     # We break out of the cube for loop
                                     break
 
     if verbose:
-        upipe.print_info("Datasets {0} - Selected {1}/{2} files after "
+        upipe.print_info("Datasets {0} - Selected {1}/{2} exposures after "
                          "dictionary filtering".format(list_datasets,
                                                 len(selected_filename_list),
                                                 nfiles_input_list))
 
         for pointing in dict_exposures_per_pointing:
-            upipe.print_info(f"Pointing {pointing}:"
-                             f" {dict_exposures_per_pointing[pointing]}")
+            upipe.print_info(f"Pointing {pointing} - Detected exposures [TPL / NEXPO]:")
+            for tplexpo in dict_exposures_per_pointing[pointing]:
+                upipe.print_info(f"     tplexpo[0] / tplexpo[1]")
+
     return selected_filename_list, dict_exposures_per_pointing
 
 def filter_list_with_suffix_list(list_names, included_suffix_list=[],
