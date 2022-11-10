@@ -479,7 +479,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Initialise the dictionary of pixtabs to be found in each dataset
         self.dict_pixtabs_in_datasets = {}
         self.dict_allpixtabs_in_datasets = {}
-        self.pointing_dict_pixtabs = {}
+        self.dict_pixtabs_in_pointings = {}
         # Loop on Datasets
         for dataset in self.list_datasets:
             # get the path
@@ -540,7 +540,8 @@ class MusePointings(SofPipe, PipeRecipes):
                                                          dict_files=self.dict_exposures,
                                                          verbose=self.verbose)
 
-            self.pointing_dict_pixtabs = merge_dict(self.pointing_dict_pixtabs, tempp_dict_pixtabs)
+            self.dict_pixtabs_in_pointings = merge_dict(self.dict_pixtabs_in_pointings, 
+                                                        tempp_dict_pixtabs)
             select_list_pixtabs.sort()
             print(f"TEST SORT = {dataset}/{self.dict_pixtabs_in_datasets}")
             self.dict_pixtabs_in_datasets[dataset] = copy.copy(select_list_pixtabs)
