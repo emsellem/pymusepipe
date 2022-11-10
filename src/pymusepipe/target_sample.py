@@ -801,7 +801,7 @@ class MusePipeSample(object):
             self.set_pipe_target(targetname=targetname, list_datasets=list_datasets, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets(targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
