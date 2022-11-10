@@ -101,7 +101,7 @@ def get_list_targets(folder=""):
     return list_targets
 
 def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
-                         ndigits=default_ndigits):
+                         ndigits=default_ndigits, show_pointings=False):
     """Build a dictionary of exposures using the list of datasets found for the
     given dataset path
 
@@ -123,9 +123,22 @@ def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
     list_datasets = get_list_datasets(target_path, str_dataset, ndigits)
     dict_expos = {}
     for dataset in list_datasets:
+        # Get the name of the dataset
         name_dataset = get_dataset_name(dataset, str_dataset, ndigits)
         upipe.print_info(f"For dataset {dataset}")
+        # Get the list of exposures for that dataset
         dict_p = get_list_exposures(joinpath(target_path, name_dataset))
+
+        # If introducing the pointings, we set them by just showing the dataset
+        # numbers as a default, to be changed lated by the user
+        if show_pointings:
+            dict_p_wpointings = {}
+            for tpl in dict_p:
+                dict_p_wpointings[tpl] = [[nexpo, dataset] for nexpo in dict_p[tpl]
+            # Now changing dict_p
+            dict_p = copy.copy(dict_p_wpointings)
+
+        # Now creating the dictionary entry for that dataset
         dict_expos[dataset] = [(tpl, dict_p[tpl]) for tpl in dict_p]
 
     return dict_expos
