@@ -749,53 +749,55 @@ def filter_list_with_pdict(input_list, list_datasets=None,
 
         if list_datasets is None:
             list_datasets = dict_files.keys()
-        elif not isinstance(list_datasets, list):
+        elif not isinstance(list_datasets, tuple):
             upipe.print_error("Cannot recognise input dataset(s)")
-            return selected_filename_list
-
-        for dataset in list_datasets:
-            if dataset not in dict_files:
-                upipe.print_warning("Dataset {} not in dictionary "
-                                    "- skipping".format(dataset))
-            else:
-                list_tpltuple = dict_files[dataset]
-                print(f"TEST - list_tpltuple {list_tpltuple}")
-                # We loop on that list which should contain the list of tpl associated
-                # with a list of exposure numbers
-                for expotuple in list_tpltuple:
-                    # We get the tpl, and then the list of expo numbers
-                    tpl, list_expo = expotuple[0], expotuple[1]
-                    # For each list of expo numbers, check if this is just a number
-                    # or also a pointing association
-                    for expo in list_expo:
-                        # By default we assign the dataset as pointing number
-                        if type(expo) in [str, int]:
-                            nexpo = int(expo)
-                            pointing = int(dataset)
-                        elif len(expo) == 2:
-                            nexpo = int(expo[0])
-                            pointing = int(expo[1])
-                        else:
-                            upipe.print_warning(f"Dictionary entry {expotuple} ignored")
-                            break
-                        print(f"TEST - expo {expo} / {nexpo} / {pointing}")
-
-                        # Check whether this exists in the our cube list
-#                        suffix_expo = "_{0:04d}".format(nexpo)
-                        for filename in input_list:
-                            ftpl, fnexpo = get_tpl_nexpo(filename)
-#                            if (suffix_expo in filename) and (tpl in filename):
-                            upipe.print_info(f"filename {ftpl} / {fnexpo} ---- {tpl} / {nexpo}")
-                            if (nexpo == fnexpo) & (ftpl == tpl):
-                                # We select the file
-                                selected_filename_list.append(filename)
-                                if pointing not in dict_exposures_per_pointing:
-                                    dict_exposures_per_pointing[pointing] = []
-                                dict_exposures_per_pointing[pointing].append(filename)
-                                # And remove it from the list
-                                input_list.remove(filename)
-                                # We break out of the cube for loop
+        else:
+            for dataset in list_datasets:
+                if dataset not in dict_files:
+                    upipe.print_warning("Dataset {} not in dictionary "
+                                        "- skipping".format(dataset))
+                else:
+                    list_tpltuple = dict_files[dataset]
+                    print(f"TEST - list_tpltuple {list_tpltuple}")
+                    # We loop on that list which should contain 
+                    # the list of tpl associated
+                    # with a list of exposure numbers
+                    for expotuple in list_tpltuple:
+                        # We get the tpl, and then the list of expo numbers
+                        tpl, list_expo = expotuple[0], expotuple[1]
+                        # For each list of expo numbers, check 
+                        # if this is just a number
+                        # or also a pointing association
+                        for expo in list_expo:
+                            # By default we assign the dataset as 
+                            # pointing number
+                            if type(expo) in [str, int]:
+                                nexpo = int(expo)
+                                pointing = int(dataset)
+                            elif len(expo) == 2:
+                                nexpo = int(expo[0])
+                                pointing = int(expo[1])
+                            else:
+                                upipe.print_warning(f"Dictionary entry {expotuple} ignored")
                                 break
+                            print(f"TEST - expo {expo} / {nexpo} / {pointing}")
+
+                            # Check whether this exists in the our cube list
+#                            suffix_expo = "_{0:04d}".format(nexpo)
+                            for filename in input_list:
+                                ftpl, fnexpo = get_tpl_nexpo(filename)
+#                                if (suffix_expo in filename) and (tpl in filename):
+                                upipe.print_info(f"filename {ftpl} / {fnexpo} - {tpl} / {nexpo}")
+                                if (nexpo == fnexpo) & (ftpl == tpl):
+                                    # We select the file
+                                    selected_filename_list.append(filename)
+                                    if pointing not in dict_exposures_per_pointing:
+                                        dict_exposures_per_pointing[pointing] = []
+                                    dict_exposures_per_pointing[pointing].append(filename)
+                                    # And remove it from the list
+                                    input_list.remove(filename)
+                                    # We break out of the cube for loop
+                                    break
 
     if verbose:
         upipe.print_info("Datasets {0} - Selected {1}/{2} files after "
