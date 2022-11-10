@@ -746,7 +746,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
         list_tplexpo = []
         for filename in input_list:
             ftpl, fnexpo = get_tpl_nexpo(filename)
-            list_tplexpo.append(ftpl, fnexpo)
+            list_tplexpo.append([ftpl, fnexpo])
         dict_tplexpo_per_pointing = {0: list_tplexpo}
 
     # Otherwise use the ones which are given via their expo numbers
