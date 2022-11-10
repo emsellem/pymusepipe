@@ -134,7 +134,7 @@ def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
         if show_pointings:
             dict_p_wpointings = {}
             for tpl in dict_p:
-                dict_p_wpointings[tpl] = [[nexpo, dataset] for nexpo in dict_p[tpl]
+                dict_p_wpointings[tpl] = [[nexpo, dataset] for nexpo in dict_p[tpl]]
             # Now changing dict_p
             dict_p = copy.copy(dict_p_wpointings)
 
