@@ -737,7 +737,6 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     """
     nfiles_input_list = len(input_list)
     if dict_files is None:
-        print(f"TEST: dict_files is None?")
         selected_filename_list = input_list
         dict_exposures_per_pointing = {0: input_list}
 
@@ -758,7 +757,6 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                                         "- skipping".format(dataset))
                 else:
                     list_tpltuple = dict_files[dataset]
-                    print(f"TEST - list_tpltuple {list_tpltuple}")
                     # We loop on that list which should contain 
                     # the list of tpl associated
                     # with a list of exposure numbers
@@ -780,7 +778,6 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             else:
                                 upipe.print_warning(f"Dictionary entry {expotuple} ignored")
                                 break
-                            print(f"TEST - expo {expo} / {nexpo} / {pointing}")
 
                             # Check whether this exists in the our cube list
 #                            suffix_expo = "_{0:04d}".format(nexpo)
