@@ -737,8 +737,17 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     """
     nfiles_input_list = len(input_list)
     if dict_files is None:
+        # Returning the default input list
         selected_filename_list = input_list
+        # Just one dummy pointing with all files
         dict_exposures_per_pointing = {0: input_list}
+        # Building the dummy list of tpl and nexpo for
+        # this input list, decrypting with get_tpl_nexpo
+        list_tplexpo = []
+        for filename in input_list:
+            ftpl, fnexpo = get_tpl_nexpo(filename)
+            list_tplexpo.append(ftpl, fnexpo)
+        dict_tplexpo_per_pointing = {0: list_tplexpo}
 
     # Otherwise use the ones which are given via their expo numbers
     else:
