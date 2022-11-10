@@ -500,7 +500,6 @@ class MusePointings(SofPipe, PipeRecipes):
             list_pixtabs = glob.glob(path_pixtables + "{0}{1}{2}*fits".format(
                                      pixtable_suffix, suffix,
                                      dataset_suffix))
-            print(f"TEST PIXTABS = {path_pixtables} / {pixtable_suffix} / {suffix} / {dataset_suffix}")
 
             # Take (or not) the masked pixtables
             if self.use_masked_pixtables:
@@ -543,7 +542,6 @@ class MusePointings(SofPipe, PipeRecipes):
             self.dict_pixtabs_in_pointings = merge_dict(self.dict_pixtabs_in_pointings, 
                                                         tempp_dict_pixtabs)
             select_list_pixtabs.sort()
-            print(f"TEST SORT = {dataset}/{self.dict_pixtabs_in_datasets}")
             self.dict_pixtabs_in_datasets[dataset] = copy.copy(select_list_pixtabs)
 
     def _read_offset_table(self, name_offset_table=None, folder_offset_table=None):
