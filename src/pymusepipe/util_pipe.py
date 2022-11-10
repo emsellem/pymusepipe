@@ -804,9 +804,9 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                                                 len(selected_filename_list),
                                                 nfiles_input_list))
 
-        for pointing in dict_exposures_per_pointing:
+        for pointing in dict_tplexpo_per_pointing:
             upipe.print_info(f"Pointing {pointing} - Detected exposures [TPL / NEXPO]:")
-            for tplexpo in dict_exposures_per_pointing[pointing]:
+            for tplexpo in dict_tplexpo_per_pointing[pointing]:
                 upipe.print_info(f"     {tplexpo[0]} / {tplexpo[1]}")
 
     return selected_filename_list, dict_exposures_per_pointing
