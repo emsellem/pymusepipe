@@ -785,7 +785,6 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             for filename in input_list:
                                 ftpl, fnexpo = get_tpl_nexpo(filename)
 #                                if (suffix_expo in filename) and (tpl in filename):
-                                upipe.print_info(f"filename {ftpl} / {fnexpo} - {tpl} / {nexpo}")
                                 if (nexpo == fnexpo) & (ftpl == tpl):
                                     # We select the file
                                     selected_filename_list.append(filename)
@@ -808,7 +807,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
         for pointing in dict_exposures_per_pointing:
             upipe.print_info(f"Pointing {pointing} - Detected exposures [TPL / NEXPO]:")
             for tplexpo in dict_exposures_per_pointing[pointing]:
-                upipe.print_info(f"     tplexpo[0] / tplexpo[1]")
+                upipe.print_info(f"     {tplexpo[0]} / {tplexpo[1]}")
 
     return selected_filename_list, dict_exposures_per_pointing
 
