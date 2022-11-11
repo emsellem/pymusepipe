@@ -786,7 +786,9 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                                 nexpo = int(expo[0])
                                 pointing = int(expo[1])
                             else:
-                                upipe.print_warning(f"Dictionary entry {expotuple} ignored")
+                                upipe.print_warning(f"Dictionary entry {expotuple} "
+                                                    f"ignored (type of expo - {expo} - "
+                                                    f"is {type(expo)}")
                                 break
 
                             # Check whether this exists in the our cube list
