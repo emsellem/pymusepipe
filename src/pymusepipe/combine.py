@@ -195,7 +195,7 @@ def get_list_exposures(dataset_path=""):
     for name in list_files:
         tpl, lint = get_tpl_nexpo(name)
         if lint > 0:
-            list_expos.append((tpl, np.int(lint)))
+            list_expos.append((tpl, int(lint)))
 
     # Making it unique and sort
     list_expos = np.unique(list_expos, axis=0)
@@ -207,9 +207,9 @@ def get_list_exposures(dataset_path=""):
     for l in sorted_list:
         tpl = l[0]
         if tpl in dict_expos:
-            dict_expos[tpl].append(l[1])
+            dict_expos[tpl].append(int(l[1]))
         else:
-            dict_expos[tpl] = [l[1]]
+            dict_expos[tpl] = [int(l[1])]
 
     # Finding the full list of tpl
     upipe.print_info("Exposures list:")
