@@ -510,6 +510,7 @@ class MusePointings(SofPipe, PipeRecipes):
             dataset_suffix = add_string(dataset_suffix)
             suffix = add_string(self.suffix)
             # List existing pixtabs, using the given suffix
+            print(f"TEST {pixtable_suffix} / {suffix} / {dataset_suffix}")
             list_pixtabs = glob.glob(path_pixtables + "{0}{1}{2}*fits".format(
                                      pixtable_suffix, suffix,
                                      dataset_suffix))

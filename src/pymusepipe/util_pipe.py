@@ -796,7 +796,6 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             for filename in input_list:
                                 ftpl, fnexpo = get_tpl_nexpo(filename)
 #                                if (suffix_expo in filename) and (tpl in filename):
-                                print(f"{nexpo} / {fnexpo} - {tpl} / {ftpl}")
                                 if (nexpo == int(fnexpo)) & (ftpl == tpl):
                                     # We select the file
                                     selected_filename_list.append(filename)
