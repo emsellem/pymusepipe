@@ -659,14 +659,14 @@ class MusePointings(SofPipe, PipeRecipes):
         """Go back to original folder
         """
         upipe.print_info("Going back to the original folder {0}".format(self.paths.orig),
-                             pipe=self)
+                         pipe=self)
         self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
 
     def goto_prevfolder(self, addtolog=False):
         """Go back to previous folder
         """
         upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder),
-                             pipe=self)
+                         pipe=self)
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
 
     def goto_folder(self, newpath, addtolog=False, verbose=True):

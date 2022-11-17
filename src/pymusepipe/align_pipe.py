@@ -30,17 +30,6 @@ import scipy.ndimage as nd
 from scipy.signal import correlate
 from scipy.odr import ODR, Model, RealData
 
-# Skimage if you have it
-try:
-    import skimage
-    from skimage.registration import phase_cross_correlation
-except ImportError:
-    upipe.print_warning("If you wish to use skimage for image registration, " 
-                        "please install "
-                        "it via: pip install scikit-image "
-                        "or via: conda install scikit-image")
-
-
 # Astropy
 from astropy import wcs as awcs
 from astropy.io import fits as pyfits
@@ -60,6 +49,7 @@ from .config_pipe import mjd_names, date_names, tpl_names
 from .config_pipe import dataset_names, iexpo_names
 from .config_pipe import default_offset_table, dict_listObject
 
+
 try:
     import reproject
     from reproject import reproject_interp as repro_interp
@@ -68,6 +58,26 @@ except ImportError:
     upipe.print_warning("If you wish to use reproject, please install "
                         "it via: pip install reproject.")
 
+
+# Skimage if you have it
+try:
+    import skimage
+    from skimage.registration import phase_cross_correlation
+except ImportError:
+    upipe.print_warning("If you wish to use skimage for image registration, "
+                        "please install it via "
+                        "    pip install scikit-image "
+                        "or  conda install scikit-image")
+
+
+# Spacepylot
+try:
+    import spacepylot as spp
+    import spacepylot.alignment as sppalign
+    import spacepylot.plotting as spppl
+except ImportError:
+    upipe.print_warning("If you wish to use spaxepylot please install it via"
+                        "pip install or conda install or cloning the github version")
 
 def is_sequence(arg):
     """Test if sequence and return the boolean result
@@ -665,6 +675,21 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
             np.float(hd[angle_keyword]) - hd[angle_orig_keyword]))
 
 
+def init_optical_flow_plot(opflow):
+    """Initialise the optical flow plot using the AlignmentPlotting
+
+    Input
+    -----
+    opflow: optical flow instance (see spacepylot)
+
+    Returns
+    -------
+    An optical flow plot instance
+    """
+    # Initialise the plot
+    return spppl.AlignmentPlotting.from_align_object(opflow)
+
+
 #################################################################
 # ================== END Useful functions ===================== #
 #################################################################
@@ -683,7 +708,7 @@ class AlignMuseDataset(object):
                  dynamic_range=10,
                  border=10, hdu_ext=(0, 1),
                  chunk_size=15,
-                 threshold_muse=0.,
+                 firstguess="crosscorr",
                  **kwargs):
         """Initialise the AlignMuseImages class.
         
@@ -698,18 +723,18 @@ class AlignMuseDataset(object):
         name_muse_images: str or list
             List of names for the MUSE images (or str if only 1 image)
         suffix_muse_images: str
-            Suffix to be used for muse image names 
-            if only a subset should be selected.
+            Suffix to be used for muse image names if only a subset should be selected.
         filter_name: str
             Name of filter to consider when filtering the muse image names
         firstguess: str
-            If "crosscorr", will use cross-correlation to guess
-            the alignment offsets.
+            If "crosscorr", will use cross-correlation to guess the alignment offsets.
             If "fits", will use input fits OFFSET table to start with
+            If set to None explicitly, will put 0's as start offsets.
+            Default is "crosscorr".
         name_offset_table: str
-            Name of the fits OFFSET table. Only used as input
-            as guess if "firstguess" is set to "fits". This name will be the
-            default name when saving the offsets in an OFFSET fits table.
+            Name of the fits OFFSET table. Only used as input as guess if "firstguess"
+            is set to "fits". This name will be the default name when saving
+            the offsets in an OFFSET fits table.
         sel_indices_images: list [None]
             List of images to select from the given set
         median_window: int [10]
@@ -729,12 +754,12 @@ class AlignMuseDataset(object):
         chunk_size: int [15]
             Size in pixels of the chunk used to bin and compute the 
             normalisation factors
-        threshold_muse: float [0]
-            Minimum threshold value to consider for the input 
-            images to align
 
         Other keywords
         --------------
+        threshold_muse: float [0]
+            Minimum threshold value to consider for the input
+            images to align
         verbose: bool [True]
             If True, spits out more verbose output
         plot: bool [True]
@@ -759,7 +784,9 @@ class AlignMuseDataset(object):
         # Some input variables for the cross-correlation
         self.verbose = kwargs.pop("verbose", True)
         self.plot = kwargs.pop("plot", True)
-        # Using mpdaf or image_registration
+
+        # Using mpdaf or image_registration - Default is False
+        # as mpdaf does not define the output WCS homogeneously
         self.use_mpdaf = kwargs.pop("use_mpdaf", False)
         if self.use_mpdaf:
             upipe.print_info("Will use mpdaf for image regridding.")
@@ -768,11 +795,13 @@ class AlignMuseDataset(object):
         else:
             upipe.print_info("Will use image_registration for image regridding.")
 
+        # Set of input parameters for the image processing
         self.border = np.int(border)
         self.chunk_size = np.int(chunk_size)
         self.subim_window = subim_window
         self.median_window = median_window
         self.dynamic_range = dynamic_range
+
         self.name_reference = name_reference
         default_folder = os.getcwd()
         if folder_reference is None:
@@ -812,9 +841,9 @@ class AlignMuseDataset(object):
         upipe.safely_create_folder(self.figures_folder_name, verbose=self.verbose)
 
         # Getting the names
+        self.save_hdr = kwargs.pop("save_hdr", False)
         self.name_musehdr = kwargs.pop("name_musehdr", "muse")
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
-        self.name_refhdr = kwargs.pop("name_refhdr", "reference.hdr")
         self.suffix_images = kwargs.pop("suffix_muse_images", "IMAGE_FOV")
         self.filter_name = kwargs.pop("filter_name", "Cousins_R")
 
@@ -842,7 +871,6 @@ class AlignMuseDataset(object):
         # Initialise the parameters for the first guess
         self.phase_corr = kwargs.pop("phase_corr", True)
         self.phase_subsamp = kwargs.pop("phase_subsamp", 10)
-        self.firstguess = kwargs.pop("firstguess", "crosscorr")
         self.folder_offset_table = kwargs.pop("folder_offset_table",
                                               self.folder_muse_images)
         self.folder_output_table = kwargs.pop("folder_output_table",
@@ -857,39 +885,13 @@ class AlignMuseDataset(object):
         if self.nimages == 0:
             upipe.print_error("No MUSE images detected. Aborted")
             return
-        self.list_offmuse_hdu = [None] * self.nimages
-        self.list_wcs_offmuse_hdu = [None] * self.nimages
-        self.list_proj_refhdu = [None] * self.nimages
-        self.list_wcs_proj_refhdu = [None] * self.nimages
+        self.default_threshold_muse = kwargs.pop("threshold_muse", 0)
 
-        # Initialise the needed arrays for the offsets
-        self.cross_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
-        self.extra_off_pixel = np.zeros_like(self.cross_off_pixel)
-
-        self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
-        self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
-
-        self.extra_rotangles = np.zeros((self.nimages), dtype=np.float64)
-        self._diffra_angle = np.zeros_like(self.extra_rotangles)
-
-        # RESET! all parameters
+        # Reset! all parameters
         self._reset_init_guess_values()
 
-        # Cross normalisation for the images
-        # This contains the parameters of the linear fit
-        self.ima_polypar = [None] * self.nimages
-        # Normalisation factor to be saved or used
-        self.ima_norm_factors = np.zeros(self.nimages, dtype=np.float64)
-        self.ima_background = np.zeros_like(self.ima_norm_factors)
-        self.threshold_muse = np.zeros_like(self.ima_norm_factors) + threshold_muse
-        self._convolve_muse = np.zeros_like(self.ima_norm_factors)
-        self._convolve_reference = np.zeros_like(self.ima_norm_factors)
-        # Default lists for date, mjd, tpls of the MUSE images
-        self.ima_dateobs = [None] * self.nimages
-        self.ima_mjdobs = [None] * self.nimages
-        self.ima_tplstart = [None] * self.nimages
-        self.ima_iexpo = [None] * self.nimages
-        self.ima_dataset = [None] * self.nimages
+        # Initialise the arrays
+        self._init_alignment_arrays()
 
         # Which extension to be used for the ref and muse images
         self.hdu_ext = hdu_ext
@@ -901,7 +903,7 @@ class AlignMuseDataset(object):
             return
 
         # Initialise the offsets using the cross-correlation or FITS table
-        self.init_guess_offset(self.firstguess)
+        self.init_guess_offset(firstguess=firstguess)
 
         # Now doing the shifts and projections with the guess/input values
         for nima in range(self.nimages):
@@ -934,7 +936,54 @@ class AlignMuseDataset(object):
                 self.ima_polypar[nima].beta[0],
                 self.ima_polypar[nima].beta[1]))
 
-    def init_guess_offset(self, firstguess="crosscorr"):
+    def _init_alignment_arrays(self):
+        """Initialise all list and image arrays which are needed
+        for processing the alignment
+        """
+
+        self.list_offmuse_hdu = [None] * self.nimages
+        self.list_wcs_offmuse_hdu = [None] * self.nimages
+        self.list_proj_refhdu = [None] * self.nimages
+        self.list_wcs_proj_refhdu = [None] * self.nimages
+
+        # Initialise the needed arrays for the PCC offsets
+        self.pcc_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
+        self.pcc_off_arcsec = np.zeros_like(self.pcc_off_pixel)
+        self.pcc_off_init = [False] * self.nimages
+
+        # Initialise the list of optical flows
+        self.optical_flows = [None] * self.nimages
+        self.op_plots = [None] * self.nimages
+
+        # Initialise the needed arrays for the cross-correlation offsets
+        self.cross_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
+        self.extra_off_pixel = np.zeros_like(self.cross_off_pixel)
+
+        self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
+        self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
+
+        self.extra_rotangles = np.zeros((self.nimages), dtype=np.float64)
+        self._diffra_angle = np.zeros_like(self.extra_rotangles)
+
+        # Cross normalisation for the images
+        # This contains the parameters of the linear fit
+        self.ima_polypar = [None] * self.nimages
+
+        # Normalisation factor to be saved or used
+        self.ima_norm_factors = np.zeros(self.nimages, dtype=np.float64)
+        self.ima_background = np.zeros_like(self.ima_norm_factors)
+        self.ima_threshold = np.full_like(self.ima_norm_factors, self.default_threshold_muse)
+        self._convolve_muse = np.zeros_like(self.ima_norm_factors)
+        self._convolve_reference = np.zeros_like(self.ima_norm_factors)
+
+        # Default lists for date, mjd, tpls of the MUSE images
+        self.ima_dateobs = [None] * self.nimages
+        self.ima_mjdobs = [None] * self.nimages
+        self.ima_tplstart = [None] * self.nimages
+        self.ima_iexpo = [None] * self.nimages
+        self.ima_dataset = [None] * self.nimages
+
+    def init_guess_offset(self, **kwargs):
         """Initialise first guess, either from cross-correlation (default)
         or from an Offset FITS Table
          
@@ -944,32 +993,42 @@ class AlignMuseDataset(object):
             If "crosscorr" uses cross-correlation to get the first guess
             of the offsets. If "fits" uses the input fits table.
         """
+        self.firstguess = kwargs.pop("firstguess", "crosscorr")
+
         # Implement the guess
-        self.firstguess = firstguess
-        if firstguess is None:
+        if self.firstguess is None:
             upipe.print_info("No initial guess shift: all set to 0")
             self.init_off_arcsec = self.cross_off_arcsec * 0.0
             self.init_off_pixel = self.cross_off_pixel * 0.0
             return
+        else:
+            # Forcing crosscorr if not recognised
+            if self.firstguess not in ["pcc", "crosscorr", "fits"]:
+                self.firstguess = "crosscorr"
+                upipe.print_warning("Keyword 'firstguess' not recognised")
+                upipe.print_warning("Using Cross-Correlation as a first guess for the alignment")
 
-        if firstguess not in ["crosscorr", "fits"]:
-            firstguess = "crosscorr"
-            upipe.print_warning("Keyword 'firstguess' not recognised")
-            upipe.print_warning("Using Cross-Correlation as "
-                                "a first guess of the alignment")
-
-        if firstguess == "crosscorr":
+        if self.firstguess == "crosscorr":
             upipe.print_info("Using cross-correlation as the initial guess")
             # find the cross correlation peaks for each image
             # This is using zero offset and zero rotation
             # as all parameters have been reset above
             # New values will be taken out from the cross-correlation or fits table
             # just below with the init_guess_offset
-            self.find_ncross_peak()
-
+            self.find_cross_peak_listima()
+            # Transfer the cross-correlation offsets to the initialisation offsets
             self.init_off_arcsec = self.cross_off_arcsec * 1.0
             self.init_off_pixel = self.cross_off_pixel * 1.0
-        elif firstguess == "fits":
+
+        elif self.firstguess == "pcc":
+            # We use PCC from spacepylot to get the first guess here
+            self.get_shift_from_pcc_listima()
+            # Transfer the PCC offsets to the initialisation offsets
+            self.init_off_arcsec = self.pcc_off_arcsec * 1.0
+            self.init_off_pixel = self.pcc_off_pixel * 1.0
+
+        elif self.firstguess == "fits":
+            # Look for the offset table
             exist_table, self.offset_table = self.open_offset_table(
                 joinpath(self.folder_offset_table, self.name_offset_table))
             if exist_table is not True:
@@ -982,8 +1041,7 @@ class AlignMuseDataset(object):
                 self.name_offset_table))
             # First get the right indices for the table by comparing MJD_OBS
             if mjd_names['table'] not in self.offset_table.columns:
-                upipe.print_warning("Input table does not "
-                                    "contain MJD_OBS column")
+                upipe.print_warning("Input table does not contain MJD_OBS column")
                 self._reset_init_guess_values()
                 return
 
@@ -1004,8 +1062,8 @@ class AlignMuseDataset(object):
                     np.isnan(self.offset_table['ROTANGLE']),
                     0., self.offset_table['ROTANGLE'])
             else:
-                upipe.print_warning("Rotation angles not present in offset table."
-                                    " Please use argument 'extra_rotation' "
+                upipe.print_warning("Rotation angles not present in offset table. "
+                                    "Please use argument 'extra_rotation' "
                                     "in 'run' to force a non zero value.")
 
             # Loop over the images, using MJD
@@ -1060,8 +1118,7 @@ class AlignMuseDataset(object):
         """
         if name_table is None:
             if not hasattr(self, "name_table"):
-                upipe.print_error("No FITS table name provided, "
-                                  "Aborting Open")
+                upipe.print_error("No FITS table name provided, Aborting Open")
                 return None, Table()
 
         if not os.path.isfile(name_table):
@@ -1110,12 +1167,17 @@ class AlignMuseDataset(object):
         """Save all offsets and norms into filename. By default, file will
         be overwritten.
 
-        Args:
-            filename (str):
-            folder_output_file (str):
-            overwrite (bool): [True]
+        Input
+        -----
+        filename: str
+            Name of file where the output will be written
+        folder_output_file: str
+            Name of output folder where the file will be written
+        overwrite: bool
+            Default is True
 
-        Creates:
+        Creates
+        -------
             Ascii file named via the filename input argument
 
         """
@@ -1192,11 +1254,11 @@ class AlignMuseDataset(object):
             Suffix to be used to add to the input name. This is handy
             to just modify the given fits name with a suffix 
             (e.g., version number).
-        save_flux_scale: bool
-            If True (default), saving the flux in FLUX_SCALE
+        save_flux_scale: bool [True]
+            If True, saving the flux in FLUX_SCALE
             If False, do not save the flux conversion
-        save_other_params: bool
-            If True (default), saving the background + rotation
+        save_other_params: bool [True]
+            If True, saving the background + rotation
             If False, do not save these 2 parameters.
         
         Creates
@@ -1270,7 +1332,7 @@ class AlignMuseDataset(object):
         self.name_output_table = name_output_table
 
     def run(self, nima=0, **kwargs):
-        """Run the offset and comparison
+        """Run the offset and comparison for a given image number
          
         Input
         -----
@@ -1443,54 +1505,36 @@ class AlignMuseDataset(object):
 
         return 1
 
-    def find_ncross_peak(self, list_nima=None, minflux=None):
-        """Run the cross correlation peaks on all MUSE images
-        Derive the self.cross_off_pixel/arcsec parameters
-         
+    def get_imaref_muse(self, muse_hdu, rotation=0.0, minflux=0.0, **kwargs):
+        """Returns the ref image and muse images on the same grid assuming a given
+        rotation
+
         Input
         -----
-        list_nima: list of indices for images to process
-            Should be a list. Default is None
-            and all images are processed
+        muse_hdu: HDU
+            MUSE hdu file
+        name_musehdr: str
+            name of the muse hdr to save
+        rotation: float
+            Angle in degrees (0).
+        minflux: float
+            Minimum flux to prepare the image (0).
 
-        minflux: float [None]
-            minimum flux to be used in the cross-correlation
-            Flux below that value will be set to 0.
-        """
-        upipe.print_info("Starting the cross-correlation for all images")
-        if list_nima is None:
-            list_nima = range(self.nimages)
-
-        for nima in list_nima:
-            self.cross_off_pixel[nima] = self.find_cross_peak(
-                self.list_muse_hdu[nima],
-                self.list_name_musehdr[nima],
-                rotation=self.init_rotangles[nima],
-                minflux=minflux)
-            self.cross_off_arcsec[nima] = pixel_to_arcsec(
-                self.list_muse_hdu[nima],
-                self.cross_off_pixel[nima])
-
-    def find_cross_peak(self, muse_hdu, name_musehdr, rotation=0.0, minflux=None):
-        """Aligns the MUSE HDU to a reference HDU
-         
-        Input
-        -----
-        muse_hdu: MUSE hdu file
-        name_musehdr: name of the muse hdr to save
-        rotation: Angle in degrees (0). 
-        minflux: minimum flux to be used in the cross-correlation
-                Flux below that value will be set to 0.
-                Default is 0.
-        
         Returns
         -------
-        xpix_cross
-        ypix_cross: x and y pixel coordinates of the cross-correlation peak
+        ima_ref, ima_muse: arrays
+            Reprojected images
+
+        Note that the original images are saved in self._temp_input_origmuse and
+        self._temp_input_origref when debug mode is on (self._debug)
         """
+        # Save hdr if save_hdr is True
+        if self.save_hdr :
+            name_musehdr = kwargs.pop("name_musehdr", "dummy.hdr")
+            _ = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
+                                                    name_musehdr), overwrite=True)
+
         # Projecting the reference image onto the MUSE dataset
-        _ = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
-                                                name_musehdr), overwrite=True)
         hdu_target, proj_ref_hdu, diffra_angle = self._align_reference_hdu(muse_hdu,
                                                                            target_rotation=rotation)
 
@@ -1507,8 +1551,333 @@ class AlignMuseDataset(object):
                                  self.dynamic_range, self.median_window,
                                  minflux=minflux)
         if self._debug:
-            self._temp_input_origmuse_cc = muse_hdu.data * 1.0
-            self._temp_input_origref_cc = proj_ref_hdu.data * 1.0
+            self._temp_input_origmuse = muse_hdu.data * 1.0
+            self._temp_input_origref = proj_ref_hdu.data * 1.0
+
+        return ima_ref, ima_muse
+
+
+    def get_shift_from_pcc_listima(self, list_nima=None, minflux=None, verbose=False):
+        """Run the PCC shift guess on a list of images given by a list
+        of indices
+
+        Input
+        -----
+        list_nima: list of indices for images to process
+            Should be a list. Default is None
+            and all images are processed
+
+        minflux: float [None]
+            minimum flux to be used in the cross-correlation
+            Flux below that value will be set to 0.
+        """
+        upipe.print_info("Starting the PCC shift guess for all images")
+        if list_nima is None:
+            list_nima = range(self.nimages)
+
+        for nima in list_nima:
+            self.get_shift_from_pcc_ima(nima=nima, minflux=minflux, verbose=verbose)
+
+    def get_shift_from_pcc_ima(self, nima=None, minflux=None, rotation=None, verbose=False):
+        """Run the PCC shift guess for image nima
+
+        Input
+        -----
+        nima: int
+            Index of image
+        minflux: float [None]
+           minimum flux to be used in the cross-correlation
+           Flux below that value will be set to 0.
+        rotation: float
+           If None, will take the init_rotangle. Otherwise it will take the input value
+        """
+        upipe.print_info(f"PCC for image {nima}")
+
+        if rotation is None:
+            rotation = self.init_rotangles[nima]
+
+        # Running shift_from_pcc
+        self.pcc_off_pixel[nima] = self.get_shift_from_pcc(self.list_muse_hdu[nima],
+                                                           rotation=rotation,
+                                                           minflux=minflux,
+                                                           name_musehdr=self.list_name_musehdr[
+                                                               nima],
+                                                           verbose=verbose)
+        self.pcc_off_arcsec[nima] = pixel_to_arcsec(self.list_muse_hdu[nima],
+                                                    self.pcc_off_pixel[nima])
+        self.pcc_off_init[nima] = True
+
+    def get_shift_from_pcc(self, muse_hdu, rotation=0.0, minflux=0.0, verbose=False, **kwargs):
+        """Find a guess translation using PCC
+
+        Input
+        -----
+        muse_hdu: HDU
+            MUSE hdu file
+        rotation: float
+            Angle in degrees (0).
+        minflux: float
+            Minimum flux to prepare the image (0).
+        name_musehdr: str
+            Name of the muse hdr to save. Optional. Only operational if self.save_hdr is True
+
+        Returns
+        -------
+        xpix_pcc
+        ypix_pcc x and y pixel coordinates of the cross-correlation peak
+        """
+        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, **kwargs)
+
+        gt = sppalign.AlignTranslationPCC(ima_muse, ima_ref, verbose=verbose)
+        # Beware that get_translation from spacepylot return y, x
+        # Hence the ::-1 to reverse it
+        initial_guess_shifts = gt.get_translation(split_image=2)[::-1]
+
+        # Note that get_shift_from_pcc returnx X,U while get_translation from spacepylot return Y, X
+        return initial_guess_shifts
+
+    def run_optical_flow(self, list_nima=None, save_plot=True, verbose=False):
+        """Run Optical flow, first with a guess offset and then iterating. The solution
+        is saved as extra offset in the class, and a op_plot instance is created.
+        If save_plot is True, it will save a set of default plots
+
+        Input
+        -----
+        list_nima: list
+            List of indices. If None, will use the default list of all images
+        save_plot : bool
+            Whether to save the optical flow diagnostic plots or not.
+        """
+        for nima in list_nima:
+            upipe.print_info("------- Optical Flow for Image {nima} -------")
+            self.run_optical_flow_ima(nima=nima, save_plot=save_plot, verbose=verbose)
+
+    def run_optical_flow_ima(self, nima=0, save_plot=True, verbose=False):
+        """Run Optical flow on image with index nima,
+        first with a guess offset and then iterating. The solution
+        is saved as extra offset in the class, and a op_plot instance is created.
+        If save_plot is True, it will save a set of default plots
+
+        Input
+        -----
+        nima: int
+            Image index.
+        save_plot : bool
+            Whether to save the optical flow diagnostic plots or not.
+        """
+        self.iterate_on_optical_flow_ima(nima, verbose=verbose)
+        self.apply_optical_flow_offset_ima(nima)
+        if save_plot:
+            plt.ioff()
+            self.op_plots[nima].red_blue_before_after()
+            plt.savefig(joinpath(self.figures_folder_name, "opflow_redblue_{nima:03d}.png"))
+            self.op_plots[nima].before_after()
+            plt.savefig(joinpath(self.figures_folder_name, "opflow_beforeafter_{nima:03d}.png"))
+            self.op_plots[nima].illustrate_vector_fields()
+            plt.savefig(joinpath(self.figures_folder_name, "opflow_vectorfield_{nima:03d}.png"))
+            plt.ion()
+
+    def apply_optical_flow_offset_listima(self, list_nima=None):
+        """Apply the optical flow offset as extra pixels offsets and rotation
+        list_nima: list
+            If None, will be initiliased to the default list of indices
+        """
+        upipe.print_info("Apply the optical flow offset as extra user offset - and rotation")
+        if list_nima is None:
+            list_nima = range(self.nimages)
+
+        for nima in list_nima:
+            self.apply_optical_flow_offset_ima(nima=nima)
+
+
+    def apply_optical_flow_offset_ima(self, nima=0):
+        """Transfer the value of the optical flow into the extra pixel
+        """
+        if self.optical_flows[nima] is None:
+            upipe.print_warning(f"No optical flow class for image {nima} -"
+                                 "- run it before applying it")
+            return
+
+        upipe.print_info(f"Apply optical flow offset {nima}")
+        # Now set up the extra needed offsets as the solution from optical flow
+        # We need to invert Y, X to X, Y (the [::-1]) and use the minus sign
+        # considering optical flow derives the motion of ref to MUSE
+        self._add_user_pixel_offset(extra_pixel=-self.optical_flows[nima].translation[::-1],
+                                    extra_rotation=-self.optical_flows[nima].rotation_deg,
+                                    nima=nima)
+        # Initialise the plot
+        self.op_plots[nima] = init_optical_flow_plot(self.optical_flows[nima])
+
+
+    def iterate_on_optical_flow_ima(self, nima=0, niter=5, verbose=False):
+        """Iterate solution using the optical flow guess
+
+        Input
+        -----
+        nima: int
+            Index of image to consider
+        niter: int
+            Number of iterations
+        """
+        upipe.print_info(f"Starting {niter} iterations for Optical Flow of image {nima}")
+        if self.optical_flows[nima] is None:
+            self.init_optical_flow_ima(nima, verbose=verbose)
+
+        self.optical_flows[nima].get_iterate_translation_rotation(niter)
+
+
+    def iterate_on_optical_flow_listima(self, list_nima=None, **kwargs):
+        """Run the iteration for the optical flow on a list of images
+        given by a list of indices
+
+        Input
+        -----
+        list_nima: list of indices for images to process
+            Should be a list. Default is None
+            and all images are processed
+
+        niter: int
+            Number of iterations. Optional. If  not provided, will use the
+            default in self.iterate_on_optical_flow_ima
+        """
+        upipe.print_info("Iteration the Optical Flow solution on all images")
+        if list_nima is None:
+            list_nima = range(self.nimages)
+
+        for nima in list_nima:
+            self.iterate_on_optical_flow_ima(nima=nima, **kwargs)
+
+    def init_optical_flow_listima(selfself, list_nima=None, **kwargs):
+        """Initialise the optical flow on a list of images
+        given by a list of indices
+
+        Input
+        -----
+        list_nima: list of indices for images to process
+            Should be a list. Default is None
+            and all images are processed
+
+        """
+        upipe.print_info("Initiliase the Optical Flow on all images")
+        if list_nima is None:
+            list_nima = range(self.nimages)
+
+        for nima in list_nima:
+            self.init_optical_flow_ima(nima=nima, **kwargs)
+
+
+    def init_optical_flow_ima(self, nima=0, minflux=None, force_pcc=True, guess_offset=[0.,0.],
+                              verbose=False):
+        """Initialise the optical flow using the current image with index nima
+
+        Input
+        -----
+        nima: int
+            Index of image
+        minflux: float
+            Minimum flux to consider
+        """
+        # If forcing PCC by default, we redo it just for the sake of being close
+        # Otherwise we just take a 0 value
+        # WARNING: we need to set the offset as Y, X to pass it on optical flow
+        if force_pcc:
+            self.get_shift_from_pcc_ima(nima, minflux=minflux, verbose=verbose)
+            guess_translation = self.pcc_off_pixel[nima][::-1]
+        else:
+            guess_translation = guess_offset[::-1]
+
+        # Calling optical flow initialisation
+        self.optical_flows[nima] = self.init_optical_flow(self.list_muse_hdu[nima],
+                                                          rotation=self.init_rotangles[nima],
+                                                          minflux=minflux,
+                                                          guess_translation=guess_translation,
+                                                          name_musehdr=self.list_name_musehdr[
+                                                              nima],
+                                                          verbose=verbose)
+
+
+    def init_optical_flow(self, muse_hdu, rotation=0., minflux=None, guess_translation=[0.,0.],
+                          verbose=False, **kwargs):
+        """Get the optical flow for this hdu
+
+        Input
+        -----
+        muse_hdu: HDU
+            Muse HDU input
+        rotation: float
+            Input rotation
+        minflux: float
+            Minimum flux to consider in the image
+        name_musehdr: str
+            Name of hdr in case those are saved (self.save_hdr is True)
+        """
+        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, **kwargs)
+
+        # WARNING: we pass on Y, X hence the [::-1] in the guess_translation parameter
+        return sppalign.AlignOpticalFlow(ima_muse, ima_ref,
+                                         guess_translation=guess_translation[::-1], verbose=verbose)
+
+
+    def find_cross_peak_ima(self, nima=0, minflux=None):
+        """Find the cross correlation peak and get the x and y shifts
+        for a given image, given its index nima
+
+        Input
+        -----
+        nima: int
+           Index of the image
+        minflux: float
+           Minimum flux for the cross-correlation
+        """
+        upipe.print_info(f"Cross-correlation for image {nima}")
+
+        self.cross_off_pixel[nima] = self.find_cross_peak(self.list_muse_hdu[nima],
+                                                          rotation=self.init_rotangles[nima],
+                                                          minflux=minflux,
+                                                          name_musehdr=self.list_name_musehdr[nima])
+        self.cross_off_arcsec[nima] = pixel_to_arcsec(self.list_muse_hdu[nima],
+                                                      self.cross_off_pixel[nima])
+
+    def find_cross_peak_listima(self, list_nima=None, minflux=None):
+        """Run the cross correlation peaks on all MUSE images
+        Derive the self.cross_off_pixel/arcsec parameters
+
+        Input
+        -----
+        list_nima: list of indices for images to process
+            Should be a list. Default is None
+            and all images are processed
+
+        minflux: float [None]
+            minimum flux to be used in the cross-correlation
+            Flux below that value will be set to 0.
+        """
+        upipe.print_info("Starting the cross-correlation for all images")
+
+        if list_nima is None:
+            list_nima = range(self.nimages)
+
+        for nima in list_nima:
+            self.find_cross_peak_ima(nima, minflux=minflux)
+
+    def find_cross_peak(self, muse_hdu, rotation=0.0, minflux=None, **kwargs):
+        """Aligns the MUSE HDU to a reference HDU
+         
+        Input
+        -----
+        muse_hdu: MUSE hdu file
+        name_musehdr: name of the muse hdr to save
+        rotation: Angle in degrees (0). 
+        minflux: minimum flux to be used in the cross-correlation
+                Flux below that value will be set to 0.
+                Default is 0.
+        
+        Returns
+        -------
+        xpix_cross
+        ypix_cross: x and y pixel coordinates of the cross-correlation peak
+        """
+        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, **kwargs)
 
         if self.phase_corr:
             shifts, shift_errors, phasediff = phase_cross_correlation(ima_ref, ima_muse,
@@ -1614,13 +1983,14 @@ class AlignMuseDataset(object):
 
         Input
         -----
-        muse_hdu: HDU [None]
-            Input hdu
-        hdu_ref: HDU [None]
-        to_align_rotation: float [0]
-            Rotation angle in degrees
+        hdu_target: HDU [None]
+            Target hdu (on to which to project)
+        hdu_to_align: HDU [None]
+             Hdu to be aligned
         target_rotation: float [0]
-            Rotation angle in degrees
+            Rotation angle in degrees of the target hdu
+        to_align_rotation: float [0]
+            Rotation angle in degrees of the to be aligned hdu
 
         Returns
         -------
@@ -1637,6 +2007,7 @@ class AlignMuseDataset(object):
         if hdu_target is not None and hdu_to_align is not None:
             # Getting the reference image data and WCS
             wcs_to_align = WCS(hdr=hdu_to_align.header)
+            # If there is a rotation of the WCS we remove it
             if to_align_rotation != 0.:
                 wcs_to_align.rotate(-to_align_rotation)
             ima_to_align = Image(data=hdu_to_align.data * conversion_factor,
@@ -1666,7 +2037,7 @@ class AlignMuseDataset(object):
             # - namely = keeping the original RA as a reference -
             fixed_target_rotation = target_rotation - diffang
 
-            # Doing the rotation
+            # Doing the rotation now on the target WCS
             if fixed_target_rotation != 0.:
                 wcs_target.rotate(-fixed_target_rotation)
             ima_target = Image(data=np.nan_to_num(hdu_target.data),
@@ -1706,8 +2077,10 @@ class AlignMuseDataset(object):
         -----
         muse_hdu: HDU [None]
             Input hdu
-        rotation: float [0]
-            Rotation angle in degrees
+        target_rotation: float [0]
+            Target rotation angle in degrees
+        ref_rotation: float [0]
+            Rotation of the reference image
         
         Returns
         -------
@@ -1732,6 +2105,26 @@ class AlignMuseDataset(object):
     @property
     def _total_off_arcsec(self):
         return self.init_off_arcsec + self.extra_off_arcsec
+
+    def _add_user_pixel_offset(self, extra_pixel=(0., 0.),
+                               extra_rotation=0., nima=0):
+        """Add user offset in pixel and transform into arcseconds
+
+        Input
+        -----
+        extra_pixel: list of 2 floats [0,0]
+            Extra offsets (x,y) in pixels
+        extra_rotation: rotation in degrees [0]
+        nima: int
+            Index of image to consider
+        """
+        # Transforming the arc into pix
+        self.extra_off_pixel[nima] = extra_pixel
+        # Transforming into arcsec - would be better with setter
+        self.extra_off_arcsec[nima] = pixel_to_arcsec(self.list_muse_hdu[nima],
+                                                      self.extra_off_pixel[nima])
+        # And the rotation angle in degrees
+        self.extra_rotangles[nima] = extra_rotation
 
     def _add_user_arc_offset(self, extra_arcsec=(0., 0.),
                              extra_rotation=0., nima=0):
@@ -1801,16 +2194,17 @@ class AlignMuseDataset(object):
         newhdr['CRPIX2'] = newhdr['CRPIX2'] + self._total_off_pixel[nima][1]
 
         # Creating a new Primary HDU with the input data, and the new Header
+        # This HDU has now been offset using the total offsets
         self.list_offmuse_hdu[nima] = pyfits.PrimaryHDU(
             self.list_muse_hdu[nima].data, header=newhdr)
         # Now reading the WCS of that new HDU and saving it in the list
-        self.list_wcs_offmuse_hdu[nima] = WCS(
-            self.list_offmuse_hdu[nima].header)
+        self.list_wcs_offmuse_hdu[nima] = WCS(self.list_offmuse_hdu[nima].header)
 
         # Writing this up in an ascii file for record purposes
-        tmphdr = self.list_offmuse_hdu[nima].header.totextfile(
-            joinpath(self.header_folder_name, self.list_name_offmusehdr[nima]),
-            overwrite=True)
+        if self.save_hdr:
+            _ = self.list_offmuse_hdu[nima].header.totextfile(joinpath(self.header_folder_name,
+                                                                       self.list_name_offmusehdr[nima]),
+                                                              overwrite=True)
 
         upipe.print_info("Image {0:03d} Rotation of {1} will be applied".format(
             nima, self._total_rotangles[nima]))
@@ -1819,8 +2213,7 @@ class AlignMuseDataset(object):
             self._align_reference_hdu(hdu_target=self.list_offmuse_hdu[nima],
                                       target_rotation=self._total_rotangles[nima])
         # Now reading the WCS and saving it in the list
-        self.list_wcs_proj_refhdu[nima] = WCS(
-            self.list_proj_refhdu[nima].header)
+        self.list_wcs_proj_refhdu[nima] = WCS(self.list_proj_refhdu[nima].header)
 
         # Getting the normalisation factors again
         musedata, refdata = self.get_image_normfactor(nima, **kwargs)
@@ -1874,7 +2267,7 @@ class AlignMuseDataset(object):
 
         # Getting the result of the normalisation
         if threshold_muse is not None:
-            self.threshold_muse[nima] = threshold_muse
+            self.ima_threshold[nima] = threshold_muse
 
         # Cropping the data
         border = kwargs.pop("border", self.border)
@@ -1884,7 +2277,7 @@ class AlignMuseDataset(object):
         chunk_size = kwargs.pop("chunk_size", self.chunk_size)
         self.ima_polypar[nima] = get_image_norm_poly(musedataC,
                                                      refdataC, chunk_size=chunk_size,
-                                                     threshold1=self.threshold_muse[nima])
+                                                     threshold1=self.ima_threshold[nima])
         if self.use_polynorm:
             self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
             self.ima_background[nima] = self.ima_polypar[nima].beta[0]
@@ -1938,7 +2331,7 @@ class AlignMuseDataset(object):
         
         Makes a maximum of 4 figures
         """
-        threshold_muse = kwargs.pop("threshold_muse", self.threshold_muse[nima])
+        threshold_muse = kwargs.pop("threshold_muse", self.ima_threshold[nima])
         border = kwargs.pop("border", self.border)
         chunk_size = kwargs.pop("chunk_size", self.chunk_size)
         savefig = kwargs.pop("savefig", True)
