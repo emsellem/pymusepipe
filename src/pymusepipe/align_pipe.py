@@ -558,7 +558,8 @@ def filtermed_image(data, border=0, filter_size=2):
 
 
 def prepare_image(data, border=10, dynamic_range=10,
-                  median_window=10, minflux=0.0):
+                  median_window=10, minflux=0.0, squeeze=True,
+                  remove_bkg=True):
     """Process image by squeezing the range, removing 
     the borders and filtering it. The image is first filtered, 
     then it is cropped. All values below a given minimum are 
@@ -574,15 +575,23 @@ def prepare_image(data, border=10, dynamic_range=10,
         Size of the window used for the median filtering.
     minflux: float [0]
         Value of the minimum flux allowed.
+    squeeze: bool
+        Squeeze the dynamic range by using the dynamic_range variable
+    crop: bool
+        Crop the borders using border as the variable
+    remove_bkg: remove the filter_medianed background
     
     Returns
     -------
     """
-    # Squish bright pixels down
-    data = np.arctan(data / np.nanmedian(data) / dynamic_range)
+    if squeeze:
+        # Squish bright pixels down
+        data = np.arctan(data / np.nanmedian(data) / dynamic_range)
 
-    # Omit the border pixels
-    data -= filtermed_image(data, 0, median_window)
+    if remove_bkg:
+        # Omit the border pixels
+        data -= filtermed_image(data, 0, median_window)
+
     cdata = crop_data(data, border)
 
     # Removing the zeros
@@ -675,7 +684,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
             np.float(hd[angle_keyword]) - hd[angle_orig_keyword]))
 
 
-def init_optical_flow_plot(opflow):
+def init_plot_optical_flow(opflow):
     """Initialise the optical flow plot using the AlignmentPlotting
 
     Input
@@ -1528,6 +1537,10 @@ class AlignMuseDataset(object):
         Note that the original images are saved in self._temp_input_origmuse and
         self._temp_input_origref when debug mode is on (self._debug)
         """
+        remove_bkg = kwargs.pop("remove_bkg", True)
+        squeeze = kwargs.pop("squeeze", True)
+        border = kwargs.pop("border", self.border)
+
         # Save hdr if save_hdr is True
         if self.save_hdr :
             name_musehdr = kwargs.pop("name_musehdr", "dummy.hdr")
@@ -1536,20 +1549,18 @@ class AlignMuseDataset(object):
 
         # Projecting the reference image onto the MUSE dataset
         hdu_target, proj_ref_hdu, diffra_angle = self._align_reference_hdu(muse_hdu,
-                                                                           target_rotation=rotation)
+                                                                           target_rotation=rotation,
+                                                                           conversion=True)
 
         # Cleaning the images
         if minflux is None:
             minflux = self.minflux_crosscorr
 
         minflux_ref = minflux / self.conversion_factor
-        ima_ref = prepare_image(proj_ref_hdu.data, self.border,
-                                self.dynamic_range,
-                                self.median_window,
-                                minflux=minflux_ref) * self.conversion_factor
-        ima_muse = prepare_image(muse_hdu.data, self.border,
-                                 self.dynamic_range, self.median_window,
-                                 minflux=minflux)
+        ima_ref = prepare_image(proj_ref_hdu.data, border, self.dynamic_range, self.median_window,
+                                minflux=minflux_ref, squeeze=squeeze, remove_bkg=remove_bkg)
+        ima_muse = prepare_image(muse_hdu.data, border, self.dynamic_range, self.median_window,
+                                 minflux=minflux, squeeze=squeeze, remove_bkg=remove_bkg)
         if self._debug:
             self._temp_input_origmuse = muse_hdu.data * 1.0
             self._temp_input_origref = proj_ref_hdu.data * 1.0
@@ -1626,17 +1637,21 @@ class AlignMuseDataset(object):
         xpix_pcc
         ypix_pcc x and y pixel coordinates of the cross-correlation peak
         """
-        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, **kwargs)
+        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, border=10,
+                                                 remove_bkg=False, squeeze=False, **kwargs)
+        if self._debug:
+            self._temp_input_pccmuse = ima_muse
+            self._temp_input_pccref = ima_ref
 
         gt = sppalign.AlignTranslationPCC(ima_muse, ima_ref, verbose=verbose)
         # Beware that get_translation from spacepylot return y, x
-        # Hence the ::-1 to reverse it
-        initial_guess_shifts = gt.get_translation(split_image=2)[::-1]
+        # Hence the ::-1 to reverse it and the minus sign as it is the reverse than done with PCC
+        initial_guess_shifts = -gt.get_translation(split_image=2)[::-1]
 
         # Note that get_shift_from_pcc returnx X,U while get_translation from spacepylot return Y, X
         return initial_guess_shifts
 
-    def run_optical_flow(self, list_nima=None, save_plot=True, verbose=False):
+    def run_optical_flow(self, list_nima=None, save_plot=True, verbose=False, **kwargs):
         """Run Optical flow, first with a guess offset and then iterating. The solution
         is saved as extra offset in the class, and a op_plot instance is created.
         If save_plot is True, it will save a set of default plots
@@ -1650,9 +1665,9 @@ class AlignMuseDataset(object):
         """
         for nima in list_nima:
             upipe.print_info("------- Optical Flow for Image {nima} -------")
-            self.run_optical_flow_ima(nima=nima, save_plot=save_plot, verbose=verbose)
+            self.run_optical_flow_ima(nima=nima, save_plot=save_plot, verbose=verbose, **kwargs)
 
-    def run_optical_flow_ima(self, nima=0, save_plot=True, verbose=False):
+    def run_optical_flow_ima(self, nima=0, save_plot=True, verbose=False, **kwargs):
         """Run Optical flow on image with index nima,
         first with a guess offset and then iterating. The solution
         is saved as extra offset in the class, and a op_plot instance is created.
@@ -1665,7 +1680,7 @@ class AlignMuseDataset(object):
         save_plot : bool
             Whether to save the optical flow diagnostic plots or not.
         """
-        self.iterate_on_optical_flow_ima(nima, verbose=verbose)
+        self.iterate_on_optical_flow_ima(nima, verbose=verbose, **kwargs)
         self.apply_optical_flow_offset_ima(nima)
         if save_plot:
             plt.ioff()
@@ -1675,6 +1690,10 @@ class AlignMuseDataset(object):
             plt.savefig(joinpath(self.figures_folder_name, "opflow_beforeafter_{nima:03d}.png"))
             self.op_plots[nima].illustrate_vector_fields()
             plt.savefig(joinpath(self.figures_folder_name, "opflow_vectorfield_{nima:03d}.png"))
+            self.op_plots[nima].before_after_diff_frac()
+            plt.savefig(joinpath(self.figures_folder_name, "opflow_beforeafter_frac_{"
+                                                           "nima:03d}.png"))
+            plt.close('all')
             plt.ion()
 
     def apply_optical_flow_offset_listima(self, list_nima=None):
@@ -1702,14 +1721,16 @@ class AlignMuseDataset(object):
         # Now set up the extra needed offsets as the solution from optical flow
         # We need to invert Y, X to X, Y (the [::-1]) and use the minus sign
         # considering optical flow derives the motion of ref to MUSE
-        self._add_user_pixel_offset(extra_pixel=-self.optical_flows[nima].translation[::-1],
+        self._add_user_pixel_offset(extra_pixel=(-self.init_off_pixel[nima]
+                                                 -self.optical_flows[nima].translation[::-1]),
                                     extra_rotation=-self.optical_flows[nima].rotation_deg,
                                     nima=nima)
+        self._apply_alignment(nima=nima)
         # Initialise the plot
-        self.op_plots[nima] = init_optical_flow_plot(self.optical_flows[nima])
+        self.op_plots[nima] = init_plot_optical_flow(self.optical_flows[nima])
 
 
-    def iterate_on_optical_flow_ima(self, nima=0, niter=5, verbose=False):
+    def iterate_on_optical_flow_ima(self, nima=0, niter=5, verbose=False, **kwargs):
         """Iterate solution using the optical flow guess
 
         Input
@@ -1720,8 +1741,9 @@ class AlignMuseDataset(object):
             Number of iterations
         """
         upipe.print_info(f"Starting {niter} iterations for Optical Flow of image {nima}")
-        if self.optical_flows[nima] is None:
-            self.init_optical_flow_ima(nima, verbose=verbose)
+        reset_opf = kwargs.pop("reset_optical_flow", True)
+        if self.optical_flows[nima] is None or reset_opf:
+            self.init_optical_flow_ima(nima, verbose=verbose, **kwargs)
 
         self.optical_flows[nima].get_iterate_translation_rotation(niter)
 
@@ -1747,7 +1769,7 @@ class AlignMuseDataset(object):
         for nima in list_nima:
             self.iterate_on_optical_flow_ima(nima=nima, **kwargs)
 
-    def init_optical_flow_listima(selfself, list_nima=None, **kwargs):
+    def init_optical_flow_listima(self, list_nima=None, **kwargs):
         """Initialise the optical flow on a list of images
         given by a list of indices
 
@@ -1766,8 +1788,8 @@ class AlignMuseDataset(object):
             self.init_optical_flow_ima(nima=nima, **kwargs)
 
 
-    def init_optical_flow_ima(self, nima=0, minflux=None, force_pcc=True, guess_offset=[0.,0.],
-                              verbose=False):
+    def init_optical_flow_ima(self, nima=0, minflux=None, force_pcc=False, guess_offset=(0.,0.),
+                              verbose=False, provide_header=True):
         """Initialise the optical flow using the current image with index nima
 
         Input
@@ -1787,17 +1809,21 @@ class AlignMuseDataset(object):
             guess_translation = guess_offset[::-1]
 
         # Calling optical flow initialisation
+        if provide_header:
+            header = self.list_muse_hdu[nima].header
+        else:
+            header = None
         self.optical_flows[nima] = self.init_optical_flow(self.list_muse_hdu[nima],
                                                           rotation=self.init_rotangles[nima],
                                                           minflux=minflux,
                                                           guess_translation=guess_translation,
                                                           name_musehdr=self.list_name_musehdr[
                                                               nima],
-                                                          verbose=verbose)
+                                                          header=header, verbose=verbose)
 
 
     def init_optical_flow(self, muse_hdu, rotation=0., minflux=None, guess_translation=[0.,0.],
-                          verbose=False, **kwargs):
+                          header=None, verbose=False, **kwargs):
         """Get the optical flow for this hdu
 
         Input
@@ -1811,11 +1837,19 @@ class AlignMuseDataset(object):
         name_musehdr: str
             Name of hdr in case those are saved (self.save_hdr is True)
         """
-        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, **kwargs)
+        # Getting the images. Note that border must be 0 as otherwise you will need to change
+        # the WCS (header passed to AlignOpticalFlow
+        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, border=0,
+                                                 remove_bkg=False, squeeze=False, **kwargs)
+        if self._debug:
+            self._temp_input_opmuse = ima_muse * 1.0
+            self._temp_input_opref = ima_ref * 1.0
 
         # WARNING: we pass on Y, X hence the [::-1] in the guess_translation parameter
         return sppalign.AlignOpticalFlow(ima_muse, ima_ref,
-                                         guess_translation=guess_translation[::-1], verbose=verbose)
+                                         guess_translation=guess_translation[::-1],
+                                         header=header,
+                                         verbose=verbose)
 
 
     def find_cross_peak_ima(self, nima=0, minflux=None):
@@ -2069,7 +2103,7 @@ class AlignMuseDataset(object):
         return hdu_target, hdu_aligned, diffang
 
     def _align_reference_hdu(self, hdu_target=None, target_rotation=0.0,
-                             ref_rotation=0.0):
+                             ref_rotation=0.0, conversion=True):
         """Project the reference image onto the MUSE dataset
         Hidden function, as only used internally
          
@@ -2092,7 +2126,7 @@ class AlignMuseDataset(object):
                                target_rotation=target_rotation,
                                to_align_rotation=ref_rotation,
                                hdu_to_align=self.reference_hdu,
-                               conversion=True)
+                               conversion=conversion)
 
     @property
     def _total_rotangles(self):
@@ -2221,7 +2255,9 @@ class AlignMuseDataset(object):
     def get_image_normfactor(self, nima=0, median_filter=True,
                              convolve_muse=0., convolve_reference=0.,
                              threshold_muse=None, **kwargs):
-        """Get the normalisation factor for image nima
+        """Get the normalisation factor for shifted and projected images. This function
+        only consider the input image given by index nima and the reference image (after
+        projection).
          
         Input
         -----
