@@ -66,7 +66,7 @@ except Exception as e:
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.viewcode', 'sphinx.ext.coverage',
               'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.mathjax',
-              'sphinx.ext.napoleon', 'sphinx_rtd_theme']
+              'sphinx.ext.napoleon', 'sphinx_rtd_theme',  'sphinxcontrib.email']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -220,7 +220,8 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'pymusepipe-doc'
 
-
+# configuration for the email command
+email_automode = True
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
