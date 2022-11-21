@@ -46,40 +46,31 @@ Step 2: Preparing your configuration files
 
 pymusepipe only needs two configurations ascii files: 
 
-   #. ``calib_tables.dic``, which contains a series of given fits files which will be used by the pipeline. Most names are self-explantory. That includes:
-      * *geo_table* and *astro_table*: only used if you don't rely on the default time dependent geometry files (see ``rc.dic`` file).
-      * *badpix_table*, *vignetting_mask*, *std_flux_table*, *extinct_table*, *line_catalog* all usually provided with the MUSE pipeline.
-      * *filter_list* : name of the fits filter list. This is used in case you wish to provide your own. Note that it needs to follow the MUSE standard for such a table.
+   #. ``calib_tables.dic``, which contains a series of file names associated with muse static calibration files and other configuration files (e.g. fitler lists). Most names are self-explantory. These include:
+
+      * *geo_table* and *astro_table*: static files, time dependent geometry files can be specified (see ``rc.dic``).
+      * *badpix_table*, *vignetting_mask*, *std_flux_table*, *extinct_table*, *line_catalog*, statical calibrations provided with the MUSE pipeline, no need to change these.
+      * *filter_list* : used in case you wish to provide your own. Note that the file it needs to follow the MUSE standard for such a table.
+
    #. ``rc.dic``, which provides the root folders for the static calibration files and for your datasets.
-      * *root* provides the root folder for your data. For Target NGC1000, and OB 1, the Raw data will be looked for in *root*/Target1000/OB001/Raw.
-      * musecalib should contain the standard MUSE calibration files. These are distributed in the MUSE pipeline installation in a "muse-calib-x.x.x/cal" folder.
-      * musecalib_time: time dependent geometry and astrometry files (the correspondence between observing run dates and specific files are given in the dic_geo_astrowcs_table in musepipe.py).
 
-#### rc configuration file
-It contains 3 lines, with: *musecalib*, *musecalib_time* and *root*.
-
-   
-
-#### calib_tables configuration file
-It contains a series of given fits files which will be used by the pipeline. Most names are self-explantory. That includes:
-   * *geo_table* and *astro_table*: only used if you don't rely on the default time dependent geometry files (see rc file).
-   * *badpix_table*, *vignetting_mask*, *std_flux_table*, *extinct_table*, *line_catalog* all usually provided with the MUSE pipeline.
-   * *filter_list* : name of the fits filter list. This is used in case you wish to provide your own. Note that it needs to follow the MUSE standard for such a table.
+      * *root* provides the root folder for your data. For Target NGC1000, and OB 1, the Raw data will be looked for in *root*/NGC1000/OB001/Raw.
+      * *musecalib* should contain the standard MUSE calibration files. These are distributed in the MUSE pipeline installation in a "muse-calib-x.x.x/cal" folder.
+      * *musecalib_time*: time dependent geometry and astrometry files (the correspondence between observing run dates and specific files are hard-coded into pymusepipe).
 
 Examples of such files are provided in the ``config_templates`` folder of the pymusepipe package.
 
 Step 3: Running the pipeline
 """"""""""""""""""""""""""""""""""""""""""""""
 
-The pipeline is meant to be run automatically from a given python  structure. This should thus take the user only a few lines of codes, including one to import pymusepipe, a couple to define the names of the configuration files, one to initialise the musepipe python structure, 
-and one to launch the recipes. Here is an example of how this should look::
+Here is an example of how to run the pipeline to reduce a single OB (dataset)::
 
    # Import the modules
    import pymusepipe as pmp
    from pymusepipe import musepipe
    
-   # define the names of the configuration files
-   rcfile = "/my_data/MUSE/Config/rc.dic"
+   # define the paths to the two configuration files
+   rcfile = "my_data/MUSE/Config/rc.dic"
    calfile = "my_data_MUSE/Config/calib_tables.dic"
    
    # Initialisation of the python - MusePipe Class - structure
@@ -98,7 +89,7 @@ Some explanation may be needed to understand what is happening:
 
    * ``targetname``: is just the name of the target, used to decided where the data will be
    * ``dataset``: the number of the OB that will be used, namely "OB001" etc.
-   * ``logfile``: name of the logging file. This logfile is actually a shell-like file which can be used to re-run the pipeline one step at a time. Two more files will also be created, namely <logfile_name>.out and <logfile_name>.err which will contain the full output of the commands, and the error messages (stdout, stderr, respectively).
+   * ``logfile``: name of the logging file. 
    * ``fakemode``: you can set this to True if you just wish to initialise things without actually running any recipes. The pipeline will only set things up but if you run any recipes will only "fake" them (not launch any esorex command, only spitting the log out)
    * ``filter_list``: list of filter names to use to reconstruct images when building up cubes. This should be part of the filter_list fits table provided (see ``calib_tables`` config file).
    * ``filter_for_alignment``: specific filter name used for alignment between exposures.
@@ -110,5 +101,70 @@ Other options can be useful:
    * ``overwrite_astropy_table``: by default this is False. If True, new runs will rewrite the Astropy output tables.
    * ``time_astrometry```: by default it is False, meaning the pipeline will try to detect a GEOMETRY and ASTROMETRY Files delivered with the Rawfiles by ESO. If set to True, it will use the time dependent astro/geo files provided by the GTO Team but you would need to make these available on your system.Hence I would recommend to keep the default (False).
 
-
+Under the hood of run_recipes
 """"""""""""""""""""""""""""""""""""""""""""""
+
+``run_recipes()`` launches a default set of functions listed below::
+
+   # generate the master bias using the muse_bias esorex recipe
+   mypipe.run_bias()
+   # generate the master flat using the muse_flat esorex recipe
+   mypipe.run_flat()
+   # generate the wavelength calibration using the muse_wavecal esorex recipe
+   mypipe.run_wave()
+   # generate the lsf using the muse_lsf esorex recipe
+   mypipe.run_lsf()
+   # generate the illumination correction using the muse_lsf esorex recipe
+   mypipe.run_twilight(illum=True)
+   # process individual exposures to remove the instrumental signature usign the muse_scibasic 
+   # esorex recipes. It runs on both the object, standard star and sky exposures
+   mypipe.run_scibasic_all(illum=True)
+   # generates the response function using the standard star observations and the muse_standard 
+   # esorex recipe
+   mypipe.run_standard()
+   # uses the sky exposures to generate a sky spectrum
+   mypipe.run_sky(fraction=0.8)
+   # runs the esosex muse_scipost recipe individually on each object exposures generating 
+   # a datacubes and image in the requested filter for each exposure. 
+   # These images are then used for aligment.
+   mypipe.run_prep_align()
+   # runs the muse_exp_align recipe to generate an OFFSET_TABLE files containing the astrometric
+   # shifts between individual exposures. Pymusepipe provides more refined options for this
+   mypipe.run_align_bydataset()
+   # ??
+   mypipe.run_align_bygroup()
+   # generates the final aligned datacubes for individual exposures using muse_scipost
+   mypipe.run_scipost_perexpo()
+   # generates the sky datacube
+   mypipe.run_scipost_sky()
+   # merge exposures in the final datacube
+   mypipe.combine_dataset()
+       
+Individual pipeline stages can be (re)run by calling any of the individual functions above. The order is important, as in any data reduction process
+
+
+Structure of the output
+""""""""""""""""""""""""""""""""""""""""""""""
+
+Folders
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The structure of the output is driven by a set of folder names described in :py:func:`pymusepipe.init_musepipe` in a few dictionaries (:py:func:`dic_input_folders`, :py:func:`dic_folders`, :py:func:`dic_folders_target`). You can in principle change the names of the folders themselves, although it is not advised.
+
+The pipeline will create the folder structure automatically, checking whether the folders exist or not.
+
+Log files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Two basic log files are produced: one is the Esorex output which will be stored in the "Esorex_log" folder. The other one will be in the "Log" folder with the name provided at start: that one is like a shell script which can be used to rerun things directly via the command line. In the "Log" folder, there will also be, for each log file, a file ".out" and one with ".err" extensions, respectively including all the stdout and stderr messages. This may be useful to trace details in the data reduction and problems.
+
+Astropy Tables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Each recipe will trigger the creation of a astropy Table. 
+These are stored under "Astro_Tables". You can use these to monitor which files have been processed or used.
+
+Sof files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sof files are saved under the "Sof" directory for each esorex recipes used in the pipeline. These are useful to see exactly which files are processed by each esorex recipe.
+
+Python structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Most of the information you may need is actually stored in the python :py:class:`pymusepipe.musepipe.MusePipe` class structure. More details to come.

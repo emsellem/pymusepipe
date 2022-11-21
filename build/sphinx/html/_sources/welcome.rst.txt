@@ -17,7 +17,7 @@ A description of the pipeline and its usage to reduce data from the PHANGS-MUSE 
 .. attention:: 
    Please do not forget to cite Emsellem et al. (`2022 <https://ui.adsabs.harvard.edu/abs/2022A%26A...659A.191E/abstract/>`_)
    and the MUSE data reduction pipeline paper (Weilbacher et al. `2019 <https://ui.adsabs.harvard.edu/abs/2020A%26A...641A..28W/abstract>`_) if you make use of pymusepipe in your work. In particular, we suggest you add the following text (or equivalent) to the data reduction section of your work. 
-   |
+   
    *The dataset was reduced using recipes the MUSE data processing pipeline software (Weilbacher et al. 2019). All recipes were executed with ESOREX commands, wrapped around using the dedicated python package pymusepipe (Emsellem et al. 2022).*
 
 GitHub Repository
