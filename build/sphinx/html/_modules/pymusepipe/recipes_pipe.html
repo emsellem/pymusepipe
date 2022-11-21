@@ -1,69 +1,34 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pymusepipe.recipes_pipe &mdash; pymusepipe 2.15.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>pymusepipe.recipes_pipe &mdash; pymusepipe 2.9.9.post16 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> pymusepipe
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.9.9.post16
+                2.15.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -71,85 +36,41 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../howto.html">HowTo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">pymusepipe</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>pymusepipe.recipes_pipe</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pymusepipe.recipes_pipe</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for pymusepipe.recipes_pipe</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Licensed under a MIT style license - see LICENSE.rst</span>
 
@@ -173,6 +94,7 @@
 <span class="c1"># pymusepipe modules</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
 <span class="kn">from</span> <span class="nn">.version</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">pipeversion</span>
+<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="n">dict_products_scipost</span>
 
 <span class="c1"># Likwid command</span>
 <span class="n">default_likwid</span> <span class="o">=</span> <span class="s2">&quot;likwid-pin -c N:&quot;</span>
@@ -209,10 +131,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">esorex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{likwid}{list_cpu}</span><span class="s2"> </span><span class="si">{nocache}</span><span class="s2"> esorex --output-dir=</span><span class="si">{outputdir}</span><span class="s2"> </span><span class="si">{checksum}</span><span class="s2">&quot;</span> 
-                    <span class="s2">&quot; --log-dir=</span><span class="si">{logdir}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">likwid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">likwid</span><span class="p">,</span> 
-                    <span class="n">list_cpu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">list_cpu</span><span class="p">,</span> <span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> <span class="n">outputdir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">pipe_products</span><span class="p">,</span> 
-                    <span class="n">checksum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">checksum</span><span class="p">,</span> <span class="n">logdir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">esorex_log</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">likwid</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">list_cpu</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> esorex &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;--output-dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">pipe_products</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">checksum</span><span class="si">}</span><span class="s2">&quot;</span> 
+                <span class="sa">f</span><span class="s2">&quot; --log-dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">esorex_log</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">checksum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -299,14 +220,13 @@
 <div class="viewcode-block" id="PipeRecipes.recipe_flat"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_flat">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_flat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_flat</span><span class="p">,</span> <span class="n">name_flat</span><span class="p">,</span> <span class="n">dir_trace</span><span class="p">,</span> <span class="n">name_trace</span><span class="p">,</span> <span class="n">tpl</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Running the esorex muse_flat recipe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=flat_</span><span class="si">{tpl}</span><span class="s2">.log muse_flat &quot;</span> 
-                <span class="s2">&quot;--nifu=</span><span class="si">{nifu}</span><span class="s2"> </span><span class="si">{merge}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> 
-                    <span class="n">nifu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nifu</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="si">}</span><span class="s2"> --log-file=flat_</span><span class="si">{</span><span class="n">tpl</span><span class="si">}</span><span class="s2">.log muse_flat &quot;</span> 
+                           <span class="sa">f</span><span class="s2">&quot;--nifu=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nifu</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">sof</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># Moving the MASTER FLAT and TRACE_TABLE</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{namein}</span><span class="s2">.fits </span><span class="si">{nameout}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
-            <span class="n">namein</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_flat</span><span class="p">),</span> <span class="n">nameout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_flat</span><span class="p">,</span> <span class="n">name_flat</span><span class="p">),</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{namein}</span><span class="s2">.fits </span><span class="si">{nameout}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
-            <span class="n">namein</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_trace</span><span class="p">),</span> <span class="n">nameout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_trace</span><span class="p">,</span> <span class="n">name_trace</span><span class="p">),</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> mv </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_flat</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_flat</span><span class="p">,</span> <span class="n">name_flat</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tpl</span><span class="si">}</span><span class="s2">.fits&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> mv </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_trace</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_trace</span><span class="p">,</span> <span class="n">name_trace</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tpl</span><span class="si">}</span><span class="s2">.fits&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipeRecipes.recipe_wave"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_wave">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_wave</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_wave</span><span class="p">,</span> <span class="n">name_wave</span><span class="p">,</span> <span class="n">tpl</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Running the esorex muse_wavecal recipe</span>
@@ -423,25 +343,26 @@
                                <span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
                                <span class="n">name_imain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="o">+</span><span class="n">suff_prod</span><span class="p">),</span> 
                                <span class="n">fitsname</span><span class="o">=</span><span class="n">fitsname_out</span><span class="p">))</span>
-            <span class="c1"># Adding pointing and expo numbers as keywords</span>
+            <span class="c1"># Adding dataset and expo numbers as keywords</span>
             <span class="k">if</span> <span class="n">filter_for_alignment</span> <span class="ow">in</span> <span class="n">fitsname_out</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">add_key_pointing_expo</span><span class="p">(</span><span class="n">fitsname_out</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointing</span><span class="p">)</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">add_key_dataset_expo</span><span class="p">(</span><span class="n">fitsname_out</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
 
-            <span class="c1"># Now if in need of an alignment image and it is the filter image</span>
-            <span class="c1"># Copying it in the Alignment folder or write it </span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_alignment_images</span> <span class="ow">and</span> <span class="n">filter_for_alignment</span> <span class="ow">in</span> <span class="n">fitsname_out</span> \
-                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_suffix_prealign</span> <span class="ow">in</span> <span class="n">fitsname_out</span><span class="p">:</span>
-                <span class="n">name_imageout_align</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{name_imaout}{suffix}</span><span class="s2">_P</span><span class="si">{pointing:02d}</span><span class="s2">_</span><span class="si">{myfilter}</span><span class="s2">&quot;</span>
+            <span class="c1"># Now if in need of an alignment image and it is the prealign scipost</span>
+            <span class="c1"># Check that it is an image using the dictionary in config_pipe</span>
+            <span class="c1"># and copying it in the Alignment folder</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_alignment_images</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_suffix_prealign</span> <span class="ow">in</span> <span class="n">fitsname_out</span> \
+                <span class="ow">and</span> <span class="n">dict_products_scipost</span><span class="p">[</span><span class="s1">&#39;cube&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">fitsname_out</span><span class="p">:</span>
+                <span class="n">name_imageout_align</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{name_imaout}{suffix}</span><span class="s2">_</span><span class="si">{dsname}</span><span class="s2">_</span><span class="si">{myfilter}</span><span class="s2">&quot;</span>
                                       <span class="s2">&quot;_</span><span class="si">{tpl}{suff_post}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                       <span class="n">name_imaout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">alignment</span><span class="p">,</span>
                                                            <span class="n">prefix_all</span><span class="o">+</span><span class="s2">&quot;IMAGE_FOV&quot;</span><span class="p">),</span>
                                       <span class="n">myfilter</span><span class="o">=</span><span class="n">filter_for_alignment</span><span class="p">,</span> <span class="n">suff_post</span><span class="o">=</span><span class="n">suff_post</span><span class="p">,</span> 
-                                      <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> <span class="n">pointing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pointing</span><span class="p">))</span>
+                                      <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> <span class="n">dsname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">()))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> cp </span><span class="si">{fitsname}</span><span class="s2"> </span><span class="si">{nameima_out}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                    <span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> <span class="n">fitsname</span><span class="o">=</span><span class="n">fitsname_out</span><span class="p">,</span>
                                    <span class="n">nameima_out</span><span class="o">=</span><span class="n">name_imageout_align</span><span class="p">))</span>
-                <span class="c1"># Adding pointing and expo numbers as keywords</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">add_key_pointing_expo</span><span class="p">(</span><span class="n">name_imageout_align</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointing</span><span class="p">)</span></div>
+                <span class="c1"># Adding dataset and expo numbers as keywords</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">add_key_dataset_expo</span><span class="p">(</span><span class="n">name_imageout_align</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipeRecipes.recipe_align"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_align">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_products</span><span class="p">,</span> <span class="n">namein_products</span><span class="p">,</span> <span class="n">nameout_products</span><span class="p">,</span> <span class="n">tpl</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span>
             <span class="n">threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">srcmin</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">srcmax</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">fwhm</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
@@ -460,11 +381,11 @@
                 <span class="n">name_imaout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">nameout_prod</span><span class="p">)))</span></div>
 
 <div class="viewcode-block" id="PipeRecipes.recipe_combine"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_combine">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_products</span><span class="p">,</span> <span class="n">name_products</span><span class="p">,</span> <span class="n">tpl</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span>
-            <span class="n">suffix_products</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> <span class="n">suffix_prefinalnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> 
-            <span class="n">save</span><span class="o">=</span><span class="s1">&#39;cube&#39;</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> 
+            <span class="n">suffix_products</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">suffix_prefinalnames</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">prefix_products</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">save</span><span class="o">=</span><span class="s1">&#39;cube&#39;</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="n">format_out</span><span class="o">=</span><span class="s1">&#39;Cube&#39;</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span>
             <span class="n">lambdamin</span><span class="o">=</span><span class="mf">4000.</span><span class="p">,</span> <span class="n">lambdamax</span><span class="o">=</span><span class="mf">10000.</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Running the muse_exp_combine recipe for one single pointing</span>
+        <span class="sd">&quot;&quot;&quot;Running the muse_exp_combine recipe for one single dataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2">  --log-file=exp_combine_cube_</span><span class="si">{expotype}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.log &quot;</span>
                <span class="s2">&quot; muse_exp_combine --save=</span><span class="si">{save}</span><span class="s2"> --pixfrac=</span><span class="si">{pixfrac:0.2f}</span><span class="s2"> &quot;</span>
@@ -474,85 +395,61 @@
                    <span class="n">pixfrac</span><span class="o">=</span><span class="n">pixfrac</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">format_out</span><span class="p">,</span> <span class="n">filt</span><span class="o">=</span><span class="n">filter_list</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> 
                    <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="n">expotype</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="n">lambdamin</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="n">lambdamax</span><span class="p">))</span>
 
-        <span class="k">for</span> <span class="n">name_prod</span><span class="p">,</span> <span class="n">suff_prod</span><span class="p">,</span> <span class="n">suff_pre</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">name_products</span><span class="p">,</span> <span class="n">suffix_products</span><span class="p">,</span> 
-                <span class="n">suffix_prefinalnames</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name_prod</span><span class="p">,</span> <span class="n">suff_prod</span><span class="p">,</span> <span class="n">suff_pre</span><span class="p">,</span> <span class="n">pre_prod</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">name_products</span><span class="p">,</span> <span class="n">suffix_products</span><span class="p">,</span> 
+                <span class="n">suffix_prefinalnames</span><span class="p">,</span> <span class="n">prefix_products</span><span class="p">):</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{name_imain}</span><span class="s2">.fits &quot;</span>
-                <span class="s1">&#39;</span><span class="si">{name_imaout}{suffix}{suff_pre}</span><span class="s1">_</span><span class="si">{pointing}</span><span class="s1">_</span><span class="si">{tpl}</span><span class="s1">.fits&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span>
-                <span class="n">name_imain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="o">+</span><span class="n">suff_prod</span><span class="p">),</span> 
-                <span class="n">name_imaout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">name_prod</span><span class="p">),</span>
-                <span class="n">suff_pre</span><span class="o">=</span><span class="n">suff_pre</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> 
-                <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">pointing</span><span class="o">=</span><span class="s2">&quot;P</span><span class="si">{0:02d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointing</span><span class="p">)))</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> mv </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="o">+</span><span class="n">suff_prod</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits &quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">pre_prod</span><span class="o">+</span><span class="n">name_prod</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">suff_pre</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tpl</span><span class="si">}</span><span class="s2">.fits&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PipeRecipes.recipe_combine_pointings"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_combine_pointings">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_combine_pointings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_products</span><span class="p">,</span> <span class="n">name_products</span><span class="p">,</span>
-            <span class="n">suffix_products</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> <span class="n">suffix_prefinalnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> 
-            <span class="n">prefix_products</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> <span class="n">save</span><span class="o">=</span><span class="s1">&#39;cube&#39;</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> 
+<div class="viewcode-block" id="PipeRecipes.recipe_combine_datasets"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_combine_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_combine_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_products</span><span class="p">,</span> <span class="n">name_products</span><span class="p">,</span>
+            <span class="n">suffix_products</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">suffix_prefinalnames</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">prefix_products</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">save</span><span class="o">=</span><span class="s1">&#39;cube&#39;</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="n">format_out</span><span class="o">=</span><span class="s1">&#39;Cube&#39;</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> 
             <span class="n">lambdamin</span><span class="o">=</span><span class="mf">4000.</span><span class="p">,</span> <span class="n">lambdamax</span><span class="o">=</span><span class="mf">10000.</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Running the muse_exp_combine recipe for pointings</span>
+        <span class="sd">&quot;&quot;&quot;Running the muse_exp_combine recipe for datasets</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2">  --log-file=exp_combine_pointings.log &quot;</span>
-               <span class="s2">&quot; muse_exp_combine --save=</span><span class="si">{save}</span><span class="s2"> --pixfrac=</span><span class="si">{pixfrac:0.2f}</span><span class="s2"> &quot;</span>
-               <span class="s2">&quot;--format=</span><span class="si">{form}</span><span class="s2"> --filter=</span><span class="si">{filt}</span><span class="s2"> &quot;</span>
-               <span class="s2">&quot;--lambdamin=</span><span class="si">{lmin}</span><span class="s2"> --lambdamax=</span><span class="si">{lmax}</span><span class="s2"> &quot;</span>
-               <span class="s2">&quot;</span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> 
-                   <span class="n">save</span><span class="o">=</span><span class="n">save</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="n">pixfrac</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">format_out</span><span class="p">,</span> 
-                   <span class="n">filt</span><span class="o">=</span><span class="n">filter_list</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> 
-                   <span class="n">lmin</span><span class="o">=</span><span class="n">lambdamin</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="n">lambdamax</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="si">}</span><span class="s2">  --log-file=exp_combine_datasets.log &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot; muse_exp_combine --save=</span><span class="si">{</span><span class="n">save</span><span class="si">}</span><span class="s2"> --pixfrac=</span><span class="si">{</span><span class="n">pixfrac</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;--format=</span><span class="si">{</span><span class="n">format_out</span><span class="si">}</span><span class="s2"> --filter=</span><span class="si">{</span><span class="n">filter_list</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;--lambdamin=</span><span class="si">{</span><span class="n">lambdamin</span><span class="si">}</span><span class="s2"> --lambdamax=</span><span class="si">{</span><span class="n">lambdamax</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sof</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">name_prod</span><span class="p">,</span> <span class="n">suff_prod</span><span class="p">,</span> <span class="n">suff_pre</span><span class="p">,</span> <span class="n">pre_prod</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">name_products</span><span class="p">,</span> <span class="n">suffix_products</span><span class="p">,</span> 
                 <span class="n">suffix_prefinalnames</span><span class="p">,</span> <span class="n">prefix_products</span><span class="p">):</span>
 
-            <span class="n">name_imaout</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{name_imaout}{suffix}{suff_pre}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                         <span class="n">name_imaout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">pre_prod</span><span class="o">+</span><span class="n">name_prod</span><span class="p">),</span>
-                         <span class="n">suff_pre</span><span class="o">=</span><span class="n">suff_pre</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{name_imain}</span><span class="s2">.fits &quot;</span>
-                              <span class="s2">&quot;</span><span class="si">{name_imaout}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                  <span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
-                                  <span class="n">name_imain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="o">+</span><span class="n">suff_prod</span><span class="p">),</span> 
-                                  <span class="n">name_imaout</span><span class="o">=</span><span class="n">name_imaout</span><span class="p">))</span>
+            <span class="n">name_imaout</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">pre_prod</span><span class="o">+</span><span class="n">name_prod</span><span class="p">)</span><span class="si">}{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">suff_pre</span><span class="si">}</span><span class="s2">.fits&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> mv </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="o">+</span><span class="n">suff_prod</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits &quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name_imaout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;DATACUBE&quot;</span> <span class="ow">in</span> <span class="n">name_imaout</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_combined_cube_name</span> <span class="o">=</span> <span class="n">name_imaout</span></div></div>
-
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Eric Emsellem
-
-    </p>
+    <p>&#169; Copyright 2019, Eric Emsellem.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

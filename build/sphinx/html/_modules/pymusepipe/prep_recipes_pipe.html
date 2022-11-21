@@ -1,69 +1,34 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pymusepipe.prep_recipes_pipe &mdash; pymusepipe 2.15.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>pymusepipe.prep_recipes_pipe &mdash; pymusepipe 2.9.9.post16 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> pymusepipe
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.9.9.post16
+                2.15.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -71,85 +36,41 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../howto.html">HowTo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">pymusepipe</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>pymusepipe.prep_recipes_pipe</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pymusepipe.prep_recipes_pipe</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for pymusepipe.prep_recipes_pipe</h1><div class="highlight"><pre>
 <span></span>
 <span class="c1"># Licensed under a MIT license - see LICENSE</span>
@@ -174,48 +95,19 @@
 <span class="c1"># pymusepipe modules</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
 <span class="kn">from</span> <span class="nn">.create_sof</span> <span class="kn">import</span> <span class="n">SofPipe</span>
-<span class="kn">from</span> <span class="nn">.align_pipe</span> <span class="kn">import</span> <span class="n">create_offset_table</span>
+<span class="kn">from</span> <span class="nn">.align_pipe</span> <span class="kn">import</span> <span class="n">create_offset_table</span><span class="p">,</span> <span class="n">AlignMuseDataset</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">musepipe</span>
 <span class="kn">from</span> <span class="nn">.mpdaf_pipe</span> <span class="kn">import</span> <span class="n">MuseSkyContinuum</span><span class="p">,</span> <span class="n">MuseFilter</span>
-<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="n">mjd_names</span><span class="p">,</span><span class="n">get_suffix_product</span>
-<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="n">dict_recipes_per_num</span><span class="p">,</span> <span class="n">dict_recipes_per_name</span>
+<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">mjd_names</span><span class="p">,</span> <span class="n">get_suffix_product</span><span class="p">,</span> <span class="n">dict_default_for_recipes</span><span class="p">,</span>
+                          <span class="n">dict_recipes_per_num</span><span class="p">,</span> <span class="n">dict_recipes_per_name</span><span class="p">,</span>
+                          <span class="n">dict_files_iexpo_products</span><span class="p">,</span> <span class="n">dict_files_products</span><span class="p">,</span>
+                          <span class="n">dict_products_scipost</span><span class="p">)</span>
 
 <span class="k">try</span> <span class="p">:</span>
     <span class="kn">import</span> <span class="nn">astropy</span> <span class="k">as</span> <span class="nn">apy</span>
     <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="p">:</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;astropy is required for this module&quot;</span><span class="p">)</span>
-
-<span class="c1"># =======================================================</span>
-<span class="c1"># List of recipes</span>
-<span class="c1"># =======================================================</span>
-<span class="n">list_recipes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bias&#39;</span><span class="p">,</span> <span class="s1">&#39;flat&#39;</span><span class="p">,</span> <span class="s1">&#39;wave&#39;</span><span class="p">,</span> <span class="s1">&#39;lsf&#39;</span><span class="p">,</span> 
-        <span class="s1">&#39;twilight&#39;</span><span class="p">,</span> <span class="s1">&#39;scibasic_all&#39;</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="s1">&#39;sky&#39;</span><span class="p">]</span>
-        
-<span class="n">dict_files_iexpo_products</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;ALIGN&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;SOURCE_LIST&#39;</span><span class="p">]</span>
-        <span class="p">}</span>
-
-<span class="n">dict_files_products</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;STD&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;DATACUBE_STD&#39;</span><span class="p">,</span> <span class="s1">&#39;STD_FLUXES&#39;</span><span class="p">,</span> 
-            <span class="s1">&#39;STD_RESPONSE&#39;</span><span class="p">,</span> <span class="s1">&#39;STD_TELLURIC&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;TWILIGHT&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;DATACUBE_SKYFLAT&#39;</span><span class="p">,</span> <span class="s1">&#39;TWILIGHT_CUBE&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;SKY&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;SKY_MASK&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_IMAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_LINES&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_SPECTRUM&#39;</span><span class="p">,</span> 
-            <span class="s1">&#39;SKY_CONTINUUM&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;ALIGN&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OFFSET_LIST&#39;</span><span class="p">]</span>
-        <span class="p">}</span>
-
-<span class="n">dict_products_scipost</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;cube&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;DATACUBE_FINAL&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_FOV&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;individual&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PIXTABLE_REDUCED&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;stacked&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OBJECT_RESAMPLED&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;positioned&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PIXTABLE_POSITIONED&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;combined&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PIXTABLE_COMBINED&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;skymodel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;SKY_MASK&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_SPECTRUM&#39;</span><span class="p">,</span> 
-            <span class="s1">&#39;SKY_LINES&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_IMAGE&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;raman&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;RAMAN_IMAGES&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;autocal&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;AUTOCAL_FACTORS&#39;</span><span class="p">]</span>
-        <span class="p">}</span>
 
 <span class="c1"># =======================================================</span>
 <span class="c1"># Few useful functions</span>
@@ -244,7 +136,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">myargs</span><span class="p">,</span> <span class="o">**</span><span class="n">mykwargs</span><span class="p">):</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;################   &quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;   ################&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">myargs</span><span class="p">,</span> <span class="o">**</span><span class="n">mykwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wrapped</span></div>
 
@@ -259,8 +151,8 @@
     <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="n">dict_products_scipost</span><span class="p">[</span><span class="s1">&#39;cube&#39;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">prod</span> <span class="o">==</span> <span class="s2">&quot;IMAGE_FOV&quot;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">filter_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-                <span class="n">suffix_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;_</span><span class="si">{0:04d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-                <span class="n">suffix_prefinalnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;_</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                <span class="n">suffix_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">suffix_prefinalnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">name_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
                 <span class="n">prefix_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prefix_all</span><span class="p">)</span>
         <span class="k">else</span> <span class="p">:</span>
@@ -282,7 +174,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">SofPipe</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 <span class="c1">#        super(PipePrep, self).__init__()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">list_recipes</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">list_recipes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">first_recipe</span> <span class="o">=</span> <span class="n">first_recipe</span>
         <span class="k">if</span> <span class="n">last_recipe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">last_recipe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dict_recipes_per_num</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
@@ -325,15 +216,14 @@
     <span class="k">def</span> <span class="nf">print_recipes</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;Printing the list of recipes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># for recipe in self.list_recipes:</span>
         <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;=============================================&quot;</span><span class="p">)</span>
         <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;The dictionary of recipes which can be run is&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_recipes_num</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">dict_recipes_num</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_recipes_per_num</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">dict_recipes_per_num</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
         <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;=============================================&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipePrep.run_recipes"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_recipes">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_recipes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">skymethod</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_recipes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Running all recipes in one shot</span>
 
 <span class="sd">        Input</span>
@@ -345,13 +235,35 @@
 <span class="sd">            Default is True (use illumination during twilight calibration)</span>
 <span class="sd">        skymethod: str</span>
 <span class="sd">            Default is &quot;model&quot;.</span>
+<span class="sd">        filter_for_alignment: str</span>
+<span class="sd">            Default is defined in config_pipe</span>
+<span class="sd">        line: str</span>
+<span class="sd">            Default is None as defined in config_pipe</span>
+<span class="sd">        lambda_window: float</span>
+<span class="sd">            Default is 10.0 as defined in config_pipe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">class</span> <span class="nc">DefVal</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">pass</span>
+
+        <span class="n">defval</span> <span class="o">=</span> <span class="n">DefVal</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_default_for_recipes</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">defval</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">dict_default_for_recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+
+        <span class="c1"># We overwrite filter_for_alignment as it can be already set</span>
+        <span class="n">defval</span><span class="o">.</span><span class="n">filter_for_alignment</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_for_alignment&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_for_alignment</span><span class="p">)</span>
+
         <span class="c1"># Dictionary of arguments for each recipe</span>
-        <span class="n">default_dict_kwargs_recipes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;twilight&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;illum&#39;</span><span class="p">:</span> <span class="n">illum</span><span class="p">},</span>
-                             <span class="s1">&#39;scibasic_all&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;illum&#39;</span><span class="p">:</span> <span class="n">illum</span><span class="p">},</span>
-                             <span class="s1">&#39;sky&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;fraction&#39;</span><span class="p">:</span> <span class="n">fraction</span><span class="p">},</span>
-                             <span class="s1">&#39;prep_align&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;skymethod&#39;</span><span class="p">:</span> <span class="n">skymethod</span><span class="p">},</span>
-                             <span class="s1">&#39;scipost_per_expo&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;skymethod&#39;</span><span class="p">:</span> <span class="n">skymethod</span><span class="p">}</span>
+        <span class="n">default_dict_kwargs_recipes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;twilight&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;illum&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">illum</span><span class="p">},</span>
+                             <span class="s1">&#39;scibasic_all&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;illum&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">illum</span><span class="p">},</span>
+                             <span class="s1">&#39;sky&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;fraction&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">fraction</span><span class="p">},</span>
+                             <span class="s1">&#39;prep_align&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;skymethod&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">skymethod</span><span class="p">,</span> 
+                                            <span class="s1">&#39;filter_for_alignment&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">filter_for_alignment</span><span class="p">,</span>
+                                            <span class="s1">&#39;line&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">line</span><span class="p">,</span>
+                                            <span class="s1">&#39;lambda_window&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">lambda_window</span>
+                                            <span class="p">},</span>
+                             <span class="s1">&#39;scipost_per_expo&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;skymethod&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">skymethod</span><span class="p">},</span>
+                             <span class="s1">&#39;scipost&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;skymethod&#39;</span><span class="p">:</span> <span class="n">defval</span><span class="o">.</span><span class="n">skymethod</span><span class="p">}</span>
                              <span class="p">}</span>
 
         <span class="n">dict_kwargs_recipes</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;param_recipes&quot;</span><span class="p">,</span> <span class="p">{})</span>
@@ -665,16 +577,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_prevfolder</span><span class="p">(</span><span class="n">addtolog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipePrep.run_scibasic_all"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_scibasic_all">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_scibasic_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_object</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY&#39;</span><span class="p">,</span> <span class="s1">&#39;STD&#39;</span><span class="p">],</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_scibasic_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_object</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY&#39;</span><span class="p">,</span> <span class="s1">&#39;STD&#39;</span><span class="p">],</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span>
+                         <span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Running scibasic for all objects in list_object</span>
 <span class="sd">        Making different sof for each category</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">expotype</span> <span class="ow">in</span> <span class="n">list_object</span><span class="p">:</span>
             <span class="n">sof_filename</span> <span class="o">=</span> <span class="s1">&#39;scibasic_</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expotype</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">run_scibasic</span><span class="p">(</span><span class="n">sof_filename</span><span class="o">=</span><span class="n">sof_filename</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="n">expotype</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">illum</span><span class="o">=</span><span class="n">illum</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_scibasic</span><span class="p">(</span><span class="n">sof_filename</span><span class="o">=</span><span class="n">sof_filename</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="n">expotype</span><span class="p">,</span>
+                              <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">illum</span><span class="o">=</span><span class="n">illum</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipePrep.run_scibasic"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_scibasic">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_scibasic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;scibasic&#39;</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_scibasic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;scibasic&#39;</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reducing the files of a certain category and creating the PIXTABLES</span>
 <span class="sd">        Will run the esorex muse_scibasic </span>
 
@@ -699,7 +614,7 @@
 
         <span class="c1"># Create the dictionary for the LSF including</span>
         <span class="c1"># the list of files to be processed for one MASTER Flat</span>
-        <span class="k">for</span> <span class="n">gtable</span> <span class="ow">in</span> <span class="n">tpl_gtable</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ntable</span><span class="p">,</span> <span class="n">gtable</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tpl_gtable</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_calib_to_sofdict</span><span class="p">(</span><span class="s2">&quot;BADPIX_TABLE&quot;</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_calib_to_sofdict</span><span class="p">(</span><span class="s2">&quot;LINE_CATALOG&quot;</span><span class="p">)</span>
             <span class="c1"># extract the tpl (string) and mean mjd (float) </span>
@@ -734,14 +649,19 @@
             <span class="c1"># Write the Processed files Table and save it</span>
             <span class="c1"># Note: always overwrite the table so that a fresh numbering is done</span>
             <span class="n">gtable</span><span class="p">[</span><span class="s1">&#39;iexpo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">list_expo</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">gtable</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                 <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ntable</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">gtable</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">gtable</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># Go back to original folder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_prevfolder</span><span class="p">(</span><span class="n">addtolog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipePrep.run_standard"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_standard">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_standard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_standard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reducing the STD files after they have been obtained</span>
 <span class="sd">        Running the muse_standard routine</span>
 
@@ -780,13 +700,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">recipe_std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_sof</span><span class="p">,</span> <span class="n">dir_std</span><span class="p">,</span> <span class="n">name_std</span><span class="p">,</span> <span class="n">mytpl</span><span class="p">)</span>
 
         <span class="c1"># Write the MASTER files Table and save it</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="s2">&quot;STD&quot;</span><span class="p">,</span> <span class="n">std_table</span><span class="p">,</span> <span class="s2">&quot;master&quot;</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="s2">&quot;STD&quot;</span><span class="p">,</span> <span class="n">std_table</span><span class="p">,</span> <span class="s2">&quot;master&quot;</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
 
         <span class="c1"># Go back to original folder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_prevfolder</span><span class="p">(</span><span class="n">addtolog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipePrep.run_sky"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_sky">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;sky&#39;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;sky&#39;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                <span class="n">update</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reducing the SKY after they have been scibasic reduced</span>
 <span class="sd">        Will run the esorex muse_create_sky routine</span>
 
@@ -830,7 +752,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">recipe_sky</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_sof</span><span class="p">,</span> <span class="n">dir_sky</span><span class="p">,</span> <span class="n">name_sky</span><span class="p">,</span> <span class="n">mytpl</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="n">fraction</span><span class="p">)</span>
 
         <span class="c1"># Write the MASTER files Table and save it</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="s2">&quot;SKY&quot;</span><span class="p">,</span> <span class="n">sky_table</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="s2">&quot;SKY&quot;</span><span class="p">,</span> <span class="n">sky_table</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
 
         <span class="c1"># Go back to original folder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_prevfolder</span><span class="p">(</span><span class="n">addtolog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -895,7 +818,7 @@
                     <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipePrep.run_check_align"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_check_align">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_check_align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset_table_name</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;scipost&#39;</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">run_check_align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_offset_table</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;scipost&#39;</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span>
             <span class="n">line</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">folder_offset_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Launch the scipost command to get individual exposures in a narrow</span>
 <span class="sd">        band filter to check if the alignments are ok (after rotation </span>
@@ -933,7 +856,7 @@
                     <span class="n">tpl</span><span class="o">=</span><span class="n">mytpl</span><span class="p">,</span> <span class="n">list_expo</span><span class="o">=</span><span class="p">[</span><span class="n">iexpo</span><span class="p">],</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> 
                     <span class="n">lambdaminmax</span><span class="o">=</span><span class="p">[</span><span class="n">lmin</span><span class="p">,</span> <span class="n">lmax</span><span class="p">],</span> <span class="n">save</span><span class="o">=</span><span class="s1">&#39;cube&#39;</span><span class="p">,</span> 
                     <span class="n">offset_list</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="n">filter_for_alignment</span><span class="p">,</span>
-                    <span class="n">offset_table_name</span><span class="o">=</span><span class="n">offset_table_name</span><span class="p">,</span>
+                    <span class="n">name_offset_table</span><span class="o">=</span><span class="n">name_offset_table</span><span class="p">,</span>
                     <span class="n">folder_offset_table</span><span class="o">=</span><span class="n">folder_offset_table</span><span class="p">,</span>
                     <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">)</span></div>
 
@@ -1048,7 +971,7 @@
         <span class="k">return</span> <span class="n">found_expo</span><span class="p">,</span> <span class="n">list_expo</span><span class="p">,</span> <span class="n">group_list_expo</span><span class="p">,</span> <span class="n">group_table</span>
 
     <span class="k">def</span> <span class="nf">_normalise_skycontinuum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mjd_expo</span><span class="p">,</span> <span class="n">tpl_expo</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> 
-            <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">offset_table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name_offset_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a normalised continuum, to be included in the sof file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">stage</span> <span class="o">=</span> <span class="s2">&quot;processed&quot;</span>
@@ -1077,11 +1000,11 @@
         <span class="k">if</span> <span class="n">normalise_factor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Checking input offset table and corresponding pixtables</span>
             <span class="n">folder_offset_table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;folder_offset_table&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_read_offset_table</span><span class="p">(</span><span class="n">offset_table_name</span><span class="p">,</span> <span class="n">folder_offset_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_offset_table</span><span class="p">(</span><span class="n">name_offset_table</span><span class="p">,</span> <span class="n">folder_offset_table</span><span class="p">)</span>
             <span class="c1"># Get the background value</span>
             <span class="k">if</span> <span class="n">mjd_names</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset_table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                 <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;No MJD column in offset table </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                     <span class="n">offset_table_name</span><span class="p">))</span>
+                                     <span class="n">name_offset_table</span><span class="p">))</span>
                 <span class="n">status</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>    
                 <span class="n">table_mjdobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset_table</span><span class="p">[</span><span class="n">mjd_names</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">]]</span>
@@ -1094,7 +1017,7 @@
             <span class="k">if</span> <span class="n">status</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">dict_err</span> <span class="o">=</span> <span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;MJD&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;BACKGROUND&quot;</span><span class="p">}</span>
                 <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Table </span><span class="si">{0}</span><span class="s2"> - </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">folder_offset_table</span><span class="p">,</span>
-                                  <span class="n">offset_table_name</span><span class="p">))</span>
+                                  <span class="n">name_offset_table</span><span class="p">))</span>
                 <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Could not find </span><span class="si">{0}</span><span class="s2"> value in offset table&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                     <span class="n">dict_err</span><span class="p">[</span><span class="n">status</span><span class="p">]))</span>
                 <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;A background of 0 will be assumed, and&quot;</span><span class="p">)</span>
@@ -1110,7 +1033,7 @@
             <span class="c1"># Integration of the continuum in that filter</span>
             <span class="n">thisfile_musemode</span> <span class="o">=</span> <span class="n">expo_table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
             <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;For this sky continuum, we use MUSE Mode = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">thisfile_musemode</span><span class="p">))</span>
-            <span class="n">mycont</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">mymusefilter</span><span class="p">,</span> <span class="n">AO_mask</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;-AO-&quot;</span> <span class="ow">in</span> <span class="n">thisfile_musemode</span><span class="p">))</span>
+            <span class="n">mycont</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">mymusefilter</span><span class="p">,</span> <span class="n">ao_mask</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;-AO-&quot;</span> <span class="ow">in</span> <span class="n">thisfile_musemode</span><span class="p">))</span>
             <span class="n">mycont</span><span class="o">.</span><span class="n">get_normfactor</span><span class="p">(</span><span class="n">background</span><span class="p">,</span> <span class="n">filter_for_alignment</span><span class="p">)</span>
             <span class="n">normalise_factor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mycont</span><span class="p">,</span> <span class="n">filter_for_alignment</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span>
 
@@ -1155,7 +1078,7 @@
 <span class="sd">            Type of skymethod. See MUSE manual.</span>
 <span class="sd">        offset_list: bool</span>
 <span class="sd">            If True, using an OFFSET list. Default is True.</span>
-<span class="sd">        offset_table_name: str</span>
+<span class="sd">        name_offset_table: str</span>
 <span class="sd">            Name of the offset table table. If not provided, will use the </span>
 <span class="sd">            default name produced during the pipeline run.</span>
 <span class="sd">        filter_for_alignment: str</span>
@@ -1194,11 +1117,11 @@
 
         <span class="c1"># Offsets</span>
         <span class="n">offset_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;offset_list&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="n">offset_table_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;offset_table_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">name_offset_table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;name_offset_table&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">folder_offset_table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;folder_offset_table&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">offset_list</span><span class="p">:</span>
             <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Will use offset table: </span><span class="si">{0}</span><span class="s2"> in </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">offset_table_name</span><span class="p">,</span> <span class="n">folder_offset_table</span><span class="p">))</span>
+                <span class="n">name_offset_table</span><span class="p">,</span> <span class="n">folder_offset_table</span><span class="p">))</span>
 
         <span class="c1"># Misc parameters - autocalib, barycentric correction, AC</span>
         <span class="n">autocalib</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;autocalib&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
@@ -1254,16 +1177,16 @@
             <span class="k">if</span> <span class="n">ref_wcs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="s1">&#39;OUTPUT_WCS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">joinpath</span><span class="p">(</span><span class="n">folder_ref_wcs</span><span class="p">,</span> <span class="n">ref_wcs</span><span class="p">)]</span>
 
-            <span class="k">if</span> <span class="n">offset_table_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name_offset_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">folder_offset_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fullpath_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">)</span>
-                <span class="n">offset_table_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0}{1}</span><span class="s1">_</span><span class="si">{2}</span><span class="s1">_</span><span class="si">{3}</span><span class="s1">.fits&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">name_offset_table</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0}{1}</span><span class="s1">_</span><span class="si">{2}</span><span class="s1">_</span><span class="si">{3}</span><span class="s1">.fits&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                        <span class="n">dict_files_products</span><span class="p">[</span><span class="s1">&#39;ALIGN&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
                                        <span class="n">suffix</span><span class="p">,</span> <span class="n">filter_for_alignment</span><span class="p">,</span> <span class="n">tpl</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">folder_offset_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">folder_offset_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">alignment</span>
             <span class="k">if</span> <span class="n">offset_list</span> <span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="s1">&#39;OFFSET_LIST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">joinpath</span><span class="p">(</span><span class="n">folder_offset_table</span><span class="p">,</span> <span class="n">offset_table_name</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="s1">&#39;OFFSET_LIST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">joinpath</span><span class="p">(</span><span class="n">folder_offset_table</span><span class="p">,</span> <span class="n">name_offset_table</span><span class="p">)]</span>
 
             <span class="c1"># The sky subtraction method on the sky continuum to normalise it</span>
             <span class="c1"># But only if requested</span>
@@ -1276,7 +1199,7 @@
                         <span class="n">tpl_expo</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">iexpo</span><span class="o">=</span><span class="n">list_group_expo</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
                         <span class="n">suffix</span><span class="o">=</span><span class="n">suffix_skycontinuum</span><span class="p">,</span> 
                         <span class="n">folder_offset_table</span><span class="o">=</span><span class="n">folder_offset_table</span><span class="p">,</span>
-                        <span class="n">offset_table_name</span><span class="o">=</span><span class="n">offset_table_name</span><span class="p">)</span>
+                        <span class="n">name_offset_table</span><span class="o">=</span><span class="n">name_offset_table</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">prefix_skycontinuum</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
             <span class="k">if</span> <span class="n">skymethod</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
@@ -1319,7 +1242,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">scipost_table</span><span class="p">,</span> <span class="s2">&quot;reduced&quot;</span><span class="p">,</span> 
                     <span class="s2">&quot;IMAGES_FOV</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}{2}</span><span class="s2">_</span><span class="si">{3}</span><span class="s2">_list_table.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">suffix</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">suffix_expo</span><span class="p">,</span> <span class="n">tpl</span><span class="p">),</span> 
-                        <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Go back to original folder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_prevfolder</span><span class="p">(</span><span class="n">addtolog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -1401,8 +1324,8 @@
         <span class="c1"># Go back to original folder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_prevfolder</span><span class="p">(</span><span class="n">addtolog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="PipePrep.run_align_bypointing"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_align_bypointing">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_align_bypointing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;exp_align_bypointing&#39;</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span> 
+<div class="viewcode-block" id="PipePrep.run_align_bydataset"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_align_bydataset">[docs]</a>    <span class="nd">@print_my_function_name</span>
+    <span class="k">def</span> <span class="nf">run_align_bydataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;exp_align_bydataset&#39;</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span>
             <span class="n">list_expo</span><span class="o">=</span><span class="p">[],</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Aligning the individual exposures from a dataset</span>
@@ -1424,10 +1347,10 @@
         <span class="c1"># Stop the process if only 1 or fewer exposures are retrieved</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">align_table</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Pointing = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointing</span><span class="p">),</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Dataset = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">),</span>
                         <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
                 <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;No derived OFFSET LIST as only &quot;</span>
-                                    <span class="s2">&quot;1 exposure retrieved in this Pointing&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;1 exposure retrieved in this Dataset&quot;</span><span class="p">,</span>
                         <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
             <span class="k">return</span>
         
@@ -1439,8 +1362,8 @@
         <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">suffix</span> <span class="o">+=</span> <span class="s2">&quot;_</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
-        <span class="c1"># Use the pointing as a suffix for the names</span>
-        <span class="n">pointing</span> <span class="o">=</span> <span class="s2">&quot;P</span><span class="si">{0:02d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointing</span><span class="p">)</span>
+        <span class="c1"># Use the dataset as a suffix for the names</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">()</span>
 
         <span class="c1"># Now creating the SOF file, first reseting it</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
@@ -1459,33 +1382,33 @@
 
         <span class="c1"># Write the SOF</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write_sof</span><span class="p">(</span><span class="n">sof_filename</span><span class="o">=</span><span class="n">sof_filename</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">_</span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                       <span class="n">long_suffix</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span> <span class="n">tpl</span><span class="p">),</span> <span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                       <span class="n">long_suffix</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">tpl</span><span class="p">),</span> <span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">dir_align</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fullpath_expo</span><span class="p">(</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">)</span>
         <span class="n">namein_align</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dict_files_products</span><span class="p">[</span><span class="s1">&#39;ALIGN&#39;</span><span class="p">])</span>
         <span class="n">nameout_align</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">_</span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                         <span class="n">long_suffix</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span> <span class="n">tpl</span><span class="p">)</span> 
+                         <span class="n">long_suffix</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">tpl</span><span class="p">)</span>
                              <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dict_files_products</span><span class="p">[</span><span class="s1">&#39;ALIGN&#39;</span><span class="p">])]</span>
         <span class="k">for</span> <span class="n">iter_file</span> <span class="ow">in</span> <span class="n">dict_files_iexpo_products</span><span class="p">[</span><span class="s1">&#39;ALIGN&#39;</span><span class="p">]:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">align_table</span><span class="p">):</span>
                 <span class="n">namein_align</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">_</span><span class="si">{1:04d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iter_file</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-                <span class="n">nameout_align</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">_bypointing</span><span class="si">{1}</span><span class="s1">_</span><span class="si">{2}</span><span class="s1">_</span><span class="si">{3:04d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">nameout_align</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">_bydataset</span><span class="si">{1}</span><span class="s1">_</span><span class="si">{2}</span><span class="s1">_</span><span class="si">{3:04d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">iter_file</span><span class="p">,</span> <span class="n">long_suffix</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;tpls&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;iexpo&#39;</span><span class="p">]))</span>
 
-        <span class="c1"># Find the alignment - Note that Pointing is used and tpl reflects the given selection</span>
+        <span class="c1"># Find the alignment - Note that Field is used and tpl reflects the given selection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recipe_align</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_sof</span><span class="p">,</span> <span class="n">dir_align</span><span class="p">,</span> <span class="n">namein_align</span><span class="p">,</span> <span class="n">nameout_align</span><span class="p">,</span> 
-                <span class="n">tpl</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">tpl</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Write the MASTER files Table and save it</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_expo_table</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">align_table</span><span class="p">,</span> <span class="s2">&quot;reduced&quot;</span><span class="p">,</span> 
-                <span class="s2">&quot;ALIGNED_IMAGES_BYPOINTING_</span><span class="si">{0}{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">_</span><span class="si">{3}</span><span class="s2">_list_table.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> 
-                <span class="n">long_suffix</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span> <span class="n">tpl</span><span class="p">),</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="s2">&quot;ALIGNED_IMAGES_BYDATASET_</span><span class="si">{0}{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">_</span><span class="si">{3}</span><span class="s2">_list_table.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span>
+                <span class="n">long_suffix</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">tpl</span><span class="p">),</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         
         <span class="c1"># Go back to original folder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_prevfolder</span><span class="p">(</span><span class="n">addtolog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipePrep.save_fine_alignment"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.save_fine_alignment">[docs]</a>    <span class="nd">@print_my_function_name</span>
     <span class="k">def</span> <span class="nf">save_fine_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_offset_table</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Save the fine pointing alignment</span>
+        <span class="sd">&quot;&quot;&quot; Save the fine dataset alignment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">name_offset_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name_offset_table</span> <span class="o">=</span> <span class="s2">&quot;XX&quot;</span>
@@ -1495,9 +1418,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dict_alignments</span><span class="p">[</span><span class="n">tstamp</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">name_offset_table</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PipePrep.run_fine_alignment"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_fine_alignment">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_fine_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_ima_reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nexpo</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">list_expo</span><span class="o">=</span><span class="p">[],</span> <span class="n">line</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="n">bygroup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Run the alignment on this pointing using or not a reference image</span>
+    <span class="k">def</span> <span class="nf">run_fine_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_ima_reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nexpo</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">list_expo</span><span class="o">=</span><span class="p">[],</span>
+                           <span class="n">line</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bygroup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run the alignment on this dataset using or not a reference image</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If not yet initialised, build the dictionary</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;dict_alignments&quot;</span><span class="p">):</span>
@@ -1525,7 +1448,7 @@
         
 <div class="viewcode-block" id="PipePrep.get_align_group"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.get_align_group">[docs]</a>    <span class="nd">@print_my_function_name</span>
     <span class="k">def</span> <span class="nf">get_align_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_ima_reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">list_expo</span><span class="o">=</span><span class="p">[],</span> <span class="n">line</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">bygroup</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">bygroup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extract the needed information for a set of exposures to be aligned</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Selecting the table with the right iexpo</span>
@@ -1553,7 +1476,8 @@
                 <span class="n">list_names_muse</span> <span class="o">=</span> <span class="p">[</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_fullpath_expo</span><span class="p">(</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">),</span>
                     <span class="s1">&#39;IMAGE_FOV</span><span class="si">{0}</span><span class="s1">_</span><span class="si">{1:04d}</span><span class="s1">.fits&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">long_suffix</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">))</span> 
                     <span class="k">for</span> <span class="n">iexpo</span> <span class="ow">in</span> <span class="n">list_group_expo</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">align_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AlignMusePointing</span><span class="p">(</span><span class="n">name_ima_reference</span><span class="p">,</span> <span class="n">list_names_muse</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="s2">&quot;mytpl&quot;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">align_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AlignMuseDataset</span><span class="p">(</span><span class="n">name_ima_reference</span><span class="p">,</span> <span class="n">list_names_muse</span><span class="p">,</span>
+                                                   <span class="n">flag</span><span class="o">=</span><span class="s2">&quot;mytpl&quot;</span><span class="p">))</span>
         <span class="c1"># If not by group</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">long_suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">filter_for_alignment</span><span class="p">)</span>
@@ -1563,17 +1487,17 @@
             <span class="c1"># Giving a reference image name, doing the alignment w.r.t. to that specific image</span>
             <span class="k">if</span> <span class="n">name_ima_reference</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Using the first MUSE exposure as a reference&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">align_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AlignMusePointing</span><span class="p">(</span><span class="n">list_names_muse</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">align_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AlignMuseDataset</span><span class="p">(</span><span class="n">list_names_muse</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                     <span class="n">list_names_muse</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">flag</span><span class="o">=</span><span class="s2">&quot;mytpl&quot;</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">align_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AlignMusePointing</span><span class="p">(</span><span class="n">name_ima_reference</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">align_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AlignMuseDataset</span><span class="p">(</span><span class="n">name_ima_reference</span><span class="p">,</span>
                     <span class="n">list_names_muse</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="s2">&quot;mytpl&quot;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="PipePrep.run_combine_pointing"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_combine_pointing">[docs]</a>    <span class="nd">@print_my_function_name</span>
-    <span class="k">def</span> <span class="nf">run_combine_pointing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;exp_combine&#39;</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span> 
+<div class="viewcode-block" id="PipePrep.run_combine_dataset"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_combine_dataset">[docs]</a>    <span class="nd">@print_my_function_name</span>
+    <span class="k">def</span> <span class="nf">run_combine_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;exp_combine&#39;</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span>
             <span class="n">list_expo</span><span class="o">=</span><span class="p">[],</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="s2">&quot;ALL&quot;</span><span class="p">,</span> 
             <span class="n">lambdaminmax</span><span class="o">=</span><span class="p">[</span><span class="mf">4000.</span><span class="p">,</span><span class="mf">10000.</span><span class="p">],</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Produce a cube from all frames in the pointing</span>
+        <span class="sd">&quot;&quot;&quot;Produce a cube from all frames in the dataset</span>
 <span class="sd">        list_expo or tpl specific arguments can still reduce the selection if needed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Selecting the table with the right iexpo</span>
@@ -1588,7 +1512,7 @@
         <span class="c1"># exp_combine needs a minimum of 2</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_expo</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;The combined pointing has only one exposure: process aborted&quot;</span><span class="p">,</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;The combined dataset has only one exposure: process aborted&quot;</span><span class="p">,</span>
                         <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
             <span class="k">return</span>
 
@@ -1600,8 +1524,8 @@
         <span class="n">filter_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_list&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_list</span><span class="p">)</span>
         <span class="n">prefix_all</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;prefix_all&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Use the pointing as a suffix for the names</span>
-        <span class="n">pointing</span> <span class="o">=</span> <span class="s2">&quot;P</span><span class="si">{0:02d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointing</span><span class="p">)</span>
+        <span class="c1"># Use the dataset as a suffix for the names</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">()</span>
         <span class="c1"># Save option</span>
         <span class="n">save</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;save&quot;</span><span class="p">,</span> <span class="s2">&quot;cube,combined&quot;</span><span class="p">)</span>
 
@@ -1618,12 +1542,12 @@
         <span class="n">offset_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;offset_list&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="n">folder_expo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fullpath_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span>
         <span class="n">long_suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">filter_for_alignment</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">offset_list</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="n">offset_list</span><span class="p">:</span>
             <span class="n">offset_list_tablename</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;offset_list_tablename&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">offset_list_tablename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">offset_list_tablename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">_</span><span class="si">{3}</span><span class="s2">_</span><span class="si">{4}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">dict_files_products</span><span class="p">[</span><span class="s1">&#39;ALIGN&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">long_suffix</span><span class="p">,</span>
-                        <span class="n">expotype</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span> <span class="n">tpl</span><span class="p">)</span>
+                        <span class="n">expotype</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">tpl</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">folder_expo</span><span class="p">,</span> <span class="n">offset_list_tablename</span><span class="p">)):</span>
                 <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;OFFSET_LIST table </span><span class="si">{0}</span><span class="s2"> not found in folder </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">offset_list_tablename</span><span class="p">,</span> <span class="n">folder_expo</span><span class="p">),</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
@@ -1650,7 +1574,6 @@
                 <span class="n">suffix_prefinalnames</span><span class="o">=</span><span class="n">suffix_prefinalnames</span><span class="p">,</span>
                 <span class="n">prefix_products</span><span class="o">=</span><span class="n">prefix_products</span><span class="p">,</span>
                 <span class="n">lambdamin</span><span class="o">=</span><span class="n">lambdamin</span><span class="p">,</span> <span class="n">lambdamax</span><span class="o">=</span><span class="n">lambdamax</span><span class="p">,</span>
-                <span class="n">filter_for_alignment</span><span class="o">=</span><span class="n">filter_for_alignment</span><span class="p">,</span>
                 <span class="n">save</span><span class="o">=</span><span class="n">save</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="n">filter_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Go back to original folder</span>
@@ -1658,42 +1581,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Eric Emsellem
-
-    </p>
+    <p>&#169; Copyright 2019, Eric Emsellem.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

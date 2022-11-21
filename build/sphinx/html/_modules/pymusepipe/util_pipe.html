@@ -1,69 +1,34 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pymusepipe.util_pipe &mdash; pymusepipe 2.15.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>pymusepipe.util_pipe &mdash; pymusepipe 2.9.9.post16 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> pymusepipe
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.9.9.post16
+                2.15.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -71,85 +36,41 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../howto.html">HowTo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">pymusepipe</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>pymusepipe.util_pipe</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pymusepipe.util_pipe</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for pymusepipe.util_pipe</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Licensed under a MIT license - see LICENSE</span>
 
@@ -166,6 +87,8 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">joinpath</span>
 <span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="c1"># Numpy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -174,16 +97,16 @@
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
 
 <span class="c1"># Import package modules</span>
-<span class="kn">from</span> <span class="nn">.emission_lines</span> <span class="kn">import</span> <span class="n">list_emission_lines</span>
-<span class="kn">from</span> <span class="nn">.emission_lines</span> <span class="kn">import</span> <span class="n">full_muse_wavelength_range</span>
-<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="n">default_filter_list</span>
+<span class="kn">from</span> <span class="nn">.emission_lines</span> <span class="kn">import</span> <span class="n">list_emission_lines</span><span class="p">,</span> <span class="n">full_muse_wavelength_range</span>
+<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">default_filter_list</span><span class="p">,</span> <span class="n">dict_musemodes</span><span class="p">,</span>
+                          <span class="n">default_ndigits</span><span class="p">,</span> <span class="n">default_str_dataset</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
 
-<span class="kn">from</span> <span class="nn">mpdaf.obj</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="c1"># MPDAF</span>
+<span class="kn">from</span> <span class="nn">mpdaf.obj</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">Cube</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 
-<span class="c1">############    PRINTING FUNCTIONS #########################</span>
+<span class="c1">#  PRINTING FUNCTIONS #</span>
 <span class="n">HEADER</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[95m&#39;</span>
 <span class="n">OKBLUE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[94m&#39;</span>
 <span class="n">OKGREEN</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[92m&#39;</span>
@@ -278,6 +201,120 @@
 
 <span class="c1">#-----------  END PRINTING FUNCTIONS -----------------------</span>
 
+<div class="viewcode-block" id="analyse_musemode"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.analyse_musemode">[docs]</a><span class="k">def</span> <span class="nf">analyse_musemode</span><span class="p">(</span><span class="n">musemode</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract the named field from the musemode</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    musemode: str</span>
+<span class="sd">        Mode of the MUSE data to be analysed</span>
+<span class="sd">    field: str</span>
+<span class="sd">        Field to analyse (&#39;ao&#39;, &#39;field&#39;, &#39;lambda_range&#39;)</span>
+<span class="sd">    delimiter: str</span>
+<span class="sd">        Character to delimit the fields to analyse</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    val: str</span>
+<span class="sd">        Value of the field which was analysed (e.g., &#39;AO&#39; or &#39;NOAO&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_musemodes</span><span class="p">:</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot find such a field (</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">) in the dict_musemodes&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">index</span> <span class="o">=</span> <span class="n">dict_musemodes</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+    <span class="n">sval</span> <span class="o">=</span> <span class="n">musemode</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sval</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in analyse_musemode. Cannot access field </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> &quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;After splitting the musemode </span><span class="si">{</span><span class="n">musemode</span><span class="si">}</span><span class="s2"> = sval&quot;</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">musemode</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="add_string"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.add_string">[docs]</a><span class="k">def</span> <span class="nf">add_string</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">word</span><span class="o">=</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adding string at given location</span>
+<span class="sd">    Default is underscore for string which are not empty.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ----</span>
+<span class="sd">    text (str): input text</span>
+<span class="sd">    word (str): input word to be added</span>
+<span class="sd">    loc (int): location in &#39;text&#39;. [Default is 0=start]</span>
+<span class="sd">               If None, will be added at the end.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ------</span>
+<span class="sd">    Updated text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">loc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">text</span><span class="si">}{</span><span class="n">word</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;_&quot;</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">text</span><span class="p">[:</span><span class="n">loc</span><span class="p">]</span><span class="si">}{</span><span class="n">word</span><span class="si">}{</span><span class="n">text</span><span class="p">[</span><span class="n">loc</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;String index [</span><span class="si">{</span><span class="n">loc</span><span class="si">}</span><span class="s2">] out of range [</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">] in add_string&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">text</span></div>
+
+<div class="viewcode-block" id="get_tpl_nexpo"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.get_tpl_nexpo">[docs]</a><span class="k">def</span> <span class="nf">get_tpl_nexpo</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the tpl and nexpo from a filename assuming it is at the end</span>
+<span class="sd">    of the filename</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    filename: str</span>
+<span class="sd">       Input filename</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tpl, nexpo: str, int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">basestr</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="p">[(</span><span class="n">tpl</span><span class="p">,</span> <span class="n">nexpo</span><span class="p">)]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\_(\S</span><span class="si">{19}</span><span class="s1">)\_(\d</span><span class="si">{4}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">basestr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nexpo</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tpl</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">nexpo</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="get_dataset_name"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.get_dataset_name">[docs]</a><span class="k">def</span> <span class="nf">get_dataset_name</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">str_dataset</span><span class="o">=</span><span class="n">default_str_dataset</span><span class="p">,</span> <span class="n">ndigits</span><span class="o">=</span><span class="n">default_ndigits</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Formatting for the dataset/pointing names using the number and</span>
+<span class="sd">    the number of digits and prefix string</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    dataset: int</span>
+<span class="sd">       Dataset (or Pointing) number</span>
+<span class="sd">    str_dataset: str</span>
+<span class="sd">        Prefix representing the dataset (or pointing)</span>
+<span class="sd">    ndigits: int</span>
+<span class="sd">        Number of digits to be used for formatting</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    string for the dataset/pointing name prefix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">str_dataset</span><span class="si">}{</span><span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">:</span><span class="s2">0</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ndigits</span><span class="p">)</span><span class="si">}}</span><span class="s2">&quot;</span></div>
+
+<div class="viewcode-block" id="lower_rep"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.lower_rep">[docs]</a><span class="k">def</span> <span class="nf">lower_rep</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lower the text and return it after removing all underscores</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        text (str): text to treat</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        updated text (with removed underscores and lower-cased)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="lower_allbutfirst_letter"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.lower_allbutfirst_letter">[docs]</a><span class="k">def</span> <span class="nf">lower_allbutfirst_letter</span><span class="p">(</span><span class="n">mystring</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Lowercase all letters except the first one</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -309,6 +346,27 @@
         <span class="sd">&quot;&quot;&quot;Delete a key in the dictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">tstamp</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="merge_dict"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.merge_dict">[docs]</a><span class="k">def</span> <span class="nf">merge_dict</span><span class="p">(</span><span class="n">dict1</span><span class="p">,</span> <span class="n">dict2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Merging two dictionaries by appending</span>
+<span class="sd">    keys which are duplicated</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    dict1: dict</span>
+<span class="sd">    dict2: dict</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict1 : dict</span>
+<span class="sd">        merged dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict1</span><span class="p">:</span>
+            <span class="n">dict1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dict1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">dict1</span></div>
 
 <div class="viewcode-block" id="create_time_name"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.create_time_name">[docs]</a><span class="k">def</span> <span class="nf">create_time_name</span><span class="p">()</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Create a time-link name for file saving purposes</span>
@@ -542,21 +600,21 @@
                   <span class="n">filter_list</span><span class="p">,</span> <span class="n">cubename</span><span class="p">,</span> <span class="n">filter_fits_file</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">command</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="add_key_pointing_expo"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.add_key_pointing_expo">[docs]</a><span class="k">def</span> <span class="nf">add_key_pointing_expo</span><span class="p">(</span><span class="n">imaname</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="n">pointing</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Add pointing and expo number to image</span>
+<div class="viewcode-block" id="add_key_dataset_expo"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.add_key_dataset_expo">[docs]</a><span class="k">def</span> <span class="nf">add_key_dataset_expo</span><span class="p">(</span><span class="n">imaname</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add dataset and expo number to image</span>
 
 <span class="sd">    Input</span>
 <span class="sd">    -----</span>
 <span class="sd">    imaname: str</span>
 <span class="sd">    iexpo: int</span>
-<span class="sd">    pointing: int</span>
+<span class="sd">    dataset: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Writing the pointing and iexpo in the IMAGE_FOV</span>
+    <span class="c1"># Writing the dataset and iexpo in the IMAGE_FOV</span>
     <span class="n">this_image</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">imaname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">)</span>
-    <span class="n">this_image</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;MUSEPIPE_POINTING&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pointing</span><span class="p">,</span> <span class="s2">&quot;Pointing number&quot;</span><span class="p">)</span>
+    <span class="n">this_image</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;MUSEPIPE_DATASET&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;Dataset number&quot;</span><span class="p">)</span>
     <span class="n">this_image</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;MUSEPIPE_IEXPO&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">iexpo</span><span class="p">,</span> <span class="s2">&quot;Exposure number&quot;</span><span class="p">)</span>
     <span class="n">this_image</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Keywords MUSEPIPE_POINTING/EXPO updated for image </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Keywords MUSEPIPE_DATASET/EXPO updated for image </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">imaname</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="rotate_image_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.rotate_image_wcs">[docs]</a><span class="k">def</span> <span class="nf">rotate_image_wcs</span><span class="p">(</span><span class="n">ima_name</span><span class="p">,</span> <span class="n">ima_folder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">outwcs_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rotangle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
@@ -633,109 +691,276 @@
             <span class="n">out_name</span> <span class="o">=</span> <span class="n">ima_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">in_suffix</span><span class="p">,</span> <span class="n">out_suffix</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">name</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">ima_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">out_suffix</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="n">out_suffix</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_suffix</span><span class="p">)</span>
+        <span class="n">out_suffix</span> <span class="o">=</span> <span class="n">add_string</span><span class="p">(</span><span class="n">out_suffix</span><span class="p">)</span>
         <span class="n">out_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">out_suffix</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
 
     <span class="c1"># write output</span>
     <span class="n">final_rot_image</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">outwcs_folder</span><span class="p">,</span> <span class="n">out_name</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">outwcs_folder</span><span class="p">,</span> <span class="n">out_name</span></div>
 
-<div class="viewcode-block" id="filter_list_with_pdict"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.filter_list_with_pdict">[docs]</a><span class="k">def</span> <span class="nf">filter_list_with_pdict</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">dict_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="rotate_cube_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.rotate_cube_wcs">[docs]</a><span class="k">def</span> <span class="nf">rotate_cube_wcs</span><span class="p">(</span><span class="n">cube_name</span><span class="p">,</span> <span class="n">cube_folder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">outwcs_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rotangle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Routine to remove potential Nan around an image and reconstruct</span>
+<span class="sd">    an optimal WCS reference image. The rotation angle is provided as a way</span>
+<span class="sd">    to optimise the extent of the output image, removing Nan along X and Y</span>
+<span class="sd">    at that angle.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cube_name (str): input image name. No default.</span>
+<span class="sd">        cube_folder (str): input image folder [&#39;&#39;]</span>
+<span class="sd">        outwcs_folder (str): folder where to write the output frame. Default is</span>
+<span class="sd">            None which means that it will use the folder of the input image.</span>
+<span class="sd">        rotangle (float): rotation angle in degrees [0]</span>
+<span class="sd">        **kwargs:</span>
+<span class="sd">            in_suffix (str): in suffix to remove from name [&#39;prealign&#39;]</span>
+<span class="sd">            out_suffix (str): out suffix to add to name [&#39;rotwcs&#39;]</span>
+<span class="sd">            margin_factor (float): factor to extend the image [1.1]</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Reading the input names and setting output folder</span>
+    <span class="n">fullname</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="n">cube_folder</span><span class="p">,</span> <span class="n">cube_name</span><span class="p">)</span>
+    <span class="n">cube_folder</span><span class="p">,</span> <span class="n">cube_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outwcs_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outwcs_folder</span> <span class="o">=</span> <span class="n">cube_folder</span>
+
+    <span class="c1"># Suffix</span>
+    <span class="n">in_suffix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;in_suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;prealign&quot;</span><span class="p">)</span>
+    <span class="n">out_suffix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;out_suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;rotwcs&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get margin if needed</span>
+    <span class="n">margin_factor</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;margin_factor&quot;</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+    <span class="n">extend_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="p">(</span><span class="n">margin_factor</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">))</span>
+    <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Will use a </span><span class="si">{:5.2f}% e</span><span class="s2">xtra margin&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">extend_fraction</span><span class="o">*</span><span class="mf">100.</span><span class="p">))</span>
+
+    <span class="c1"># Opening the image via mpdaf</span>
+    <span class="n">cubewcs</span> <span class="o">=</span> <span class="n">Cube</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+    <span class="n">imawcs</span> <span class="o">=</span> <span class="n">cubewcs</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">extra_pixels</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imawcs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">extend_fraction</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+
+    <span class="c1"># New dimensions and extend current image</span>
+    <span class="n">new_dim</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imawcs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">+</span> <span class="n">extra_pixels</span><span class="p">)</span>
+    <span class="n">ima_ext</span> <span class="o">=</span> <span class="n">imawcs</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">newdim</span><span class="o">=</span><span class="n">new_dim</span><span class="p">,</span> <span class="n">refpos</span><span class="o">=</span><span class="n">imawcs</span><span class="o">.</span><span class="n">get_start</span><span class="p">(),</span>
+                            <span class="n">refpix</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">extra_pixels</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">),</span>
+                            <span class="n">newinc</span><span class="o">=</span><span class="n">imawcs</span><span class="o">.</span><span class="n">get_step</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">3600.</span><span class="p">)</span>
+
+    <span class="c1"># Copy and rotate WCS</span>
+    <span class="n">new_wcs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ima_ext</span><span class="o">.</span><span class="n">wcs</span><span class="p">)</span>
+    <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Rotating spatial WCS of Cube by </span><span class="si">{}</span><span class="s2"> degrees&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rotangle</span><span class="p">))</span>
+    <span class="n">new_wcs</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">rotangle</span><span class="p">)</span>
+
+    <span class="c1"># New rotated image</span>
+    <span class="n">ima_rot</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">ima_ext</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">wcs</span><span class="o">=</span><span class="n">new_wcs</span><span class="p">)</span>
+
+    <span class="c1"># Then resample the image using the initial one as your reference</span>
+    <span class="n">ima_rot_resampled</span> <span class="o">=</span> <span class="n">ima_rot</span><span class="o">.</span><span class="n">align_with_image</span><span class="p">(</span><span class="n">ima_ext</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Crop NaN</span>
+    <span class="n">ima_rot_resampled</span><span class="o">.</span><span class="n">crop</span><span class="p">()</span>
+
+    <span class="c1"># get the new header with wcs and rotate back</span>
+    <span class="n">finalwcs</span> <span class="o">=</span> <span class="n">ima_rot_resampled</span><span class="o">.</span><span class="n">wcs</span>
+    <span class="n">finalwcs</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="n">rotangle</span><span class="p">)</span>
+
+    <span class="c1"># create the final image</span>
+    <span class="n">data_cube_rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">ima_rot_resampled</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                              <span class="n">cubewcs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">final_rot_cube</span> <span class="o">=</span> <span class="n">Cube</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_cube_rot</span><span class="p">,</span> <span class="n">wave</span><span class="o">=</span><span class="n">cubewcs</span><span class="o">.</span><span class="n">wave</span><span class="p">,</span> <span class="n">wcs</span><span class="o">=</span><span class="n">finalwcs</span><span class="p">)</span>
+
+    <span class="c1"># Save image</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_suffix</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">in_suffix</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">in_suffix</span> <span class="ow">in</span> <span class="n">cube_name</span><span class="p">:</span>
+            <span class="n">out_name</span> <span class="o">=</span> <span class="n">cube_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">in_suffix</span><span class="p">,</span> <span class="n">out_suffix</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">cube_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out_suffix</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">out_suffix</span> <span class="o">=</span> <span class="n">add_string</span><span class="p">(</span><span class="n">out_suffix</span><span class="p">)</span>
+        <span class="n">out_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">out_suffix</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
+
+    <span class="c1"># write output</span>
+    <span class="n">final_rot_cube</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">outwcs_folder</span><span class="p">,</span> <span class="n">out_name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">outwcs_folder</span><span class="p">,</span> <span class="n">out_name</span></div>
+
+
+<div class="viewcode-block" id="ExposureInfo"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.ExposureInfo">[docs]</a><span class="k">class</span> <span class="nc">ExposureInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targername</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">tpl</span><span class="p">,</span> <span class="n">nexpo</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A dummy class to just store temporarily</span>
+<span class="sd">        the various basic info about a Muse exposure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetname</span> <span class="o">=</span> <span class="n">targetname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tpl</span> <span class="o">=</span> <span class="n">tpl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nexpo</span> <span class="o">=</span> <span class="n">nexpo</span></div>
+
+
+<div class="viewcode-block" id="filter_list_with_pdict"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.filter_list_with_pdict">[docs]</a><span class="k">def</span> <span class="nf">filter_list_with_pdict</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">list_datasets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">dict_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Filter out exposures (pixtab or cube namelist) using a dictionary which</span>
-<span class="sd">    has a list of pointings and for each pointing a list of exposure number.</span>
+<span class="sd">    has a list of datasets and for each dataset a list of exposure number.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        input_list (list of str):  input list to filter</span>
 <span class="sd">        dict_files (dict):  dictionary used to filter</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        selected_list: selected list of files</span>
+<span class="sd">        selected_filename_list: selected list of files</span>
+<span class="sd">        exposure_list_per_pointing: selected list of files for each pointing</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nfiles_input_list</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">dict_files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-          <span class="n">selected_list</span> <span class="o">=</span> <span class="n">input_list</span>
+        <span class="c1"># Returning the default input list</span>
+        <span class="n">selected_filename_list</span> <span class="o">=</span> <span class="n">input_list</span>
+        <span class="c1"># Just one dummy pointing with all files</span>
+        <span class="n">dict_exposures_per_pointing</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">input_list</span><span class="p">}</span>
+        <span class="c1"># Building the dummy list of tpl and nexpo for</span>
+        <span class="c1"># this input list, decrypting with get_tpl_nexpo</span>
+        <span class="n">list_tplexpo</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">input_list</span><span class="p">:</span>
+            <span class="n">ftpl</span><span class="p">,</span> <span class="n">fnexpo</span> <span class="o">=</span> <span class="n">get_tpl_nexpo</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">list_tplexpo</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ftpl</span><span class="p">,</span> <span class="n">fnexpo</span><span class="p">])</span>
+        <span class="n">dict_tplexpo_per_pointing</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">list_tplexpo</span><span class="p">}</span>
 
     <span class="c1"># Otherwise use the ones which are given via their expo numbers</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">selected_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">selected_filename_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dict_exposures_per_pointing</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">dict_tplexpo_per_pointing</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># this is the list of exposures to consider</span>
 
-        <span class="k">if</span> <span class="n">list_pointings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">list_pointings</span> <span class="o">=</span> <span class="n">dict_files</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Cannot recognise input pointing(s)&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">selected_list</span>
-
-        <span class="k">for</span> <span class="n">pointing</span> <span class="ow">in</span> <span class="n">list_pointings</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">pointing</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_files</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Pointing </span><span class="si">{}</span><span class="s2"> not in dictionary &quot;</span>
-                                    <span class="s2">&quot;- skipping&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pointing</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">list_expo</span> <span class="o">=</span> <span class="n">dict_files</span><span class="p">[</span><span class="n">pointing</span><span class="p">]</span>
-                <span class="c1"># We loop on that list</span>
-                <span class="k">for</span> <span class="n">expotuple</span> <span class="ow">in</span> <span class="n">list_expo</span><span class="p">:</span>
-                    <span class="n">tpl</span><span class="p">,</span> <span class="n">nexpo</span> <span class="o">=</span> <span class="n">expotuple</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">expotuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">expo</span> <span class="ow">in</span> <span class="n">nexpo</span><span class="p">:</span>
-                        <span class="c1"># Check whether this exists in the our cube list</span>
-                        <span class="n">suffix_expo</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">{0:04d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">expo</span><span class="p">))</span>
-                        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">input_list</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="p">(</span><span class="n">suffix_expo</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">tpl</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">):</span>
-                                <span class="c1"># We select the file</span>
-                                <span class="n">selected_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                                <span class="c1"># And remove it from the list</span>
-                                <span class="n">input_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                                <span class="c1"># We break out of the cube for loop</span>
+        <span class="k">if</span> <span class="n">list_datasets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">list_datasets</span> <span class="o">=</span> <span class="n">dict_files</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Cannot recognise input dataset(s)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">list_datasets</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dataset</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_files</span><span class="p">:</span>
+                    <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Dataset </span><span class="si">{}</span><span class="s2"> not in dictionary &quot;</span>
+                                        <span class="s2">&quot;- skipping&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">list_tpltuple</span> <span class="o">=</span> <span class="n">dict_files</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span>
+                    <span class="c1"># We loop on that list which should contain </span>
+                    <span class="c1"># the list of tpl associated</span>
+                    <span class="c1"># with a list of exposure numbers</span>
+                    <span class="k">for</span> <span class="n">expotuple</span> <span class="ow">in</span> <span class="n">list_tpltuple</span><span class="p">:</span>
+                        <span class="c1"># We get the tpl, and then the list of expo numbers</span>
+                        <span class="n">tpl</span><span class="p">,</span> <span class="n">list_expo</span> <span class="o">=</span> <span class="n">expotuple</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">expotuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="c1"># For each list of expo numbers, check </span>
+                        <span class="c1"># if this is just a number</span>
+                        <span class="c1"># or also a pointing association</span>
+                        <span class="k">for</span> <span class="n">expo</span> <span class="ow">in</span> <span class="n">list_expo</span><span class="p">:</span>
+                            <span class="c1"># By default we assign the dataset as </span>
+                            <span class="c1"># pointing number</span>
+                            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">expo</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+                                <span class="n">nexpo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">expo</span><span class="p">)</span>
+                                <span class="n">pointing</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">expo</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                                <span class="n">nexpo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">expo</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                                <span class="n">pointing</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">expo</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dictionary entry </span><span class="si">{</span><span class="n">expotuple</span><span class="si">}</span><span class="s2"> &quot;</span>
+                                                    <span class="sa">f</span><span class="s2">&quot;ignored (type of expo - </span><span class="si">{</span><span class="n">expo</span><span class="si">}</span><span class="s2"> - &quot;</span>
+                                                    <span class="sa">f</span><span class="s2">&quot;is </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">expo</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                                 <span class="k">break</span>
 
+                            <span class="c1"># Check whether this exists in the our cube list</span>
+<span class="c1">#                            suffix_expo = &quot;_{0:04d}&quot;.format(nexpo)</span>
+                            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">input_list</span><span class="p">:</span>
+                                <span class="n">ftpl</span><span class="p">,</span> <span class="n">fnexpo</span> <span class="o">=</span> <span class="n">get_tpl_nexpo</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="c1">#                                if (suffix_expo in filename) and (tpl in filename):</span>
+                                <span class="k">if</span> <span class="p">(</span><span class="n">nexpo</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">fnexpo</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ftpl</span> <span class="o">==</span> <span class="n">tpl</span><span class="p">):</span>
+                                    <span class="c1"># We select the file</span>
+                                    <span class="n">selected_filename_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                                    <span class="k">if</span> <span class="n">pointing</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_exposures_per_pointing</span><span class="p">:</span>
+                                        <span class="n">dict_exposures_per_pointing</span><span class="p">[</span><span class="n">pointing</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                                        <span class="n">dict_tplexpo_per_pointing</span><span class="p">[</span><span class="n">pointing</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                                    <span class="n">dict_exposures_per_pointing</span><span class="p">[</span><span class="n">pointing</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                                    <span class="n">dict_tplexpo_per_pointing</span><span class="p">[</span><span class="n">pointing</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">tpl</span><span class="p">,</span> <span class="n">nexpo</span><span class="p">])</span>
+                                    <span class="c1"># And remove it from the list</span>
+                                    <span class="n">input_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                                    <span class="c1"># We break out of the cube for loop</span>
+                                    <span class="k">break</span>
+
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Pointings </span><span class="si">{0}</span><span class="s2"> - Selected </span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2"> files after &quot;</span>
-                         <span class="s2">&quot;dictionary filtering&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">,</span>
-                                                <span class="nb">len</span><span class="p">(</span><span class="n">selected_list</span><span class="p">),</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Datasets </span><span class="si">{0}</span><span class="s2"> - Selected </span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2"> exposures after &quot;</span>
+                         <span class="s2">&quot;dictionary filtering&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">,</span>
+                                                <span class="nb">len</span><span class="p">(</span><span class="n">selected_filename_list</span><span class="p">),</span>
                                                 <span class="n">nfiles_input_list</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">selected_list</span></div>
+
+        <span class="k">for</span> <span class="n">pointing</span> <span class="ow">in</span> <span class="n">dict_tplexpo_per_pointing</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pointing </span><span class="si">{</span><span class="n">pointing</span><span class="si">}</span><span class="s2"> - Detected exposures [TPL / NEXPO]:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tplexpo</span> <span class="ow">in</span> <span class="n">dict_tplexpo_per_pointing</span><span class="p">[</span><span class="n">pointing</span><span class="p">]:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     </span><span class="si">{</span><span class="n">tplexpo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">tplexpo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">selected_filename_list</span><span class="p">,</span> <span class="n">dict_exposures_per_pointing</span></div>
+
+<div class="viewcode-block" id="filter_list_with_suffix_list"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.util_pipe.filter_list_with_suffix_list">[docs]</a><span class="k">def</span> <span class="nf">filter_list_with_suffix_list</span><span class="p">(</span><span class="n">list_names</span><span class="p">,</span> <span class="n">included_suffix_list</span><span class="o">=</span><span class="p">[],</span>
+                                 <span class="n">excluded_suffix_list</span><span class="o">=</span><span class="p">[],</span> <span class="n">name_list</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        list_names (list of str):</span>
+<span class="sd">        included_suffix_list (list of str):</span>
+<span class="sd">        excluded_suffix_list (list of str):</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">add_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;for list </span><span class="si">{</span><span class="n">name_list</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">add_message</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># if the list of inclusion suffix is empty, just use all cubes</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">included_suffix_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using suffixes </span><span class="si">{</span><span class="n">included_suffix_list</span><span class="si">}</span><span class="s2"> &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;as an inclusive condition </span><span class="si">{</span><span class="n">add_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Filtering out the ones that don&#39;t have any of the suffixes</span>
+        <span class="n">temp_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">list_names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">temp_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">suff</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">l</span> <span class="k">for</span> <span class="n">suff</span> <span class="ow">in</span> <span class="n">included_suffix_list</span><span class="p">]):</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="n">list_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+    <span class="c1"># if the list of exclusion suffix is empty, just use all cubes</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">excluded_suffix_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using suffixes </span><span class="si">{</span><span class="n">excluded_suffix_list</span><span class="si">}</span><span class="s2"> &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;as an exclusive condition </span><span class="si">{</span><span class="n">add_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Filtering out the ones that have any of the suffixes</span>
+        <span class="n">temp_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">list_names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">temp_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">suff</span> <span class="ow">in</span> <span class="n">l</span> <span class="k">for</span> <span class="n">suff</span> <span class="ow">in</span> <span class="n">excluded_suffix_list</span><span class="p">]):</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="n">list_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">list_names</span></div>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Eric Emsellem
-
-    </p>
+    <p>&#169; Copyright 2019, Eric Emsellem.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

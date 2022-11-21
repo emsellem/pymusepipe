@@ -1,8 +1,8 @@
 ======
-pydisc
+Pymusepipe
 ======
 
-This is the documentation of **pydisc**.
+This is the documentation of **pymusepipe**.
 
 .. .. note::
 ..
@@ -21,6 +21,9 @@ This is the documentation of **pydisc**.
 ..    The pretty useful extension `autodoc`_ is activated by default and lets
 ..    you include documentation from docstrings. Docstrings can be written in
 ..    `Google style`_ (recommended!), `NumPy style`_ and `classical style`_.
+.. To compile the sphinx documentation correctly you need
+.. pip install sphinxcontrib-email
+.. 
 
 
 Contents
@@ -29,7 +32,13 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   HowTo <howto>
+   Welcome <welcome>
+   Install <install>
+   Getting Started <getting_started>
+   Alignment <alignment>
+   Mosaicking <mosaicking>
+   Convolution <convolution>
+   PHANGS pipeline example <phangs_example>
    License <license>
    Authors <authors>
    Changelog <changelog>
