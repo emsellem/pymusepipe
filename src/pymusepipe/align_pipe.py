@@ -63,6 +63,7 @@ except ImportError:
 try:
     import skimage
     from skimage.registration import phase_cross_correlation
+    from skimage import transform
 except ImportError:
     upipe.print_warning("If you wish to use skimage for image registration, "
                         "please install it via "
@@ -75,6 +76,7 @@ try:
     import spacepylot as spp
     import spacepylot.alignment as sppalign
     import spacepylot.plotting as spppl
+    from spacepylot.alignment_utilities import TranslationTransform
 except ImportError:
     upipe.print_warning("If you wish to use spaxepylot please install it via"
                         "pip install or conda install or cloning the github version")
@@ -279,8 +281,47 @@ def my_linear_model(B, x):
     return B[1] * (x + B[0])
 
 
-def get_image_norm_poly(array1, array2, chunk_size=15, threshold1=0.,
-                        threshold2=0, percentiles=(0., 100.), sigclip=0):
+def get_normfactor(array1, array2, median_filter=True, border=0.,
+                   convolve_data1=0., convolve_data2=0., chunk_size=10,
+                   threshold=0.):
+    """Get the normalisation factor for shifted and projected images. This function
+    only consider the input images given by their data (numpy) arrays.
+
+    Input
+    -----
+    array1: 2d np.array
+    array2: 2d np.array
+        Input arrays. Should be the same size
+    median_filter: bool
+        If True, will median filter
+    convolve_muse: float [0]
+        Will convolve the image with index nima
+        with a gaussian with that sigma. 0 means no convolution
+    convolve_reference: float [0]
+        Will convolve the reference image
+        with a gaussian with that sigma. 0 means no convolution
+    border: int
+        Number of pixels to crop
+    threshold: float [None]
+        Threshold for the input image flux to consider
+
+    Returns
+    -------
+    data: 2d array
+    refdata: 2d array
+        The 2 arrays (input, reference) after processing
+    """
+    # Retrieving the data and preparing it
+    d1 = prepare_image(array1, median_filter=median_filter, sigma=convolve_data1, border=border)
+    d2 = prepare_image(array2, median_filter=median_filter, sigma=convolve_data2, border=border)
+    polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold)
+
+    # Returning the processed data
+    return d1, d2, polypar
+
+
+def get_polynorm(array1, array2, chunk_size=15, threshold1=0.,
+                 threshold2=0, percentiles=(0., 100.), sigclip=0):
     """Find the normalisation factor between two arrays.
 
     Including the background and slope. This uses the function
@@ -557,7 +598,40 @@ def filtermed_image(data, border=0, filter_size=2):
     return meddata
 
 
-def prepare_image(data, border=10, dynamic_range=10,
+def prepare_image(data, median_filter=True, sigma=0., border=0):
+    """Median filter plus convolve the input image
+
+    Input
+    -----
+    data: 2D np.array
+        Data to process
+    median_filter: bool
+        If True, will median filter
+    convolve float [0]
+        Will convolve the data with this gaussian width (sigma)
+        0 means no convolution
+
+    Returns
+    -------
+    data: 2d array
+    """
+    # If median filter do the filtermed_image process including the border
+    # No cropping here
+    if median_filter:
+        data = filtermed_image(data)
+
+    # Smoothing out the result in case it is needed
+    if sigma > 0:
+        kernel = Gaussian2DKernel(x_stddev=sigma)
+        data = convolve(data, kernel)
+
+    # Cropping the data
+    data = crop_data(data, border)
+
+    # Returning the processed data
+    return data
+
+def flatclean_image(data, border=10, dynamic_range=10,
                   median_window=10, minflux=0.0, squeeze=True,
                   remove_bkg=True):
     """Process image by squeezing the range, removing 
@@ -916,7 +990,7 @@ class AlignMuseDataset(object):
 
         # Now doing the shifts and projections with the guess/input values
         for nima in range(self.nimages):
-            self._apply_alignment(nima)
+            self._apply_alignment_ima(nima)
 
     def show_norm_factors(self):
         """Print some information about the normalisation factors.
@@ -1557,9 +1631,9 @@ class AlignMuseDataset(object):
             minflux = self.minflux_crosscorr
 
         minflux_ref = minflux / self.conversion_factor
-        ima_ref = prepare_image(proj_ref_hdu.data, border, self.dynamic_range, self.median_window,
+        ima_ref = flatclean_image(proj_ref_hdu.data, border, self.dynamic_range, self.median_window,
                                 minflux=minflux_ref, squeeze=squeeze, remove_bkg=remove_bkg)
-        ima_muse = prepare_image(muse_hdu.data, border, self.dynamic_range, self.median_window,
+        ima_muse = flatclean_image(muse_hdu.data, border, self.dynamic_range, self.median_window,
                                  minflux=minflux, squeeze=squeeze, remove_bkg=remove_bkg)
         if self._debug:
             self._temp_input_origmuse = muse_hdu.data * 1.0
@@ -1651,7 +1725,8 @@ class AlignMuseDataset(object):
         # Note that get_shift_from_pcc returnx X,U while get_translation from spacepylot return Y, X
         return initial_guess_shifts
 
-    def run_optical_flow(self, list_nima=None, save_plot=True, verbose=False, **kwargs):
+    def run_optical_flow(self, list_nima=None, save_plot=True, use_rotation=True,
+                         verbose=False, **kwargs):
         """Run Optical flow, first with a guess offset and then iterating. The solution
         is saved as extra offset in the class, and a op_plot instance is created.
         If save_plot is True, it will save a set of default plots
@@ -1662,12 +1737,22 @@ class AlignMuseDataset(object):
             List of indices. If None, will use the default list of all images
         save_plot : bool
             Whether to save the optical flow diagnostic plots or not.
+        use_rotation: bool
+            True if you wish to have rotation. False otherwise
+        verbose: bool
         """
+        upipe.print_info("Run the optical flow for all images in list (indices)")
+        if list_nima is None:
+            list_nima = range(self.nimages)
+
+        # Use Translation and Rotation or only rotation?
         for nima in list_nima:
             upipe.print_info("------- Optical Flow for Image {nima} -------")
-            self.run_optical_flow_ima(nima=nima, save_plot=save_plot, verbose=verbose, **kwargs)
+            self.run_optical_flow_ima(nima=nima, save_plot=save_plot,
+                                      use_rotation=use_rotation,
+                                      verbose=verbose, **kwargs)
 
-    def run_optical_flow_ima(self, nima=0, save_plot=True, verbose=False, **kwargs):
+    def run_optical_flow_ima(self, nima=0, save_plot=True, use_rotation=True, verbose=False, **kwargs):
         """Run Optical flow on image with index nima,
         first with a guess offset and then iterating. The solution
         is saved as extra offset in the class, and a op_plot instance is created.
@@ -1680,19 +1765,19 @@ class AlignMuseDataset(object):
         save_plot : bool
             Whether to save the optical flow diagnostic plots or not.
         """
-        self.iterate_on_optical_flow_ima(nima, verbose=verbose, **kwargs)
+        self.iterate_on_optical_flow_ima(nima, verbose=verbose, use_rotation=use_rotation, **kwargs)
         self.apply_optical_flow_offset_ima(nima)
         if save_plot:
             plt.ioff()
             self.op_plots[nima].red_blue_before_after()
-            plt.savefig(joinpath(self.figures_folder_name, "opflow_redblue_{nima:03d}.png"))
+            plt.savefig(joinpath(self.figures_folder_name, f"opflow_redblue_{nima:03d}.png"))
             self.op_plots[nima].before_after()
-            plt.savefig(joinpath(self.figures_folder_name, "opflow_beforeafter_{nima:03d}.png"))
+            plt.savefig(joinpath(self.figures_folder_name, f"opflow_beforeafter_{nima:03d}.png"))
             self.op_plots[nima].illustrate_vector_fields()
-            plt.savefig(joinpath(self.figures_folder_name, "opflow_vectorfield_{nima:03d}.png"))
+            plt.savefig(joinpath(self.figures_folder_name, f"opflow_vectorfield_{nima:03d}.png"))
             self.op_plots[nima].before_after_diff_frac()
-            plt.savefig(joinpath(self.figures_folder_name, "opflow_beforeafter_frac_{"
-                                                           "nima:03d}.png"))
+            plt.savefig(joinpath(self.figures_folder_name, f"opflow_beforeafter_frac_"
+                                                           f"{nima:03d}.png"))
             plt.close('all')
             plt.ion()
 
@@ -1725,12 +1810,13 @@ class AlignMuseDataset(object):
                                                  -self.optical_flows[nima].translation[::-1]),
                                     extra_rotation=-self.optical_flows[nima].rotation_deg,
                                     nima=nima)
-        self._apply_alignment(nima=nima)
+        self._apply_alignment_ima(nima=nima)
         # Initialise the plot
         self.op_plots[nima] = init_plot_optical_flow(self.optical_flows[nima])
 
 
-    def iterate_on_optical_flow_ima(self, nima=0, niter=5, verbose=False, **kwargs):
+    def iterate_on_optical_flow_ima(self, nima=0, niter=5, verbose=False,
+                                    use_rotation=True, **kwargs):
         """Iterate solution using the optical flow guess
 
         Input
@@ -1745,10 +1831,18 @@ class AlignMuseDataset(object):
         if self.optical_flows[nima] is None or reset_opf:
             self.init_optical_flow_ima(nima, verbose=verbose, **kwargs)
 
-        self.optical_flows[nima].get_iterate_translation_rotation(niter)
+        if "homography_method" in kwargs:
+            homography_method = kwargs.pop("homography_method", transform.EuclideanTransform)
+        else:
+            if use_rotation:
+                homography_method = transform.EuclideanTransform
+            else:
+                homography_method = TranslationTransform
+        self.optical_flows[nima].get_iterate_translation_rotation(niter,
+                                                                  homography_method=homography_method)
 
 
-    def iterate_on_optical_flow_listima(self, list_nima=None, **kwargs):
+    def iterate_on_optical_flow_listima(self, list_nima=None, use_rotation=True, **kwargs):
         """Run the iteration for the optical flow on a list of images
         given by a list of indices
 
@@ -1767,7 +1861,7 @@ class AlignMuseDataset(object):
             list_nima = range(self.nimages)
 
         for nima in list_nima:
-            self.iterate_on_optical_flow_ima(nima=nima, **kwargs)
+            self.iterate_on_optical_flow_ima(nima=nima, use_rotation=use_rotation, **kwargs)
 
     def init_optical_flow_listima(self, list_nima=None, **kwargs):
         """Initialise the optical flow on a list of images
@@ -1810,10 +1904,11 @@ class AlignMuseDataset(object):
 
         # Calling optical flow initialisation
         if provide_header:
-            header = self.list_muse_hdu[nima].header
+            header = copy.copy(self.list_muse_hdu[nima].header)
         else:
             header = None
-        self.optical_flows[nima] = self.init_optical_flow(self.list_muse_hdu[nima],
+        muse_ima = copy.copy(self.list_muse_hdu[nima])
+        self.optical_flows[nima] = self.init_optical_flow(muse_ima,
                                                           rotation=self.init_rotangles[nima],
                                                           minflux=minflux,
                                                           guess_translation=guess_translation,
@@ -2196,67 +2291,94 @@ class AlignMuseDataset(object):
             Index of image to consider
         """
         self._add_user_arc_offset(extra_arcsec, extra_rotation, nima)
-        self._apply_alignment(nima, **kwargs)
+        self._apply_alignment_ima(nima, **kwargs)
 
-    def _apply_alignment(self, nima=0, **kwargs):
+    def _apply_alignment_ima(self, nima=0, **kwargs):
+        """Apply alignment for image with index nima
+
+        Input
+        ----
+        nima: int
+            Index of image. Default is 0
+
+        """
+        # Call the alignment given the input nima image
+        upipe.print_info(f"- Image Offset/Rotation {nima}] ="
+                         f" {self.list_name_museimages[nima]} -")
+        hdu_offmuse, hdu_projref, diffra  = self._apply_alignment(self.list_muse_hdu[nima],
+            total_off_pixel=self._total_off_pixel[nima], total_rotangle=self._total_rotangles[nima])
+
+        # Creating a new Primary HDU and its WCS with the input data, and the new Header
+        # This HDU has now been offset using the total offsets
+        self.list_offmuse_hdu[nima] = hdu_offmuse
+        self.list_wcs_offmuse_hdu[nima] = WCS(hdu_offmuse.header)
+        # Saving the projected reference hdu and its WCS
+        self.list_proj_refhdu[nima] = hdu_projref
+        self.list_wcs_proj_refhdu[nima] = WCS(hdu_projref.header)
+
+        # Writing this up in an ascii file for record purposes
+        if self.save_hdr:
+             _ = self.list_offmuse_hdu[nima].header.totextfile(joinpath(self.header_folder_name,
+                                                                        self.list_name_offmusehdr[nima]),
+                                                               overwrite=True)
+        # Getting the normalisation factors using those last projections
+        _, _, self.ima_polypar[nima] = self.get_normfactor_ima(nima, **kwargs)
+        # Saving the normalisation
+        self.save_polypar_ima(nima, self.ima_polypar[nima].beta)
+
+    def _apply_alignment(self, hdu, total_off_pixel=None, total_off_arcsec=None,
+                         total_rotangle=0.):
         """Create New HDU after shifting it with the right offset
         (only considering image with index nima)
          
         Input
         -----
+        hdu : HDU
+            Input HDU of image to offset
         nima: int
             Index of image to consider
         
         Does not return anything, but could in principle
         """
         # Create a new Header
-        newhdr = copy.deepcopy(self.list_muse_hdu[nima].header)
+        newhdr = copy.copy(hdu.header)
+
+        # Using input offset or total
+        if total_off_pixel is None:
+            if total_off_arcsec is None:
+                upipe.print_warning("No input offset given: using [0., 0.]")
+                total_off_pixel = [0., 0.]
+            else:
+                total_off_pixel = arcsec_to_pixel(hdu, total_off_arcsec)
+        else:
+            total_off_arcsec = pixel_to_arcsec(hdu, total_off_pixel)
 
         # Shift the HDU in X and Y
         if self.verbose:
-            print("Image {0:03d} - {1}".format(nima, self.list_name_museimages[nima]))
-            print("Shifting CRPIX1 by {0:8.4f} pixels "
-                  "/ {1:8.4f} arcsec".format(
-                self._total_off_pixel[nima][0],
-                self._total_off_arcsec[nima][0]))
-        newhdr['CRPIX1'] = newhdr['CRPIX1'] + self._total_off_pixel[nima][0]
-        if self.verbose:
-            print("         CRPIX2 by {0:8.4f} pixels "
-                  "/ {1:8.4f} arcsec".format(
-                self._total_off_pixel[nima][1],
-                self._total_off_arcsec[nima][1]))
-        newhdr['CRPIX2'] = newhdr['CRPIX2'] + self._total_off_pixel[nima][1]
+            upipe.print_info(f"Shifting [PIXELS]: {total_off_pixel[0]:8.4f}"
+                           f" {total_off_pixel[1]:8.4f}")
+            upipe.print_info(f"   -     [ARCSEC]: {total_off_arcsec[0]:8.4f}"
+                           f"{total_off_arcsec[1]:8.4f}")
+            upipe.print_info(f"Rotation [DEGREE]: {total_rotangle}")
+
+        # Shifting the CRPIX values in the header
+        newhdr['CRPIX1'] += total_off_pixel[0]
+        newhdr['CRPIX2'] += total_off_pixel[1]
 
         # Creating a new Primary HDU with the input data, and the new Header
         # This HDU has now been offset using the total offsets
-        self.list_offmuse_hdu[nima] = pyfits.PrimaryHDU(
-            self.list_muse_hdu[nima].data, header=newhdr)
-        # Now reading the WCS of that new HDU and saving it in the list
-        self.list_wcs_offmuse_hdu[nima] = WCS(self.list_offmuse_hdu[nima].header)
+        hdu_offmuse = pyfits.PrimaryHDU(hdu.data, header=newhdr)
 
-        # Writing this up in an ascii file for record purposes
-        if self.save_hdr:
-            _ = self.list_offmuse_hdu[nima].header.totextfile(joinpath(self.header_folder_name,
-                                                                       self.list_name_offmusehdr[nima]),
-                                                              overwrite=True)
-
-        upipe.print_info("Image {0:03d} Rotation of {1} will be applied".format(
-            nima, self._total_rotangles[nima]))
         # Reprojecting the Reference image onto the new MUSE frame
-        hdu_target, self.list_proj_refhdu[nima], self._diffra_angle[nima] = \
-            self._align_reference_hdu(hdu_target=self.list_offmuse_hdu[nima],
-                                      target_rotation=self._total_rotangles[nima])
-        # Now reading the WCS and saving it in the list
-        self.list_wcs_proj_refhdu[nima] = WCS(self.list_proj_refhdu[nima].header)
+        hdu_target, hdu_projref, diffra = \
+            self._align_reference_hdu(hdu_target=hdu_offmuse, target_rotation=total_rotangle)
 
-        # Getting the normalisation factors again
-        musedata, refdata = self.get_image_normfactor(nima, **kwargs)
+        return hdu_offmuse, hdu_projref, diffra
 
-    def get_image_normfactor(self, nima=0, median_filter=True,
-                             convolve_muse=0., convolve_reference=0.,
-                             threshold_muse=None, **kwargs):
-        """Get the normalisation factor for shifted and projected images. This function
-        only consider the input image given by index nima and the reference image (after
+    def get_normfactor_ima(self, nima=0, median_filter=True, border=0.,
+                               convolve_muse=0., convolve_reference=0., chunk_size=10):
+        """Get the normalisation factor for shifted and projected images. This function only 
+        consider the input image given by index nima and the reference image (after
         projection).
          
         Input
@@ -2271,8 +2393,12 @@ class AlignMuseDataset(object):
         convolve_reference: float [0]
             Will convolve the reference image
             with a gaussian with that sigma. 0 means no convolution
+        border: int
+            Number of pixels to crop
         threshold_muse: float [None]
             Threshold for the input image flux to consider
+        chunk_size: int
+            Size of chunks to consider for chunk statistics (polynomial normalisation)
         
         Returns
         -------
@@ -2280,49 +2406,25 @@ class AlignMuseDataset(object):
         refdata: 2d array
             The 2 arrays (input, reference) after processing
         """
-        # If median filter do the filtermed_image process including the border
-        # Both for the muse data and the reference data
-        # No cropping here
-        if median_filter:
-            musedata = filtermed_image(self.list_offmuse_hdu[nima].data)
-            refdata = filtermed_image(self.list_proj_refhdu[nima].data)
-        # Otherwise just copy the data
-        else:
-            musedata = copy.copy(self.list_offmuse_hdu[nima].data)
-            refdata = self.list_proj_refhdu[nima].data
+        return get_normfactor(self.list_offmuse_hdu[nima].data, self.list_proj_refhdu[nima].data,
+                              convolve_data1=convolve_muse, convolve_data2=convolve_reference,
+                              median_filter=median_filter, border=border,
+                              chunk_size=chunk_size, threshold=self.ima_threshold[nima])
 
-        # Smoothing out the result in case it is needed
-        if convolve_muse > 0:
-            kernel = Gaussian2DKernel(x_stddev=convolve_muse)
-            musedata = convolve(musedata, kernel)
-            self._convolve_muse[nima] = convolve_muse
-        if convolve_reference > 0:
-            kernel = Gaussian2DKernel(x_stddev=convolve_reference)
-            refdata = convolve(refdata, kernel)
-            self._convolve_reference[nima] = convolve_reference
 
-        # Getting the result of the normalisation
-        if threshold_muse is not None:
-            self.ima_threshold[nima] = threshold_muse
+    def save_polypar_ima(self, nima=0, beta=None):
+        """Saving the input values into the fixed arrays for the polynomial
 
-        # Cropping the data
-        border = kwargs.pop("border", self.border)
-        musedataC = crop_data(musedata, border)
-        refdataC = crop_data(refdata, border)
+        Input
+        -----
+        beta: list/array of 2 floats
+        """
+        if beta is not None:
+            self.ima_background[nima] = beta[0]
+            self.ima_norm_factors[nima] = beta[1]
 
-        chunk_size = kwargs.pop("chunk_size", self.chunk_size)
-        self.ima_polypar[nima] = get_image_norm_poly(musedataC,
-                                                     refdataC, chunk_size=chunk_size,
-                                                     threshold1=self.ima_threshold[nima])
-        if self.use_polynorm:
-            self.ima_norm_factors[nima] = self.ima_polypar[nima].beta[1]
-            self.ima_background[nima] = self.ima_polypar[nima].beta[0]
-
-        # Returning the uncropped data
-        return musedata, refdata
-
-    def compare(self, start_nfig=1, nlevels=10, levels=None, convolve_muse=0.,
-                convolve_reference=0., samecontour=True, nima=0,
+    def compare(self, nima=0, start_nfig=1, nlevels=10, levels=None, convolve_muse=0.,
+                convolve_reference=0., samecontour=True,
                 showcontours=True, showcuts=True, shownormalise=True, showdiff=True,
                 normalise=True, median_filter=True, ncuts=5, percentage=5.,
                 nima_museref=None, **kwargs):
@@ -2367,18 +2469,16 @@ class AlignMuseDataset(object):
         
         Makes a maximum of 4 figures
         """
-        threshold_muse = kwargs.pop("threshold_muse", self.ima_threshold[nima])
         border = kwargs.pop("border", self.border)
         chunk_size = kwargs.pop("chunk_size", self.chunk_size)
         savefig = kwargs.pop("savefig", True)
 
         # Getting the data
-        musedata, refdata = self.get_image_normfactor(nima=nima,
-                                                      median_filter=median_filter,
-                                                      convolve_muse=convolve_muse,
-                                                      convolve_reference=convolve_reference,
-                                                      threshold_muse=threshold_muse,
-                                                      border=border, chunk_size=chunk_size)
+        musedata, refdata, polypar = self.get_normfactor_ima(nima=nima,
+                                                             median_filter=median_filter,
+                                                             convolve_muse=convolve_muse,
+                                                             convolve_reference=convolve_reference,
+                                                             border=border, chunk_size=chunk_size)
 
         # Getting data from the MUSE ref image if one is given
         museref = nima_museref is not None
@@ -2392,18 +2492,13 @@ class AlignMuseDataset(object):
             # Getting the data
             musedataR = filtermed_image(musehduR.data)
             musedataC = filtermed_image(musehduC.data)
+            polyparR = self.ima_polypar[nima_museref]
             if self._convolve_muse[nima_museref] > 0:
                 kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima_museref])
                 musedataR = convolve(musedataR, kernel)
             if self._convolve_muse[nima] > 0:
                 kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima])
                 musedataC = convolve(musedataC, kernel)
-
-        # If normalising, using the median ratio fit
-        if normalise or shownormalise:
-            polypar = self.ima_polypar[nima]
-            if museref:
-                polyparR = self.ima_polypar[nima_museref]
 
         # If normalising, use the polypar slope and background
         if normalise:

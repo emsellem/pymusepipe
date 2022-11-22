@@ -686,7 +686,7 @@ class MusePipeSample(object):
 
         # Running the scipost_perexpo for all datasets individually
         for dataset in list_datasets:
-            obname = self.pipes[targetname][dataset]._get_dataset_name(dataset)
+            obname = self.pipes[targetname][dataset]._get_dataset_name(dataset=dataset)
             if wcs_auto:
                 ref_wcs = f"{wcs_suffix}_{obname}.fits"
             if ref_wcs is not None:
