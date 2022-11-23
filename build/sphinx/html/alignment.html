@@ -43,7 +43,10 @@
 <li class="toctree-l1"><a class="reference internal" href="welcome.html">Welcome</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Alignment</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Alignment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#limitations-of-run-align-recipes">Limitations of run_align recipes</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="mosaicking.html">Mosaicking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="convolution.html">Convolution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="phangs_example.html">PHANGS pipeline example</a></li>
@@ -80,7 +83,19 @@
   <div class="section" id="alignment">
 <h1>Alignment<a class="headerlink" href="#alignment" title="Permalink to this headline"></a>
 </h1>
-<p>tbw</p>
+<div class="section" id="limitations-of-run-align-recipes">
+<h2>Limitations of run_align recipes<a class="headerlink" href="#limitations-of-run-align-recipes" title="Permalink to this headline"></a>
+</h2>
+<p>The esorex implementation of the alignment procedure (implemented in the  <a class="reference internal" href="api/pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_align_bydataset" title="pymusepipe.prep_recipes_pipe.PipePrep.run_align_bydataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">pymusepipe.prep_recipes_pipe.PipePrep.run_align_bydataset()</span></code></a>) for multiple object exposures suffers from some severe limitations</p>
+<blockquote>
+<div>
+<ul class="simple">
+<li><p>It does not perform absolute astrometry, but merely fixes the astrometry of subsequent exposures to the WCS of the first one.</p></li>
+<li><p>It works by finding and matching point sources across white light images from multiple exposures. This requires the images to contain a sufficient number of point sources. Moreover, in case of mosaics, is requires the <em>overlap region</em> between different MUSE pointings to contain a sufficient number of point sources.</p></li>
+</ul>
+</div>
+</blockquote>
+</div>
 </div>
 </body>
 

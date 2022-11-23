@@ -142,13 +142,15 @@ Under the hood of run_recipes
        
 Individual pipeline stages can be (re)run by calling any of the individual functions above. The order is important, as in any data reduction process
 
+.. attention:: 
+   This pipeline flow closely mirrors the standard data reduction for MUSE data implemented by the e.g. EsoReflex workflow. Pymusepipe offers alternative recipes to perform alignment (:doc:`alignment`) and mosaicking (:doc:`mosaicking`). For best results, therefore, we do not recommend running the above workflow. Examples workflows are presented in :doc:`phangs_example`.
 
 Structure of the output
 """"""""""""""""""""""""""""""""""""""""""""""
 
 Folders
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The structure of the output is driven by a set of folder names described in :py:func:`pymusepipe.init_musepipe`.py in a few dictionaries (:py:func:`dic_input_folders`, :py:func:`dic_folders`, :py:func:`dic_folders_target`). You can in principle change the names of the folders themselves, although it is not advised.
+The structure of the output is driven by a set of folder names described in :py:func:`pymusepipe.init_musepipe` in a few dictionaries (:py:func:`dic_input_folders`, :py:func:`dic_folders`, :py:func:`dic_folders_target`). You can in principle change the names of the folders themselves, although it is not advisable.
 
 The pipeline will create the folder structure automatically, checking whether the folders exist or not.
 
