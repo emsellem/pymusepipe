@@ -1,4 +1,4 @@
-# Licensed under a MIT license - see LICENSE
+#Creating a plot showing the normalisation arising from a polypar object Licensed under a MIT license - see LICENSE
 
 """MUSE-PHANGS alignement module. This module can be used to align MUSE
 reconstructed images either with each others or using a reference background
@@ -26,19 +26,15 @@ import matplotlib.pyplot as plt
 
 # Import Numpy Scipy
 import numpy as np
-import scipy.ndimage as nd
 from scipy.signal import correlate
-from scipy.odr import ODR, Model, RealData
 
 # Astropy
 from astropy import wcs as awcs
 from astropy.io import fits as pyfits
 from astropy.io import ascii
 from astropy.modeling import models, fitting
-from astropy.stats import mad_std, sigma_clip
 from astropy.table import Table, Column
 from astropy import units as u
-from astropy.convolution import Gaussian2DKernel, convolve
 
 # Import mpdaf
 from mpdaf.obj import Image, WCS
@@ -48,6 +44,9 @@ from . import util_pipe as upipe  # noqua: E402
 from .config_pipe import mjd_names, date_names, tpl_names
 from .config_pipe import dataset_names, iexpo_names
 from .config_pipe import default_offset_table, dict_listObject
+from .graph_pipe import (plot_polypar, plot_compare_contours,
+                         plot_compare_cuts, plot_compare_diff)
+from .util_pipe import my_linear_model, flatclean_image, get_normfactor
 
 
 try:
@@ -184,247 +183,6 @@ def create_offset_table(image_names, table_folder="",
     offset_table.write(table_fullname, overwrite=overwrite)
 
 
-def open_new_wcs_figure(nfig, mywcs=None):
-    """Open a new figure (with number nfig) with given wcs.
-    If not WCS is provided, just opens a subplot in that figure.
-
-    Parameters
-    ----------
-    nfig : int
-        Figure number to consider
-    mywcs : astropy.wcs.WCS
-        Input WCS to open a new figure (Default value = None)
-
-    Returns
-    -------
-    fig, subplot
-        Figure itself with the subplots using the wcs projection
-
-    """
-
-    # get the figure
-    fig = plt.figure(nfig)
-
-    # Clean the figure
-    plt.clf()
-
-    # Adding axes with WCS
-    if mywcs is None:
-        return fig, fig.add_subplot(1, 1, 1)
-    else:
-        return fig, fig.add_subplot(1, 1, 1, projection=mywcs)
-
-
-def chunk_stats(list_arrays, chunk_size=15):
-    """Cut the datasets in 2d chunks and take the median
-    Return the set of medians for all chunks.
-
-    Parameters
-    ----------
-    list_arrays : list of np.arrays
-        List of arrays with the same sizes/shapes
-    chunk_size : int
-        number of pixel (one D of a 2D chunk)
-        of the chunk to consider (Default value = 15)
-
-    Returns
-    -------
-    median, standard: 2 arrays of the medians and standard deviations
-        for the given datasets analysed in chunks.
-
-    """
-
-    narrays = len(list_arrays)
-
-    nchunk_x = np.int(list_arrays[0].shape[0] // chunk_size - 1)
-    nchunk_y = np.int(list_arrays[0].shape[1] // chunk_size - 1)
-    # Check that all arrays have the same size
-    med_array = np.zeros((narrays, nchunk_x * nchunk_y), dtype=np.float64)
-    std_array = np.zeros_like(med_array)
-
-    if not all([d.size for d in list_arrays]):
-        upipe.print_error("Datasets are not of the same "
-                          "size in median_compare")
-    else:
-        for i in range(0, nchunk_x):
-            for j in range(0, nchunk_y):
-                for k in range(narrays):
-                    # Taking the median of all arrays
-                    med_array[k, i * nchunk_y + j] = np.nanmedian(
-                        list_arrays[k][i * chunk_size:(i + 1) * chunk_size,
-                        j * chunk_size:(j + 1) * chunk_size])
-                    # Taking the std deviation of all arrays
-                    std_array[k, i * nchunk_y + j] = mad_std(
-                        list_arrays[k][i * chunk_size:(i + 1) * chunk_size,
-                        j * chunk_size:(j + 1) * chunk_size], ignore_nan=True)
-
-    # Cleaning in case of Nan
-    med_array = np.nan_to_num(med_array)
-    std_array = np.nan_to_num(std_array)
-    return med_array, std_array
-
-
-def my_linear_model(B, x):
-    """Linear function for the regression.
-     
-    Parameters
-    ----------
-    B : 1D np.array of 2 floats
-        Input 1D polynomial parameters (0=constant, 1=slope)
-    x : np.array
-        Array which will be multiplied by the polynomial
-    
-    Returns
-    -------
-        An array = B[1] * (x + B[0])
-    """
-    return B[1] * (x + B[0])
-
-
-def get_normfactor(array1, array2, median_filter=True, border=0.,
-                   convolve_data1=0., convolve_data2=0., chunk_size=10,
-                   threshold=0.):
-    """Get the normalisation factor for shifted and projected images. This function
-    only consider the input images given by their data (numpy) arrays.
-
-    Input
-    -----
-    array1: 2d np.array
-    array2: 2d np.array
-        Input arrays. Should be the same size
-    median_filter: bool
-        If True, will median filter
-    convolve_muse: float [0]
-        Will convolve the image with index nima
-        with a gaussian with that sigma. 0 means no convolution
-    convolve_reference: float [0]
-        Will convolve the reference image
-        with a gaussian with that sigma. 0 means no convolution
-    border: int
-        Number of pixels to crop
-    threshold: float [None]
-        Threshold for the input image flux to consider
-
-    Returns
-    -------
-    data: 2d array
-    refdata: 2d array
-        The 2 arrays (input, reference) after processing
-    """
-    # Retrieving the data and preparing it
-    d1 = prepare_image(array1, median_filter=median_filter, sigma=convolve_data1, border=border)
-    d2 = prepare_image(array2, median_filter=median_filter, sigma=convolve_data2, border=border)
-    polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold)
-
-    # Returning the processed data
-    return d1, d2, polypar
-
-
-def get_polynorm(array1, array2, chunk_size=15, threshold1=0.,
-                 threshold2=0, percentiles=(0., 100.), sigclip=0):
-    """Find the normalisation factor between two arrays.
-
-    Including the background and slope. This uses the function
-    regress_odr which is included in align_pipe.py and itself
-    makes use of ODR in scipy.odr.ODR.
-
-    Parameters
-    ----------
-    array1 : 2D np.array
-    array2 : 2D np.array
-        2 arrays (2D) of identical shapes
-
-    chunk_size : int
-        Default value = 15
-    threshold1 : float
-        Lower threshold for array1 (Default value = 0.)
-    threshold2 : float
-        Lower threshold for array2 (Default value = 0)
-    percentiles : list of 2 floats
-        Percentiles (Default value = [0., 100.])
-    sigclip : float
-        Sigma clipping factor (Default value = 0)
-
-    Returns
-    -------
-    result: python structure
-        Result of the regression (ODR)
-    """
-
-    # proceeds by splitting the data arrays in chunks of chunk_size
-    med, std = chunk_stats([array1, array2], chunk_size=chunk_size)
-
-    # Selecting where data is supposed to be good
-    pos = (med[0] > threshold1) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > threshold2)
-    # Guess the slope from this selection
-    guess_slope = 1.0
-
-    # Doing the regression itself
-    result = regress_odr(x=med[0][pos], y=med[1][pos], sx=std[0][pos],
-                         sy=std[1][pos], beta0=[0., guess_slope],
-                         percentiles=percentiles, sigclip=sigclip)
-    result.med = med
-    result.std = std
-    result.selection = pos
-    return result
-
-
-def regress_odr(x, y, sx, sy, beta0=(0., 1.),
-                percentiles=(0., 100.), sigclip=0.0):
-    """Return an ODR linear regression using scipy.odr.ODR
-
-    Args:
-        x : numpy.array 
-        y : numpy.array
-            Input array with signal
-        sx : numpy.array 
-        sy : numpy.array
-            Input array (as x,y) with standard deviations
-        beta0 : list or tuple of 2 floats
-            Initial guess for the constant and slope
-        percentiles: tuple or list of 2 floats
-            Two numbers providing the min and max percentiles
-        sigclip: float
-            sigma factor for sigma clipping. If 0, no sigma clipping
-            is performed
-
-    Returns:
-        result: result of the ODR analysis
-
-    """
-    # Percentiles
-    xrav = x.ravel()
-    if len(xrav) > 0:
-        percentiles = np.percentile(xrav, percentiles)
-        sel = (xrav >= percentiles[0]) & (xrav <= percentiles[1])
-    else:
-        sel = np.abs(xrav) > 0
-
-    xsel, ysel = xrav[sel], y.ravel()[sel]
-    sxsel, sysel = sx.ravel()[sel], sy.ravel()[sel]
-    linear = Model(my_linear_model)
-
-    # We introduce the minimum of x to avoid negative values
-    minx = np.min(xsel)
-    mydata = RealData(xsel - minx, ysel, sx=sxsel, sy=sysel)
-    result = ODR(mydata, linear, beta0=beta0)
-
-    if sigclip > 0:
-        diff = ysel - my_linear_model([result.beta[0], result.beta[1]], xsel)
-        filtered = sigma_clip(diff, sigma=sigclip)
-        xnsel, ynsel = xsel[~filtered.mask], ysel[~filtered.mask]
-        sxnsel, synsel = sxsel[~filtered.mask], sysel[~filtered.mask]
-        clipdata = RealData(xnsel, ynsel, sx=sxnsel, sy=synsel)
-        result = ODR(clipdata, linear, beta0=beta0)
-
-    # Running the ODR
-    r = result.run()
-    # Offset from the min of x
-    r.beta[0] -= minx
-
-    return r
-
-
 def get_conversion_factor(input_unit, output_unit, filter_name="WFI"):
     """ Conversion of units from an input one
     to an output one
@@ -537,145 +295,6 @@ def pixel_to_arcsec(hdu, xy_pixel=(0., 0.)):
     xarc = np.sum(dels * input_wcs.pixel_scale_matrix[0, :] * 3600.)
     yarc = np.sum(dels * input_wcs.pixel_scale_matrix[1, :] * 3600.)
     return xarc, yarc
-
-
-def crop_data(data, border=10):
-    """Crop a 2D data and return it cropped after a border
-    has been removed (number of pixels) from each edge
-    (borderx2 pixels are removed from each dimension)
-    
-    Input
-    -----
-    data: 2d array
-        Array which has the signal to be cropped
-    border: int
-        Number of pixels to be cropped at each edge
-    
-    Returns
-    -------
-    cdata: 2d array
-        Cropped data array
-    """
-    if border <= 0:
-        return data
-
-    if data.ndim != 2:
-        upipe.print_warning("Input data to crop is not 2, "
-                            "returning the original data")
-        return data
-
-    if (data.shape[0] > 2 * border) & (data.shape[1] > 2 * border):
-        return data[border:-border, border:-border]
-    else:
-        upipe.print_warning("Data is not being cropped, as shape is {0} "
-                            " while border is {1}".format(data.shape, border))
-        return data
-
-
-def filtermed_image(data, border=0, filter_size=2):
-    """Process image by removing the borders
-    and filtering it via a median filter
-     
-    Input
-    -----
-    data: 2d array
-        Array to be processed
-    border: int
-        Number of pixels to remove at each edge
-    filter_size: float
-        Size of the filtering (median)
-    
-    Returns
-    -------
-    cdata: 2d array
-        Processed array
-    """
-    # Omit the border pixels
-    if border > 0:
-        data = crop_data(data, border=border)
-    meddata = nd.filters.median_filter(data, filter_size)
-
-    return meddata
-
-
-def prepare_image(data, median_filter=True, sigma=0., border=0):
-    """Median filter plus convolve the input image
-
-    Input
-    -----
-    data: 2D np.array
-        Data to process
-    median_filter: bool
-        If True, will median filter
-    convolve float [0]
-        Will convolve the data with this gaussian width (sigma)
-        0 means no convolution
-
-    Returns
-    -------
-    data: 2d array
-    """
-    # If median filter do the filtermed_image process including the border
-    # No cropping here
-    if median_filter:
-        data = filtermed_image(data)
-
-    # Smoothing out the result in case it is needed
-    if sigma > 0:
-        kernel = Gaussian2DKernel(x_stddev=sigma)
-        data = convolve(data, kernel)
-
-    # Cropping the data
-    data = crop_data(data, border)
-
-    # Returning the processed data
-    return data
-
-def flatclean_image(data, border=10, dynamic_range=10,
-                  median_window=10, minflux=0.0, squeeze=True,
-                  remove_bkg=True):
-    """Process image by squeezing the range, removing 
-    the borders and filtering it. The image is first filtered, 
-    then it is cropped. All values below a given minimum are 
-    set to 0 and all Nan set to 0 or infinity accordingly.
-     
-    Input
-    -----
-    data: 2d array
-        Input array to process
-    dynamic_range: float [10]
-        Dynamic range used to squash the bright pixels down
-    median_window: int [10]
-        Size of the window used for the median filtering.
-    minflux: float [0]
-        Value of the minimum flux allowed.
-    squeeze: bool
-        Squeeze the dynamic range by using the dynamic_range variable
-    crop: bool
-        Crop the borders using border as the variable
-    remove_bkg: remove the filter_medianed background
-    
-    Returns
-    -------
-    """
-    if squeeze:
-        # Squish bright pixels down
-        data = np.arctan(data / np.nanmedian(data) / dynamic_range)
-
-    if remove_bkg:
-        # Omit the border pixels
-        data -= filtermed_image(data, 0, median_window)
-
-    cdata = crop_data(data, border)
-
-    # Removing the zeros
-    with np.errstate(invalid='ignore'):
-        cdata[cdata < minflux] = 0.
-
-    # Clean up the NaNs
-    cdata = np.nan_to_num(cdata)
-
-    return cdata
 
 
 def rotate_pixtables(folder="", name_suffix="", list_ifu=None,
@@ -1414,23 +1033,34 @@ class AlignMuseDataset(object):
                          overwrite=overwrite)
         self.name_output_table = name_output_table
 
-    def run(self, nima=0, **kwargs):
+
+    def _check_nima(self, nima):
+        test_nima = nima in range(self.nimages)
+        if self.verbose:
+            if not test_nima:
+                upipe.print_error(f"nima={nima} not within the range "
+                                  f"allowed by self.nimages ({self.nimages})")
+        return test_nima
+
+
+    def offset_and_compare(self, nima=0, extra_pixel=None, extra_arcsec=None,
+                           extra_rotation=None, **kwargs):
         """Run the offset and comparison for a given image number
          
         Input
         -----
         nima: int
             Index of the image to consider
-        extra_pixel: list of 2 floats [0,0]
+        extra_pixel: list of 2 floats
             Offsets in X and Y in pixels to add to the existing
             guessed offsets
             IMPORTANT NOTE: extra_pixel will be considered first
             (before extra_arcsec).
-        extra_arcsec: list of 2 floats [0,0]
+        extra_arcsec: list of 2 floats
             Offsets in X and Y in arcsec to add to the existing
-            guessed offsets. Ignored if extra_pixel is given.
-        extra_rotation: rotation in degrees [0]
-            Angle to rotate the image (in degrees)
+            guessed offsets. Ignored if extra_pixel is given or None
+        extra_rotation: rotation in degrees
+            Angle to rotate the image (in degrees). Ignore if None
         threshold_muse: float [0]
             Threshold to consider when plotting the comparison
 
@@ -1445,29 +1075,19 @@ class AlignMuseDataset(object):
 
         See also all arguments from self.compare
         """
-        if nima not in range(self.nimages):
-            upipe.print_error("nima not within the range "
-                              "allowed by self.nimages ({0})".format(self.nimages))
+        if not self._check_nima(nima):
             return
-
-        if "extra_pixel" in kwargs:
-            extra_pixel = kwargs.pop("extra_pixel", [0., 0.])
-            extra_arcsec = pixel_to_arcsec(self.list_muse_hdu[nima],
-                                           extra_pixel)
-        else:
-            extra_arcsec = kwargs.pop("extra_arcsec", [0., 0.])
-
-        # Define the additional rotation angle
-        extra_rotangle = kwargs.pop("extra_rotation", 0.0)
 
         # Add the offset from user
         border = kwargs.get("border", self.border)
         chunk_size = kwargs.get("chunk_size", self.chunk_size)
-        self.shift_arcsecond(extra_arcsec, extra_rotangle, nima,
-                             border=border, chunk_size=chunk_size)
+        self.apply_extra_offset_ima(nima=nima, extra_arcsec=extra_arcsec,
+                                    extra_pixel=extra_pixel,
+                                    extra_rotation=extra_rotation,
+                                    border=border, chunk_size=chunk_size)
 
         # Compare contours if plot is set to True
-        self.compare(nima=nima, **kwargs)
+        self.compare_ima(nima=nima, **kwargs)
 
     def _get_list_muse_images(self):
         """Extract the name of the muse images
@@ -1747,7 +1367,7 @@ class AlignMuseDataset(object):
 
         # Use Translation and Rotation or only rotation?
         for nima in list_nima:
-            upipe.print_info("------- Optical Flow for Image {nima} -------")
+            upipe.print_info(f"------- Optical Flow for Image {nima} -------")
             self.run_optical_flow_ima(nima=nima, save_plot=save_plot,
                                       use_rotation=use_rotation,
                                       verbose=verbose, **kwargs)
@@ -1802,15 +1422,15 @@ class AlignMuseDataset(object):
                                  "- run it before applying it")
             return
 
-        upipe.print_info(f"Apply optical flow offset {nima}")
+        if self.verbose:
+            upipe.print_info(f"Apply optical flow offset to Image {nima}")
         # Now set up the extra needed offsets as the solution from optical flow
         # We need to invert Y, X to X, Y (the [::-1]) and use the minus sign
         # considering optical flow derives the motion of ref to MUSE
-        self._add_user_pixel_offset(extra_pixel=(-self.init_off_pixel[nima]
-                                                 -self.optical_flows[nima].translation[::-1]),
-                                    extra_rotation=-self.optical_flows[nima].rotation_deg,
-                                    nima=nima)
-        self._apply_alignment_ima(nima=nima)
+        self.apply_extra_offset_ima(nima=nima,
+                                    extra_pixel=(-self.init_off_pixel[nima]
+                                                 - self.optical_flows[nima].translation[::-1]),
+                                    extra_rotation=-self.optical_flows[nima].rotation_deg)
         # Initialise the plot
         self.op_plots[nima] = init_plot_optical_flow(self.optical_flows[nima])
 
@@ -1826,7 +1446,8 @@ class AlignMuseDataset(object):
         niter: int
             Number of iterations
         """
-        upipe.print_info(f"Starting {niter} iterations for Optical Flow of image {nima}")
+        if self.verbose:
+            upipe.print_info(f"Optical flow with {niter} iterations for Image {nima}")
         reset_opf = kwargs.pop("reset_optical_flow", True)
         if self.optical_flows[nima] is None or reset_opf:
             self.init_optical_flow_ima(nima, verbose=verbose, **kwargs)
@@ -2076,34 +1697,7 @@ class AlignMuseDataset(object):
         else:
             upipe.print_error("There are not yet any new hdu to save")
 
-    def _get_flux_range(self, data, low=2, high=98):
-        """Get the range of fluxes within the array
-        by looking at percentiles.
-         
-        Input
-        -----
-        data: 2d array
-            Input array with signal to process
-        low, high: two floats (10, 99)
-            Percentiles to consider to filter
-        
-        Returns
-        -------
-        lperc, hperc: 2 floats
-            Low and high percentiles
-        """
-        # Omit the border pixels
-        data = crop_data(data, self.border)
 
-        # Clean up the NaNs
-        data = np.nan_to_num(data)
-        if data.size > 0:
-            lperc = np.percentile(data[data > 0.], low)
-            hperc = np.percentile(data[data > 0.], high)
-        else:
-            lperc, hperc = 0., 1.
-
-        return lperc, hperc
 
     def _align_hdu(self, hdu_target=None, hdu_to_align=None, target_rotation=0.0,
                    to_align_rotation=0.0, conversion=False):
@@ -2235,63 +1829,63 @@ class AlignMuseDataset(object):
     def _total_off_arcsec(self):
         return self.init_off_arcsec + self.extra_off_arcsec
 
-    def _add_user_pixel_offset(self, extra_pixel=(0., 0.),
-                               extra_rotation=0., nima=0):
+    def _set_extra_offset_ima(self, nima=0, extra_pixel=None, extra_arcsec=None,
+                              extra_rotation=None):
         """Add user offset in pixel and transform into arcseconds
 
         Input
         -----
         extra_pixel: list of 2 floats [0,0]
             Extra offsets (x,y) in pixels
+        extra_arsec: list of 2 floats [0,0]
+            Extra offsets (x,y) in arcsec if extra_pixel is not provided
         extra_rotation: rotation in degrees [0]
         nima: int
             Index of image to consider
         """
-        # Transforming the arc into pix
-        self.extra_off_pixel[nima] = extra_pixel
-        # Transforming into arcsec - would be better with setter
-        self.extra_off_arcsec[nima] = pixel_to_arcsec(self.list_muse_hdu[nima],
-                                                      self.extra_off_pixel[nima])
+        # Add this to the extra_off arrays
+        if extra_pixel is None:
+            if extra_arcsec is not None:
+                # Transforming the arc into pix
+                self.extra_off_arcsec[nima] = extra_arcsec
+                # Transforming into pixels - would be better with setter
+                self.extra_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima], extra_arcsec)
+        else:
+            self.extra_off_pixel[nima] = extra_pixel
+            # Transforming into arcsec - would be better with setter
+            self.extra_off_arcsec[nima] = pixel_to_arcsec(self.list_muse_hdu[nima], extra_pixel)
+
         # And the rotation angle in degrees
-        self.extra_rotangles[nima] = extra_rotation
+        if extra_rotation is not None:
+            self.extra_rotangles[nima] = extra_rotation
 
-    def _add_user_arc_offset(self, extra_arcsec=(0., 0.),
-                             extra_rotation=0., nima=0):
-        """Add user offset in arcseconds and transform into pixels
 
-        Input
-        -----
-        extra_arcsec: list of 2 floats [0,0]
-            Extra offsets (x,y) in arcseconds
-        extra_rotation: rotation in degrees [0]
-        nima: int
-            Index of image to consider
-        """
-        # Transforming the arc into pix
-        self.extra_off_arcsec[nima] = extra_arcsec
-        # Transforming into pixels - would be better with setter
-        self.extra_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
-                                                     self.extra_off_arcsec[nima])
-        # And the rotation angle in degrees
-        self.extra_rotangles[nima] = extra_rotation
-
-    def shift_arcsecond(self, extra_arcsec=(0., 0.), extra_rotation=0., nima=0,
-                        **kwargs):
+    def apply_extra_offset_ima(self, nima=0, extra_pixel=None, extra_arcsec=None,
+                               extra_rotation=None, **kwargs):
         """Shift image with index nima with the total offset
         after adding any extra given offset
         This does not return anything but could in principle
         if using the output of the self.shift
-         
+
         Input
         -----
-        extra_arcsec: list of 2 floats [0,0]
-            Extra offsets (x,y) in arcseconds
-        extra_rotation: rotation in degrees [0]
         nima: int
             Index of image to consider
+        extra_pixel: list of 2 floats
+            Extra offsets (x,y) in pixels. If None, nothing is applied
+        extra_arcsec: list of 2 floats
+            Extra offsets (x,y) in arcsec if extra_pixel is not provided
+            If None, nothing is applied
+        extra_rotation: float
+            Rotation in degrees. If None, no new extra offset is applied
         """
-        self._add_user_arc_offset(extra_arcsec, extra_rotation, nima)
+        # Add this to the extra_off arrays
+        self._set_extra_offset_ima(nima=nima, extra_arcsec=extra_arcsec, extra_pixel=extra_pixel,
+                                    extra_rotation=extra_rotation)
+
+        # Actually apply the alignment to the image
         self._apply_alignment_ima(nima, **kwargs)
+
 
     def _apply_alignment_ima(self, nima=0, **kwargs):
         """Apply alignment for image with index nima
@@ -2303,7 +1897,7 @@ class AlignMuseDataset(object):
 
         """
         # Call the alignment given the input nima image
-        upipe.print_info(f"- Image Offset/Rotation {nima}] ="
+        upipe.print_info(f"- Image Offset/Rotation [{nima}] ="
                          f" {self.list_name_museimages[nima]} -")
         hdu_offmuse, hdu_projref, diffra  = self._apply_alignment(self.list_muse_hdu[nima],
             total_off_pixel=self._total_off_pixel[nima], total_rotangle=self._total_rotangles[nima])
@@ -2322,7 +1916,7 @@ class AlignMuseDataset(object):
                                                                         self.list_name_offmusehdr[nima]),
                                                                overwrite=True)
         # Getting the normalisation factors using those last projections
-        _, _, self.ima_polypar[nima] = self.get_normfactor_ima(nima, **kwargs)
+        _, _, self.ima_polypar[nima] = self.get_normfactor_ima(nima=nima, **kwargs)
         # Saving the normalisation
         self.save_polypar_ima(nima, self.ima_polypar[nima].beta)
 
@@ -2355,11 +1949,11 @@ class AlignMuseDataset(object):
 
         # Shift the HDU in X and Y
         if self.verbose:
-            upipe.print_info(f"Shifting [PIXELS]: {total_off_pixel[0]:8.4f}"
-                           f" {total_off_pixel[1]:8.4f}")
-            upipe.print_info(f"   -     [ARCSEC]: {total_off_arcsec[0]:8.4f}"
+            upipe.print_info(f"Offset [PIXELS]: {total_off_pixel[0]:8.4f}"
+                           f" {total_off_pixel[1]:8.4f}  /  "
+                           f"[ARCSEC]: {total_off_arcsec[0]:8.4f}"
                            f"{total_off_arcsec[1]:8.4f}")
-            upipe.print_info(f"Rotation [DEGREE]: {total_rotangle}")
+            upipe.print_info(f"Rotation [DEGREE]: {total_rotangle:8.4f}")
 
         # Shifting the CRPIX values in the header
         newhdr['CRPIX1'] += total_off_pixel[0]
@@ -2375,7 +1969,7 @@ class AlignMuseDataset(object):
 
         return hdu_offmuse, hdu_projref, diffra
 
-    def get_normfactor_ima(self, nima=0, median_filter=True, border=0.,
+    def get_normfactor_ima(self, nima=0, median_filter=True, border=0,
                                convolve_muse=0., convolve_reference=0., chunk_size=10):
         """Get the normalisation factor for shifted and projected images. This function only 
         consider the input image given by index nima and the reference image (after
@@ -2423,18 +2017,62 @@ class AlignMuseDataset(object):
             self.ima_background[nima] = beta[0]
             self.ima_norm_factors[nima] = beta[1]
 
-    def compare(self, nima=0, start_nfig=1, nlevels=10, levels=None, convolve_muse=0.,
-                convolve_reference=0., samecontour=True,
+
+    def compare_ima(self, nima=0, nima_museref=None,
+                    convolve_muse=0, convolve_reference=0., **kwargs):
+        """
+        
+        Input
+        -----
+        nima: int
+            Index of input image
+        nima_museref: int
+            Index of second input image for the reference. Default is None, hence ignored
+            and the default reference image will be used.
+
+        Create
+        ------
+        Plots which compare the two input datasets as defined by the indices
+
+        """
+        # Getting the first MUSE image (aligned)
+        musehdu = self.list_offmuse_hdu[nima]
+        if self._debug:
+            self._temp_prealigned = self.list_muse_hdu[nima].data
+
+        # Getting data from the MUSE ref image if one is given
+        museref = nima_museref is not None
+        if museref:
+            refhdu = self.list_offmuse_hdu[nima_museref]
+        else:
+            refhdu = self.list_proj_refhdu[nima]
+
+        threshold_muse = kwargs.pop("threshold_muse", self.ima_threshold[nima])
+
+        musedata, refdata, polypar = get_normfactor(musehdu.data, refhdu.data,
+                                                    convolve_data1=convolve_muse,
+                                                    convolve_data2=convolve_reference,
+                                                    threshold=threshold_muse)
+        self.compare(data1=musedata, data2=refdata, header=musehdu.header,
+                     suffix_fig=f"{nima:03d}", **kwargs)
+
+    def compare(self, data1, data2, header=None,
+                start_nfig=1, nlevels=10, levels=None, convolve_data1=0., convolve_data2=0.,
                 showcontours=True, showcuts=True, shownormalise=True, showdiff=True,
                 normalise=True, median_filter=True, ncuts=5, percentage=5.,
-                nima_museref=None, **kwargs):
+                suffix_fig="", **kwargs):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
          
         Parameters
         ----------
-        nima: int
-            Index of image to consider
+        data1:
+        data2: 2d np.arrays
+            Array to compare
+        header: Header
+            If provided, will be use to get the WCS in the plots. Default is None (ignored).
+        polypar: ODR result
+            If None, it will be recalculated
         showcontours: bool [True]
         showcuts: bool [True]
         shownormalise: bool [True]
@@ -2452,229 +2090,83 @@ class AlignMuseDataset(object):
             Number of levels for the contour plots
         levels: list of float [None]
             Specific list of levels if any (default is None)
-        convolve_muse: float [0]
+        convolve_data1: float [0]
             If not 0, will convolve with a gaussian of that sigma
-        convolve_reference: float [0]
+        convolve_data2: float [0]
             If not 0, will convolve the reference image
             with a gaussian of that sigma
-        samecontour: bool [True]
-            If True, will use the same levels for both images
-            (this is recommended). Otherwise levels can be
-            automatically derived from percentiles, but will
-            not necessarily be the same (which can bring
-            confusion but may sometimes be useful).
         savefig (bool): False
             If True, will save the figure into a png
-        nima_museref
-        
+        suffix_fig: str
+            Suffix name to add to the figure filenames
+
         Makes a maximum of 4 figures
         """
         border = kwargs.pop("border", self.border)
         chunk_size = kwargs.pop("chunk_size", self.chunk_size)
         savefig = kwargs.pop("savefig", True)
+        threshold = kwargs.pop("threshold", 0.)
 
         # Getting the data
-        musedata, refdata, polypar = self.get_normfactor_ima(nima=nima,
-                                                             median_filter=median_filter,
-                                                             convolve_muse=convolve_muse,
-                                                             convolve_reference=convolve_reference,
-                                                             border=border, chunk_size=chunk_size)
-
-        # Getting data from the MUSE ref image if one is given
-        museref = nima_museref is not None
-        if museref:
-            # Projecting the MUSE image onto the MUSE reference
-            musehduR, musehduC, dlatval = self._align_hdu(hdu_to_align=self.list_offmuse_hdu[nima],
-                                                          target_rotation=self._total_rotangles[nima_museref],
-                                                          to_align_rotation=self._total_rotangles[nima],
-                                                          hdu_target=self.list_offmuse_hdu[nima_museref],
-                                                          conversion=False)
-            # Getting the data
-            musedataR = filtermed_image(musehduR.data)
-            musedataC = filtermed_image(musehduC.data)
-            polyparR = self.ima_polypar[nima_museref]
-            if self._convolve_muse[nima_museref] > 0:
-                kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima_museref])
-                musedataR = convolve(musedataR, kernel)
-            if self._convolve_muse[nima] > 0:
-                kernel = Gaussian2DKernel(x_stddev=self._convolve_muse[nima])
-                musedataC = convolve(musedataC, kernel)
+        _, _, polypar = get_normfactor(data1, data2,
+                                       convolve_data1=convolve_data1,
+                                       convolve_data2=convolve_data2,
+                                       median_filter=median_filter, border=border,
+                                       chunk_size=chunk_size,
+                                       threshold=threshold)
 
         # If normalising, use the polypar slope and background
         if normalise:
             if self.verbose:
-                upipe.print_info("Renormalising the MUSE data as NewMUSE = "
-                                 "{0:8.4e} * ({1:8.4e} + MUSE)".format(polypar.beta[1],
-                                                                       polypar.beta[0]))
+                upipe.print_info(f"Renormalising the data as: Normalised = "
+                                 f"{polypar.beta[1]:8.4e} * ({polypar.beta[0]:8.4e} + MUSE)")
 
-            musedata = (polypar.beta[0] + musedata) * polypar.beta[1]
-            if museref:
-                musedataC = (polypar.beta[0] + musedataC) * polypar.beta[1]
-                musedataR = (polyparR.beta[0] + musedataR) * polyparR.beta[1]
-
-        # Getting the range of relevant fluxes
-        lowlevel_muse, highlevel_muse = self._get_flux_range(musedata)
-        lowlevel_ref, highlevel_ref = self._get_flux_range(refdata)
-        if self.verbose:
-            print("Low / High level MUSE flux: "
-                  "{0:8.4e} {1:8.4e}".format(lowlevel_muse, highlevel_muse))
-            print("Low / High level REF  flux: "
-                  "{0:8.4e} {1:8.4e}".format(lowlevel_ref, highlevel_ref))
+            data1 = my_linear_model(polypar.beta, data1)
 
         # Save the frames in case this is needed
-        self._temp_refdata = refdata
-        self._temp_musedata = musedata
-        if museref:
-            self._temp_musedataR = musedataR
-            self._temp_musedataC = musedataC
-
-        # Stop here if plot is not needed
-        plot = kwargs.pop("plot", self.plot)
-        if not plot:
-            return
+        if self._debug:
+            self._temp_aligned = data1
+            self._temp_reference = data2
 
         # WCS for plotting using astropy
-        plotwcs = awcs.WCS(self.list_offmuse_hdu[nima].header)
+        if header is not None:
+            plotwcs = awcs.WCS(header)
+        else:
+            plotwcs = None
 
         # Preparing the figure
         current_fig = start_nfig
         self.list_figures = []
         foldfig = self.figures_folder_name
 
+        if suffix_fig != "":
+            suffix_fig = f"_{suffix_fig}"
+
         # Starting the plotting
         if shownormalise:
-            # plotting the normalization
-            fig, ax = open_new_wcs_figure(current_fig)
-            (x, y) = (polypar.med[0][polypar.selection],
-                      polypar.med[1][polypar.selection])
-            ax.plot(x, y, '.')
-            ax.set_xlabel("MuseData")
-            ax.set_ylabel("RefData")
-            ax.plot(x, my_linear_model(polypar.beta, x), 'k')
-            # ax.plot([np.min(x), np.max(x)], [np.min(x), np.max(x)], 'r')
-            plt.tight_layout()
-            if savefig:
-                namefig = joinpath(foldfig, f"align_norm_scatter_{nima:03d}.png")
-                plt.savefig(namefig)
-
+            plot_polypar(polypar, labels=["MuseData","RefData"], figfolder=foldfig,
+                         fignum=current_fig, namefig=f"align_norm_scatter{suffix_fig}.png",
+                         savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1
 
         if showcontours:
-            np.seterr(divide='ignore', invalid='ignore')
-            fig, ax = open_new_wcs_figure(current_fig, plotwcs)
-
-            # Defining the levels for MUSE
-            if levels is not None:
-                levels_muse = levels
-            else:
-                levels_muse = np.linspace(np.log10(lowlevel_muse),
-                                          np.log10(highlevel_muse),
-                                          nlevels)
-            # Plot contours for MUSE
-            cmuseset = ax.contour(np.log10(musedata),
-                                  levels_muse, colors='k',
-                                  origin='lower', linestyles='solid')
-
-            # now define Ref levels if not samecontour
-            if samecontour:
-                levels_ref = cmuseset.levels
-            else:
-                levels_ref = np.linspace(np.log10(lowlevel_ref),
-                                         np.log10(highlevel_ref),
-                                         nlevels)
-            # Plot contours for Ref
-            crefset = ax.contour(np.log10(refdata), levels=levels_ref,
-                                 colors='r', origin='lower', alpha=0.5,
-                                 linestyles='solid')
-
-            ax.set_aspect('equal')
-            h1, _ = cmuseset.legend_elements()
-            h2, _ = crefset.legend_elements()
-            ax.legend([h1[0], h2[0]], ['MUSE', 'REF'])
-            if nima is not None:
-                plt.title("Image #{0:03d}".format(nima))
-            plt.tight_layout()
-            if savefig:
-                namefig = joinpath(foldfig, f"align_contours_{nima:03d}.png")
-                plt.savefig(namefig)
-
+            plot_compare_contours(data1, data2, plotwcs=plotwcs, fignum=current_fig,
+                               labels=['MUSE', 'REF'], nlevels=nlevels, levels=levels,
+                               figfolder=foldfig, namefig=f"align_contours{suffix_fig}.png",
+                               title=f'Image {suffix_fig}')
             self.list_figures.append(current_fig)
             current_fig += 1
-            np.seterr(divide='warn', invalid='warn')
 
         if showcuts:
-            fig, ax = open_new_wcs_figure(current_fig)
-            diffima = (refdata - musedata) * 200. / (lowlevel_muse
-                                                     + highlevel_muse)
-            chunk_x = musedata.shape[0] // (ncuts + 1)
-            chunk_y = musedata.shape[1] // (ncuts + 1)
-            c1 = ax.plot(diffima[np.arange(ncuts) * chunk_x, :].T, 'k-', label='X')
-            c2 = ax.plot(diffima[:, np.arange(ncuts) * chunk_y], 'r-', label='Y')
-            ax.legend(handles=[c1[0], c2[0]], loc=0)
-            ax.set_ylim(-20, 20)
-            ax.set_xlabel("[pixels]", fontsize=20)
-            ax.set_ylabel("[%]", fontsize=20)
-            plt.tight_layout()
-            if savefig:
-                namefig = joinpath(foldfig, f"align_cuts_{nima:03d}.png")
-                plt.savefig(namefig)
-
+            plot_compare_cuts(data1, data2, ncuts=ncuts, fignum=current_fig, figfolder=foldfig,
+                              namefig=f"align_cuts{suffix_fig}.png", savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1
 
         if showdiff:
-            fig, ax = open_new_wcs_figure(current_fig, plotwcs)
-            ratio = 100. * (refdata - musedata) / (musedata + 1.e-12)
-            im = ax.imshow(ratio, vmin=-percentage, vmax=percentage)
-            cbar = fig.colorbar(im, shrink=0.8)
-            if savefig:
-                namefig = joinpath(foldfig, f"align_diff_{nima:03d}.png")
-                plt.savefig(namefig)
-
-            plt.tight_layout()
+            plot_compare_diff(data1, data2, plotwcs=plotwcs, fignum=current_fig,
+                              figfolder=foldfig, percentage=percentage,
+                              namefig=f"align_diff{suffix_fig}.png", savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1
-
-        if museref:
-            np.seterr(divide='ignore', invalid='ignore')
-            fig, ax = open_new_wcs_figure(current_fig, plotwcs)
-
-            # Defining the levels for MUSE
-            if levels is not None:
-                levels_muse = levels
-            else:
-                levels_muse = np.linspace(np.log10(lowlevel_muse),
-                                          np.log10(highlevel_muse),
-                                          nlevels)
-            # Plot contours for MUSE current image
-            cmusesetc = ax.contour(np.log10(musedataC),
-                                   levels_muse, colors='k',
-                                   origin='lower', linestyles='solid')
-
-            # now define Ref levels if not samecontour
-            if samecontour:
-                levels_ref = cmusesetc.levels
-            else:
-                levels_ref = np.linspace(np.log10(lowlevel_ref),
-                                         np.log10(highlevel_ref),
-                                         nlevels)
-            # Plot contours for Ref
-            cmusesetr = ax.contour(np.log10(musedataR), levels=levels_muse,
-                                   colors='r', origin='lower',
-                                   linestyles='solid', alpha=0.5)
-
-            ax.set_aspect('equal')
-            h1, _ = cmusesetc.legend_elements()
-            h2, _ = cmusesetr.legend_elements()
-            ax.legend([h1[0], h2[0]], ['MUSE', 'MUSEREF'])
-            if nima is not None:
-                plt.title("Image #{0:03d} / #{1:03d}".format(nima, nima_museref))
-            plt.tight_layout()
-            if savefig:
-                namefig = joinpath(foldfig, f"align_museref{nima_museref:03d}_{nima:03d}.png")
-                plt.savefig(namefig)
-
-            self.list_figures.append(current_fig)
-            current_fig += 1
-            np.seterr(divide='warn', invalid='warn')
