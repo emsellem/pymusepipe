@@ -328,12 +328,12 @@ class PipeRecipes(object) :
                                f"{joinpath(dir_products, pre_prod+name_prod)}"
                                f"{suffix}{suff_pre}_{self._get_dataset_name()}_{tpl}.fits")
 
-    def recipe_combine_datasets(self, sof, dir_products, name_products,
+    def recipe_combine_pointings(self, sof, dir_products, name_products,
             suffix_products=(""), suffix_prefinalnames=(""),
             prefix_products=(""), save='cube', pixfrac=0.6, suffix="",
             format_out='Cube', filter_list='white', 
             lambdamin=4000., lambdamax=10000.):
-        """Running the muse_exp_combine recipe for datasets
+        """Running the muse_exp_combine recipe for pointings
         """
         self.run_oscommand(f"{self.esorex}  --log-file=exp_combine_datasets.log "
                            f" muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
