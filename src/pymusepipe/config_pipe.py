@@ -328,7 +328,7 @@ mjd_names = {'table': "MJD_OBS", 'image': "MJD-OBS"}
 date_names = {'table': "DATE_OBS", 'image': "DATE-OBS"}
 tpl_names = {'table': "TPL_START", 'image': "HIERARCH ESO TPL START"}
 iexpo_names = {'table': "IEXPO_OBS", 'image': "MUSEPIPE_IEXPO"}
-dataset_names = {'table': "DATASET_OBS", 'image': "MUSEPIPE_DATASET"}
+dataset_names = {'table': "DATASET_OBS", 'image': "MUSEPIPE_DATASET", 'oldimage': "MUSEPIPE_POINTING"}
 
 default_offset_table = {'date': [date_names['table'], 'S23', ""],
                         'mjd': [mjd_names['table'], 'f8', 0.0],

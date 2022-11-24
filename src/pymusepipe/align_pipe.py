@@ -106,9 +106,9 @@ default_reference_unit = u.microJansky
 
 dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
                       "DUPONT_R": u.spectral_density(6483.58 * u.AA)}
-
-
 # ================== Useful function ====================== #
+
+
 def create_offset_table(image_names, table_folder="",
                         table_name="dummy_offset_table.fits", overwrite=False):
     """Create an offset list table from a given set of images. It will use
@@ -514,6 +514,8 @@ class AlignMuseDataset(object):
         self._debug = kwargs.pop("debug", False)
         if self._debug:
             upipe.print_warning("In DEBUG Mode [more printing]")
+        # Backward compatibility - TO BE REMOVED when fixed
+        self._backward_comp = kwargs.pop("backward_comp", True)
 
         # Check if folder reference exists
         if not os.path.isdir(self.folder_reference):
@@ -1183,10 +1185,13 @@ class AlignMuseDataset(object):
                 self.ima_iexpo[nima] = None
             else:
                 self.ima_iexpo[nima] = hdu[0].header[iexpo_names['image']]
-            if dataset_names['image'] not in hdu[0].header:
-                self.ima_dataset[nima] = None
-            else:
+            if dataset_names['image'] in hdu[0].header:
                 self.ima_dataset[nima] = hdu[0].header[dataset_names['image']]
+            else:
+                if self._backward_comp and dataset_names['oldimage'] in hdu[0].header:
+                    self.ima_dataset[nima] = hdu[0].header[dataset_names['oldimage']]
+                else:
+                    self.ima_dataset[nima] = None
 
             if self.list_muse_hdu[nima].data is None:
                 return 0
