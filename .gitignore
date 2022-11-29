@@ -5,7 +5,6 @@
 # Setuptools distribution folder.
 dist/
 old_stuff/
-build/
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
@@ -17,3 +16,13 @@ build/
 
 # gvim swap
 *.py.swp
+
+# misc
+bin
+develop-eggs
+downloads
+eggs
+parts
+src/*.egg-info
+lib
+lib64
