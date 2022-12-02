@@ -1,0 +1,465 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Alignment" href="alignment.html" />
+    <link rel="prev" title="Install" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage-dealing-with-obs-individually">Basic Usage - Dealing with OBs, individually</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-1-preparing-your-data">Step 1: Preparing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-2-preparing-your-configuration-files">Step 2: Preparing your configuration files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-3-running-the-pipeline">Step 3: Running the pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#under-the-hood-of-run-recipes">Under the hood of run_recipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-of-the-output">Structure of the output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#folders">Folders</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#log-files">Log files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#astropy-tables">Astropy Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sof-files">Sof files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-structure">Python structure</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Getting Started</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a>
+</h1>
+<section id="basic-usage-dealing-with-obs-individually">
+<h2>Basic Usage - Dealing with OBs, individually<a class="headerlink" href="#basic-usage-dealing-with-obs-individually" title="Permalink to this heading">¶</a>
+</h2>
+<p>The pymusepipe wrapper is meant to provide the user with a simple way to
+run the MUSE pipeline.</p>
+<p>Only three steps are needed:</p>
+<blockquote>
+<div>
+<ol class="arabic simple">
+<li><p>preparing the data (download),</p></li>
+<li><p>preparing the configuration files (templates are provided),</p></li>
+<li><p>using the code (a few lines at most).</p></li>
+</ol>
+</div>
+</blockquote>
+<p>I recommend to use <code class="docutils literal notranslate"><span class="pre">Ipython</span></code> as an environment, possibly via
+a <code class="docutils literal notranslate"><span class="pre">screen</span></code> or <code class="docutils literal notranslate"><span class="pre">tmux</span></code> which would allow you to disconnect from the server that
+actually runs the commands.</p>
+</section>
+<section id="step-1-preparing-your-data">
+<h2>Step 1: Preparing your data<a class="headerlink" href="#step-1-preparing-your-data" title="Permalink to this heading">¶</a>
+</h2>
+<p>The first thing to do is to prepare the folder structure to welcome your
+MUSE datasets.</p>
+<p>Imagine you have:</p>
+<ul class="simple">
+<li><p>a target or field named e.g. <code class="docutils literal notranslate"><span class="pre">NGC1000</span></code>.</p></li>
+<li><p>several <strong>datasets</strong>. In the simplest cases this corresponds to data from one
+MUSE Observing Block (OB), including all the calibration and science object raw data files, as
+downloaded from the ESO archive. In practice pymusepipe will also reduce several OBs, provided
+all the necessary calibrations are avaiable. Some functionality requires a distinction between
+<strong>dataset</strong> and <strong>pointing</strong>. This distinction is described in <a class="reference internal" href="mosaicking.html"><span class="doc">Targets and Mosaicking</span></a>.</p></li>
+</ul>
+<p>Then under your data root folder &lt;my_data_folder&gt; create the following folder structure:</p>
+<div class="highlight-default notranslate">
+<div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">my_data_folder</span><span class="o">&gt;/</span><span class="n">NGC1000</span>
+   <span class="o">./</span><span class="n">OB001</span>
+      <span class="o">./</span><span class="n">Raw</span>
+   <span class="o">./</span><span class="n">OB002</span>
+     <span class="o">./</span><span class="n">Raw</span>
+   <span class="o">./</span><span class="n">OB003</span>
+     <span class="o">./</span><span class="n">Raw</span>
+</pre></div>
+</div>
+<p>Each dataset, or OB for short, has a <code class="docutils literal notranslate"><span class="pre">Raw</span></code> folder.</p>
+<p>The next step is to download your MUSE data (including raw calibrations) from the
+ESO web site, and put all the raw files (in fitsor fits.gz format) into each individual
+<code class="docutils literal notranslate"><span class="pre">Raw</span></code> folders, associated with the right dataset.</p>
+</section>
+<section id="step-2-preparing-your-configuration-files">
+<h2>Step 2: Preparing your configuration files<a class="headerlink" href="#step-2-preparing-your-configuration-files" title="Permalink to this heading">¶</a>
+</h2>
+<p>pymusepipe only needs two configurations ascii files:</p>
+<ol class="arabic simple">
+<li>
+<p><code class="docutils literal notranslate"><span class="pre">calib_tables.dic</span></code>, which contains a series of file names associated
+with muse static calibration files and other configuration files (e.g. fitler lists). Most
+names are self-explantory. These include:</p>
+<ul class="simple">
+<li><p><em>geo_table</em> and <em>astro_table</em>: static files, time dependent geometry files can be specified
+(see <code class="docutils literal notranslate"><span class="pre">rc.dic</span></code>).</p></li>
+<li><p><em>badpix_table</em>, <em>vignetting_mask</em>, <em>std_flux_table</em>, <em>extinct_table</em>, <em>line_catalog</em>,
+statical calibrations provided with the MUSE pipeline, no need to change these.</p></li>
+<li><p><em>filter_list</em> : used in case you wish to provide your own. Note that the file it needs
+to follow the MUSE standard for such a table.</p></li>
+</ul>
+</li>
+<li>
+<p><code class="docutils literal notranslate"><span class="pre">rc.dic</span></code>, which provides the root folders for the static calibration files and for your datasets.</p>
+<ul class="simple">
+<li><p><em>root</em> provides the root folder for your data. For Target NGC1000, and OB 1,
+the Raw data will be looked for in <em>root</em>/NGC1000/OB001/Raw.</p></li>
+<li><p><em>musecalib</em> should contain the standard MUSE calibration files.
+These are distributed in the MUSE pipeline installation in a “muse-calib-x.x.x/cal” folder.</p></li>
+<li><p><em>musecalib_time</em>: time dependent geometry and astrometry files (the correspondence
+between observing run dates and specific files are hard-coded into pymusepipe).</p></li>
+</ul>
+</li>
+</ol>
+<p>Examples of such files are provided in the <code class="docutils literal notranslate"><span class="pre">config_templates</span></code> folder of the pymusepipe package.</p>
+</section>
+<section id="step-3-running-the-pipeline">
+<h2>Step 3: Running the pipeline<a class="headerlink" href="#step-3-running-the-pipeline" title="Permalink to this heading">¶</a>
+</h2>
+<p>Here is an example of how to run the pipeline to reduce a single OB (dataset):</p>
+<div class="highlight-default notranslate">
+<div class="highlight"><pre><span></span><span class="c1"># Import the modules</span>
+<span class="kn">import</span> <span class="nn">pymusepipe</span> <span class="k">as</span> <span class="nn">pmp</span>
+<span class="kn">from</span> <span class="nn">pymusepipe</span> <span class="kn">import</span> <span class="n">musepipe</span>
+
+<span class="c1"># define the paths to the two configuration files</span>
+<span class="n">rcfile</span> <span class="o">=</span> <span class="s2">"my_data/MUSE/Config/rc.dic"</span>
+<span class="n">calfile</span> <span class="o">=</span> <span class="s2">"my_data_MUSE/Config/calib_tables.dic"</span>
+
+<span class="c1"># Initialisation of the python - MusePipe Class - structure</span>
+<span class="n">mypipe</span> <span class="o">=</span> <span class="n">musepipe</span><span class="o">.</span><span class="n">MusePipe</span><span class="p">(</span><span class="n">targetname</span><span class="o">=</span><span class="s2">"NGC1000"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rc_filename</span><span class="o">=</span><span class="n">rcfile</span><span class="p">,</span>
+                        <span class="n">cal_filename</span><span class="o">=</span><span class="n">calfile</span><span class="p">,</span> <span class="n">log_filename</span><span class="o">=</span><span class="s2">"NGC1000_version01.log"</span><span class="p">,</span>
+                        <span class="n">fakemode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite_astropy_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">filter_list</span><span class="o">=</span><span class="s2">"white,Cousins_R"</span><span class="p">,</span>
+                        <span class="n">filter_for_alignment</span><span class="o">=</span><span class="s2">"Cousins_R"</span><span class="p">)</span>
+
+<span class="c1"># Launching the pipeline</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_recipes</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>That’s it! Your data has now been reduced!</p>
+<p>Some explanation may be needed to understand what is happening:</p>
+<blockquote>
+<div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">targetname</span></code>: is just the name of the target, used to decided where the data will be</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset</span></code>: the number of the OB that will be used, namely “OB001” etc.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logfile</span></code>: name of the logging file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fakemode</span></code>: you can set this to True if you just wish to initialise things without
+actually running any recipes. The pipeline will only set things up but if you run any recipes
+will only “fake” them (not launch any esorex command, only spitting the log out)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">filter_list</span></code>: list of filter names to use to reconstruct images when building
+up cubes. This should be part of the filter_list fits table provided (see <code class="docutils literal notranslate"><span class="pre">calib_tables</span></code>
+config file).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">filter_for_alignment</span></code>: specific filter name used for alignment between exposures.</p></li>
+</ul>
+</div>
+</blockquote>
+<p>Other options can be useful:</p>
+<blockquote>
+<div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">musemode</span></code>: this is by default <code class="docutils literal notranslate"><span class="pre">WFM_NOAO_N</span></code> which is the most often used MUSE mode. This will filter out exposures not compatible with the given mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reset_log</span></code>: will reset the log file. By default it is False, hence new runs will be appended.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">overwrite_astropy_table</span></code>: by default this is False. If True, new runs will rewrite the Astropy output tables.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time_astrometry`</span></code>: by default it is False, meaning the pipeline will try to detect a GEOMETRY and ASTROMETRY Files delivered with the Rawfiles by ESO. If set to True, it will use the time dependent astro/geo files provided by the GTO Team but you would need to make these available on your system.Hence I would recommend to keep the default (False).</p></li>
+</ul>
+</div>
+</blockquote>
+</section>
+<section id="under-the-hood-of-run-recipes">
+<h2>Under the hood of run_recipes<a class="headerlink" href="#under-the-hood-of-run-recipes" title="Permalink to this heading">¶</a>
+</h2>
+<p><code class="docutils literal notranslate"><span class="pre">run_recipes()</span></code> launches a default set of functions listed below:</p>
+<div class="highlight-default notranslate">
+<div class="highlight"><pre><span></span><span class="c1"># generate the master bias using the muse_bias esorex recipe</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_bias</span><span class="p">()</span>
+<span class="c1"># generate the master flat using the muse_flat esorex recipe</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_flat</span><span class="p">()</span>
+<span class="c1"># generate the wavelength calibration using the muse_wavecal esorex recipe</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_wave</span><span class="p">()</span>
+<span class="c1"># generate the lsf using the muse_lsf esorex recipe</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_lsf</span><span class="p">()</span>
+<span class="c1"># generate the illumination correction using the muse_lsf esorex recipe</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_twilight</span><span class="p">(</span><span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># process individual exposures to remove the instrumental signature usign the muse_scibasic</span>
+<span class="c1"># esorex recipes. It runs on both the object, standard star and sky exposures</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_scibasic_all</span><span class="p">(</span><span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># generates the response function using the standard star observations and the muse_standard</span>
+<span class="c1"># esorex recipe</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_standard</span><span class="p">()</span>
+<span class="c1"># uses the sky exposures to generate a sky spectrum</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_sky</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="c1"># runs the esosex muse_scipost recipe individually on each object exposures generating</span>
+<span class="c1"># a datacubes and image in the requested filter for each exposure.</span>
+<span class="c1"># These images are then used for aligment.</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_prep_align</span><span class="p">()</span>
+<span class="c1"># runs the muse_exp_align recipe to generate an OFFSET_TABLE files containing the astrometric</span>
+<span class="c1"># shifts between individual exposures. Pymusepipe provides more refined options for this</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_align_bydataset</span><span class="p">()</span>
+<span class="c1"># ??</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_align_bygroup</span><span class="p">()</span>
+<span class="c1"># generates the final aligned datacubes for individual exposures using muse_scipost</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_scipost_perexpo</span><span class="p">()</span>
+<span class="c1"># generates the sky datacube</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">run_scipost_sky</span><span class="p">()</span>
+<span class="c1"># merge exposures in the final datacube</span>
+<span class="n">mypipe</span><span class="o">.</span><span class="n">combine_dataset</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Individual pipeline stages can be (re)run by calling any of the individual functions
+above. The order is important, as in any data reduction process</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>This pipeline flow closely mirrors the standard data reduction for MUSE data implemented
+by the e.g. EsoReflex workflow. Pymusepipe offers alternative recipes to perform alignment
+(<a class="reference internal" href="alignment.html"><span class="doc">Alignment</span></a>) and mosaicking (<a class="reference internal" href="mosaicking.html"><span class="doc">Targets and Mosaicking</span></a>). For best results, therefore, we do not
+recommend running the above workflow. Examples workflows are presented in <a class="reference internal" href="phangs_example.html"><span class="doc">PHANGS pipeline example</span></a>.</p>
+</div>
+</section>
+<section id="structure-of-the-output">
+<h2>Structure of the output<a class="headerlink" href="#structure-of-the-output" title="Permalink to this heading">¶</a>
+</h2>
+<section id="folders">
+<h3>Folders<a class="headerlink" href="#folders" title="Permalink to this heading">¶</a>
+</h3>
+<p>The structure of the output is driven by a set of folder names described in
+<a class="reference internal" href="api/pymusepipe.html#module-pymusepipe.init_musepipe" title="pymusepipe.init_musepipe"><code class="xref py py-func docutils literal notranslate"><span class="pre">pymusepipe.init_musepipe()</span></code></a> in a few dictionaries (<code class="xref py py-func docutils literal notranslate"><span class="pre">dic_input_folders()</span></code>,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">dic_folders()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">dic_folders_target()</span></code>). You can in principle change the names
+of the folders themselves, although it is not advisable.</p>
+<p>The pipeline will create the folder structure automatically, checking whether the folders exist or not.</p>
+</section>
+<section id="log-files">
+<h3>Log files<a class="headerlink" href="#log-files" title="Permalink to this heading">¶</a>
+</h3>
+<p>Two basic log files are produced: one is the Esorex output which will be stored in the
+“Esorex_log” folder. The other one will be in the “Log” folder with the name provided at start:
+that one is like a shell script which can be used to rerun things directly via the command line.
+In the “Log” folder, there will also be, for each log file, a file “.out” and one with “.err”
+extensions, respectively including all the stdout and stderr messages. This may be useful to trace
+details in the data reduction and problems.</p>
+</section>
+<section id="astropy-tables">
+<h3>Astropy Tables<a class="headerlink" href="#astropy-tables" title="Permalink to this heading">¶</a>
+</h3>
+<p>Each recipe will trigger the creation of a astropy Table.
+These are stored under “Astro_Tables”. You can use these to monitor which files have been
+processed or used.</p>
+</section>
+<section id="sof-files">
+<h3>Sof files<a class="headerlink" href="#sof-files" title="Permalink to this heading">¶</a>
+</h3>
+<p>Sof files are saved under the “Sof” directory for each esorex recipes used in the pipeline.
+These are useful to see exactly which files are processed by each esorex recipe.</p>
+</section>
+<section id="python-structure">
+<h3>Python structure<a class="headerlink" href="#python-structure" title="Permalink to this heading">¶</a>
+</h3>
+<p>Most of the information you may need is actually stored in the python
+<a class="reference internal" href="api/pymusepipe.html#pymusepipe.musepipe.MusePipe" title="pymusepipe.musepipe.MusePipe"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymusepipe.musepipe.MusePipe</span></code></a> class structure. More details to come.</p>
+</section>
+</section>
+</section>
+
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="alignment.html" class="btn btn-neutral float-right" title="Alignment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral float-left" title="Install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe.emission_lines &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymusepipe.emission_lines</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymusepipe.emission_lines</h1><div class="highlight"><pre>
+<span></span><span class="n">full_muse_wavelength_range</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4000.</span><span class="p">,</span> <span class="mf">10000.</span><span class="p">]</span>
+
+<span class="n">list_emission_lines</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;CaIIK&quot;</span><span class="p">:</span>       <span class="p">[</span><span class="mf">3933.663</span><span class="p">,</span>   <span class="mf">3934.777</span><span class="p">],</span> 
+        <span class="s2">&quot;CaII&quot;</span> <span class="p">:</span>       <span class="p">[</span><span class="mf">3968.468</span><span class="p">,</span>   <span class="mf">3969.591</span><span class="p">],</span>
+        <span class="s2">&quot;[OII]3726&quot;</span><span class="p">:</span>   <span class="p">[</span><span class="mf">3726.03</span><span class="p">,</span>    <span class="mf">3727.09</span><span class="p">],</span>
+        <span class="s2">&quot;[OII]3729&quot;</span><span class="p">:</span>   <span class="p">[</span><span class="mf">3728.82</span><span class="p">,</span>    <span class="mf">3729.88</span><span class="p">],</span>
+        <span class="s2">&quot;[NeIII]&quot;</span> <span class="p">:</span>    <span class="p">[</span><span class="mf">3868.71</span><span class="p">,</span>    <span class="mf">3869.81</span><span class="p">],</span>
+        <span class="s2">&quot;[NeIII]&quot;</span> <span class="p">:</span>    <span class="p">[</span><span class="mf">3967.41</span><span class="p">,</span>    <span class="mf">3968.53</span><span class="p">],</span>
+        <span class="s2">&quot;H12&quot;</span><span class="p">:</span>	       <span class="p">[</span><span class="mf">3750.15</span><span class="p">,</span>    <span class="mf">3751.22</span><span class="p">],</span>
+        <span class="s2">&quot;H11&quot;</span><span class="p">:</span>	       <span class="p">[</span><span class="mf">3770.63</span><span class="p">,</span>    <span class="mf">3771.70</span><span class="p">],</span>
+        <span class="s2">&quot;H10&quot;</span><span class="p">:</span>         <span class="p">[</span><span class="mf">3797.90</span><span class="p">,</span>    <span class="mf">3798.98</span><span class="p">],</span>
+        <span class="s2">&quot;H9&quot;</span><span class="p">:</span>          <span class="p">[</span><span class="mf">3835.39</span><span class="p">,</span>    <span class="mf">3836.48</span><span class="p">],</span>
+        <span class="s2">&quot;H8&quot;</span><span class="p">:</span>          <span class="p">[</span><span class="mf">3889.05</span><span class="p">,</span>    <span class="mf">3890.15</span><span class="p">],</span>
+        <span class="s2">&quot;He&quot;</span><span class="p">:</span>          <span class="p">[</span><span class="mf">3970.07</span><span class="p">,</span>    <span class="mf">3971.19</span><span class="p">],</span>
+        <span class="s2">&quot;Hd&quot;</span><span class="p">:</span>          <span class="p">[</span><span class="mf">4101.76</span><span class="p">,</span>    <span class="mf">4102.92</span><span class="p">],</span>
+        <span class="s2">&quot;Hg&quot;</span><span class="p">:</span>          <span class="p">[</span><span class="mf">4340.47</span><span class="p">,</span>    <span class="mf">4341.69</span><span class="p">],</span>
+        <span class="s2">&quot;Hb&quot;</span><span class="p">:</span>          <span class="p">[</span><span class="mf">4861.33</span><span class="p">,</span>    <span class="mf">4862.69</span><span class="p">],</span>
+        <span class="s2">&quot;Ha&quot;</span><span class="p">:</span>          <span class="p">[</span><span class="mf">6562.80</span><span class="p">,</span>    <span class="mf">6564.61</span><span class="p">],</span>
+        <span class="s2">&quot;[OIII]5007&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="mf">5006.84</span><span class="p">,</span>    <span class="mf">5008.24</span><span class="p">],</span>
+        <span class="s2">&quot;[OIII]4959&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="mf">4958.92</span><span class="p">,</span>    <span class="mf">4960.30</span><span class="p">],</span>
+        <span class="s2">&quot;[OIII]4363&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="mf">4363.21</span><span class="p">,</span>    <span class="mf">4364.44</span><span class="p">],</span>
+        <span class="s2">&quot;[NII]6549&quot;</span> <span class="p">:</span>  <span class="p">[</span><span class="mf">6548.03</span><span class="p">,</span>    <span class="mf">6549.84</span><span class="p">],</span>
+        <span class="s2">&quot;[NII]6583&quot;</span> <span class="p">:</span>  <span class="p">[</span><span class="mf">6583.41</span><span class="p">,</span>    <span class="mf">6585.23</span><span class="p">],</span>
+        <span class="s2">&quot;[NII]5755&quot;</span> <span class="p">:</span>  <span class="p">[</span><span class="mf">5754.64</span><span class="p">,</span>    <span class="mf">5756.24</span><span class="p">],</span>
+        <span class="s2">&quot;[SII]6717&quot;</span> <span class="p">:</span>  <span class="p">[</span><span class="mf">6716.47</span><span class="p">,</span>    <span class="mf">6718.32</span><span class="p">],</span>
+        <span class="s2">&quot;[SII]6731&quot;</span> <span class="p">:</span>  <span class="p">[</span><span class="mf">6730.85</span><span class="p">,</span>    <span class="mf">6732.71</span><span class="p">],</span>
+        <span class="s2">&quot;NaI&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">5889.951</span><span class="p">,</span>   <span class="mf">5891.583</span><span class="p">],</span>
+        <span class="s2">&quot;NaI&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">5895.924</span><span class="p">,</span>   <span class="mf">5897.558</span><span class="p">],</span>
+        <span class="s2">&quot;HeI&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">3888.65</span><span class="p">,</span>    <span class="mf">3889.75</span><span class="p">],</span>
+        <span class="s2">&quot;HeI&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">5875.67</span><span class="p">,</span>    <span class="mf">5877.30</span><span class="p">],</span>
+        <span class="s2">&quot;HeI&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">6678.152</span><span class="p">,</span>   <span class="mf">6679.996</span><span class="p">],</span>
+        <span class="s2">&quot;[OI]6300&quot;</span> <span class="p">:</span>   <span class="p">[</span><span class="mf">6300.30</span><span class="p">,</span>    <span class="mf">6302.04</span><span class="p">],</span>
+        <span class="s2">&quot;[SIII]&quot;</span> <span class="p">:</span>     <span class="p">[</span><span class="mf">6312.1</span><span class="p">,</span>     <span class="mf">6313.8</span><span class="p">],</span>
+        <span class="s2">&quot;[NeII]&quot;</span> <span class="p">:</span>     <span class="p">[</span><span class="mf">6583.41</span><span class="p">,</span>    <span class="mf">6585.23</span><span class="p">],</span>
+        <span class="s2">&quot;[NeII]&quot;</span> <span class="p">:</span>     <span class="p">[</span><span class="mf">6548.03</span><span class="p">,</span>    <span class="mf">6549.84</span><span class="p">],</span>
+        <span class="s2">&quot;[NeII]&quot;</span> <span class="p">:</span>     <span class="p">[</span><span class="mf">5754.64</span><span class="p">,</span>    <span class="mf">5756.24</span><span class="p">],</span>
+        <span class="s2">&quot;[OI]5577&quot;</span> <span class="p">:</span>   <span class="p">[</span><span class="mf">5577.3387</span><span class="p">,</span>  <span class="mf">5578.8874</span><span class="p">],</span>
+        <span class="s2">&quot;Mgb&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">5167.321</span><span class="p">,</span>   <span class="mf">5168.761</span><span class="p">],</span>
+        <span class="s2">&quot;Mgb&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">5172.684</span><span class="p">,</span>   <span class="mf">5174.125</span><span class="p">],</span>
+        <span class="s2">&quot;Mgb&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">5183.604</span><span class="p">,</span>   <span class="mf">5185.048</span><span class="p">],</span>
+        <span class="s2">&quot;[ArIII]&quot;</span> <span class="p">:</span>    <span class="p">[</span><span class="mf">7135.8</span><span class="p">,</span>     <span class="mf">7137.8</span><span class="p">],</span>
+        <span class="s2">&quot;[ArIII]&quot;</span> <span class="p">:</span>    <span class="p">[</span><span class="mf">7751.1</span><span class="p">,</span>     <span class="mf">7753.2</span><span class="p">],</span>
+        <span class="s2">&quot;CaII&quot;</span> <span class="p">:</span>       <span class="p">[</span><span class="mf">8498.03</span><span class="p">,</span>    <span class="mf">8500.36</span><span class="p">],</span>
+        <span class="s2">&quot;CaII&quot;</span> <span class="p">:</span>       <span class="p">[</span><span class="mf">8542.09</span><span class="p">,</span>    <span class="mf">8544.44</span><span class="p">],</span>
+        <span class="s2">&quot;CaII&quot;</span> <span class="p">:</span>       <span class="p">[</span><span class="mf">8662.14</span><span class="p">,</span>    <span class="mf">8664.52</span><span class="p">],</span>
+        <span class="s2">&quot;[SIII]&quot;</span> <span class="p">:</span>     <span class="p">[</span><span class="mf">9068.6</span><span class="p">,</span>     <span class="mf">9071.1</span><span class="p">],</span>
+        <span class="s2">&quot;[SIII]&quot;</span> <span class="p">:</span>     <span class="p">[</span><span class="mf">9530.6</span><span class="p">,</span>     <span class="mf">9533.2</span><span class="p">],</span>
+        <span class="s2">&quot;P11&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">8862.783</span><span class="p">,</span>   <span class="mf">8865.217</span><span class="p">],</span>
+        <span class="s2">&quot;P10&quot;</span> <span class="p">:</span>        <span class="p">[</span><span class="mf">9014.910</span><span class="p">,</span>   <span class="mf">9017.385</span><span class="p">],</span>
+        <span class="s2">&quot;P9&quot;</span> <span class="p">:</span>         <span class="p">[</span><span class="mf">9229.014</span><span class="p">,</span>   <span class="mf">9231.547</span><span class="p">],</span>
+        <span class="s2">&quot;P8&quot;</span> <span class="p">:</span>         <span class="p">[</span><span class="mf">9545.972</span><span class="p">,</span>   <span class="mf">9548.590</span><span class="p">],</span>
+        <span class="s2">&quot;P7&quot;</span> <span class="p">:</span>         <span class="p">[</span><span class="mf">10049.373</span><span class="p">,</span> <span class="mf">10052.128</span><span class="p">],</span>
+        <span class="s2">&quot;Pg&quot;</span> <span class="p">:</span>         <span class="p">[</span><span class="mf">10938.095</span><span class="p">,</span> <span class="mf">10941.091</span><span class="p">],</span>
+        <span class="s2">&quot;Pb&quot;</span> <span class="p">:</span>         <span class="p">[</span><span class="mf">12818.08</span><span class="p">,</span>  <span class="mf">12821.59</span><span class="p">],</span>
+        <span class="s2">&quot;Pa&quot;</span> <span class="p">:</span>         <span class="p">[</span><span class="mf">18751.01</span><span class="p">,</span>  <span class="mf">18756.13</span><span class="p">],</span>
+        <span class="s2">&quot;Brg&quot;</span> <span class="p">:</span>	       <span class="p">[</span><span class="mf">21655.29</span><span class="p">,</span>  <span class="mf">21661.20</span><span class="p">],</span>
+            <span class="p">}</span>
+
+<div class="viewcode-block" id="print_emission_lines"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.emission_lines.print_emission_lines">[docs]</a><span class="k">def</span> <span class="nf">print_emission_lines</span><span class="p">()</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Printing the names of the various emission lines</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">list_emission_lines</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

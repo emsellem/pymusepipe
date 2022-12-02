@@ -5,6 +5,7 @@
 # Setuptools distribution folder.
 dist/
 old_stuff/
+docs_save/
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
@@ -26,3 +27,4 @@ parts
 src/*.egg-info
 lib
 lib64
+HOWTO.txt

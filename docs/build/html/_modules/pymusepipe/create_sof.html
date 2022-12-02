@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe.create_sof &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymusepipe.create_sof</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymusepipe.create_sof</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under a MIT license - see LICENSE</span>
+
+<span class="sd">&quot;&quot;&quot;MUSE-PHANGS creating sof file module</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__authors__</span>   <span class="o">=</span> <span class="s2">&quot;Eric Emsellem&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;(c) 2017, ESO + CRAL&quot;</span>
+<span class="n">__license__</span>   <span class="o">=</span> <span class="s2">&quot;MIT License&quot;</span>
+<span class="n">__contact__</span>   <span class="o">=</span> <span class="s2">&quot; &lt;eric.emsellem@eso.org&gt;&quot;</span>
+
+<span class="c1"># This module has been largely inspired by work of</span>
+<span class="c1"># Bern Husemann, Dimitri Gadotti, Kyriakos and Martina from the GTO MUSE MAD team</span>
+<span class="c1"># and further rewritten by Mark van den Brok. </span>
+<span class="c1"># Thanks to all !</span>
+
+<span class="c1"># Standard modules</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">joinpath</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
+<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="n">get_suffix_product</span>
+
+<div class="viewcode-block" id="SofDict"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.create_sof.SofDict">[docs]</a><span class="k">class</span> <span class="nc">SofDict</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;New Dictionary for the SOF writing</span>
+<span class="sd">    Inheriting from ordered Dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
+        <span class="n">OrderedDict</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SofPipe"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.create_sof.SofPipe">[docs]</a><span class="k">class</span> <span class="nc">SofPipe</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;SofPipe class containing all the SOF writing modules</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialisation of SofPipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Creating an empty dictionary for the SOF writing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span> <span class="o">=</span> <span class="n">SofDict</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SofPipe.write_sof"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.create_sof.SofPipe.write_sof">[docs]</a>    <span class="k">def</span> <span class="nf">write_sof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof_filename</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Feeding an sof file with input filenames from a dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Removing the extension of the file if already set</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sof_filename</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.sof&quot;</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">sof_filename</span> <span class="o">=</span> <span class="n">sof_filename</span> <span class="o">+</span> <span class="s2">&quot;.sof&quot;</span>
+
+        <span class="n">sof</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">sof</span><span class="p">,</span> <span class="n">sof_filename</span><span class="p">)</span>
+        <span class="c1"># If new file, start from scratch (overwrite)</span>
+        <span class="k">if</span> <span class="n">new</span> <span class="p">:</span>
+            <span class="n">sof_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sof</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing in file </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sof</span><span class="p">))</span>
+        <span class="c1"># if not new, then append</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">sof_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sof</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Appending in file </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sof</span><span class="p">))</span>
+    
+        <span class="c1"># Use dictionary to write up the lines</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">:</span>
+                <span class="n">text_to_write</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                <span class="n">sof_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text_to_write</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">verbose</span> <span class="p">:</span>
+                    <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="n">text_to_write</span><span class="p">)</span>
+
+        <span class="n">sof_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c1"># Returning the current sof as relative path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sof</span> <span class="o">=</span> <span class="n">upipe</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">sof</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_list_tplmaster_to_sofdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean_mjd</span><span class="p">,</span> <span class="n">list_expotype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a list of masterfiles to the SOF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">expotype</span> <span class="ow">in</span> <span class="n">list_expotype</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_tplmaster_to_sofdict</span><span class="p">(</span><span class="n">mean_mjd</span><span class="p">,</span> <span class="n">expotype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_tplmaster_to_sofdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean_mjd</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add item to dictionary for the sof writing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c1"># Finding the best tpl for this master</span>
+        <span class="n">index</span><span class="p">,</span> <span class="n">this_tpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_closest_mjd</span><span class="p">(</span><span class="n">mean_mjd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_table_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">))</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_debug</span><span class="p">(</span><span class="s2">&quot;Index = </span><span class="si">{0}</span><span class="s2">, Tpl = </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">this_tpl</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dir_master</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fullpath_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="n">get_suffix_product</span><span class="p">(</span><span class="n">expotype</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">upipe</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_master</span><span class="p">,</span> 
+                <span class="n">get_suffix_product</span><span class="p">(</span><span class="n">expotype</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">this_tpl</span> <span class="o">+</span> <span class="s2">&quot;.fits&quot;</span><span class="p">))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Failed to find a master exposure of type </span><span class="si">{}</span><span class="s2"> &quot;</span>
+                              <span class="s2">&quot;in this table&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expotype</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_add_tplraw_to_sofdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean_mjd</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add item to dictionary for the sof writing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c1"># Finding the best tpl for this raw file type</span>
+        <span class="n">expo_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_table_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span>
+        <span class="n">index</span><span class="p">,</span> <span class="n">this_tpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_closest_mjd</span><span class="p">(</span><span class="n">mean_mjd</span><span class="p">,</span> <span class="n">expo_table</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="n">expotype</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">upipe</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">rawfiles</span><span class="p">,</span> 
+                <span class="n">expo_table</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Failed to find a raw exposure of type </span><span class="si">{}</span><span class="s2"> &quot;</span>
+                              <span class="s2">&quot;in this table&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expotype</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_add_skycalib_to_sofdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">mean_mjd</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;master&quot;</span><span class="p">,</span> 
+            <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">perexpo</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add item to dictionary for the sof writing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c1"># Finding the best tpl for this sky calib file type</span>
+        <span class="n">expo_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_table_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span>
+        <span class="n">index</span><span class="p">,</span> <span class="n">this_tpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_closest_mjd</span><span class="p">(</span><span class="n">mean_mjd</span><span class="p">,</span> <span class="n">expo_table</span><span class="p">)</span> 
+        <span class="n">dir_calib</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fullpath_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">perexpo</span><span class="p">:</span>
+            <span class="n">iexpo</span> <span class="o">=</span> <span class="n">expo_table</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="s1">&#39;iexpo&#39;</span><span class="p">]</span>
+            <span class="n">suffix</span> <span class="o">+=</span> <span class="s2">&quot;_</span><span class="si">{0:04d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iexpo</span><span class="p">)</span>
+
+        <span class="c1"># Name for the sky calibration file</span>
+        <span class="n">name_skycalib</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">_</span><span class="si">{2}{3}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">this_tpl</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_calib</span><span class="p">,</span> <span class="n">name_skycalib</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">_add_calib_to_sofdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibtype</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adding a calibration file for the SOF </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="n">calibtype</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_name_calibfile</span><span class="p">(</span><span class="n">calibtype</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">_get_name_calibfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibtype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the name of the calibration file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">calibfile</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="p">,</span> <span class="n">calibtype</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">musecalib</span><span class="p">,</span> <span class="n">calibfile</span><span class="p">)</span>    
+
+    <span class="k">def</span> <span class="nf">_add_geometry_to_sofdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tpls</span><span class="p">,</span> <span class="n">mean_mjd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extract the geometry table and add it to the dictionary</span>
+<span class="sd">        for the SOF file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_astrometry</span> <span class="p">:</span>
+            <span class="n">calfolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">musecalib_time</span>
+            <span class="n">geofile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_geoastro_name</span><span class="p">(</span><span class="n">tpls</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="n">fieldmode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_fielmode</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">expo_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_table_expo</span><span class="p">(</span><span class="s2">&quot;GEOMETRY&quot;</span><span class="p">,</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expo_table</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">index</span><span class="p">,</span> <span class="n">this_tpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_closest_mjd</span><span class="p">(</span><span class="n">mean_mjd</span><span class="p">,</span> <span class="n">expo_table</span><span class="p">)</span> 
+                <span class="n">calfolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">rawfiles</span>
+                <span class="n">geofile</span> <span class="o">=</span> <span class="n">expo_table</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Did not find a GEOMETRY entry in Astropy &quot;</span>
+                                    <span class="s2">&quot;table. Using default GEOMETRY&quot;</span>
+                                    <span class="s2">&quot;Check if Raw Table was initialised&quot;</span><span class="p">)</span>
+                <span class="n">calfolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">musecalib</span>
+                <span class="n">geofile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">geo_table</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="s1">&#39;GEOMETRY_TABLE&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{folder}{geo}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="n">calfolder</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geofile</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">_add_astrometry_to_sofdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tpls</span><span class="p">,</span> <span class="n">mean_mjd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extract the astrometry table and add it to the dictionary</span>
+<span class="sd">        for the SOF file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_astrometry</span> <span class="p">:</span>
+            <span class="n">calfolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">musecalib_time</span>
+            <span class="n">astrofile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_geoastro_name</span><span class="p">(</span><span class="n">tpls</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;astro&#39;</span><span class="p">,</span> <span class="n">fieldmode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_fielmode</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">expo_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_table_expo</span><span class="p">(</span><span class="s2">&quot;ASTROMETRY&quot;</span><span class="p">,</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expo_table</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">index</span><span class="p">,</span> <span class="n">this_tpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_closest_mjd</span><span class="p">(</span><span class="n">mean_mjd</span><span class="p">,</span> <span class="n">expo_table</span><span class="p">)</span> 
+                <span class="n">calfolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">rawfiles</span>
+                <span class="n">astrofile</span> <span class="o">=</span> <span class="n">expo_table</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Did not find an ASTROMETRY entry in Astropy &quot;</span>
+                                    <span class="s2">&quot;Raw table. Using default ASTROMETRY.&quot;</span>
+                                    <span class="s2">&quot;Check if Raw Table was initialised&quot;</span><span class="p">)</span>
+                <span class="n">calfolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">musecalib</span>
+                <span class="n">astrofile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">astro_table</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sofdict</span><span class="p">[</span><span class="s1">&#39;ASTROMETRY_WCS&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{folder}{astro}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="n">calfolder</span><span class="p">,</span> <span class="n">astro</span><span class="o">=</span><span class="n">astrofile</span><span class="p">)]</span></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

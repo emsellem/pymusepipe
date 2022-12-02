@@ -77,7 +77,7 @@ try:
     import spacepylot.plotting as spppl
     from spacepylot.alignment_utilities import TranslationTransform
 except ImportError:
-    upipe.print_warning("If you wish to use spaxepylot please install it via"
+    upipe.print_warning("If you wish to use spacepylot please install it via"
                         "pip install or conda install or cloning the github version")
 
 def is_sequence(arg):
@@ -1408,6 +1408,9 @@ class AlignMuseDataset(object):
 
     def apply_optical_flow_offset_listima(self, list_nima=None):
         """Apply the optical flow offset as extra pixels offsets and rotation
+
+        Input
+        -----
         list_nima: list
             If None, will be initiliased to the default list of indices
         """
@@ -1599,10 +1602,9 @@ class AlignMuseDataset(object):
 
         Input
         -----
-        list_nima: list of indices for images to process
-            Should be a list. Default is None
+        list_nima: list
+            list of indices for images to process Should be a list. Default is None
             and all images are processed
-
         minflux: float [None]
             minimum flux to be used in the cross-correlation
             Flux below that value will be set to 0.
@@ -1620,12 +1622,15 @@ class AlignMuseDataset(object):
          
         Input
         -----
-        muse_hdu: MUSE hdu file
-        name_musehdr: name of the muse hdr to save
-        rotation: Angle in degrees (0). 
+        muse_hdu: astropy.io.fits hdu
+            MUSE hdu file
+        name_musehdr: str
+            name of the muse hdr to save
+        rotation: float
+            Angle in degrees (0).
         minflux: minimum flux to be used in the cross-correlation
-                Flux below that value will be set to 0.
-                Default is 0.
+            Flux below that value will be set to 0.
+            Default is 0.
         
         Returns
         -------
@@ -2149,7 +2154,7 @@ class AlignMuseDataset(object):
 
         # Starting the plotting
         if shownormalise:
-            plot_polypar(polypar, labels=["MuseData","RefData"], figfolder=foldfig,
+            plot_polypar(polypar, labels=["MuseData", "RefData"], figfolder=foldfig,
                          fignum=current_fig, namefig=f"align_norm_scatter{suffix_fig}.png",
                          savefig=savefig)
             self.list_figures.append(current_fig)
@@ -2157,9 +2162,9 @@ class AlignMuseDataset(object):
 
         if showcontours:
             plot_compare_contours(data1, data2, plotwcs=plotwcs, fignum=current_fig,
-                               labels=['MUSE', 'REF'], nlevels=nlevels, levels=levels,
-                               figfolder=foldfig, namefig=f"align_contours{suffix_fig}.png",
-                               title=f'Image {suffix_fig}')
+                                  labels=['MUSE', 'REF'], nlevels=nlevels, levels=levels,
+                                  figfolder=foldfig, namefig=f"align_contours{suffix_fig}.png",
+                                  title=f'Image {suffix_fig}')
             self.list_figures.append(current_fig)
             current_fig += 1
 

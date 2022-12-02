@@ -1,0 +1,657 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pymusepipe package" href="pymusepipe.html" />
+    <link rel="prev" title="Changelog" href="../changelog.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Module Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pymusepipe.html">pymusepipe package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>pymusepipe</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/modules.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="pymusepipe">
+<h1>pymusepipe<a class="headerlink" href="#pymusepipe" title="Permalink to this heading">¶</a>
+</h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1">
+<a class="reference internal" href="pymusepipe.html">pymusepipe package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pymusepipe.html#submodules">Submodules</a></li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.align_pipe">pymusepipe.align_pipe module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.apply_extra_offset_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.apply_extra_offset_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.apply_optical_flow_offset_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.apply_optical_flow_offset_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.apply_optical_flow_offset_listima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.apply_optical_flow_offset_listima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.compare"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.compare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.compare_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.compare_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.find_cross_peak"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.find_cross_peak()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.find_cross_peak_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.find_cross_peak_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.find_cross_peak_listima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.find_cross_peak_listima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.get_imaref_muse"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.get_imaref_muse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.get_normfactor_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.get_normfactor_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.get_shift_from_pcc"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.get_shift_from_pcc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.get_shift_from_pcc_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.get_shift_from_pcc_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.get_shift_from_pcc_listima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.get_shift_from_pcc_listima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.init_guess_offset"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.init_guess_offset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.init_optical_flow"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.init_optical_flow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.init_optical_flow_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.init_optical_flow_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.init_optical_flow_listima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.init_optical_flow_listima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.iterate_on_optical_flow_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.iterate_on_optical_flow_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.iterate_on_optical_flow_listima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.iterate_on_optical_flow_listima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.offset_and_compare"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.offset_and_compare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.open_hdu"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.open_hdu()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.open_offset_table"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.open_offset_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.print_images_names"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.print_images_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.print_offsets_and_norms"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.print_offsets_and_norms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.run_optical_flow"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.run_optical_flow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.run_optical_flow_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.run_optical_flow_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.save_fits_offset_table"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.save_fits_offset_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.save_image"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.save_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.save_polypar_ima"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.save_polypar_ima()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.show_linearfit_values"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.show_linearfit_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.show_norm_factors"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.show_norm_factors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.show_offset_fromfits"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.show_offset_fromfits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.AlignMuseDataset.show_offsets"><code class="docutils literal notranslate"><span class="pre">AlignMuseDataset.show_offsets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.arcsec_to_pixel"><code class="docutils literal notranslate"><span class="pre">arcsec_to_pixel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.create_offset_table"><code class="docutils literal notranslate"><span class="pre">create_offset_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.get_conversion_factor"><code class="docutils literal notranslate"><span class="pre">get_conversion_factor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.init_plot_optical_flow"><code class="docutils literal notranslate"><span class="pre">init_plot_optical_flow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.is_sequence"><code class="docutils literal notranslate"><span class="pre">is_sequence()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.pixel_to_arcsec"><code class="docutils literal notranslate"><span class="pre">pixel_to_arcsec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.rotate_pixtable"><code class="docutils literal notranslate"><span class="pre">rotate_pixtable()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.align_pipe.rotate_pixtables"><code class="docutils literal notranslate"><span class="pre">rotate_pixtables()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.check_pipe">pymusepipe.check_pipe module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.check_pipe.CheckPipe"><code class="docutils literal notranslate"><span class="pre">CheckPipe</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.check_pipe.CheckPipe.check_given_images"><code class="docutils literal notranslate"><span class="pre">CheckPipe.check_given_images()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.check_pipe.CheckPipe.check_master_bias_flat"><code class="docutils literal notranslate"><span class="pre">CheckPipe.check_master_bias_flat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.check_pipe.CheckPipe.check_quadrants"><code class="docutils literal notranslate"><span class="pre">CheckPipe.check_quadrants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.check_pipe.CheckPipe.check_sky_spectra"><code class="docutils literal notranslate"><span class="pre">CheckPipe.check_sky_spectra()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.check_pipe.CheckPipe.check_white_line_images"><code class="docutils literal notranslate"><span class="pre">CheckPipe.check_white_line_images()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.check_pipe.print_plot"><code class="docutils literal notranslate"><span class="pre">print_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.combine">pymusepipe.combine module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings"><code class="docutils literal notranslate"><span class="pre">MusePointings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.create_all_pointings_wcs"><code class="docutils literal notranslate"><span class="pre">MusePointings.create_all_pointings_wcs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.create_combined_wcs"><code class="docutils literal notranslate"><span class="pre">MusePointings.create_combined_wcs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.create_pointing_wcs"><code class="docutils literal notranslate"><span class="pre">MusePointings.create_pointing_wcs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.create_reference_wcs"><code class="docutils literal notranslate"><span class="pre">MusePointings.create_reference_wcs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.extract_combined_narrow_wcs"><code class="docutils literal notranslate"><span class="pre">MusePointings.extract_combined_narrow_wcs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.full_list_datasets"><code class="docutils literal notranslate"><span class="pre">MusePointings.full_list_datasets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.goto_folder"><code class="docutils literal notranslate"><span class="pre">MusePointings.goto_folder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.goto_origfolder"><code class="docutils literal notranslate"><span class="pre">MusePointings.goto_origfolder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.goto_prevfolder"><code class="docutils literal notranslate"><span class="pre">MusePointings.goto_prevfolder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.run_combine"><code class="docutils literal notranslate"><span class="pre">MusePointings.run_combine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.run_combine_all_single_pointings"><code class="docutils literal notranslate"><span class="pre">MusePointings.run_combine_all_single_pointings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.run_combine_single_pointing"><code class="docutils literal notranslate"><span class="pre">MusePointings.run_combine_single_pointing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.MusePointings.set_fullpath_names"><code class="docutils literal notranslate"><span class="pre">MusePointings.set_fullpath_names()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.build_dict_exposures"><code class="docutils literal notranslate"><span class="pre">build_dict_exposures()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.get_list_datasets"><code class="docutils literal notranslate"><span class="pre">get_list_datasets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.get_list_exposures"><code class="docutils literal notranslate"><span class="pre">get_list_exposures()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.get_list_periods"><code class="docutils literal notranslate"><span class="pre">get_list_periods()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.get_list_reduced_pixtables"><code class="docutils literal notranslate"><span class="pre">get_list_reduced_pixtables()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.combine.get_list_targets"><code class="docutils literal notranslate"><span class="pre">get_list_targets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.config_pipe">pymusepipe.config_pipe module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.config_pipe.get_suffix_product"><code class="docutils literal notranslate"><span class="pre">get_suffix_product()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.create_sof">pymusepipe.create_sof module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.create_sof.SofDict"><code class="docutils literal notranslate"><span class="pre">SofDict</span></code></a></li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.create_sof.SofPipe"><code class="docutils literal notranslate"><span class="pre">SofPipe</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.create_sof.SofPipe.write_sof"><code class="docutils literal notranslate"><span class="pre">SofPipe.write_sof()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.cube_convolve">pymusepipe.cube_convolve module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.convolution_kernel"><code class="docutils literal notranslate"><span class="pre">convolution_kernel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.convolution_kernel_gaussian"><code class="docutils literal notranslate"><span class="pre">convolution_kernel_gaussian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.cube_convolve"><code class="docutils literal notranslate"><span class="pre">cube_convolve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.cube_kernel"><code class="docutils literal notranslate"><span class="pre">cube_kernel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.gaussian_kernel"><code class="docutils literal notranslate"><span class="pre">gaussian_kernel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.moffat_kernel"><code class="docutils literal notranslate"><span class="pre">moffat_kernel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.psf2d"><code class="docutils literal notranslate"><span class="pre">psf2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.psf3d"><code class="docutils literal notranslate"><span class="pre">psf3d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.cube_convolve.pypher_script"><code class="docutils literal notranslate"><span class="pre">pypher_script()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.emission_lines">pymusepipe.emission_lines module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.emission_lines.print_emission_lines"><code class="docutils literal notranslate"><span class="pre">print_emission_lines()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.graph_pipe">pymusepipe.graph_pipe module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.GraphMuse"><code class="docutils literal notranslate"><span class="pre">GraphMuse</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.close"><code class="docutils literal notranslate"><span class="pre">GraphMuse.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.plot_page"><code class="docutils literal notranslate"><span class="pre">GraphMuse.plot_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.plot_set_images"><code class="docutils literal notranslate"><span class="pre">GraphMuse.plot_set_images()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.plot_set_spectra"><code class="docutils literal notranslate"><span class="pre">GraphMuse.plot_set_spectra()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.savepage"><code class="docutils literal notranslate"><span class="pre">GraphMuse.savepage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.start_page"><code class="docutils literal notranslate"><span class="pre">GraphMuse.start_page()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.open_new_wcs_figure"><code class="docutils literal notranslate"><span class="pre">open_new_wcs_figure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.plot_compare_contours"><code class="docutils literal notranslate"><span class="pre">plot_compare_contours()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.plot_compare_cuts"><code class="docutils literal notranslate"><span class="pre">plot_compare_cuts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.plot_compare_diff"><code class="docutils literal notranslate"><span class="pre">plot_compare_diff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.plot_polypar"><code class="docutils literal notranslate"><span class="pre">plot_polypar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.graph_pipe.print_fig"><code class="docutils literal notranslate"><span class="pre">print_fig()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.init_musepipe">pymusepipe.init_musepipe module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.init_musepipe.InitMuseParameters"><code class="docutils literal notranslate"><span class="pre">InitMuseParameters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.init_musepipe.InitMuseParameters.init_default_param"><code class="docutils literal notranslate"><span class="pre">InitMuseParameters.init_default_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.init_musepipe.InitMuseParameters.read_param_file"><code class="docutils literal notranslate"><span class="pre">InitMuseParameters.read_param_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.init_musepipe.add_suffix_tokeys"><code class="docutils literal notranslate"><span class="pre">add_suffix_tokeys()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.mpdaf_pipe">pymusepipe.mpdaf_pipe module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.BasicFile"><code class="docutils literal notranslate"><span class="pre">BasicFile</span></code></a></li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.BasicPSF"><code class="docutils literal notranslate"><span class="pre">BasicPSF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.BasicPSF.psf_array"><code class="docutils literal notranslate"><span class="pre">BasicPSF.psf_array</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube"><code class="docutils literal notranslate"><span class="pre">MuseCube</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.astropy_convolve"><code class="docutils literal notranslate"><span class="pre">MuseCube.astropy_convolve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.build_filterlist_images"><code class="docutils literal notranslate"><span class="pre">MuseCube.build_filterlist_images()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.convolve_cube_to_psf"><code class="docutils literal notranslate"><span class="pre">MuseCube.convolve_cube_to_psf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.create_reference_cube"><code class="docutils literal notranslate"><span class="pre">MuseCube.create_reference_cube()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.extract_onespectral_cube"><code class="docutils literal notranslate"><span class="pre">MuseCube.extract_onespectral_cube()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.get_emissionline_image"><code class="docutils literal notranslate"><span class="pre">MuseCube.get_emissionline_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.get_filter_image"><code class="docutils literal notranslate"><span class="pre">MuseCube.get_filter_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.get_image_from_cube"><code class="docutils literal notranslate"><span class="pre">MuseCube.get_image_from_cube()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.get_quadrant_spectra_from_cube"><code class="docutils literal notranslate"><span class="pre">MuseCube.get_quadrant_spectra_from_cube()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.get_set_spectra"><code class="docutils literal notranslate"><span class="pre">MuseCube.get_set_spectra()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.get_spectrum_from_cube"><code class="docutils literal notranslate"><span class="pre">MuseCube.get_spectrum_from_cube()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.get_whiteimage_from_cube"><code class="docutils literal notranslate"><span class="pre">MuseCube.get_whiteimage_from_cube()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.mask_trail"><code class="docutils literal notranslate"><span class="pre">MuseCube.mask_trail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.rebin_spatial"><code class="docutils literal notranslate"><span class="pre">MuseCube.rebin_spatial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.save_mask"><code class="docutils literal notranslate"><span class="pre">MuseCube.save_mask()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic"><code class="docutils literal notranslate"><span class="pre">MuseCubeMosaic</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic.build_list"><code class="docutils literal notranslate"><span class="pre">MuseCubeMosaic.build_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic.convolve_cubes"><code class="docutils literal notranslate"><span class="pre">MuseCubeMosaic.convolve_cubes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic.cube_names"><code class="docutils literal notranslate"><span class="pre">MuseCubeMosaic.cube_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic.list_cubes"><code class="docutils literal notranslate"><span class="pre">MuseCubeMosaic.list_cubes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic.madcombine"><code class="docutils literal notranslate"><span class="pre">MuseCubeMosaic.madcombine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic.ncubes"><code class="docutils literal notranslate"><span class="pre">MuseCubeMosaic.ncubes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic.print_cube_names"><code class="docutils literal notranslate"><span class="pre">MuseCubeMosaic.print_cube_names()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseFilter"><code class="docutils literal notranslate"><span class="pre">MuseFilter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseFilter.read"><code class="docutils literal notranslate"><span class="pre">MuseFilter.read()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseImage"><code class="docutils literal notranslate"><span class="pre">MuseImage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseImage.get_fwhm_startend"><code class="docutils literal notranslate"><span class="pre">MuseImage.get_fwhm_startend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseImage.mask_trail"><code class="docutils literal notranslate"><span class="pre">MuseImage.mask_trail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseImage.reset_mask"><code class="docutils literal notranslate"><span class="pre">MuseImage.reset_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseImage.save_mask"><code class="docutils literal notranslate"><span class="pre">MuseImage.save_mask()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSetImages"><code class="docutils literal notranslate"><span class="pre">MuseSetImages</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSetImages.update"><code class="docutils literal notranslate"><span class="pre">MuseSetImages.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSetSpectra"><code class="docutils literal notranslate"><span class="pre">MuseSetSpectra</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSetSpectra.update"><code class="docutils literal notranslate"><span class="pre">MuseSetSpectra.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSkyContinuum"><code class="docutils literal notranslate"><span class="pre">MuseSkyContinuum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSkyContinuum.get_normfactor"><code class="docutils literal notranslate"><span class="pre">MuseSkyContinuum.get_normfactor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSkyContinuum.integrate"><code class="docutils literal notranslate"><span class="pre">MuseSkyContinuum.integrate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSkyContinuum.read"><code class="docutils literal notranslate"><span class="pre">MuseSkyContinuum.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSkyContinuum.save_normalised"><code class="docutils literal notranslate"><span class="pre">MuseSkyContinuum.save_normalised()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSpectrum"><code class="docutils literal notranslate"><span class="pre">MuseSpectrum</span></code></a></li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.PixTableToMask"><code class="docutils literal notranslate"><span class="pre">PixTableToMask</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.PixTableToMask.create_mask"><code class="docutils literal notranslate"><span class="pre">PixTableToMask.create_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.PixTableToMask.imshow"><code class="docutils literal notranslate"><span class="pre">PixTableToMask.imshow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.PixTableToMask.mask_pixtable"><code class="docutils literal notranslate"><span class="pre">PixTableToMask.mask_pixtable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.PixTableToMask.save_mask"><code class="docutils literal notranslate"><span class="pre">PixTableToMask.save_mask()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.get_sky_spectrum"><code class="docutils literal notranslate"><span class="pre">get_sky_spectrum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.mpdaf_pipe.integrate_spectrum"><code class="docutils literal notranslate"><span class="pre">integrate_spectrum()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.musepipe">pymusepipe.musepipe module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe"><code class="docutils literal notranslate"><span class="pre">MusePipe</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.goto_folder"><code class="docutils literal notranslate"><span class="pre">MusePipe.goto_folder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.goto_origfolder"><code class="docutils literal notranslate"><span class="pre">MusePipe.goto_origfolder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.goto_prevfolder"><code class="docutils literal notranslate"><span class="pre">MusePipe.goto_prevfolder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.init_raw_table"><code class="docutils literal notranslate"><span class="pre">MusePipe.init_raw_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.musemode"><code class="docutils literal notranslate"><span class="pre">MusePipe.musemode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.print_musemodes"><code class="docutils literal notranslate"><span class="pre">MusePipe.print_musemodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.read_all_astro_tables"><code class="docutils literal notranslate"><span class="pre">MusePipe.read_all_astro_tables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.read_astropy_table"><code class="docutils literal notranslate"><span class="pre">MusePipe.read_astropy_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.retrieve_geoastro_name"><code class="docutils literal notranslate"><span class="pre">MusePipe.retrieve_geoastro_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.save_expo_table"><code class="docutils literal notranslate"><span class="pre">MusePipe.save_expo_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.set_fullpath_names"><code class="docutils literal notranslate"><span class="pre">MusePipe.set_fullpath_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.MusePipe.sort_raw_tables"><code class="docutils literal notranslate"><span class="pre">MusePipe.sort_raw_tables()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.musepipe.PipeObject"><code class="docutils literal notranslate"><span class="pre">PipeObject</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.prep_recipes_pipe">pymusepipe.prep_recipes_pipe module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep"><code class="docutils literal notranslate"><span class="pre">PipePrep</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.get_align_group"><code class="docutils literal notranslate"><span class="pre">PipePrep.get_align_group()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.print_recipes"><code class="docutils literal notranslate"><span class="pre">PipePrep.print_recipes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_align_bydataset"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_align_bydataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_align_bygroup"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_align_bygroup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_autocal_sky"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_autocal_sky()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_bias"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_bias()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_check_align"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_check_align()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_combine_dataset"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_combine_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_fine_alignment"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_fine_alignment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_flat"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_flat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_lsf"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_lsf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_phangs_recipes"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_phangs_recipes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_prep_align"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_prep_align()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_recipes"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_recipes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_scibasic"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_scibasic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_scibasic_all"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_scibasic_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_scipost"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_scipost()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_scipost_perexpo"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_scipost_perexpo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_scipost_sky"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_scipost_sky()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_sky"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_sky()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_standard"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_standard()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_twilight"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_twilight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.run_wave"><code class="docutils literal notranslate"><span class="pre">PipePrep.run_wave()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.save_fine_alignment"><code class="docutils literal notranslate"><span class="pre">PipePrep.save_fine_alignment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.PipePrep.select_tpl_files"><code class="docutils literal notranslate"><span class="pre">PipePrep.select_tpl_files()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.add_listpath"><code class="docutils literal notranslate"><span class="pre">add_listpath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.norm_listpath"><code class="docutils literal notranslate"><span class="pre">norm_listpath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.prep_recipes_pipe.print_my_function_name"><code class="docutils literal notranslate"><span class="pre">print_my_function_name()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.recipes_pipe">pymusepipe.recipes_pipe module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes"><code class="docutils literal notranslate"><span class="pre">PipeRecipes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.checksum"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.checksum</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.esorex"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.esorex</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.joinprod"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.joinprod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.merge"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.merge</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_align"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_align()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_bias"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_bias()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_combine"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_combine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_combine_pointings"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_combine_pointings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_flat"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_flat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_lsf"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_lsf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_scibasic"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_scibasic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_scipost"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_scipost()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_sky"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_sky()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_std"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_twilight"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_twilight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_wave"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.recipe_wave()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.run_oscommand"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.run_oscommand()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.write_errlogfile"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.write_errlogfile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.write_logfile"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.write_logfile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.write_outlogfile"><code class="docutils literal notranslate"><span class="pre">PipeRecipes.write_outlogfile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.target_sample">pymusepipe.target_sample module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample"><code class="docutils literal notranslate"><span class="pre">MusePipeSample</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.combine_target"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.combine_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.combine_target_per_pointing"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.combine_target_per_pointing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.convolve_mosaic_per_pointing"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.convolve_mosaic_per_pointing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.create_reference_wcs"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.create_reference_wcs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.finalise_reduction"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.finalise_reduction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.init_combine"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.init_combine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.init_mosaic"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.init_mosaic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.mosaic"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.mosaic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.reduce_all_targets"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.reduce_all_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.reduce_target"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.reduce_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.reduce_target_postalign"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.reduce_target_postalign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.reduce_target_prealign"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.reduce_target_prealign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.rotate_pixtables_target"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.rotate_pixtables_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.run_target_recipe"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.run_target_recipe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.run_target_scipost_perexpo"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.run_target_scipost_perexpo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeSample.set_pipe_target"><code class="docutils literal notranslate"><span class="pre">MusePipeSample.set_pipe_target()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.MusePipeTarget"><code class="docutils literal notranslate"><span class="pre">MusePipeTarget</span></code></a></li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.PipeDict"><code class="docutils literal notranslate"><span class="pre">PipeDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.PipeDict.run_on_all_keys"><code class="docutils literal notranslate"><span class="pre">PipeDict.run_on_all_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.PipeDict.setdefault"><code class="docutils literal notranslate"><span class="pre">PipeDict.setdefault()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.PipeDict.update"><code class="docutils literal notranslate"><span class="pre">PipeDict.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.insert_suffix"><code class="docutils literal notranslate"><span class="pre">insert_suffix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.target_sample.update_calib_file"><code class="docutils literal notranslate"><span class="pre">update_calib_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="pymusepipe.html#module-pymusepipe.util_pipe">pymusepipe.util_pipe module</a><ul>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.Circle_Zone"><code class="docutils literal notranslate"><span class="pre">Circle_Zone</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.Circle_Zone.select"><code class="docutils literal notranslate"><span class="pre">Circle_Zone.select()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.ExposureInfo"><code class="docutils literal notranslate"><span class="pre">ExposureInfo</span></code></a></li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.Rectangle_Zone"><code class="docutils literal notranslate"><span class="pre">Rectangle_Zone</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.Rectangle_Zone.select"><code class="docutils literal notranslate"><span class="pre">Rectangle_Zone.select()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.Selection_Zone"><code class="docutils literal notranslate"><span class="pre">Selection_Zone</span></code></a></li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.TimeStampDict"><code class="docutils literal notranslate"><span class="pre">TimeStampDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.TimeStampDict.create_new_timestamp"><code class="docutils literal notranslate"><span class="pre">TimeStampDict.create_new_timestamp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.TimeStampDict.delete_timestamp"><code class="docutils literal notranslate"><span class="pre">TimeStampDict.delete_timestamp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3">
+<a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.Trail_Zone"><code class="docutils literal notranslate"><span class="pre">Trail_Zone</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.Trail_Zone.select"><code class="docutils literal notranslate"><span class="pre">Trail_Zone.select()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.abspath"><code class="docutils literal notranslate"><span class="pre">abspath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.add_key_dataset_expo"><code class="docutils literal notranslate"><span class="pre">add_key_dataset_expo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.add_string"><code class="docutils literal notranslate"><span class="pre">add_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.analyse_musemode"><code class="docutils literal notranslate"><span class="pre">analyse_musemode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.append_file"><code class="docutils literal notranslate"><span class="pre">append_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.chunk_stats"><code class="docutils literal notranslate"><span class="pre">chunk_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.create_time_name"><code class="docutils literal notranslate"><span class="pre">create_time_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.crop_data"><code class="docutils literal notranslate"><span class="pre">crop_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.doppler_shift"><code class="docutils literal notranslate"><span class="pre">doppler_shift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.filter_list_with_pdict"><code class="docutils literal notranslate"><span class="pre">filter_list_with_pdict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.filter_list_with_suffix_list"><code class="docutils literal notranslate"><span class="pre">filter_list_with_suffix_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.filtermed_image"><code class="docutils literal notranslate"><span class="pre">filtermed_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.flatclean_image"><code class="docutils literal notranslate"><span class="pre">flatclean_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.formatted_time"><code class="docutils literal notranslate"><span class="pre">formatted_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.get_dataset_name"><code class="docutils literal notranslate"><span class="pre">get_dataset_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.get_emissionline_band"><code class="docutils literal notranslate"><span class="pre">get_emissionline_band()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.get_emissionline_wavelength"><code class="docutils literal notranslate"><span class="pre">get_emissionline_wavelength()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.get_flux_range"><code class="docutils literal notranslate"><span class="pre">get_flux_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.get_normfactor"><code class="docutils literal notranslate"><span class="pre">get_normfactor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.get_polynorm"><code class="docutils literal notranslate"><span class="pre">get_polynorm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.get_tpl_nexpo"><code class="docutils literal notranslate"><span class="pre">get_tpl_nexpo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.lower_allbutfirst_letter"><code class="docutils literal notranslate"><span class="pre">lower_allbutfirst_letter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.lower_rep"><code class="docutils literal notranslate"><span class="pre">lower_rep()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.merge_dict"><code class="docutils literal notranslate"><span class="pre">merge_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.my_linear_model"><code class="docutils literal notranslate"><span class="pre">my_linear_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.normpath"><code class="docutils literal notranslate"><span class="pre">normpath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.prepare_image"><code class="docutils literal notranslate"><span class="pre">prepare_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.print_debug"><code class="docutils literal notranslate"><span class="pre">print_debug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.print_endline"><code class="docutils literal notranslate"><span class="pre">print_endline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.print_error"><code class="docutils literal notranslate"><span class="pre">print_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.print_info"><code class="docutils literal notranslate"><span class="pre">print_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.print_warning"><code class="docutils literal notranslate"><span class="pre">print_warning()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.reconstruct_filter_images"><code class="docutils literal notranslate"><span class="pre">reconstruct_filter_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.regress_odr"><code class="docutils literal notranslate"><span class="pre">regress_odr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.rotate_cube_wcs"><code class="docutils literal notranslate"><span class="pre">rotate_cube_wcs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.rotate_image_wcs"><code class="docutils literal notranslate"><span class="pre">rotate_image_wcs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.safely_create_folder"><code class="docutils literal notranslate"><span class="pre">safely_create_folder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymusepipe.html#pymusepipe.util_pipe.select_spaxels"><code class="docutils literal notranslate"><span class="pre">select_spaxels()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pymusepipe.html#module-pymusepipe.version">pymusepipe.version module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pymusepipe.html#module-pymusepipe">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pymusepipe.html" class="btn btn-neutral float-right" title="pymusepipe package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../changelog.html" class="btn btn-neutral float-left" title="Changelog" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,556 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe.recipes_pipe &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymusepipe.recipes_pipe</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymusepipe.recipes_pipe</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under a MIT style license - see LICENSE.rst</span>
+
+<span class="sd">&quot;&quot;&quot;MUSE-PHANGS recipe module</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__authors__</span>   <span class="o">=</span> <span class="s2">&quot;Eric Emsellem&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;(c) 2017, ESO + CRAL&quot;</span>
+<span class="n">__license__</span>   <span class="o">=</span> <span class="s2">&quot;MIT License&quot;</span>
+<span class="n">__contact__</span>   <span class="o">=</span> <span class="s2">&quot; &lt;eric.emsellem@eso.org&gt;&quot;</span>
+
+<span class="c1"># This module has been largely inspired by work of</span>
+<span class="c1"># Bern Husemann, Dimitri Gadotti, Kyriakos and Martina from the GTO MUSE MAD team</span>
+<span class="c1"># and further rewritten by Mark van den Brok. </span>
+<span class="c1"># Thanks to all !</span>
+
+<span class="c1"># Importing modules</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">joinpath</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="c1"># pymusepipe modules</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
+<span class="kn">from</span> <span class="nn">.version</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">pipeversion</span>
+<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="n">dict_products_scipost</span>
+
+<span class="c1"># Likwid command</span>
+<span class="n">default_likwid</span> <span class="o">=</span> <span class="s2">&quot;likwid-pin -c N:&quot;</span>
+
+<div class="viewcode-block" id="PipeRecipes"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes">[docs]</a><span class="k">class</span> <span class="nc">PipeRecipes</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;PipeRecipes class containing all the esorex recipes for MUSE data reduction</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nifu</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">first_cpu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ncpu</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">list_cpu</span><span class="o">=</span><span class="p">[],</span> <span class="n">likwid</span><span class="o">=</span><span class="n">default_likwid</span><span class="p">,</span>
+            <span class="n">fakemode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">domerge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nocache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nochecksum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialisation of PipeRecipes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Fake mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fakemode</span> <span class="o">=</span> <span class="n">fakemode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="n">fakemode</span> <span class="p">:</span> <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;WARNING: running in FAKE mode&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span> <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;WARNING: running actual recipes&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nocache</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocache</span> <span class="o">=</span> <span class="s2">&quot;nocache&quot;</span>
+        <span class="k">else</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocache</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># Addressing CPU by number (cpu0=start, cpu1=end)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first_cpu</span> <span class="o">=</span> <span class="n">first_cpu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ncpu</span> <span class="o">=</span> <span class="n">ncpu</span>
+
+        <span class="k">if</span> <span class="n">likwid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">likwid</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">list_cpu</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">likwid</span> <span class="o">=</span> <span class="n">likwid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_cpu</span><span class="p">(</span><span class="n">first_cpu</span><span class="p">,</span> <span class="n">ncpu</span><span class="p">,</span> <span class="n">list_cpu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nifu</span> <span class="o">=</span> <span class="n">nifu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domerge</span> <span class="o">=</span> <span class="n">domerge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nochecksum</span> <span class="o">=</span> <span class="n">nochecksum</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">esorex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">likwid</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">list_cpu</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> esorex &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;--output-dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">pipe_products</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">checksum</span><span class="si">}</span><span class="s2">&quot;</span> 
+                <span class="sa">f</span><span class="s2">&quot; --log-dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">esorex_log</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">checksum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nochecksum</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;--no-checksum&quot;</span>
+        <span class="k">else</span> <span class="p">:</span> 
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domerge</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="s2">&quot;--merge&quot;</span>
+        <span class="k">else</span> <span class="p">:</span> 
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_set_cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_cpu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ncpu</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">list_cpu</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Setting the cpu format for calling the esorex command</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">list_cpu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_cpu</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">list_cpu</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">-</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">first_cpu</span><span class="p">,</span> <span class="n">first_cpu</span> <span class="o">+</span> <span class="n">ncpu</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">list_cpu</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">list_cpu</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_cpu</span><span class="p">))</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">list_cpu</span> <span class="o">+=</span> <span class="s2">&quot;:</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">list_cpu</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;LIST_CPU: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">list_cpu</span><span class="p">))</span>
+
+<div class="viewcode-block" id="PipeRecipes.write_outlogfile"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.write_outlogfile">[docs]</a>    <span class="k">def</span> <span class="nf">write_outlogfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Writing in log file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_logfile</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">addext</span><span class="o">=</span><span class="s2">&quot;.out&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.write_errlogfile"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.write_errlogfile">[docs]</a>    <span class="k">def</span> <span class="nf">write_errlogfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Writing in log file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_logfile</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">addext</span><span class="o">=</span><span class="s2">&quot;.err&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.write_logfile"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.write_logfile">[docs]</a>    <span class="k">def</span> <span class="nf">write_logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">addext</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Writing in log file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="c1"># nothing to write</span>
+            <span class="k">return</span>
+        <span class="n">fulltext</span> <span class="o">=</span> <span class="s2">&quot;# At : </span><span class="si">{0}{1}</span><span class="s2"> - pymusepipe version </span><span class="si">{2}</span><span class="se">\n</span><span class="si">{3}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">formatted_time</span><span class="p">(),</span>
+                <span class="s2">&quot; FAKEMODE&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fakemode</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">pipeversion</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> 
+        <span class="n">upipe</span><span class="o">.</span><span class="n">append_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">log_filename</span><span class="o">+</span><span class="n">addext</span><span class="p">,</span> <span class="n">fulltext</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.run_oscommand"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.run_oscommand">[docs]</a>    <span class="k">def</span> <span class="nf">run_oscommand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Running an os.system shell command</span>
+<span class="sd">        Fake mode will just spit out the command but not actually do it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fakemode</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Running in Fakemode - &quot;</span>
+                                <span class="s2">&quot;Only printing/logging the command&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fakemode</span> <span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">log</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_logfile</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_outlogfile</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_outlogfile</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_errlogfile</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_errlogfile</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.joinprod"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.joinprod">[docs]</a>    <span class="k">def</span> <span class="nf">joinprod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">pipe_products</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_bias"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_bias">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_bias</span><span class="p">,</span> <span class="n">name_bias</span><span class="p">,</span> <span class="n">tpl</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_bias recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Runing the recipe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=bias_</span><span class="si">{tpl}</span><span class="s2">.log muse_bias &quot;</span> 
+                <span class="s2">&quot;--nifu=</span><span class="si">{nifu}</span><span class="s2"> </span><span class="si">{merge}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> 
+                    <span class="n">nifu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nifu</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span>
+        <span class="c1"># Moving the MASTER BIAS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{namein}</span><span class="s2">.fits </span><span class="si">{nameout}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
+            <span class="n">namein</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_bias</span><span class="p">),</span> <span class="n">nameout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_bias</span><span class="p">,</span> <span class="n">name_bias</span><span class="p">),</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_flat"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_flat">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_flat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_flat</span><span class="p">,</span> <span class="n">name_flat</span><span class="p">,</span> <span class="n">dir_trace</span><span class="p">,</span> <span class="n">name_trace</span><span class="p">,</span> <span class="n">tpl</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_flat recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="si">}</span><span class="s2"> --log-file=flat_</span><span class="si">{</span><span class="n">tpl</span><span class="si">}</span><span class="s2">.log muse_flat &quot;</span> 
+                           <span class="sa">f</span><span class="s2">&quot;--nifu=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nifu</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">sof</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Moving the MASTER FLAT and TRACE_TABLE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> mv </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_flat</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_flat</span><span class="p">,</span> <span class="n">name_flat</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tpl</span><span class="si">}</span><span class="s2">.fits&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> mv </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_trace</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_trace</span><span class="p">,</span> <span class="n">name_trace</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tpl</span><span class="si">}</span><span class="s2">.fits&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_wave"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_wave">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_wave</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_wave</span><span class="p">,</span> <span class="n">name_wave</span><span class="p">,</span> <span class="n">tpl</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_wavecal recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=wave_</span><span class="si">{tpl}</span><span class="s2">.log muse_wavecal --nifu=</span><span class="si">{nifu}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;--resample --residuals </span><span class="si">{merge}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> 
+                    <span class="n">nifu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nifu</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span>
+        <span class="c1"># Moving the MASTER WAVE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{namein}</span><span class="s2">.fits </span><span class="si">{nameout}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
+            <span class="n">namein</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_wave</span><span class="p">),</span> <span class="n">nameout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_wave</span><span class="p">,</span> <span class="n">name_wave</span><span class="p">),</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="PipeRecipes.recipe_lsf"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_lsf">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_lsf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_lsf</span><span class="p">,</span> <span class="n">name_lsf</span><span class="p">,</span> <span class="n">tpl</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_lsf recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=wave_</span><span class="si">{tpl}</span><span class="s2">.log muse_lsf --nifu=</span><span class="si">{nifu}</span><span class="s2"> </span><span class="si">{merge}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span>
+            <span class="n">nifu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nifu</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span>
+        <span class="c1"># Moving the MASTER LST PROFILE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{namein}</span><span class="s2">.fits </span><span class="si">{nameout}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
+            <span class="n">namein</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_lsf</span><span class="p">),</span> <span class="n">nameout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_lsf</span><span class="p">,</span> <span class="n">name_lsf</span><span class="p">),</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="PipeRecipes.recipe_twilight"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_twilight">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_twilight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_twilight</span><span class="p">,</span> <span class="n">name_twilight</span><span class="p">,</span> <span class="n">tpl</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_twilight recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=twilight_</span><span class="si">{tpl}</span><span class="s2">.log muse_twilight </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> 
+            <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span>
+        <span class="c1"># Moving the TWILIGHT CUBE</span>
+        <span class="k">for</span> <span class="n">name_prod</span> <span class="ow">in</span> <span class="n">name_twilight</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{namein}</span><span class="s2">.fits </span><span class="si">{nameout}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
+                <span class="n">namein</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="p">),</span> <span class="n">nameout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_twilight</span><span class="p">,</span> <span class="n">name_prod</span><span class="p">),</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_std"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_std">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_std</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_std</span><span class="p">,</span> <span class="n">name_std</span><span class="p">,</span> <span class="n">tpl</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_stc recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">[</span><span class="n">name_cube</span><span class="p">,</span> <span class="n">name_flux</span><span class="p">,</span> <span class="n">name_response</span><span class="p">,</span> <span class="n">name_telluric</span><span class="p">]</span> <span class="o">=</span> <span class="n">name_std</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=std_</span><span class="si">{tpl}</span><span class="s2">.log muse_standard --filter=white </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span>
+                <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">name_prod</span> <span class="ow">in</span> <span class="n">name_std</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{nocache}</span><span class="s1"> mv </span><span class="si">{name_prodin}</span><span class="s1">_0001.fits </span><span class="si">{name_prodout}</span><span class="s1">_</span><span class="si">{tpl}</span><span class="s1">.fits&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span>
+                <span class="n">name_prodin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="p">),</span> <span class="n">name_prodout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_std</span><span class="p">,</span> <span class="n">name_prod</span><span class="p">),</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_sky"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_sky">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_sky</span><span class="p">,</span> <span class="n">name_sky</span><span class="p">,</span> <span class="n">tpl</span><span class="p">,</span> <span class="n">iexpo</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_stc recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=sky_</span><span class="si">{tpl}</span><span class="s2">.log muse_create_sky --fraction=</span><span class="si">{fraction}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span>
+                <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="n">fraction</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">name_prod</span> <span class="ow">in</span> <span class="n">name_sky</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{nocache}</span><span class="s1"> mv </span><span class="si">{name_prodin}</span><span class="s1">.fits </span><span class="si">{name_prodout}</span><span class="s1">_</span><span class="si">{tpl}</span><span class="s1">_</span><span class="si">{iexpo:04d}</span><span class="s1">.fits&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span>
+                <span class="n">name_prodin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="p">),</span> <span class="n">name_prodout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_sky</span><span class="p">,</span> <span class="n">name_prod</span><span class="p">),</span> <span class="n">iexpo</span><span class="o">=</span><span class="n">iexpo</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_scibasic"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_scibasic">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_scibasic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">dir_products</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name_products</span><span class="o">=</span><span class="p">[],</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_scibasic recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=scibasic_</span><span class="si">{expotype}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.log muse_scibasic --nifu=</span><span class="si">{nifu}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;--saveimage=FALSE </span><span class="si">{merge}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> 
+                    <span class="n">nifu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nifu</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="n">expotype</span><span class="p">))</span>
+
+        <span class="n">suffix_out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">tpl</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name_prod</span> <span class="ow">in</span> <span class="n">name_products</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{nocache}</span><span class="s1"> mv </span><span class="si">{prod}</span><span class="s1"> </span><span class="si">{newprod}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span>
+                <span class="n">prod</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">name_prod</span><span class="p">)),</span> <span class="n">newprod</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> 
+                    <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suffix_out</span><span class="p">,</span> <span class="n">name_prod</span><span class="p">))))</span></div>
+   
+    <span class="c1"># Name of the output combined files are described by several key arguments</span>
+    <span class="c1"># Summary </span>
+    <span class="c1"># namein  = name_products + suffix_products</span>
+    <span class="c1"># nameout = dir_prod+name_prod+{suffix}{suff_pre}_{tpl}{suff_post}.fits</span>
+    <span class="c1"># Where:</span>
+    <span class="c1">#       name_imaout = folder of products + generic name of product (e.g., PIXTABLE_REDUCED)</span>
+    <span class="c1">#       suffix = User defined flag (suffix)</span>
+    <span class="c1">#       suff_pre = filter name if IMAGE_FOV, otherwise &quot;&quot;</span>
+    <span class="c1">#       tpl = tpls of the exposure</span>
+    <span class="c1">#       suff_post = number of expo if relevant (2 integer)</span>
+<div class="viewcode-block" id="PipeRecipes.recipe_scipost"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_scipost">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_scipost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">dir_products</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name_products</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span>
+            <span class="n">suffix_products</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> <span class="n">suffix_prefinalnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> <span class="n">suffix_postfinalnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> 
+            <span class="n">list_expo</span><span class="o">=</span><span class="p">[],</span> <span class="n">save</span><span class="o">=</span><span class="s1">&#39;cube,skymodel&#39;</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> 
+            <span class="n">skymethod</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">darcheck</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">skymodel_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> 
+            <span class="n">astrometry</span><span class="o">=</span><span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="n">lambdamin</span><span class="o">=</span><span class="mf">4000.</span><span class="p">,</span> <span class="n">lambdamax</span><span class="o">=</span><span class="mf">10000.</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">autocalib</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">rvcorr</span><span class="o">=</span><span class="s1">&#39;bary&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the esorex muse_scipost recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filter_for_alignment</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_for_alignment&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_for_alignment</span><span class="p">)</span>
+        <span class="n">prefix_all</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;prefix_all&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=scipost_</span><span class="si">{expotype}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.log muse_scipost  &quot;</span>
+                <span class="s2">&quot;--astrometry=</span><span class="si">{astro}</span><span class="s2"> --save=</span><span class="si">{save}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;--pixfrac=</span><span class="si">{pixfrac}</span><span class="s2">  --filter=</span><span class="si">{filt}</span><span class="s2"> --skymethod=</span><span class="si">{skym}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;--darcheck=</span><span class="si">{darcheck}</span><span class="s2"> --skymodel_frac=</span><span class="si">{model:02f}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;--lambdamin=</span><span class="si">{lmin}</span><span class="s2"> --lambdamax=</span><span class="si">{lmax}</span><span class="s2"> --autocalib=</span><span class="si">{autocalib}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;--rvcorr=</span><span class="si">{rvcorr}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> <span class="n">astro</span><span class="o">=</span><span class="n">astrometry</span><span class="p">,</span> 
+                    <span class="n">save</span><span class="o">=</span><span class="n">save</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="n">pixfrac</span><span class="p">,</span> <span class="n">filt</span><span class="o">=</span><span class="n">filter_list</span><span class="p">,</span> <span class="n">skym</span><span class="o">=</span><span class="n">skymethod</span><span class="p">,</span> 
+                    <span class="n">darcheck</span><span class="o">=</span><span class="n">darcheck</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">skymodel_frac</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="n">lambdamin</span><span class="p">,</span>
+                    <span class="n">lmax</span><span class="o">=</span><span class="n">lambdamax</span><span class="p">,</span> <span class="n">autocalib</span><span class="o">=</span><span class="n">autocalib</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="n">expotype</span><span class="p">,</span> 
+                    <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">rvcorr</span><span class="o">=</span><span class="n">rvcorr</span><span class="p">))</span>
+
+        <span class="c1"># Creating the images for the alignment, outside of scipost</span>
+        <span class="c1"># The filter can be a private one</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_debug</span><span class="p">(</span><span class="s2">&quot;Product names:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="n">name_products</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_debug</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name_prod</span><span class="p">,</span> <span class="n">suff_prod</span><span class="p">,</span> <span class="n">suff_pre</span><span class="p">,</span> <span class="n">suff_post</span><span class="p">,</span> <span class="n">iexpo</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">name_products</span><span class="p">,</span> <span class="n">suffix_products</span><span class="p">,</span> 
+                <span class="n">suffix_prefinalnames</span><span class="p">,</span> <span class="n">suffix_postfinalnames</span><span class="p">,</span> <span class="n">list_expo</span><span class="p">)</span> <span class="p">:</span>
+
+            <span class="c1"># In any case move the file from Pipe_products to the right folder</span>
+            <span class="n">fitsname_out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{name_imaout}{suffix}{suff_pre}</span><span class="s2">_</span><span class="si">{tpl}{suff_post}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">name_imaout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">prefix_all</span><span class="o">+</span><span class="n">name_prod</span><span class="p">),</span>
+                            <span class="n">suff_pre</span><span class="o">=</span><span class="n">suff_pre</span><span class="p">,</span> <span class="n">suff_post</span><span class="o">=</span><span class="n">suff_post</span><span class="p">,</span> 
+                            <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> mv </span><span class="si">{name_imain}</span><span class="s2">.fits </span><span class="si">{fitsname}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                               <span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> 
+                               <span class="n">name_imain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="o">+</span><span class="n">suff_prod</span><span class="p">),</span> 
+                               <span class="n">fitsname</span><span class="o">=</span><span class="n">fitsname_out</span><span class="p">))</span>
+            <span class="c1"># Adding dataset and expo numbers as keywords</span>
+            <span class="k">if</span> <span class="n">filter_for_alignment</span> <span class="ow">in</span> <span class="n">fitsname_out</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">add_key_dataset_expo</span><span class="p">(</span><span class="n">fitsname_out</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+            <span class="c1"># Now if in need of an alignment image and it is the prealign scipost</span>
+            <span class="c1"># Check that it is an image using the dictionary in config_pipe</span>
+            <span class="c1"># and copying it in the Alignment folder</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_alignment_images</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_suffix_prealign</span> <span class="ow">in</span> <span class="n">fitsname_out</span> \
+                <span class="ow">and</span> <span class="n">dict_products_scipost</span><span class="p">[</span><span class="s1">&#39;cube&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">fitsname_out</span><span class="p">:</span>
+                <span class="n">name_imageout_align</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{name_imaout}{suffix}</span><span class="s2">_</span><span class="si">{dsname}</span><span class="s2">_</span><span class="si">{myfilter}</span><span class="s2">&quot;</span>
+                                      <span class="s2">&quot;_</span><span class="si">{tpl}{suff_post}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                      <span class="n">name_imaout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">alignment</span><span class="p">,</span>
+                                                           <span class="n">prefix_all</span><span class="o">+</span><span class="s2">&quot;IMAGE_FOV&quot;</span><span class="p">),</span>
+                                      <span class="n">myfilter</span><span class="o">=</span><span class="n">filter_for_alignment</span><span class="p">,</span> <span class="n">suff_post</span><span class="o">=</span><span class="n">suff_post</span><span class="p">,</span> 
+                                      <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> <span class="n">dsname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">()))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{nocache}</span><span class="s2"> cp </span><span class="si">{fitsname}</span><span class="s2"> </span><span class="si">{nameima_out}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                   <span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> <span class="n">fitsname</span><span class="o">=</span><span class="n">fitsname_out</span><span class="p">,</span>
+                                   <span class="n">nameima_out</span><span class="o">=</span><span class="n">name_imageout_align</span><span class="p">))</span>
+                <span class="c1"># Adding dataset and expo numbers as keywords</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">add_key_dataset_expo</span><span class="p">(</span><span class="n">name_imageout_align</span><span class="p">,</span> <span class="n">iexpo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_align"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_align">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_products</span><span class="p">,</span> <span class="n">namein_products</span><span class="p">,</span> <span class="n">nameout_products</span><span class="p">,</span> <span class="n">tpl</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span>
+            <span class="n">threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">srcmin</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">srcmax</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">fwhm</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the muse_exp_align recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2"> --log-file=exp_align_</span><span class="si">{group}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.log &quot;</span>
+                <span class="s2">&quot;muse_exp_align --srcmin=</span><span class="si">{srcmin}</span><span class="s2"> --srcmax=</span><span class="si">{srcmax}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;--threshold=</span><span class="si">{threshold}</span><span class="s2"> --fwhm=</span><span class="si">{fwhm}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> <span class="n">srcmin</span><span class="o">=</span><span class="n">srcmin</span><span class="p">,</span> <span class="n">srcmax</span><span class="o">=</span><span class="n">srcmax</span><span class="p">,</span> 
+                    <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">fwhm</span><span class="o">=</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span>
+                    <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">))</span>
+    
+        <span class="k">for</span> <span class="n">namein_prod</span><span class="p">,</span> <span class="n">nameout_prod</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">namein_products</span><span class="p">,</span> <span class="n">nameout_products</span><span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{nocache}</span><span class="s1"> mv </span><span class="si">{name_imain}</span><span class="s1">.fits </span><span class="si">{name_imaout}</span><span class="s1">.fits&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">nocache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="p">,</span> <span class="n">name_imain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">namein_prod</span><span class="p">),</span> 
+                <span class="n">name_imaout</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">nameout_prod</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_combine"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_combine">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_products</span><span class="p">,</span> <span class="n">name_products</span><span class="p">,</span> <span class="n">tpl</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span>
+            <span class="n">suffix_products</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">suffix_prefinalnames</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">prefix_products</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">save</span><span class="o">=</span><span class="s1">&#39;cube&#39;</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">format_out</span><span class="o">=</span><span class="s1">&#39;Cube&#39;</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span>
+            <span class="n">lambdamin</span><span class="o">=</span><span class="mf">4000.</span><span class="p">,</span> <span class="n">lambdamax</span><span class="o">=</span><span class="mf">10000.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the muse_exp_combine recipe for one single dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{esorex}</span><span class="s2">  --log-file=exp_combine_cube_</span><span class="si">{expotype}</span><span class="s2">_</span><span class="si">{tpl}</span><span class="s2">.log &quot;</span>
+               <span class="s2">&quot; muse_exp_combine --save=</span><span class="si">{save}</span><span class="s2"> --pixfrac=</span><span class="si">{pixfrac:0.2f}</span><span class="s2"> &quot;</span>
+               <span class="s2">&quot;--format=</span><span class="si">{form}</span><span class="s2"> --filter=</span><span class="si">{filt}</span><span class="s2"> &quot;</span>
+               <span class="s2">&quot;--lambdamin=</span><span class="si">{lmin}</span><span class="s2"> --lambdamax=</span><span class="si">{lmax}</span><span class="s2"> </span><span class="si">{sof}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                   <span class="n">esorex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="n">save</span><span class="p">,</span> 
+                   <span class="n">pixfrac</span><span class="o">=</span><span class="n">pixfrac</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">format_out</span><span class="p">,</span> <span class="n">filt</span><span class="o">=</span><span class="n">filter_list</span><span class="p">,</span> <span class="n">sof</span><span class="o">=</span><span class="n">sof</span><span class="p">,</span> 
+                   <span class="n">tpl</span><span class="o">=</span><span class="n">tpl</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="n">expotype</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="n">lambdamin</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="n">lambdamax</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">name_prod</span><span class="p">,</span> <span class="n">suff_prod</span><span class="p">,</span> <span class="n">suff_pre</span><span class="p">,</span> <span class="n">pre_prod</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">name_products</span><span class="p">,</span> <span class="n">suffix_products</span><span class="p">,</span> 
+                <span class="n">suffix_prefinalnames</span><span class="p">,</span> <span class="n">prefix_products</span><span class="p">):</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> mv </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="o">+</span><span class="n">suff_prod</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits &quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">pre_prod</span><span class="o">+</span><span class="n">name_prod</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">suff_pre</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tpl</span><span class="si">}</span><span class="s2">.fits&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PipeRecipes.recipe_combine_pointings"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.recipes_pipe.PipeRecipes.recipe_combine_pointings">[docs]</a>    <span class="k">def</span> <span class="nf">recipe_combine_pointings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sof</span><span class="p">,</span> <span class="n">dir_products</span><span class="p">,</span> <span class="n">name_products</span><span class="p">,</span>
+            <span class="n">suffix_products</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">suffix_prefinalnames</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">prefix_products</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">save</span><span class="o">=</span><span class="s1">&#39;cube&#39;</span><span class="p">,</span> <span class="n">pixfrac</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">format_out</span><span class="o">=</span><span class="s1">&#39;Cube&#39;</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> 
+            <span class="n">lambdamin</span><span class="o">=</span><span class="mf">4000.</span><span class="p">,</span> <span class="n">lambdamax</span><span class="o">=</span><span class="mf">10000.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Running the muse_exp_combine recipe for pointings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">esorex</span><span class="si">}</span><span class="s2">  --log-file=exp_combine_datasets.log &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot; muse_exp_combine --save=</span><span class="si">{</span><span class="n">save</span><span class="si">}</span><span class="s2"> --pixfrac=</span><span class="si">{</span><span class="n">pixfrac</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;--format=</span><span class="si">{</span><span class="n">format_out</span><span class="si">}</span><span class="s2"> --filter=</span><span class="si">{</span><span class="n">filter_list</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;--lambdamin=</span><span class="si">{</span><span class="n">lambdamin</span><span class="si">}</span><span class="s2"> --lambdamax=</span><span class="si">{</span><span class="n">lambdamax</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sof</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name_prod</span><span class="p">,</span> <span class="n">suff_prod</span><span class="p">,</span> <span class="n">suff_pre</span><span class="p">,</span> <span class="n">pre_prod</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">name_products</span><span class="p">,</span> <span class="n">suffix_products</span><span class="p">,</span> 
+                <span class="n">suffix_prefinalnames</span><span class="p">,</span> <span class="n">prefix_products</span><span class="p">):</span>
+
+            <span class="n">name_imaout</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_products</span><span class="p">,</span> <span class="n">pre_prod</span><span class="o">+</span><span class="n">name_prod</span><span class="p">)</span><span class="si">}{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">suff_pre</span><span class="si">}</span><span class="s2">.fits&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_oscommand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nocache</span><span class="si">}</span><span class="s2"> mv </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">joinprod</span><span class="p">(</span><span class="n">name_prod</span><span class="o">+</span><span class="n">suff_prod</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits &quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name_imaout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;DATACUBE&quot;</span> <span class="ow">in</span> <span class="n">name_imaout</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_combined_cube_name</span> <span class="o">=</span> <span class="n">name_imaout</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

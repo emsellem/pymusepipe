@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe.init_musepipe &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymusepipe.init_musepipe</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymusepipe.init_musepipe</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under a MIT license - see LICENSE</span>
+
+<span class="sd">&quot;&quot;&quot;MUSE-PHANGS pipeline wrapper</span>
+<span class="sd">   initialisation of folders</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__authors__</span>   <span class="o">=</span> <span class="s2">&quot;Eric Emsellem&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;(c) 2017, ESO + CRAL&quot;</span>
+<span class="n">__license__</span>   <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+<span class="n">__contact__</span>   <span class="o">=</span> <span class="s2">&quot; &lt;eric.emsellem@eso.org&gt;&quot;</span>
+
+<span class="c1"># Standard modules</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">joinpath</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
+<span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="n">get_dataset_name</span>
+<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">dict_user_folders</span><span class="p">,</span> <span class="n">default_rc_filename</span><span class="p">,</span>
+                          <span class="n">dict_extra_filters</span><span class="p">,</span> <span class="n">dict_calib_tables</span><span class="p">,</span> <span class="n">dict_input_folders</span><span class="p">,</span>
+                          <span class="n">dict_folders</span><span class="p">,</span> <span class="n">dict_folders_target</span><span class="p">,</span>
+                          <span class="n">default_str_dataset</span><span class="p">,</span> <span class="n">default_ndigits</span><span class="p">)</span>
+
+<span class="c1">############################################################</span>
+<span class="c1"># Some fixed parameters for the structure</span>
+<span class="c1">############################################################</span>
+<div class="viewcode-block" id="add_suffix_tokeys"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.init_musepipe.add_suffix_tokeys">[docs]</a><span class="k">def</span> <span class="nf">add_suffix_tokeys</span><span class="p">(</span><span class="n">dic</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;_folder&quot;</span><span class="p">)</span> <span class="p">:</span>
+    <span class="n">newdic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dic</span><span class="p">:</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">newdic</span><span class="p">,</span> <span class="n">key</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
+
+<span class="c1">############################################################</span>
+<span class="c1"># Main class InitMuseParameters</span>
+<span class="c1">############################################################</span>
+
+<div class="viewcode-block" id="InitMuseParameters"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.init_musepipe.InitMuseParameters">[docs]</a><span class="k">class</span> <span class="nc">InitMuseParameters</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder_config</span><span class="o">=</span><span class="s2">&quot;Config/&quot;</span><span class="p">,</span> 
+                 <span class="n">rc_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cal_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Define the default parameters (folders/calibration files) </span>
+<span class="sd">        and name suffixes for the MUSE data reduction</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        folder_config: str</span>
+<span class="sd">            Name of the input folder for the configurations files</span>
+<span class="sd">        rc_filename: str</span>
+<span class="sd">            Name of the configuration file </span>
+<span class="sd">            including root input folder names</span>
+<span class="sd">        cal_filename: str</span>
+<span class="sd">            Name of the configuration file including</span>
+<span class="sd">            the calibration input folders </span>
+<span class="sd">        verbose: bool [True]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="c1"># Will first test if there is an rc_file provided</span>
+        <span class="c1"># If not, it will look for a default rc_filename, the name of which is provided</span>
+        <span class="c1"># above. If not, the hardcoded default will be used.</span>
+
+        <span class="c1"># First adding the suffix to the dictionaries</span>
+        <span class="c1"># attributing the dictionaries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict_folders</span> <span class="o">=</span> <span class="n">dict_folders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict_input_folders</span> <span class="o">=</span> <span class="n">dict_input_folders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict_folders_target</span> <span class="o">=</span> <span class="n">dict_folders_target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict_extra_filters</span> <span class="o">=</span> <span class="n">dict_extra_filters</span>
+
+        <span class="k">if</span> <span class="n">rc_filename</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">default_rc_filename</span><span class="p">):</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No filename or </span><span class="si">{</span><span class="n">default_rc_filename</span><span class="si">}</span><span class="s2"> file &quot;</span>
+                     <span class="s2">&quot;to initialise from. We will use the default hardcoded &quot;</span> 
+                     <span class="s2">&quot;in the config_pipe.py module&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_default_param</span><span class="p">(</span><span class="n">dict_user_folders</span><span class="p">)</span>
+
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_param_file</span><span class="p">(</span><span class="n">default_rc_filename</span><span class="p">,</span> <span class="n">dict_user_folders</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rcfile</span> <span class="o">=</span> <span class="s2">&quot;default_values&quot;</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">rcfile</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="n">folder_config</span><span class="p">,</span> <span class="n">rc_filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_param_file</span><span class="p">(</span><span class="n">rcfile</span><span class="p">,</span> <span class="n">dict_user_folders</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rcfile</span> <span class="o">=</span> <span class="n">rcfile</span>
+
+        <span class="c1"># Initialisation of fixed attributes for the structure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_default_param</span><span class="p">(</span><span class="n">dict_folders</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_default_param</span><span class="p">(</span><span class="n">dict_input_folders</span><span class="p">)</span>
+
+        <span class="c1"># Same happens with the calibration files.</span>
+        <span class="c1"># If filename is provided, will use that, otherwise use the hard coded values.</span>
+        <span class="k">if</span> <span class="n">cal_filename</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_default_param</span><span class="p">(</span><span class="n">dict_calib_tables</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calfile</span> <span class="o">=</span> <span class="s2">&quot;default_values&quot;</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">calfile</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="n">folder_config</span><span class="p">,</span> <span class="n">cal_filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_param_file</span><span class="p">(</span><span class="n">calfile</span><span class="p">,</span> <span class="n">dict_calib_tables</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calfile</span> <span class="o">=</span> <span class="n">calfile</span>
+
+<div class="viewcode-block" id="InitMuseParameters.init_default_param"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.init_musepipe.InitMuseParameters.init_default_param">[docs]</a>    <span class="k">def</span> <span class="nf">init_default_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_param</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialise the parameters as defined in the input dictionary</span>
+<span class="sd">        Hardcoded in config_pipe.py</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        -----</span>
+<span class="sd">        dict_param: dict</span>
+<span class="sd">            Input dictionary defining the attributes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_param</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Default initialisation of attribute </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> 
+                             <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dict_param</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="InitMuseParameters.read_param_file"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.init_musepipe.InitMuseParameters.read_param_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_param_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">dict_param</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Reading an input parameter initialisation file </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Testing existence of filename</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;Input parameter </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> cannot be found. &quot;</span>
+                    <span class="s2">&quot;We will use the default hardcoded in the &quot;</span>
+                    <span class="s2">&quot;config_pipe.py module&quot;</span><span class="p">))</span>
+            <span class="c1"># Now relying on the default file but first checking it&#39;s there</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">default_rc_filename</span><span class="p">):</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Default rc file as defined in config_pipe.py &quot;</span>
+                                  <span class="sa">f</span><span class="s2">&quot;could not be found (</span><span class="si">{</span><span class="n">default_rc_filename</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">default_rc_filename</span>
+
+        <span class="c1"># If it exists, open and read it</span>
+        <span class="n">f_param</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">f_param</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="c1"># Dummy dictionary to see which items are not initialised</span>
+        <span class="n">noninit_dict_param</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">dict_param</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span><span class="p">]:</span> <span class="k">continue</span>
+
+            <span class="n">sline</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\s+)&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="n">keyword_name</span> <span class="o">=</span> <span class="n">sline</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">keyword</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sline</span><span class="p">[</span><span class="mi">2</span><span class="p">:]))</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">keyword_name</span> <span class="ow">in</span> <span class="n">dict_param</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Initialisation of attribute </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">keyword_name</span><span class="p">),</span> 
+                                 <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword_name</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span> 
+                <span class="c1"># Here we drop the item which was initialised</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">noninit_dict_param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">keyword_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="c1"># Listing them as warning and using the hardcoded default</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">noninit_dict_param</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">((</span><span class="s2">&quot;Parameter </span><span class="si">{param}</span><span class="s2"> not initialised &quot;</span>
+                   <span class="s2">&quot;We will use the default hardcoded value from &quot;</span>
+                   <span class="s2">&quot;config_pipe.py&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="n">key</span><span class="p">))</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dict_param</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_dataset_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reporting the _get_dataset_name from the InitMuseParam</span>
+<span class="sd">        class</span>
+
+<span class="sd">        dataset : int</span>
+<span class="sd">            dataset number. Default is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">):</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;No dataset number provided&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="s2">&quot;NONAME&quot;</span>
+        <span class="k">return</span> <span class="n">get_dataset_name</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndigits</span><span class="p">)</span></div>
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

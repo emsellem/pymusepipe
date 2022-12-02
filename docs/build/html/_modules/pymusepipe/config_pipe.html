@@ -1,0 +1,595 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe.config_pipe &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymusepipe.config_pipe</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymusepipe.config_pipe</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under a MIT license - see LICENSE</span>
+<span class="sd">&quot;&quot;&quot;MUSE-PHANGS configuration module</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># import modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">__authors__</span> <span class="o">=</span> <span class="s2">&quot;Eric Emsellem&quot;</span>
+<span class="n">__copyright</span> <span class="o">=</span> <span class="s2">&quot;(c) 2017-2019, ESO + CRAL&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT License&quot;</span>
+<span class="n">__contact__</span> <span class="o">=</span> <span class="s2">&quot; &lt;eric.emsellem@eso.org&gt;&quot;</span>
+
+
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># BEGIN</span>
+<span class="c1">#           FILTER LIST</span>
+<span class="c1"># ======================================================================#</span>
+
+<span class="n">default_filter_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;white,Johnson_B,Johnson_V,Cousins_R,&quot;</span>
+                       <span class="s2">&quot;SDSS_g,SDSS_r,SDSS_i&quot;</span><span class="p">]</span>
+<span class="n">default_short_filter_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;white,Cousins_R&quot;</span><span class="p">]</span>
+<span class="n">default_PHANGS_filter_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;white,Johnson_B,Johnson_V,Cousins_R,&quot;</span>
+                              <span class="s2">&quot;SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB,DUPONT_R&quot;</span><span class="p">]</span>
+<span class="n">default_short_PHANGS_filter_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;white,WFI_BB,DUPONT_R&quot;</span><span class="p">]</span>
+
+<span class="c1"># -- END ---------------------------------------------------------------#</span>
+
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># BEGIN</span>
+<span class="c1">#           MUSE PIPELINE FITS KEYWORDS parameters</span>
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># For musepipe module</span>
+
+<span class="n">dict_expotypes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;DARK&#39;</span><span class="p">:</span> <span class="s1">&#39;DARK&#39;</span><span class="p">,</span> <span class="s1">&#39;BIAS&#39;</span><span class="p">:</span> <span class="s1">&#39;BIAS&#39;</span><span class="p">,</span> <span class="s1">&#39;FLAT&#39;</span><span class="p">:</span> <span class="s1">&#39;FLAT,LAMP&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;ILLUM&#39;</span><span class="p">:</span> <span class="s1">&#39;FLAT,LAMP,ILLUM&#39;</span><span class="p">,</span> <span class="s1">&#39;TWILIGHT&#39;</span><span class="p">:</span> <span class="s1">&#39;FLAT,SKY&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;WAVE&#39;</span><span class="p">:</span> <span class="s1">&#39;WAVE&#39;</span><span class="p">,</span> <span class="s1">&#39;STD&#39;</span><span class="p">:</span> <span class="s1">&#39;STD&#39;</span><span class="p">,</span> <span class="s1">&#39;AST&#39;</span><span class="p">:</span> <span class="s1">&#39;AST&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;OBJECT&#39;</span><span class="p">:</span> <span class="s1">&#39;OBJECT&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY&#39;</span><span class="p">:</span> <span class="s1">&#39;SKY&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;ASTROMETRY&#39;</span><span class="p">:</span> <span class="s1">&#39;ASTROMETRY&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;GEOMETRY&#39;</span><span class="p">:</span> <span class="s1">&#39;GEOMETRY&#39;</span>
+                  <span class="p">}</span>
+
+<span class="n">dict_astrogeo</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ASTROMETRY&#39;</span><span class="p">:</span> <span class="s1">&#39;Astrometric calibration (ASTROMETRY)&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;GEOMETRY&#39;</span><span class="p">:</span> <span class="s1">&#39;WAVE,MASK&#39;</span>
+                 <span class="p">}</span>
+
+<span class="c1"># This dictionary contains the types</span>
+<span class="n">dict_listMaster</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;DARK&#39;</span><span class="p">:</span> <span class="s1">&#39;MASTER_DARK&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;BIAS&#39;</span><span class="p">:</span> <span class="s1">&#39;MASTER_BIAS&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;FLAT&#39;</span><span class="p">:</span> <span class="s1">&#39;MASTER_FLAT&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;TRACE&#39;</span><span class="p">:</span> <span class="s1">&#39;TRACE_TABLE&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;TWILIGHT&#39;</span><span class="p">:</span> <span class="s1">&#39;TWILIGHT_CUBE&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;WAVE&#39;</span><span class="p">:</span> <span class="s1">&#39;WAVECAL_TABLE&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;LSF&#39;</span><span class="p">:</span> <span class="s1">&#39;LSF_PROFILE&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;STD&#39;</span><span class="p">:</span> <span class="s1">&#39;PIXTABLE_STD&#39;</span>
+                   <span class="p">}</span>
+
+<span class="n">dict_listObject</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">:</span> <span class="s1">&#39;PIXTABLE_OBJECT&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;SKY&#39;</span><span class="p">:</span> <span class="s1">&#39;PIXTABLE_SKY&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;STD&#39;</span><span class="p">:</span> <span class="s1">&#39;PIXTABLE_STD&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;REDUCED&#39;</span><span class="p">:</span> <span class="s1">&#39;PIXTABLE_REDUCED&#39;</span>
+                   <span class="p">}</span>
+
+<span class="n">dict_listMasterObject</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">dict_listMaster</span><span class="p">,</span> <span class="o">**</span><span class="n">dict_listObject</span><span class="p">}</span>
+
+<span class="n">listexpo_files</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;OBJECT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;OBJECT&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;20A&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;TYPE&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;ESO DPR TYPE&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;20A&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;DATE&quot;</span><span class="p">:</span>  <span class="p">[</span><span class="s1">&#39;mjd&#39;</span><span class="p">,</span> <span class="s1">&#39;MJD-OBS&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;MODE&quot;</span><span class="p">:</span>  <span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;ESO INS MODE&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;10A&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;EXPTIME&quot;</span><span class="p">:</span>  <span class="p">[</span><span class="s1">&#39;exptime&#39;</span><span class="p">,</span> <span class="s1">&#39;EXPTIME&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;TPLS&quot;</span><span class="p">:</span>  <span class="p">[</span><span class="s1">&#39;tpls&#39;</span><span class="p">,</span> <span class="s1">&#39;ESO TPL START&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;30A&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;TPLN&quot;</span><span class="p">:</span>  <span class="p">[</span><span class="s1">&#39;tplnexp&#39;</span><span class="p">,</span> <span class="s1">&#39;ESO TPL NEXP&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">,</span> <span class="s1">&#39;J&#39;</span><span class="p">],</span>
+        <span class="s2">&quot;TPLNO&quot;</span><span class="p">:</span>  <span class="p">[</span><span class="s1">&#39;tplno&#39;</span><span class="p">,</span> <span class="s1">&#39;ESO TPL EXPNO&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">,</span> <span class="s1">&#39;J&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+<span class="c1"># Excluding files from the checking of their MUSE mode (AO, noAO, N/E etc)</span>
+<span class="n">list_exclude_checkmode</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BIAS&#39;</span><span class="p">,</span> <span class="s1">&#39;DARK&#39;</span><span class="p">,</span> <span class="s1">&#39;GEOMETRY&#39;</span><span class="p">]</span>
+<span class="n">list_fieldspecific_checkmode</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ILLUM&#39;</span><span class="p">,</span> <span class="s1">&#39;ASTROMETRY&#39;</span><span class="p">]</span>
+
+<span class="c1"># List of modes allowed for MUSE</span>
+<span class="n">list_musemodes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WFM-AO-N&#39;</span><span class="p">,</span> <span class="s1">&#39;WFM-AO-E&#39;</span><span class="p">,</span> <span class="s1">&#39;WFM-NOAO-E&#39;</span><span class="p">,</span> <span class="s1">&#39;WFM-NOAO-N&#39;</span><span class="p">,</span> <span class="s1">&#39;NFM-AO-N&#39;</span><span class="p">]</span>
+<span class="n">dict_musemodes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ao&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;lrange&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+
+<span class="c1"># Suffix for the pre/post-alignment files. Will be part of the output names</span>
+<span class="n">suffix_prealign</span> <span class="o">=</span> <span class="s2">&quot;_prealign&quot;</span>
+<span class="n">suffix_checkalign</span> <span class="o">=</span> <span class="s2">&quot;_checkalign&quot;</span>
+
+<span class="c1"># List of suffix you wish to have scanned</span>
+<span class="n">suffix_rawfiles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fits.fz&#39;</span><span class="p">,</span> <span class="s1">&#39;fits&#39;</span><span class="p">]</span>
+
+<span class="c1"># List of names from the products</span>
+<span class="n">dict_files_iexpo_products</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ALIGN&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;SOURCE_LIST&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+<span class="n">dict_files_products</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;STD&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;DATACUBE_STD&#39;</span><span class="p">,</span> <span class="s1">&#39;STD_FLUXES&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;STD_RESPONSE&#39;</span><span class="p">,</span> <span class="s1">&#39;STD_TELLURIC&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;TWILIGHT&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;DATACUBE_SKYFLAT&#39;</span><span class="p">,</span> <span class="s1">&#39;TWILIGHT_CUBE&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;SKY&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;SKY_MASK&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_IMAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_LINES&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_SPECTRUM&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;SKY_CONTINUUM&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;ALIGN&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OFFSET_LIST&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+<span class="n">dict_products_scipost</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;cube&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;DATACUBE_FINAL&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_FOV&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;individual&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PIXTABLE_REDUCED&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;stacked&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;OBJECT_RESAMPLED&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;positioned&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PIXTABLE_POSITIONED&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;combined&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PIXTABLE_COMBINED&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;skymodel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;SKY_MASK&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_SPECTRUM&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;SKY_LINES&#39;</span><span class="p">,</span> <span class="s1">&#39;SKY_IMAGE&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;raman&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;RAMAN_IMAGES&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;autocal&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;AUTOCAL_FACTORS&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+<span class="c1"># -- END ---------------------------------------------------------------#</span>
+
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># BEGIN</span>
+<span class="c1">#           Printing name configuration</span>
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># Formatting the output name for dataset (e.g., OBs)</span>
+<span class="c1"># E.g., nint_mf = &#39;02&#39; means that 10 will be represented by &#39;10&#39; and 1</span>
+<span class="c1"># as &#39;01&#39; (always two digits for an integer)</span>
+<span class="c1"># The following  nint_mf = &#39;02&#39; and str_mf=&#39;P&#39; will give</span>
+<span class="c1"># P01, P02, P03 etc as suffixes for the naming convention</span>
+<span class="n">default_ndigits</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">default_str_dataset</span> <span class="o">=</span> <span class="s1">&#39;OB&#39;</span>
+<span class="n">default_str_pointing</span> <span class="o">=</span> <span class="s1">&#39;P&#39;</span>
+
+<span class="c1"># -- END ---------------------------------------------------------------#</span>
+
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># BEGIN</span>
+<span class="c1">#           DEFAULT PATHS for the Muse pipeline</span>
+<span class="c1"># </span>
+<span class="c1"># Default hard-coded folders</span>
+<span class="c1"># The setting of these folders can be overwritten </span>
+<span class="c1"># by a given rc file if provided</span>
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># for init_musepipe module</span>
+
+<span class="n">dict_user_folders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># values provide the folder and whether or not this should be attempted to create</span>
+            <span class="c1"># Muse calibration files (common to all)</span>
+            <span class="s2">&quot;musecalib&quot;</span><span class="p">:</span> <span class="s2">&quot;/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/soft/muse-pipelines/calib/&#39;&quot;</span><span class="p">,</span>
+            <span class="c1"># Time varying calibrations</span>
+            <span class="s2">&quot;musecalib_time&quot;</span><span class="p">:</span> <span class="s2">&quot;/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/time_calibrations/&quot;</span><span class="p">,</span>
+            <span class="c1"># Calibration files (specific to OBs)</span>
+            <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="s2">&quot;/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/live/&quot;</span><span class="p">,</span>
+            <span class="c1"># Default prefix for Datasets</span>
+            <span class="s2">&quot;str_dataset&quot;</span><span class="p">:</span> <span class="n">default_str_dataset</span><span class="p">,</span>
+            <span class="c1"># Default prefix for Pointings</span>
+            <span class="s2">&quot;str_pointing&quot;</span><span class="p">:</span> <span class="n">default_str_pointing</span><span class="p">,</span>
+            <span class="c1"># Default number of digits for Blocks</span>
+            <span class="s2">&quot;ndigits&quot;</span><span class="p">:</span> <span class="n">default_ndigits</span>
+            <span class="p">}</span>
+
+<span class="c1"># Default initialisation file</span>
+<span class="n">default_rc_filename</span> <span class="o">=</span> <span class="s2">&quot;~/.musepiperc&quot;</span>
+
+<span class="n">PHANGS_reduc_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fakemode&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                       <span class="s1">&#39;nocache&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                       <span class="s1">&#39;checkmode&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                       <span class="s1">&#39;overwrite_astropy_table&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                       <span class="s1">&#39;filter_list&#39;</span><span class="p">:</span> <span class="s2">&quot;white,WFI_BB,DUPONT_R&quot;</span><span class="p">,</span>
+                       <span class="s1">&#39;filter_for_alignment&#39;</span><span class="p">:</span> <span class="s2">&quot;WFI_BB&quot;</span><span class="p">}</span>
+
+<span class="n">PHANGS_combine_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fakemode&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;nocache&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+<span class="c1"># Extra filters which may be used in the course of the reduction</span>
+<span class="n">dict_extra_filters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Narrow band filter</span>
+    <span class="s2">&quot;WFI_BB&quot;</span><span class="p">:</span> <span class="s2">&quot;data/Filters/LaSilla_WFI_ESO844p.txt&quot;</span><span class="p">,</span>
+    <span class="c1"># Broad band filter</span>
+    <span class="s2">&quot;WFI_NB&quot;</span><span class="p">:</span> <span class="s2">&quot;data/Filters/LaSilla_WFI_ESO856p.txt&quot;</span><span class="p">,</span>
+    <span class="c1"># DUPONT R filter</span>
+    <span class="s2">&quot;DUPONT_R&quot;</span><span class="p">:</span> <span class="s2">&quot;data/Filters/LCO_SITe3_rp.txt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LCO-HA663&quot;</span><span class="p">:</span> <span class="s2">&quot;data/Filters/Ha663BP6_AA.txt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LCO-HA657&quot;</span><span class="p">:</span> <span class="s2">&quot;data/Filters/Ha657BP6_AA.txt&quot;</span>
+    <span class="p">}</span>
+
+<span class="c1"># Default hard-coded fits files - Calibration Tables</span>
+<span class="c1"># These are also overwritten by the given calib input file (if provided)</span>
+<span class="n">dict_calib_tables</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Muse geometric file</span>
+    <span class="s2">&quot;geo_table&quot;</span><span class="p">:</span> <span class="s2">&quot;geometry_table_wfm.fits&quot;</span><span class="p">,</span>
+    <span class="c1"># Astrometry</span>
+    <span class="s2">&quot;astro_table&quot;</span><span class="p">:</span> <span class="s2">&quot;astrometry_wcs_wfm.fits&quot;</span><span class="p">,</span>
+    <span class="c1"># Bad pixel table</span>
+    <span class="s2">&quot;badpix_table&quot;</span><span class="p">:</span> <span class="s2">&quot;badpix_table_2015-06-02.fits&quot;</span><span class="p">,</span>
+    <span class="c1"># Vignetting</span>
+    <span class="s2">&quot;vignetting_mask&quot;</span><span class="p">:</span> <span class="s2">&quot;vignetting_mask.fits&quot;</span><span class="p">,</span>
+    <span class="c1"># Flux table</span>
+    <span class="s2">&quot;std_flux_table&quot;</span><span class="p">:</span> <span class="s2">&quot;std_flux_table.fits&quot;</span><span class="p">,</span>
+    <span class="c1"># Sky Flat files</span>
+    <span class="s2">&quot;extinct_table&quot;</span><span class="p">:</span> <span class="s2">&quot;extinct_table.fits&quot;</span><span class="p">,</span>
+    <span class="c1"># Line Catalog</span>
+    <span class="s2">&quot;line_catalog&quot;</span><span class="p">:</span> <span class="s2">&quot;line_catalog.fits&quot;</span><span class="p">,</span>
+    <span class="c1"># Sky lines</span>
+    <span class="s2">&quot;sky_lines&quot;</span><span class="p">:</span> <span class="s2">&quot;sky_lines.fits&quot;</span><span class="p">,</span>
+    <span class="c1"># Filter List</span>
+    <span class="s2">&quot;filter_list&quot;</span><span class="p">:</span> <span class="s2">&quot;filter_list.fits&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="c1"># Default structure folders</span>
+<span class="c1"># If already existing, won&#39;t be created</span>
+<span class="c1"># If not, will be created automatically</span>
+<span class="n">dict_input_folders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># Raw Data files</span>
+            <span class="s2">&quot;rawfiles&quot;</span><span class="p">:</span> <span class="s2">&quot;Raw/&quot;</span><span class="p">,</span>
+            <span class="c1"># Config files</span>
+            <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="s2">&quot;Config/&quot;</span><span class="p">,</span>
+            <span class="c1"># Tables</span>
+            <span class="s2">&quot;astro_tables&quot;</span><span class="p">:</span> <span class="s2">&quot;Astro_tables/&quot;</span><span class="p">,</span>
+            <span class="c1"># esores log files</span>
+            <span class="s2">&quot;esorex_log&quot;</span><span class="p">:</span> <span class="s2">&quot;Esorex_log/&quot;</span><span class="p">,</span>
+            <span class="c1"># Data Products - first writing</span>
+            <span class="s2">&quot;pipe_products&quot;</span><span class="p">:</span> <span class="s2">&quot;Pipe_products/&quot;</span><span class="p">,</span>
+            <span class="c1"># Log</span>
+            <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="s2">&quot;Log/&quot;</span>
+            <span class="p">}</span>
+
+<span class="c1"># Values provide the folder names for the file structure</span>
+<span class="c1"># If already existing, won&#39;t be created</span>
+<span class="c1"># If not, will be created automatically</span>
+<span class="n">dict_folders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># Master Calibration files</span>
+            <span class="s2">&quot;master&quot;</span><span class="p">:</span> <span class="s2">&quot;Master/&quot;</span><span class="p">,</span>
+            <span class="c1"># Object files</span>
+            <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;Object/&quot;</span><span class="p">,</span>
+            <span class="c1"># Sky files</span>
+            <span class="s2">&quot;sky&quot;</span><span class="p">:</span> <span class="s2">&quot;Sky/&quot;</span><span class="p">,</span>
+            <span class="c1"># Std files</span>
+            <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="s2">&quot;Std/&quot;</span><span class="p">,</span>
+            <span class="c1"># Reconstructed Maps</span>
+            <span class="s2">&quot;maps&quot;</span><span class="p">:</span> <span class="s2">&quot;Maps/&quot;</span><span class="p">,</span>
+            <span class="c1"># SOF folder </span>
+            <span class="s2">&quot;sof&quot;</span><span class="p">:</span> <span class="s2">&quot;Sof/&quot;</span><span class="p">,</span>
+            <span class="c1"># Figure</span>
+            <span class="s2">&quot;figures&quot;</span><span class="p">:</span> <span class="s2">&quot;Figures/&quot;</span>
+            <span class="p">}</span>
+
+<span class="c1"># This dictionary includes extra folders for certain specific task</span>
+<span class="c1"># e.g., alignment - associated with the target</span>
+<span class="c1"># Will be created automatically if not already existing</span>
+<span class="n">dict_folders_target</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;alignment&quot;</span><span class="p">:</span> <span class="s2">&quot;Alignment/&quot;</span>
+        <span class="p">}</span>
+
+<span class="n">dict_combined_folders</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1"># Sof files</span>
+        <span class="s2">&quot;sof&quot;</span><span class="p">:</span> <span class="s2">&quot;Sof/&quot;</span><span class="p">,</span>
+        <span class="c1"># Combined products</span>
+        <span class="s2">&quot;cubes&quot;</span><span class="p">:</span> <span class="s2">&quot;Cubes/&quot;</span><span class="p">,</span>
+        <span class="c1"># esores log files</span>
+        <span class="s2">&quot;esorex_log&quot;</span><span class="p">:</span> <span class="s2">&quot;Esorex_log/&quot;</span><span class="p">,</span>
+        <span class="c1"># Data Products - first writing</span>
+        <span class="s2">&quot;pipe_products&quot;</span><span class="p">:</span> <span class="s2">&quot;Pipe_products/&quot;</span><span class="p">,</span>
+        <span class="c1"># Log</span>
+        <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="s2">&quot;Log/&quot;</span>
+        <span class="p">}</span>
+
+<span class="c1"># -- END ---------------------------------------------------------------#</span>
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># BEGIN</span>
+<span class="c1">#           DEFAULT GEOMETRY AND ASTROWCS FILES</span>
+<span class="c1"># </span>
+<span class="c1"># These are provided if you need time varying astrometry files</span>
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># For musepipe module</span>
+
+<span class="n">dict_geo_astrowcs_table</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;comm1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2014-02-09&#39;</span><span class="p">,</span> <span class="s1">&#39;2014-02-09&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;comm2a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2014-04-27&#39;</span><span class="p">,</span> <span class="s1">&#39;2014-05-06&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;comm2b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2014-07-24&#39;</span><span class="p">,</span> <span class="s1">&#39;2014-08-03&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto01&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2014-09-13&#39;</span><span class="p">,</span> <span class="s1">&#39;2014-09-26&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto02&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2014-10-18&#39;</span><span class="p">,</span> <span class="s1">&#39;2014-10-29&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto03&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2014-11-16&#39;</span><span class="p">,</span> <span class="s1">&#39;2014-11-27&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;2014d&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2014-12-16&#39;</span><span class="p">,</span> <span class="s1">&#39;2014-12-25&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto05&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2015-04-14&#39;</span><span class="p">,</span> <span class="s1">&#39;2015-04-25&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto06&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2015-05-10&#39;</span><span class="p">,</span> <span class="s1">&#39;2015-05-23&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto07&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2015-08-17&#39;</span><span class="p">,</span> <span class="s1">&#39;2015-08-24&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto08&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2015-09-07&#39;</span><span class="p">,</span> <span class="s1">&#39;2015-09-12&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto09&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2015-10-09&#39;</span><span class="p">,</span> <span class="s1">&#39;2015-10-16&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto10&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2015-11-04&#39;</span><span class="p">,</span> <span class="s1">&#39;2015-11-13&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto11&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2016-01-31&#39;</span><span class="p">,</span> <span class="s1">&#39;2016-02-06&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto12&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2016-03-09&#39;</span><span class="p">,</span> <span class="s1">&#39;2016-03-14&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto13&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2016-04-05&#39;</span><span class="p">,</span> <span class="s1">&#39;2016-04-10&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto14&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2016-05-06&#39;</span><span class="p">,</span> <span class="s1">&#39;2016-05-12&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto15&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2016-08-29&#39;</span><span class="p">,</span> <span class="s1">&#39;2016-09-06&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto16&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2017-01-27&#39;</span><span class="p">,</span> <span class="s1">&#39;2017-02-03&#39;</span><span class="p">],</span>
+    <span class="c1"># Initial gto17 is actually extended with gto18</span>
+    <span class="c1"># which did not have a solution</span>
+    <span class="c1">#    &#39;gto17&#39; :   [&#39;2017-04-22&#39;, &#39;2017-04-25&#39;],</span>
+    <span class="c1">#    &#39;gto18&#39; :   [&#39;2017-05-20&#39;, &#39;2017-05-23&#39;],</span>
+    <span class="s1">&#39;gto17&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2017-04-22&#39;</span><span class="p">,</span> <span class="s1">&#39;2017-05-23&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto19&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2017-09-19&#39;</span><span class="p">,</span> <span class="s1">&#39;2017-09-25&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto20&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2017-10-16&#39;</span><span class="p">,</span> <span class="s1">&#39;2017-10-26&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto21&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2017-11-15&#39;</span><span class="p">,</span> <span class="s1">&#39;2017-11-20&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto22&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2018-02-11&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-02-16&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto23&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2018-03-14&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-03-19&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto24&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2018-04-11&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-04-19&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto25&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2018-05-10&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-05-13&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto26&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2018-08-12&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-08-18&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto27&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2018-09-05&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-15&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto28&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2018-10-07&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-10-15&#39;</span><span class="p">],</span>
+    <span class="c1"># gto30 did not provide a solution hence</span>
+    <span class="c1"># gto29 also includes gto30 run</span>
+    <span class="c1">#    &#39;gto29&#39; :   [&#39;2018-07-14&#39;, &#39;2018-11-14&#39;],</span>
+    <span class="c1">#    &#39;gto30&#39; :   [&#39;2018-12-06&#39;, &#39;2018-12-12&#39;],</span>
+    <span class="s1">&#39;gto29&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2018-07-14&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-12-12&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto31&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2019-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2019-01-09&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto32&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2019-03-04&#39;</span><span class="p">,</span> <span class="s1">&#39;2019-03-07&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto33&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2019-04-05&#39;</span><span class="p">,</span> <span class="s1">&#39;2019-04-11&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;gto34&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2019-05-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2019-05-05&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="c1"># -- END ---------------------------------------------------------------#</span>
+
+<span class="c1"># ======================================================================#</span>
+<span class="c1"># BEGIN</span>
+<span class="c1">#           DEFAULT KEYWORDS and COLUMNS for OFFSET_TABLES</span>
+<span class="c1"># </span>
+<span class="c1"># Define useful keywords for fits table and images</span>
+<span class="c1"># ======================================================================#</span>
+<span class="n">mjd_names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="s2">&quot;MJD_OBS&quot;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="s2">&quot;MJD-OBS&quot;</span><span class="p">}</span>
+<span class="n">date_names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="s2">&quot;DATE_OBS&quot;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="s2">&quot;DATE-OBS&quot;</span><span class="p">}</span>
+<span class="n">tpl_names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="s2">&quot;TPL_START&quot;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="s2">&quot;HIERARCH ESO TPL START&quot;</span><span class="p">}</span>
+<span class="n">iexpo_names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="s2">&quot;IEXPO_OBS&quot;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="s2">&quot;MUSEPIPE_IEXPO&quot;</span><span class="p">}</span>
+<span class="n">dataset_names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="s2">&quot;DATASET_OBS&quot;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="s2">&quot;MUSEPIPE_DATASET&quot;</span><span class="p">,</span> <span class="s1">&#39;oldimage&#39;</span><span class="p">:</span> <span class="s2">&quot;MUSEPIPE_POINTING&quot;</span><span class="p">}</span>
+
+<span class="n">default_offset_table</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">date_names</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">],</span> <span class="s1">&#39;S23&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">],</span>
+                        <span class="s1">&#39;mjd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">mjd_names</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">],</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                        <span class="s1">&#39;tpls&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">tpl_names</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">],</span> <span class="s1">&#39;S19&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">],</span>
+                        <span class="s1">&#39;iexpo&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">iexpo_names</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">],</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="s1">&#39;dataset&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">iexpo_names</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">],</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="s1">&#39;ora&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;RA_OFFSET&quot;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                        <span class="s1">&#39;odec&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;DEC_OFFSET&quot;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                        <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;FLUX_SCALE&quot;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]}</span>
+<span class="c1"># -- END ---------------------------------------------------------------#</span>
+
+
+<span class="c1"># --- Some useful functions using the input configuration --------------#</span>
+<div class="viewcode-block" id="get_suffix_product"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.config_pipe.get_suffix_product">[docs]</a><span class="k">def</span> <span class="nf">get_suffix_product</span><span class="p">(</span><span class="n">expotype</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">dict_listMasterObject</span><span class="p">[</span><span class="n">expotype</span><span class="p">]</span></div>
+
+
+<span class="n">default_prefix_wcs</span> <span class="o">=</span> <span class="s2">&quot;refwcs_&quot;</span>
+<span class="n">prefix_mosaic</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span>
+<span class="n">default_prefix_wcs_mosaic</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix_mosaic</span><span class="p">,</span> <span class="n">default_prefix_wcs</span><span class="p">)</span>
+<span class="n">default_wave_wcs</span> <span class="o">=</span> <span class="mf">6500.0</span>
+<span class="n">default_prefix_mask</span> <span class="o">=</span> <span class="s2">&quot;mask_&quot;</span>
+
+<span class="n">ao_mask_lambda</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5800</span><span class="p">,</span> <span class="mi">5970</span><span class="p">]</span>
+<span class="n">lambdaminmax_for_wcs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6800</span><span class="p">,</span> <span class="mi">6805</span><span class="p">]</span>
+<span class="n">lambdaminmax_for_mosaic</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4700</span><span class="p">,</span> <span class="mi">9400</span><span class="p">]</span>
+
+<span class="c1"># ===========================================</span>
+<span class="c1"># Recipes for data reduction</span>
+<span class="n">dict_recipes_per_num</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;bias&#39;</span><span class="p">,</span>
+                        <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;flat&#39;</span><span class="p">,</span>
+                        <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;wave&#39;</span><span class="p">,</span>
+                        <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;lsf&#39;</span><span class="p">,</span>
+                        <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;twilight&#39;</span><span class="p">,</span>
+                        <span class="mi">6</span><span class="p">:</span> <span class="s1">&#39;scibasic_all&#39;</span><span class="p">,</span>
+                        <span class="mi">7</span><span class="p">:</span> <span class="s1">&#39;standard&#39;</span><span class="p">,</span>
+                        <span class="mi">8</span><span class="p">:</span> <span class="s1">&#39;sky&#39;</span><span class="p">,</span>
+                        <span class="mi">9</span><span class="p">:</span> <span class="s1">&#39;prep_align&#39;</span><span class="p">,</span>
+                        <span class="mi">10</span><span class="p">:</span> <span class="s1">&#39;align_bydataset&#39;</span><span class="p">,</span>
+                        <span class="mi">11</span><span class="p">:</span> <span class="s1">&#39;align_bygroup&#39;</span><span class="p">,</span>
+                        <span class="mi">12</span><span class="p">:</span> <span class="s1">&#39;scipost_perexpo&#39;</span><span class="p">,</span>
+                        <span class="mi">13</span><span class="p">:</span> <span class="s1">&#39;scipost_sky&#39;</span><span class="p">,</span>
+                        <span class="mi">14</span><span class="p">:</span> <span class="s1">&#39;combine_dataset&#39;</span>
+                        <span class="p">}</span>
+
+<span class="c1"># Value by default for certain fixed parameters in recipes</span>
+<span class="n">dict_default_for_recipes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fraction&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> 
+                            <span class="s1">&#39;skymethod&#39;</span><span class="p">:</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;illum&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                            <span class="s1">&#39;filter_for_alignment&#39;</span><span class="p">:</span> <span class="s1">&#39;Cousins_R&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;line&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="s1">&#39;lambda_window&#39;</span><span class="p">:</span> <span class="mf">10.0</span> 
+                            <span class="p">}</span>
+
+<span class="c1"># and creating the inverse dictionary</span>
+<span class="n">dict_recipes_per_name</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_recipes_per_num</span><span class="p">:</span>
+    <span class="n">dict_recipes_per_name</span><span class="p">[</span><span class="n">dict_recipes_per_num</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span> <span class="o">=</span> <span class="n">key</span>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

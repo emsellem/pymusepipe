@@ -1,0 +1,1028 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe.musepipe &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymusepipe.musepipe</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymusepipe.musepipe</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under a MIT style license - see LICENSE</span>
+
+<span class="sd">&quot;&quot;&quot;MUSE-PHANGS core module.</span>
+<span class="sd">This defines the main class (MusePipe) which can be used throughout this package.</span>
+
+<span class="sd">This module is a complete rewrite of a pipeline wrapper for the MUSE dataset.</span>
+<span class="sd">All classes and objects were refactored.</span>
+
+<span class="sd">However, the starting point of this package has been initially</span>
+<span class="sd">inspired by several pieces of python codes developed by various individiduals,</span>
+<span class="sd">including Kyriakos and Martina from the GTO MUSE MAD team and further</span>
+<span class="sd">rewritten by Mark van den Brok.</span>
+<span class="sd">Hence: a big Thanks to all three for this!</span>
+
+<span class="sd">Note that several python packages exist which would provide similar</span>
+<span class="sd">(or better) functionalities.</span>
+
+<span class="sd">Eric Emsellem adapted a version from early 2017, provided by Mark and adapted</span>
+<span class="sd">it for the needs of the PHANGS project (PI Schinnerer). It was further</span>
+<span class="sd">refactored starting from scratch but keeping a few initial ideas.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># For print - see compatibility with Python 3</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="n">__authors__</span> <span class="o">=</span> <span class="s1">&#39;Eric Emsellem&#39;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;(c) 2017-2019, ESO + CRAL&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT license&quot;</span>
+<span class="n">__contact__</span> <span class="o">=</span> <span class="s2">&quot; &lt;eric.emsellem@eso.org&gt;&quot;</span>
+
+<span class="c1"># Importing modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Standard modules</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">joinpath</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="c1"># Pyfits from astropy</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">astropy</span> <span class="k">as</span> <span class="nn">apy</span>
+    <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;astropy is required for this module&quot;</span><span class="p">)</span>
+
+<span class="c1"># ascii reading</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">ascii</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;astropy.io.ascii is required for this module&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">setdiff</span><span class="p">,</span> <span class="n">vstack</span><span class="p">,</span> <span class="n">TableMergeError</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;astropy.table.Table is required for this module&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">astropy.utils.exceptions</span> <span class="kn">import</span> <span class="n">AstropyWarning</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">dt</span>
+
+<span class="c1"># Importing pymusepipe modules</span>
+<span class="kn">from</span> <span class="nn">.init_musepipe</span> <span class="kn">import</span> <span class="n">InitMuseParameters</span>
+<span class="kn">from</span> <span class="nn">.recipes_pipe</span> <span class="kn">import</span> <span class="n">PipeRecipes</span>
+<span class="kn">from</span> <span class="nn">.prep_recipes_pipe</span> <span class="kn">import</span> <span class="n">PipePrep</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
+<span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="n">analyse_musemode</span>
+<span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">suffix_rawfiles</span><span class="p">,</span> <span class="n">suffix_prealign</span><span class="p">,</span> <span class="n">suffix_checkalign</span><span class="p">,</span>
+                          <span class="n">listexpo_files</span><span class="p">,</span> <span class="n">dict_listObject</span><span class="p">,</span> <span class="n">dict_listMaster</span><span class="p">,</span>
+                          <span class="n">dict_listMasterObject</span><span class="p">,</span> <span class="n">dict_expotypes</span><span class="p">,</span> <span class="n">dict_geo_astrowcs_table</span><span class="p">,</span>
+                          <span class="n">list_exclude_checkmode</span><span class="p">,</span> <span class="n">list_fieldspecific_checkmode</span><span class="p">,</span> <span class="n">dict_astrogeo</span><span class="p">,</span>
+                          <span class="n">list_musemodes</span><span class="p">,</span> <span class="n">dict_default_for_recipes</span><span class="p">)</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;2.0.2 (25/09/2019)&#39;</span>
+
+<span class="c1"># Cleaning and adding comments</span>
+<span class="c1"># _version__ = &#39;2.0.0 (19 June 2019)&#39; Included an astropy table</span>
+<span class="c1"># _version__ = &#39;0.2.0 (22 May 2018)&#39;</span>
+<span class="c1"># _version__ = &#39;0.1.0 (03 April    2018)&#39;</span>
+<span class="c1"># _version__ = &#39;0.0.2 (08 March    2018)&#39;</span>
+<span class="c1"># _version__ = &#39;0.0.1 (21 November 2017)&#39;</span>
+
+
+<div class="viewcode-block" id="PipeObject"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.PipeObject">[docs]</a><span class="k">class</span> <span class="nc">PipeObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A very simple class used to store astropy tables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise the nearly empty class Add _info for a description</span>
+<span class="sd">        if needed</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            info (str): information on this object to be recorded. It will be</span>
+<span class="sd">                saved in _info.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_info</span> <span class="o">=</span> <span class="n">info</span></div>
+
+
+<div class="viewcode-block" id="MusePipe"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe">[docs]</a><span class="k">class</span> <span class="nc">MusePipe</span><span class="p">(</span><span class="n">PipePrep</span><span class="p">,</span> <span class="n">PipeRecipes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main Class to define and run the MUSE pipeline, given a certain galaxy</span>
+<span class="sd">    name. This is the main class used throughout the running of the pipeline</span>
+<span class="sd">    which contains functions and attributes all associated with the reduction</span>
+<span class="sd">    of MUSE exposures.</span>
+
+<span class="sd">    It inherits from the PipePrep class, which prepares the recipes for the</span>
+<span class="sd">    running of the MUSE pipeline, and Piperecipes which has the recipes</span>
+<span class="sd">    described.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">folder_config</span><span class="o">=</span><span class="s2">&quot;Config/&quot;</span><span class="p">,</span>
+                 <span class="n">rc_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cal_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_filename</span><span class="o">=</span><span class="s2">&quot;MusePipe.log&quot;</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">musemode</span><span class="o">=</span><span class="s2">&quot;WFM-NOAO-N&quot;</span><span class="p">,</span> <span class="n">checkmode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">strong_checkmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise the file parameters to be used during the run Create the</span>
+<span class="sd">        python structure which allows the pipeline to run either individual</span>
+<span class="sd">        recipes or global ones</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            targetname (str): Name of the target (e.g., &#39;NGC1208&#39;).</span>
+<span class="sd">            dataset (int): dataset number to consider</span>
+<span class="sd">            folder_config (str): Folder name for the configuration files</span>
+<span class="sd">            rc_filename (str): Name of the input configuration file with</span>
+<span class="sd">                the root folders</span>
+<span class="sd">            cal_filename (str):</span>
+<span class="sd">            log_filename (str):</span>
+<span class="sd">            verbose (bool):</span>
+<span class="sd">            musemode (str):</span>
+<span class="sd">            checkmode (str):</span>
+<span class="sd">            strong_checkmode (bool):</span>
+<span class="sd">            **kwargs:</span>
+
+<span class="sd">        cal_filename: str</span>
+<span class="sd">            Name of the input configuration file with calibration file names</span>
+<span class="sd">        log_filename: str [&#39;MusePipe.log&#39;]</span>
+<span class="sd">            Name of the log file where all pymusepipe output will be recorded</span>
+<span class="sd">        reset_log: bool [False]</span>
+<span class="sd">            If True, log file will be reset to an empty file before starting</span>
+<span class="sd">        verbose: bool [True]</span>
+<span class="sd">            Give more information as output</span>
+<span class="sd">        musemode: str [&#39;WFM-NOAO-N&#39;] </span>
+<span class="sd">            String to define the mode to be considered</span>
+<span class="sd">        checkmode: bool [True]</span>
+<span class="sd">            Check the mode when reducing</span>
+<span class="sd">        strong_checkmode: bool [True]</span>
+<span class="sd">            Enforce the checkmode for all if True, </span>
+<span class="sd">            or exclude DARK/BIAS from check if False</span>
+<span class="sd">        vsystemic: float [0.0]</span>
+<span class="sd">            Systemic velocity of the galaxy [in km/s]</span>
+
+<span class="sd">        Other possible entries</span>
+<span class="sd">        ----------------------</span>
+<span class="sd">        overwrite_astropy_table: bool [True]</span>
+<span class="sd">            Overwrite the astropy table even when it exists.</span>
+<span class="sd">        warnings: str [&#39;ignore&#39;]</span>
+<span class="sd">            If set to &#39;ignore&#39;, will ignore the Astropy Warnings.</span>
+<span class="sd">        time_astrometry: bool [False]</span>
+<span class="sd">            Use the time dependent geo_table and astrometry_wcs files</span>
+<span class="sd">            following on the date of the input exposures (MJD)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Verbose option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;In DEBUG Mode [more printing]&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_suffix_prealign</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;suffix_prealign&quot;</span><span class="p">,</span> <span class="n">suffix_prealign</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_suffix_checkalign</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;suffix_checkalign&quot;</span><span class="p">,</span> <span class="n">suffix_checkalign</span><span class="p">)</span>
+
+        <span class="c1"># Warnings for astropy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;warnings&quot;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span> <span class="o">==</span> <span class="s1">&#39;ignore&#39;</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">AstropyWarning</span><span class="p">)</span>
+
+        <span class="c1"># Overwriting option for the astropy table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_astropy_table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;overwrite_astropy_table&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Updating the astropy table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_astropy_table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;update_astropy_table&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Use time dependent geo_table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time_astrometry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;time_astrometry&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time_astrometry option will now be set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_time_astrometry</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set alignment saving option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_alignment_images</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;save_alignment_images&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1">#        super(MusePipe, self).__init__(**kwargs)</span>
+
+        <span class="c1"># Setting the default attibutes #####################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetname</span> <span class="o">=</span> <span class="n">targetname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vsystemic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;vsystemic&quot;</span><span class="p">,</span> <span class="mf">0.</span><span class="p">))</span>
+
+        <span class="c1"># Setting other default attributes</span>
+        <span class="k">if</span> <span class="n">log_filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log_filename</span> <span class="o">=</span> <span class="s2">&quot;log_</span><span class="si">{timestamp}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">upipe</span><span class="o">.</span><span class="n">create_time_name</span><span class="p">())</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;The Log file will be </span><span class="si">{log}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">log_filename</span><span class="p">),</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_filename</span> <span class="o">=</span> <span class="n">log_filename</span>
+
+        <span class="c1"># Further reduction options =====================================</span>
+        <span class="c1"># Mode of the observations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list_musemodes</span> <span class="o">=</span> <span class="n">list_musemodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">musemode</span> <span class="o">=</span> <span class="n">musemode</span>
+        <span class="c1"># Printing the muse mode which also serves as a test to see if allowed</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input MUSE mode = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">musemode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Checking if mode is correct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkmode</span> <span class="o">=</span> <span class="n">checkmode</span>
+        <span class="c1"># Checking if mode is correct also for BIAS &amp; DARK and also ILLUM!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strong_checkmode</span> <span class="o">=</span> <span class="n">strong_checkmode</span>
+        <span class="c1"># End of parameter settings #########################</span>
+
+        <span class="c1"># Extra parameters for the initialisation and starting of recipes</span>
+        <span class="n">first_recipe</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;first_recipe&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">last_recipe</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;last_recipe&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">init_raw_table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;init_raw_table&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Filter for alignment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_for_alignment</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_for_alignment&quot;</span><span class="p">,</span> 
+                                               <span class="n">dict_default_for_recipes</span><span class="p">[</span><span class="s1">&#39;filter_for_alignment&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_list&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+        <span class="c1"># Init of the subclasses</span>
+        <span class="n">PipePrep</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_recipe</span><span class="o">=</span><span class="n">first_recipe</span><span class="p">,</span>
+                          <span class="n">last_recipe</span><span class="o">=</span><span class="n">last_recipe</span><span class="p">)</span>
+        <span class="n">PipeRecipes</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+
+        <span class="c1"># =========================================================== #</span>
+        <span class="c1"># Setting up the folders and names for the data reduction</span>
+        <span class="c1"># Can be initialised by either an rc_file, </span>
+        <span class="c1"># or a default rc_file or harcoded defaults.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span> <span class="o">=</span> <span class="n">InitMuseParameters</span><span class="p">(</span><span class="n">folder_config</span><span class="o">=</span><span class="n">folder_config</span><span class="p">,</span>
+                                              <span class="n">rc_filename</span><span class="o">=</span><span class="n">rc_filename</span><span class="p">,</span>
+                                              <span class="n">cal_filename</span><span class="o">=</span><span class="n">cal_filename</span><span class="p">,</span> 
+                                              <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># Setting up the relative path for the data, using Galaxy Name + Pointing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">targetname</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Create full path folder </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_fullpath_names</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">log_filename</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">log_filename</span><span class="p">)</span>
+
+        <span class="c1"># Go to the data directory</span>
+        <span class="c1"># and Recording the folder where we start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">orig</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+        <span class="c1"># Making the output folders in a safe mode</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating directory structure&quot;</span><span class="p">,</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">goto_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># ==============================================</span>
+        <span class="c1"># Creating the extra pipeline folder structure</span>
+        <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_input_folders</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">safely_create_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_input_folders</span><span class="p">[</span><span class="n">folder</span><span class="p">],</span>
+                                       <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># ==============================================</span>
+        <span class="c1"># Creating the folder structure itself if needed</span>
+        <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_folders</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">safely_create_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_folders</span><span class="p">[</span><span class="n">folder</span><span class="p">],</span>
+                                       <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># ==============================================</span>
+        <span class="c1"># Init the Master exposure flag dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Master</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">mastertype</span> <span class="ow">in</span> <span class="n">dict_listMaster</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">safely_create_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_path_expo</span><span class="p">(</span><span class="n">mastertype</span><span class="p">,</span> <span class="s2">&quot;master&quot;</span><span class="p">),</span>
+                                       <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Master</span><span class="p">[</span><span class="n">mastertype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Init the Object folder</span>
+        <span class="k">for</span> <span class="n">objecttype</span> <span class="ow">in</span> <span class="n">dict_listObject</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">safely_create_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_path_expo</span><span class="p">(</span><span class="n">objecttype</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">),</span>
+                                       <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict_listMasterObject</span> <span class="o">=</span> <span class="n">dict_listMasterObject</span>
+
+        <span class="c1"># ==============================================</span>
+        <span class="c1"># Creating the folders in the TARGET root folder </span>
+        <span class="c1"># e.g, for the alignment images</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_folders_target</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">safely_create_folder</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># ==============================================</span>
+        <span class="c1"># Going back to initial working directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">goto_origfolder</span><span class="p">()</span>
+
+        <span class="c1"># ===========================================================</span>
+        <span class="c1"># Transform input dictionary of geo/astro files for later</span>
+        <span class="c1"># This is useful for the creation of the sof files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_geoastro_dates</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">init_raw_table</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_raw_table</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raw_table_initialised</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raw_table_initialised</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_all_astro_tables</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MusePipe.print_musemodes"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.print_musemodes">[docs]</a>    <span class="k">def</span> <span class="nf">print_musemodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print out the list of allowed muse modes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;List of allowed Musemodes = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_list_musemodes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">musemode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Mode for MUSE</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">umuse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_musemode</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">umuse</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_musemodes</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Provided musemode </span><span class="si">{umuse}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_musemodes</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_musemode</span>
+
+    <span class="nd">@musemode</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">musemode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_musemode</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_fieldmode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Property to return the field mode for MUSE</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">analyse_musemode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">musemode</span><span class="p">,</span> <span class="s1">&#39;field&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_aomode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Property to return the AO mode for MUSE</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">analyse_musemode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">musemode</span><span class="p">,</span> <span class="s1">&#39;ao&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_lrangemode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Property to return the lambda range (N or E) mode for MUSE</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">analyse_musemode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">musemode</span><span class="p">,</span> <span class="s1">&#39;lrange&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_geoastro_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise the dictionary for the geo and astrometry files</span>
+<span class="sd">        Transforms the dates into datetimes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict_geoastro</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">dict_geo_astrowcs_table</span><span class="p">:</span>
+            <span class="n">startd</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dict_geo_astrowcs_table</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                 <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="n">endd</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dict_geo_astrowcs_table</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                               <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dict_geoastro</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">startd</span><span class="p">,</span> <span class="n">endd</span><span class="p">]</span>
+
+<div class="viewcode-block" id="MusePipe.retrieve_geoastro_name"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.retrieve_geoastro_name">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_geoastro_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date_str</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="n">fieldmode</span><span class="o">=</span><span class="s1">&#39;wfm&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieving the astrometry or geometry fits file name</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        date_str: str</span>
+<span class="sd">            Date as a string (DD/MM/YYYY)</span>
+<span class="sd">        filetype: str</span>
+<span class="sd">            &#39;geo&#39; or &#39;astro&#39;, type of the needed file</span>
+<span class="sd">        fieldmode: str</span>
+<span class="sd">            &#39;wfm&#39; or &#39;nfm&#39; - MUSE mode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dict_pre</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;geo&#39;</span><span class="p">:</span> <span class="s1">&#39;geometry_table&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;astro&#39;</span><span class="p">:</span> <span class="s1">&#39;astrometry_wcs&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">filetype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_pre</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Could not decipher the filetype option &quot;</span>
+                              <span class="s2">&quot;in retrieve_geoastro&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Transform into a datetime date</span>
+        <span class="n">date_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="c1"># get all the distance to the dates (start+end together)</span>
+        <span class="n">near</span> <span class="o">=</span> <span class="p">{</span><span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">date_dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict_geoastro</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="nb">abs</span><span class="p">(</span><span class="n">date_dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict_geoastro</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">])):</span>
+                    <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict_geoastro</span><span class="p">}</span>
+        <span class="c1"># Find the minimum distance and get the name</span>
+        <span class="n">ga_suffix</span> <span class="o">=</span> <span class="n">near</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">near</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span>
+        <span class="c1"># Build the name with the prefix, suffix and mode</span>
+        <span class="n">ga_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dict_pre</span><span class="p">[</span><span class="n">filetype</span><span class="p">],</span>
+                                            <span class="n">fieldmode</span><span class="p">,</span> <span class="n">ga_suffix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ga_name</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_option_astropy_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the options for overwriting or updating the astropy tables</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_astropy_table</span> <span class="o">=</span> <span class="n">overwrite</span>
+        <span class="k">if</span> <span class="n">update</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_astropy_table</span> <span class="o">=</span> <span class="n">update</span>
+
+<div class="viewcode-block" id="MusePipe.goto_origfolder"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.goto_origfolder">[docs]</a>    <span class="k">def</span> <span class="nf">goto_origfolder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addtolog</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Go back to original folder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Going back to the original folder </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">orig</span><span class="p">),</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">goto_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">orig</span><span class="p">,</span> <span class="n">addtolog</span><span class="o">=</span><span class="n">addtolog</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MusePipe.goto_prevfolder"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.goto_prevfolder">[docs]</a>    <span class="k">def</span> <span class="nf">goto_prevfolder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addtolog</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Go back to previous folder</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        addtolog: bool [False]</span>
+<span class="sd">            Adding the folder move to the log file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Going back to the previous folder </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">_prev_folder</span><span class="p">),</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">goto_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">_prev_folder</span><span class="p">,</span> <span class="n">addtolog</span><span class="o">=</span><span class="n">addtolog</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MusePipe.goto_folder"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.goto_folder">[docs]</a>    <span class="k">def</span> <span class="nf">goto_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newpath</span><span class="p">,</span> <span class="n">addtolog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Changing directory and keeping memory of the old working one</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        newpath: str</span>
+<span class="sd">            Path where to go to</span>
+<span class="sd">        addtolog: bool [False]</span>
+<span class="sd">            Adding the folder move to the log file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">prev_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+            <span class="n">newpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">newpath</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">newpath</span><span class="p">)</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Going to folder </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">newpath</span><span class="p">),</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">addtolog</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">append_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">log_filename</span><span class="p">,</span> <span class="s2">&quot;cd </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">newpath</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">_prev_folder</span> <span class="o">=</span> <span class="n">prev_folder</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">newpath</span><span class="p">):</span>
+                <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="MusePipe.set_fullpath_names"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.set_fullpath_names">[docs]</a>    <span class="k">def</span> <span class="nf">set_fullpath_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create full path names to be used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># initialisation of the full paths </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="n">PipeObject</span><span class="p">(</span><span class="s2">&quot;All Paths useful for the pipeline&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetname</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_folders</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> \
+                    <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_input_folders</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                                               <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="p">,</span> <span class="n">name</span><span class="p">)))</span>
+
+        <span class="c1"># Creating the filenames for Master files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">Master</span> <span class="o">=</span> <span class="n">PipeObject</span><span class="p">(</span><span class="s2">&quot;All Paths for Master files &quot;</span>
+                                       <span class="s2">&quot;useful for the pipeline&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">expotype</span> <span class="ow">in</span> <span class="n">dict_listMaster</span><span class="p">:</span>
+            <span class="c1"># Adding the path of the folder</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">Master</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attr_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">),</span>
+                    <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_path_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span>
+                                                                  <span class="s2">&quot;master&quot;</span><span class="p">)))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dict_paths</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;master&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">Master</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">}</span>
+
+        <span class="c1"># Creating the attributes for the folders needed in the TARGET</span>
+        <span class="c1"># root folder, e.g., for alignments</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_folders_target</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_folders_target</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_dataset_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reporting the _get_dataset_name from the InitMuseParam</span>
+<span class="sd">        class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_reset_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reseting the astropy Tables for expotypes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Reseting the select_type item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span> <span class="o">=</span> <span class="n">PipeObject</span><span class="p">(</span><span class="s2">&quot;Astropy Tables&quot;</span><span class="p">)</span>
+        <span class="c1"># Creating the other two Tables categories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Raw</span> <span class="o">=</span> <span class="n">PipeObject</span><span class="p">(</span><span class="s2">&quot;Astropy Tables for each raw expotype&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Master</span> <span class="o">=</span> <span class="n">PipeObject</span><span class="p">(</span><span class="s2">&quot;Astropy Tables for each mastertype&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Processed</span> <span class="o">=</span> <span class="n">PipeObject</span><span class="p">(</span><span class="s2">&quot;Astropy Tables for each processed type&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Reduced</span> <span class="o">=</span> <span class="n">PipeObject</span><span class="p">(</span><span class="s2">&quot;Astropy Tables for each reduced type&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict_tables</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Raw</span><span class="p">,</span> <span class="s2">&quot;master&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Master</span><span class="p">,</span>
+                            <span class="s2">&quot;processed&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Processed</span><span class="p">,</span> <span class="s2">&quot;reduced&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Reduced</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dict_suffix_astro</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="s2">&quot;RAW&quot;</span><span class="p">,</span> <span class="s2">&quot;master&quot;</span><span class="p">:</span> <span class="s2">&quot;MASTER&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;processed&quot;</span><span class="p">:</span> <span class="s2">&quot;PRO&quot;</span><span class="p">,</span> <span class="s2">&quot;reduced&quot;</span><span class="p">:</span> <span class="s2">&quot;RED&quot;</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">expotype</span> <span class="ow">in</span> <span class="n">dict_expotypes</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Raw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attr_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">),</span> <span class="p">[])</span>
+
+<div class="viewcode-block" id="MusePipe.read_all_astro_tables"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.read_all_astro_tables">[docs]</a>    <span class="k">def</span> <span class="nf">read_all_astro_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise all existing Astropy Tables</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reset</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Tables&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reset_tables</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">mastertype</span> <span class="ow">in</span> <span class="n">dict_listMaster</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dict_tables</span><span class="p">[</span><span class="s2">&quot;master&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attr_expo</span><span class="p">(</span><span class="n">mastertype</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">read_astropy_table</span><span class="p">(</span><span class="n">mastertype</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;master&quot;</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">expotype</span> <span class="ow">in</span> <span class="n">dict_listObject</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dict_tables</span><span class="p">[</span><span class="s2">&quot;processed&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attr_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">read_astropy_table</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;processed&quot;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MusePipe.read_astropy_table"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.read_astropy_table">[docs]</a>    <span class="k">def</span> <span class="nf">read_astropy_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expotype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;master&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read an existing Masterfile data table to start the pipeline</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Read the astropy table</span>
+        <span class="n">name_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fitstablename_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">name_table</span><span class="p">):</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Astropy table </span><span class="si">{0}</span><span class="s2"> does not exist - setting up an &quot;</span>
+                                <span class="s2">&quot; empty one&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name_table</span><span class="p">),</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Table</span><span class="p">([[],</span> <span class="p">[],</span> <span class="p">[]],</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;tpls&#39;</span><span class="p">,</span> <span class="s1">&#39;mjd&#39;</span><span class="p">,</span> <span class="s1">&#39;tplnexp&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Reading Astropy fits Table </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name_table</span><span class="p">),</span>
+                             <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">name_table</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MusePipe.init_raw_table"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.init_raw_table">[docs]</a>    <span class="k">def</span> <span class="nf">init_raw_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a fits table with all the information from</span>
+<span class="sd">        the Raw files. Also create an astropy table with the same info</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reset: bool [False]</span>
+<span class="sd">            Resetting the raw astropy table if True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating the astropy fits raw data table&quot;</span><span class="p">,</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">reset</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Tables&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reset_tables</span><span class="p">()</span>
+
+        <span class="c1"># Testing if raw table exists</span>
+        <span class="n">name_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fitstablename_expo</span><span class="p">(</span><span class="s1">&#39;RAWFILES&#39;</span><span class="p">,</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ---- File exists - we READ it ------------------- #</span>
+        <span class="n">overwrite</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;overwrite&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_astropy_table</span><span class="p">)</span>
+        <span class="n">scan_raw</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">name_table</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;The raw-files table will be overwritten&quot;</span><span class="p">,</span>
+                                    <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;The raw files table already exists.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                                    <span class="s2">&quot;If you wish to overwrite it, please turn &quot;</span>
+                                    <span class="s2">&quot;on the &#39;overwrite_astropy_table&#39; option to &quot;</span>
+                                    <span class="s2">&quot;&#39;True&#39;.</span><span class="se">\n</span><span class="s2"> In the meantime, the existing &quot;</span>
+                                    <span class="s2">&quot;table will be read and used.&quot;</span><span class="p">,</span>
+                                    <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_astropy_table</span><span class="p">(</span><span class="s1">&#39;RAWFILES&#39;</span><span class="p">,</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span>
+                <span class="n">scan_raw</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># ---- File does not exist - we create it ---------- #</span>
+        <span class="k">if</span> <span class="n">scan_raw</span><span class="p">:</span>
+            <span class="c1"># Check the raw folder</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">goto_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">rawfiles</span><span class="p">)</span>
+            <span class="c1"># Get the list of files from the Raw data folder</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+
+            <span class="n">smalldic</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;FILENAME&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;100A&#39;</span><span class="p">]}</span>
+            <span class="n">fulldic</span> <span class="o">=</span> <span class="n">listexpo_files</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">fulldic</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">smalldic</span><span class="p">)</span>
+
+            <span class="c1"># Init the lists</span>
+            <span class="n">MUSE_infodic</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fulldic</span><span class="p">:</span>
+                <span class="n">MUSE_infodic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Looping over the files</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="c1"># Excluding the files without MUSE and fits.fz</span>
+                <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;MUSE&#39;</span> <span class="ow">in</span> <span class="n">f</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span> <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">suffix_rawfiles</span><span class="p">]):</span>
+                        <span class="n">header</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="c1"># Short circuit in case &#39;OBJECT&#39; is not found in header</span>
+                        <span class="k">if</span> <span class="s1">&#39;OBJECT&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">new_infodic</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="n">good_file</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">object_file</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">listexpo_files</span><span class="p">:</span>
+                            <span class="p">[</span><span class="n">namecol</span><span class="p">,</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">form</span><span class="p">]</span> <span class="o">=</span> <span class="n">listexpo_files</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                                <span class="n">new_infodic</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="n">keyword</span><span class="p">])</span>
+                            <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">:</span>
+                                <span class="c1"># Find the key which is right</span>
+                                <span class="n">astrogeo_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">tk</span> <span class="k">for</span> <span class="n">tk</span><span class="p">,</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">dict_astrogeo</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">tv</span> <span class="o">==</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]]</span>
+                                <span class="c1"># Nothing found?</span>
+                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">astrogeo_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">good_file</span> <span class="o">=</span> <span class="kc">False</span>
+                                <span class="c1"># If found, print info and save value</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found one </span><span class="si">{0}</span><span class="s2"> file </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                        <span class="n">astrogeo_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">f</span><span class="p">))</span>
+                                    <span class="n">new_infodic</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">astrogeo_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                    <span class="n">object_file</span> <span class="o">=</span> <span class="n">astrogeo_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">good_file</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="c1"># Transferring the information now if complete</span>
+                        <span class="k">if</span> <span class="n">object_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">new_infodic</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">object_file</span>
+                        <span class="k">if</span> <span class="n">good_file</span><span class="p">:</span>
+                            <span class="n">MUSE_infodic</span><span class="p">[</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">new_infodic</span><span class="p">:</span>
+                                <span class="n">MUSE_infodic</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_infodic</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+                    <span class="k">elif</span> <span class="nb">any</span><span class="p">([</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">f</span> <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">suffix_rawfiles</span><span class="p">]):</span>
+                        <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">{0}</span><span class="s2"> will be ignored &quot;</span>
+                                            <span class="s2">&quot;from the Raw files &quot;</span>
+                                            <span class="s2">&quot;(it may be a download duplicate - &quot;</span>
+                                            <span class="s2">&quot; please check)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                                            <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="c1"># Transforming into numpy arrayimport pymusepipe</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fulldic</span><span class="p">:</span>
+                <span class="n">MUSE_infodic</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">MUSE_infodic</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+            <span class="c1"># Getting a sorted array with indices</span>
+            <span class="n">idxsort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">MUSE_infodic</span><span class="p">[</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">])</span>
+
+            <span class="c1"># Creating the astropy table</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span> <span class="o">=</span> <span class="n">Table</span><span class="p">([</span><span class="n">MUSE_infodic</span><span class="p">[</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">][</span><span class="n">idxsort</span><span class="p">]],</span>
+                                         <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">],</span> <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;raw file table&#39;</span><span class="p">})</span>
+
+            <span class="c1"># Creating the columns</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fulldic</span><span class="p">:</span>
+                <span class="p">[</span><span class="n">namecol</span><span class="p">,</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">form</span><span class="p">]</span> <span class="o">=</span> <span class="n">fulldic</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span><span class="p">[</span><span class="n">namecol</span><span class="p">]</span> <span class="o">=</span> <span class="n">MUSE_infodic</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">idxsort</span><span class="p">]</span>
+
+            <span class="c1"># Writing up the table</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">name_table</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">,</span>
+                                       <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Raw Files Table is empty: please check your &#39;Raw&#39; folder&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Going back to the original folder</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">goto_prevfolder</span><span class="p">()</span>
+
+        <span class="c1"># Sorting the types ====================================</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sort_raw_tables</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MusePipe.save_expo_table"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.save_expo_table">[docs]</a>    <span class="k">def</span> <span class="nf">save_expo_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">tpl_gtable</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;master&quot;</span><span class="p">,</span>
+                        <span class="n">fits_tablename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">overwrite</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save the Expo (Master or not) Table corresponding to the expotype</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_option_astropy_table</span><span class="p">(</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">update</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fits_tablename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fits_tablename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fitstablename_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+
+        <span class="n">attr_expo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attr_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">)</span>
+        <span class="n">full_tablename</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">astro_tables</span><span class="p">,</span> <span class="n">fits_tablename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">aggregate</span><span class="p">:</span>
+            <span class="n">table_to_save</span> <span class="o">=</span> <span class="n">tpl_gtable</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)[</span><span class="s1">&#39;tpls&#39;</span><span class="p">,</span> <span class="s1">&#39;mjd&#39;</span><span class="p">,</span> <span class="s1">&#39;tplnexp&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">table_to_save</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">tpl_gtable</span><span class="p">)</span>
+
+        <span class="c1"># If the file already exists</span>
+        <span class="c1"># If overwrite is True we just continue and overwrite the table</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">full_tablename</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_astropy_table</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Astropy Table </span><span class="si">{</span><span class="n">fits_tablename</span><span class="si">}</span><span class="s2"> &quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;exists and will be overwritten&quot;</span><span class="p">)</span>
+            <span class="c1"># Check if we update</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_astropy_table</span><span class="p">:</span>
+                <span class="c1"># Reading the existing table</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Reading the existing Astropy table </span><span class="si">{0}</span><span class="s2"> &quot;</span>
+                                    <span class="s2">&quot;in folder </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fits_tablename</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">astro_tables</span><span class="p">),</span> <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">existing_table</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">full_tablename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">)</span>
+                <span class="c1"># first try to see if they are compatible by using vstack</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">stack_temptable</span> <span class="o">=</span> <span class="n">vstack</span><span class="p">([</span><span class="n">existing_table</span><span class="p">,</span> <span class="n">table_to_save</span><span class="p">],</span> <span class="n">join_type</span><span class="o">=</span><span class="s1">&#39;exact&#39;</span><span class="p">)</span>
+                    <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Updating the existing Astropy table </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fits_tablename</span><span class="p">),</span>
+                                        <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="n">table_to_save</span> <span class="o">=</span> <span class="n">apy</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">stack_temptable</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">TableMergeError</span><span class="p">:</span>
+                    <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Astropy Table cannot be joined to the existing one&quot;</span><span class="p">,</span>
+                                        <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="k">return</span>
+
+            <span class="c1"># Check if we want to overwrite or add the line in</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Astropy Table </span><span class="si">{0}</span><span class="s2"> already exists, &quot;</span>
+                                    <span class="s2">&quot; use overwrite_astropy_table to &quot;</span>
+                                    <span class="s2">&quot;overwrite it&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fits_tablename</span><span class="p">),</span>
+                                    <span class="n">pipe</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="n">table_to_save</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">full_tablename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dict_tables</span><span class="p">[</span><span class="n">stage</span><span class="p">],</span> <span class="n">attr_expo</span><span class="p">,</span> <span class="n">table_to_save</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MusePipe.sort_raw_tables"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.musepipe.MusePipe.sort_raw_tables">[docs]</a>    <span class="k">def</span> <span class="nf">sort_raw_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkmode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strong_checkmode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Provide lists of exposures with types defined in the dictionary</span>
+<span class="sd">        after excluding those with the wrong MUSE mode if checkmode is set up.</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        -----</span>
+<span class="sd">        checkmode: boolean</span>
+<span class="sd">            Checking the MUSE mode or not. Default to None, namely it won&#39;t use</span>
+<span class="sd">            the value set here but the value predefined in self.checkmode.</span>
+<span class="sd">        strong_checkmode: boolean</span>
+<span class="sd">            Strong check, namely in case you still wish to force the MUSE mode</span>
+<span class="sd">            even for files which are not mode specific (e.g., BIAS). </span>
+<span class="sd">            Default to None, namely it uses the self.strong_checkmode which was</span>
+<span class="sd">            already set up at start.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">checkmode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkmode</span> <span class="o">=</span> <span class="n">checkmode</span>
+
+        <span class="k">if</span> <span class="n">strong_checkmode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">strong_checkmode</span> <span class="o">=</span> <span class="n">strong_checkmode</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Raw files is empty, hence cannot be sorted&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Sorting alphabetically (thus by date)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkmode</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checkmode is True: the MUSE Mode will be checked.&quot;</span><span class="p">)</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All Raw files which do have musemode = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">musemode</span><span class="si">}</span><span class="s2"> &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;and are mode specific (e.g., Flat field) will be masked.&quot;</span><span class="p">)</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;If you wish otherwise, set checkmode to False &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;[but this may impact the data reduction].&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">expotype</span> <span class="ow">in</span> <span class="n">dict_expotypes</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">dict_expotypes</span><span class="p">[</span><span class="n">expotype</span><span class="p">])</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkmode</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">expotype</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">list_fieldspecific_checkmode</span><span class="p">:</span>
+                        <span class="n">maskmode</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fieldmode</span> <span class="o">==</span> <span class="n">analyse_musemode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;field&#39;</span><span class="p">)</span> 
+                                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]]</span>
+                        <span class="n">mask</span> <span class="o">=</span> <span class="n">maskmode</span> <span class="o">&amp;</span> <span class="n">mask</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="n">expotype</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">list_exclude_checkmode</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_checkmode</span><span class="p">:</span>
+                        <span class="n">maskmode</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">musemode</span><span class="p">)</span>
+                        <span class="n">mask</span> <span class="o">=</span> <span class="n">maskmode</span> <span class="o">&amp;</span> <span class="n">mask</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Raw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attr_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">Tables</span><span class="o">.</span><span class="n">Rawfiles</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_attr_expo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expotype</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">expotype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_fitstablename_expo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;master&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the name of the fits table covering</span>
+<span class="sd">        a certain expotype</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fitstablename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">list_table.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dict_suffix_astro</span><span class="p">[</span><span class="n">stage</span><span class="p">],</span>
+                                                            <span class="n">expotype</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">suffix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">astro_tables</span><span class="p">,</span> <span class="n">fitstablename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_table_expo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;master&quot;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dict_tables</span><span class="p">[</span><span class="n">stage</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attr_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No attributed table with expotype </span><span class="si">{</span><span class="n">expotype</span><span class="si">}</span><span class="s2"> and stage </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Table</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_read_offset_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_offset_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">folder_offset_table</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reading the Offset Table</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        -----</span>
+<span class="sd">        name_offset_table: str</span>
+<span class="sd">            Name of the offset table</span>
+<span class="sd">            Default is None</span>
+<span class="sd">        folder_offset_table: str</span>
+<span class="sd">            Name of the folder to find the offset table</span>
+<span class="sd">            Default is None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_offset_table</span> <span class="o">=</span> <span class="n">name_offset_table</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_offset_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;No Offset table name given&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offset_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Using the given folder name, alignment one by default</span>
+        <span class="k">if</span> <span class="n">folder_offset_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folder_offset_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">alignment</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folder_offset_table</span> <span class="o">=</span> <span class="n">folder_offset_table</span>
+
+        <span class="n">fullname_offset_table</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_offset_table</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">name_offset_table</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fullname_offset_table</span><span class="p">):</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Offset table [</span><span class="si">{0}</span><span class="s2">] not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">fullname_offset_table</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offset_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Opening the offset table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset_table</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fullname_offset_table</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_select_closest_mjd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mjdin</span><span class="p">,</span> <span class="n">group_table</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the closest frame within the expotype</span>
+<span class="sd">        If the attribute does not exist in Tables, it tries to read</span>
+<span class="sd">        the table from the folder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_table</span><span class="p">[</span><span class="s1">&#39;mjd&#39;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Printing an error message and sending back a -1 for index</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;[musepipe/_select_closest_mjd] Group table is empty - Aborting&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="c1"># Get the closest tpl</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">mjdin</span> <span class="o">-</span> <span class="n">group_table</span><span class="p">[</span><span class="s1">&#39;mjd&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">closest_tpl</span> <span class="o">=</span> <span class="n">group_table</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="s1">&#39;tpls&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">index</span><span class="p">,</span> <span class="n">closest_tpl</span>
+
+    <span class="k">def</span> <span class="nf">_get_path_expo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;master&quot;</span><span class="p">):</span>
+        <span class="n">masterfolder</span> <span class="o">=</span> <span class="n">upipe</span><span class="o">.</span><span class="n">lower_allbutfirst_letter</span><span class="p">(</span><span class="n">expotype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stage</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;master&quot;</span><span class="p">:</span>
+            <span class="n">masterfolder</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">master</span><span class="p">,</span> <span class="n">masterfolder</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">masterfolder</span>
+
+    <span class="k">def</span> <span class="nf">_get_fullpath_expo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expotype</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;master&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict_paths</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;[_get_fullpath_expo] stage </span><span class="si">{}</span><span class="s2"> not &quot;</span>
+                              <span class="s2">&quot;in dict_paths dict&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stage</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">upipe</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dict_paths</span><span class="p">[</span><span class="n">stage</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attr_expo</span><span class="p">(</span><span class="n">expotype</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">_get_path_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expotype</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">upipe</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">expotype</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

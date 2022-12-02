@@ -1,0 +1,563 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe.graph_pipe &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymusepipe.graph_pipe</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymusepipe.graph_pipe</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under a MIT style license - see LICENSE.txt</span>
+
+<span class="sd">&quot;&quot;&quot;MUSE-PHANGS plotting routines</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__authors__</span>   <span class="o">=</span> <span class="s2">&quot;Eric Emsellem&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;(c) 2017, ESO + CRAL&quot;</span>
+<span class="n">__license__</span>   <span class="o">=</span> <span class="s2">&quot;MIT License&quot;</span>
+<span class="n">__contact__</span>   <span class="o">=</span> <span class="s2">&quot; &lt;eric.emsellem@eso.org&gt;&quot;</span>
+
+<span class="c1"># This module provides some functions to plot and check the data reduction</span>
+<span class="c1">#</span>
+<span class="c1"># Eric Emsellem adapted a March 2018 version, provided by Rebecca</span>
+<span class="c1"># and adapted it to the pymusepipe package</span>
+
+<span class="c1"># Importing modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Standard modules</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">joinpath</span>
+
+<span class="c1"># Plotting routines</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_pdf</span> <span class="kn">import</span> <span class="n">PdfPages</span>
+<span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="k">as</span> <span class="nn">gridspec</span>
+
+<span class="kn">from</span> <span class="nn">.mpdaf_pipe</span> <span class="kn">import</span> <span class="n">MuseSetImages</span><span class="p">,</span> <span class="n">MuseSetSpectra</span>
+<span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="n">my_linear_model</span><span class="p">,</span> <span class="n">get_flux_range</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.0.1 (23 March 2018)&#39;</span>
+
+<span class="c1">############################################################</span>
+<span class="c1">#                      BEGIN</span>
+<span class="c1"># The following parameters can be adjusted for the need of</span>
+<span class="c1"># the specific pipeline to be used</span>
+<span class="c1">############################################################</span>
+
+<span class="c1">############################################################</span>
+<span class="c1">#                      END</span>
+<span class="c1">############################################################</span>
+<span class="n">PLOT</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1;35;20m&#39;</span>
+<span class="n">ENDC</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span>
+
+<div class="viewcode-block" id="print_fig"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.print_fig">[docs]</a><span class="k">def</span> <span class="nf">print_fig</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">PLOT</span> <span class="o">+</span> <span class="s2">&quot;# GraphPipeInfo &quot;</span> <span class="o">+</span> <span class="n">ENDC</span> <span class="o">+</span> <span class="n">text</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="open_new_wcs_figure"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.open_new_wcs_figure">[docs]</a><span class="k">def</span> <span class="nf">open_new_wcs_figure</span><span class="p">(</span><span class="n">nfig</span><span class="p">,</span> <span class="n">mywcs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Open a new figure (with number nfig) with given wcs.</span>
+<span class="sd">    If not WCS is provided, just opens a subplot in that figure.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    nfig : int</span>
+<span class="sd">        Figure number to consider</span>
+<span class="sd">    mywcs : astropy.wcs.WCS</span>
+<span class="sd">        Input WCS to open a new figure (Default value = None)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig, subplot</span>
+<span class="sd">        Figure itself with the subplots using the wcs projection</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get the figure</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">nfig</span><span class="p">)</span>
+
+    <span class="c1"># Clean the figure</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+
+    <span class="c1"># Adding axes with WCS</span>
+    <span class="k">if</span> <span class="n">mywcs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">mywcs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="plot_compare_contours"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.plot_compare_contours">[docs]</a><span class="k">def</span> <span class="nf">plot_compare_contours</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">,</span> <span class="n">plotwcs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Data1&#39;</span><span class="p">,</span> <span class="s1">&#39;Data2&#39;</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">nlevels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fignum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">namefig</span><span class="o">=</span><span class="s1">&#39;dummy_contours.png&#39;</span><span class="p">,</span> <span class="n">figfolder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                          <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a plot with the contours of two input datasets for comparison</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    data1</span>
+<span class="sd">    data2: 2d np.arrays</span>
+<span class="sd">        Input arrays to compare</span>
+<span class="sd">    plotwcs: WCS</span>
+<span class="sd">        WCS used to set the plot if provided</span>
+<span class="sd">    labels: tuple/list of 2 str</span>
+<span class="sd">        Labels for the plot</span>
+<span class="sd">    levels: list of floats</span>
+<span class="sd">        Levels to be used for the contours. Calculated if None.</span>
+<span class="sd">    fignum: int</span>
+<span class="sd">        Number for the figure</span>
+<span class="sd">    namefig: str</span>
+<span class="sd">        Name of the figure to be saved (if savefig is True)</span>
+<span class="sd">    figfolder: str</span>
+<span class="sd">        Name of the folder for the figure</span>
+<span class="sd">    savefig: bool</span>
+<span class="sd">        If True, will save the figure as namefig</span>
+
+<span class="sd">    Creates</span>
+<span class="sd">    -------</span>
+<span class="sd">    Plot with contours of the two input dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Getting the range of relevant fluxes</span>
+    <span class="n">lowlevel_d1</span><span class="p">,</span> <span class="n">highlevel_d1</span> <span class="o">=</span> <span class="n">get_flux_range</span><span class="p">(</span><span class="n">data1</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">open_new_wcs_figure</span><span class="p">(</span><span class="n">fignum</span><span class="p">,</span> <span class="n">plotwcs</span><span class="p">)</span>
+
+    <span class="c1"># Defining the levels for MUSE</span>
+    <span class="k">if</span> <span class="n">levels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">levels_d1</span> <span class="o">=</span> <span class="n">levels</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">levels_d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">lowlevel_d1</span><span class="p">),</span>
+                                  <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">highlevel_d1</span><span class="p">),</span>
+                                  <span class="n">nlevels</span><span class="p">)</span>
+    <span class="c1"># Plot contours for MUSE</span>
+    <span class="n">cdata1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">data1</span><span class="p">),</span> <span class="n">levels_d1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
+                          <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
+
+    <span class="n">levels_d2</span> <span class="o">=</span> <span class="n">cdata1</span><span class="o">.</span><span class="n">levels</span>
+    <span class="c1"># Plot contours for Ref</span>
+    <span class="n">cdata2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">data2</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="n">levels_d2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span>
+                        <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">h1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cdata1</span><span class="o">.</span><span class="n">legend_elements</span><span class="p">()</span>
+    <span class="n">h2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cdata2</span><span class="o">.</span><span class="n">legend_elements</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">h1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">h2</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">labels</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+
+    <span class="k">if</span> <span class="s2">&quot;title&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figfolder</span><span class="p">,</span> <span class="n">namefig</span><span class="p">))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="plot_compare_diff"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.plot_compare_diff">[docs]</a><span class="k">def</span> <span class="nf">plot_compare_diff</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">,</span> <span class="n">plotwcs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figfolder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fignum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                      <span class="n">namefig</span><span class="o">=</span><span class="s2">&quot;dummy_diff.ong&quot;</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data1</span>
+<span class="sd">    data2</span>
+<span class="sd">    figfolder</span>
+<span class="sd">    fignum</span>
+<span class="sd">    namefig</span>
+<span class="sd">    savefig</span>
+<span class="sd">    kwargs</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">open_new_wcs_figure</span><span class="p">(</span><span class="n">fignum</span><span class="p">,</span> <span class="n">plotwcs</span><span class="p">)</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="mf">100.</span> <span class="o">*</span> <span class="p">(</span><span class="n">data2</span> <span class="o">-</span> <span class="n">data1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">data1</span> <span class="o">+</span> <span class="mf">1.e-12</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="n">percentage</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">percentage</span><span class="p">)</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;title&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figfolder</span><span class="p">,</span> <span class="n">namefig</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="plot_compare_cuts"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.plot_compare_cuts">[docs]</a><span class="k">def</span> <span class="nf">plot_compare_cuts</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">),</span> <span class="n">figfolder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">fignum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">namefig</span><span class="o">=</span><span class="s2">&quot;dummy_polypar.png&quot;</span><span class="p">,</span> <span class="n">ncuts</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    data1</span>
+<span class="sd">    data2</span>
+<span class="sd">    label1</span>
+<span class="sd">    label2</span>
+<span class="sd">    figfolder</span>
+<span class="sd">    fignum</span>
+<span class="sd">    namefig</span>
+<span class="sd">    savefig</span>
+<span class="sd">    kwargs</span>
+
+<span class="sd">    Creates</span>
+<span class="sd">    -------</span>
+<span class="sd">    Plot with a comparison of the two data arrays using regular X and Y cuts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">open_new_wcs_figure</span><span class="p">(</span><span class="n">fignum</span><span class="p">)</span>
+
+    <span class="c1"># Getting the range of relevant fluxes</span>
+    <span class="n">lowlevel_d1</span><span class="p">,</span> <span class="n">highlevel_d1</span> <span class="o">=</span> <span class="n">get_flux_range</span><span class="p">(</span><span class="n">data1</span><span class="p">)</span>
+
+    <span class="n">diffima</span> <span class="o">=</span> <span class="p">(</span><span class="n">data2</span> <span class="o">-</span> <span class="n">data1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">200.</span> <span class="o">/</span> <span class="p">(</span><span class="n">lowlevel_d1</span> <span class="o">+</span> <span class="n">highlevel_d1</span><span class="p">)</span>
+    <span class="n">chunk_x</span> <span class="o">=</span> <span class="n">data1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="p">(</span><span class="n">ncuts</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">chunk_y</span> <span class="o">=</span> <span class="n">data1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="p">(</span><span class="n">ncuts</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diffima</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ncuts</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunk_x</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;k-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diffima</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ncuts</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunk_y</span><span class="p">],</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;[pixels]&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;[%]&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;title&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figfolder</span><span class="p">,</span> <span class="n">namefig</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="plot_polypar"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.plot_polypar">[docs]</a><span class="k">def</span> <span class="nf">plot_polypar</span><span class="p">(</span><span class="n">polypar</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Data 1&quot;</span><span class="p">,</span><span class="s2">&quot;Data 2&quot;</span><span class="p">),</span> <span class="n">figfolder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">fignum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">namefig</span><span class="o">=</span><span class="s2">&quot;dummy_polypar.png&quot;</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creating a plot showing the normalisation arising from a polypar object</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polypar</span>
+<span class="sd">    label1</span>
+<span class="sd">    label2</span>
+<span class="sd">    foldfig</span>
+<span class="sd">    namefig</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Opening the figure</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">open_new_wcs_figure</span><span class="p">(</span><span class="n">fignum</span><span class="p">)</span>
+
+    <span class="c1"># Getting the x, y to plot</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">polypar</span><span class="o">.</span><span class="n">med</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">polypar</span><span class="o">.</span><span class="n">selection</span><span class="p">],</span>
+              <span class="n">polypar</span><span class="o">.</span><span class="n">med</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">polypar</span><span class="o">.</span><span class="n">selection</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">my_linear_model</span><span class="p">(</span><span class="n">polypar</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;title&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figfolder</span><span class="p">,</span> <span class="n">namefig</span><span class="p">))</span></div>
+
+            
+<span class="c1">#########################################################################</span>
+<span class="c1"># Main class</span>
+<span class="c1">#                           GraphMuse</span>
+<span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="GraphMuse"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.GraphMuse">[docs]</a><span class="k">class</span> <span class="nc">GraphMuse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Graphic output to check MUSE data reduction products</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdf_name</span><span class="o">=</span><span class="s1">&#39;drs_check.pdf&#39;</span><span class="p">,</span> 
+            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">14</span><span class="p">),</span> <span class="n">rect_layout</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise the class for plotting the outcome results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdf_name</span> <span class="o">=</span> <span class="n">pdf_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pp</span> <span class="o">=</span> <span class="n">PdfPages</span><span class="p">(</span><span class="n">pdf_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figsize</span> <span class="o">=</span> <span class="n">figsize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rect_layout</span> <span class="o">=</span> <span class="n">rect_layout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npages</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="GraphMuse.close"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GraphMuse.savepage"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.savepage">[docs]</a>    <span class="k">def</span> <span class="nf">savepage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">savefig</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npages</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="GraphMuse.start_page"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.start_page">[docs]</a>    <span class="k">def</span> <span class="nf">start_page</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start the page</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="p">:</span>
+            <span class="n">print_fig</span><span class="p">(</span><span class="s2">&quot;Starting page </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npages</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">figsize</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GraphMuse.plot_page"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.plot_page">[docs]</a>    <span class="k">def</span> <span class="nf">plot_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot a set of blocks, each made of a set of spectra or</span>
+<span class="sd">        images. This is for 1 page</span>
+<span class="sd">        It first counts the number of lines needed according to the</span>
+<span class="sd">        separation for images (default is 2 per line, each image taking 2 lines)</span>
+<span class="sd">        and spectra (1 spectrum per line over 2 columns)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>
+            <span class="n">print_fig</span><span class="p">(</span><span class="s2">&quot;WARNING: datalist is empty, no plots will be created&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_page</span><span class="p">()</span>
+        <span class="n">nspectra_blocks</span><span class="p">,</span> <span class="n">nimages_blocks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">nlines</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_data</span><span class="p">,</span> <span class="n">MuseSetSpectra</span><span class="p">)</span> <span class="o">|</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_data</span><span class="p">,</span> <span class="n">MuseSetImages</span><span class="p">):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">list_data</span><span class="o">.</span><span class="n">subtitle</span><span class="p">)</span>
+            <span class="n">list_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">list_data</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">list_data</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">MuseSetSpectra</span><span class="p">):</span>
+                <span class="n">nspectra_blocks</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">nlines</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="fm">__len__</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">MuseSetImages</span><span class="p">):</span>
+                <span class="n">nimages_blocks</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">nlines</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="fm">__len__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="n">nlines</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">list_ax</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count_lines</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">list_data</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">MuseSetSpectra</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">plot_set_spectra</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> 
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">MuseSetImages</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">plot_set_images</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">savepage</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GraphMuse.plot_set_spectra"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.plot_set_spectra">[docs]</a>    <span class="k">def</span> <span class="nf">plot_set_spectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_of_spectra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plotting a set of spectra</span>
+<span class="sd">        Skipping the ones that are &#39;None&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Set of sky lines to plot when relevant - add_sky_lines to True</span>
+        <span class="n">sky_lines</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5577.</span><span class="p">,</span> <span class="mf">6300.</span><span class="p">,</span> <span class="mf">6864.</span><span class="p">,</span> <span class="mf">7914.</span><span class="p">,</span> <span class="mf">8344.</span><span class="p">,</span> <span class="mf">8827.</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">set_of_spectra</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">print_fig</span><span class="p">(</span><span class="s2">&quot;ERROR: list of spectra is empty&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">set_of_spectra</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">list_ax</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">count_lines</span><span class="p">,:]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">count_lines</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">spec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">spec</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">list_ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">add_sky_lines</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sky_lines</span><span class="p">:</span>
+                        <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">line</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">color_sky</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">linestyle_sky</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">alpha_sky</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rect_layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GraphMuse.plot_set_images"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.graph_pipe.GraphMuse.plot_set_images">[docs]</a>    <span class="k">def</span> <span class="nf">plot_set_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_of_images</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plotting a set of images</span>
+<span class="sd">        Skipping the ones that are &#39;None&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">set_of_images</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="n">print_fig</span><span class="p">(</span><span class="s2">&quot;ERROR: list of images is empty&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">set_of_images</span><span class="o">.</span><span class="fm">__len__</span><span class="p">()):</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">set_of_images</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">count_cols</span> <span class="o">=</span> <span class="n">i</span><span class="o">%</span><span class="mi">2</span>
+            <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">list_ax</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">count_lines</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_lines</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">count_cols</span><span class="p">]))</span>
+                <span class="n">image</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">vmin</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">colorbar</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">list_ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">count_lines</span> <span class="o">+=</span> <span class="n">count_cols</span> <span class="o">*</span> <span class="mi">2</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rect_layout</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

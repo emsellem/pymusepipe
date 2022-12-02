@@ -1,0 +1,686 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymusepipe.cube_convolve &mdash; pymusepipe 2.16.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pymusepipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.16.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mosaicking.html">Mosaicking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../convolution.html">Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../phangs_example.html">PHANGS pipeline example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pymusepipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymusepipe.cube_convolve</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymusepipe.cube_convolve</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;MUSE-PHANGS convolve module</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__authors__</span>   <span class="o">=</span> <span class="s2">&quot;Eric Emsellem&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;(c) 2019, ESO + CRAL&quot;</span>
+<span class="n">__license__</span>   <span class="o">=</span> <span class="s2">&quot;MIT License&quot;</span>
+<span class="n">__contact__</span>   <span class="o">=</span> <span class="s2">&quot; &lt;eric.emsellem@eso.org&gt;&quot;</span>
+
+<span class="c1"># This module uses some mpdaf routines and pypher to </span>
+<span class="c1"># convolve a given datacube to a calibrated PSF</span>
+<span class="c1"># This uses Moffat functions as reference</span>
+
+<span class="c1"># Importing modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Astropy</span>
+<span class="kn">from</span> <span class="nn">astropy.convolution</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Moffat2DKernel</span><span class="p">,</span> <span class="n">Gaussian2DKernel</span><span class="p">,</span> <span class="n">convolve</span><span class="p">,</span>
+                                 <span class="n">convolve_fft</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="kn">import</span> <span class="n">gaussian_fwhm_to_sigma</span>
+
+<span class="c1"># pypher</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pypher.pypher</span> <span class="k">as</span> <span class="nn">ph</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;IMPORT WARNING: pypher is needed for cube_convolve&quot;</span><span class="p">)</span>
+
+<span class="c1"># Importing mpdaf</span>
+<span class="k">try</span> <span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">mpdaf</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;IMPORT ERROR: mpdaf is needed for cube_convolve&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="pypher_script"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.pypher_script">[docs]</a><span class="k">def</span> <span class="nf">pypher_script</span><span class="p">(</span><span class="n">psf_source</span><span class="p">,</span> <span class="n">psf_target</span><span class="p">,</span> <span class="n">pixscale_source</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                  <span class="n">pixscale_target</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">angle_source</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">angle_target</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+                  <span class="n">reg_fact</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;calculate the convolution kernel to move from one PSF to a target one.</span>
+<span class="sd">    This is an adaptation of the main pypher script that it is meant to be used</span>
+<span class="sd">    from the terminal.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        psf_source (ndarray): 2D PSF of the source image.</span>
+<span class="sd">        psf_target (ndarray): target 2D PSF</span>
+<span class="sd">        pixscale_source (float): pixel scale of the source PSF [0.2]</span>
+<span class="sd">        pixscale_target (float): pixel scale of the target PSF [0.2]</span>
+<span class="sd">        angle_source (float): position angle of the source PSF. [0]</span>
+<span class="sd">        angle_target (float): position angle of the target PSF. [0]</span>
+<span class="sd">        reg_fact (float): Regularisation parameter for the Wiener filter [1.e-4]</span>
+<span class="sd">        verbose (bool): If True it prints more info on screen [False]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        kernel: a 2D kernel that convolved with the source PSF</span>
+<span class="sd">            returns the target PSF</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Set NaNs to 0.0 for both input PSFs</span>
+    <span class="n">psf_source</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">psf_source</span><span class="p">)</span>
+    <span class="n">psf_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">psf_target</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Source PSF pixel scale: </span><span class="si">%.2f</span><span class="s1"> arcsec&#39;</span><span class="p">,</span> <span class="n">pixscale_source</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Target PSF pixel scale: </span><span class="si">%.2f</span><span class="s1"> arcsec&#39;</span><span class="p">,</span> <span class="n">pixscale_target</span><span class="p">)</span>
+
+    <span class="c1"># Rotate images (if necessary)</span>
+    <span class="k">if</span> <span class="n">angle_source</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">psf_source</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">imrotate</span><span class="p">(</span><span class="n">psf_source</span><span class="p">,</span> <span class="n">angle_source</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Source PSF rotated by </span><span class="si">%.2f</span><span class="s1"> degrees&#39;</span><span class="p">,</span> <span class="n">angle_source</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">angle_target</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">psf_target</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">imrotate</span><span class="p">(</span><span class="n">psf_target</span><span class="p">,</span> <span class="n">angle_target</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Target PSF rotated by </span><span class="si">%.2f</span><span class="s1"> degrees&#39;</span><span class="p">,</span> <span class="n">angle_target</span><span class="p">)</span>
+
+    <span class="c1"># Normalize the PSFs if needed</span>
+    <span class="n">normalize_s</span> <span class="o">=</span> <span class="n">psf_source</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">normalize_t</span> <span class="o">=</span> <span class="n">psf_target</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">([</span><span class="n">normalize_s</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1.e-3</span><span class="p">):</span>
+        <span class="n">psf_source</span> <span class="o">/=</span> <span class="n">normalize_s</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Source PSF normalized with normalization &#39;</span>
+                  <span class="s1">&#39;constant </span><span class="si">{:0.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalize_s</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">([</span><span class="n">normalize_t</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1.e-3</span><span class="p">):</span>
+        <span class="n">psf_target</span> <span class="o">/=</span> <span class="n">normalize_t</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Target PSF normalized with normalization &#39;</span>
+                  <span class="s1">&#39;constant </span><span class="si">{:0.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalize_t</span><span class="p">))</span>
+
+    <span class="c1"># Resample high resolution image to the low one</span>
+    <span class="k">if</span> <span class="n">pixscale_source</span> <span class="o">!=</span> <span class="n">pixscale_target</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">psf_source</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">imresample</span><span class="p">(</span><span class="n">psf_source</span><span class="p">,</span>
+                                       <span class="n">pixscale_source</span><span class="p">,</span>
+                                       <span class="n">pixscale_target</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">MemoryError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;- COMPUTATION ABORTED -&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The size of the resampled PSF would have &#39;</span>
+                  <span class="s1">&#39;exceeded 10K x 10K&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Please resize your image and try again&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Source PSF resampled to the target pixel scale&#39;</span><span class="p">)</span>
+
+    <span class="c1"># check the new size of the source vs. the target</span>
+    <span class="k">if</span> <span class="n">psf_source</span><span class="o">.</span><span class="n">shape</span> <span class="o">&gt;</span> <span class="n">psf_target</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="n">psf_source</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">psf_source</span><span class="p">,</span> <span class="n">psf_target</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">psf_source</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">zero_pad</span><span class="p">(</span><span class="n">psf_source</span><span class="p">,</span> <span class="n">psf_target</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                                 <span class="n">position</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+    <span class="n">kernel</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">homogenization_kernel</span><span class="p">(</span><span class="n">psf_target</span><span class="p">,</span> <span class="n">psf_source</span><span class="p">,</span>
+                                         <span class="n">reg_fact</span><span class="o">=</span><span class="n">reg_fact</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Kernel computed using Wiener filtering and a regularisation &#39;</span>
+              <span class="s1">&#39;parameter r = </span><span class="si">{:0.2e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">reg_fact</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">kernel</span></div>
+
+<div class="viewcode-block" id="moffat_kernel"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.moffat_kernel">[docs]</a><span class="k">def</span> <span class="nf">moffat_kernel</span><span class="p">(</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Moffat kernel. Returns a Moffat function array according to given</span>
+<span class="sd">    input parameters. Using astropy Moffat2DKernel.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        fwhm (float): fwhm of the Moffat kernel, in arcsec.</span>
+<span class="sd">        n (float): power index of the Moffat</span>
+<span class="sd">        size (int numpy array): size of the requested kernel along each axis.</span>
+<span class="sd">            If ``size&#39;&#39; is a scalar number the final kernel will be a square of</span>
+<span class="sd">            side ``size&#39;&#39;. If ``size&#39;&#39; has two element they must be in</span>
+<span class="sd">            (y_size, x_size) order. In each case size must be an integer</span>
+<span class="sd">            number of pixels.</span>
+<span class="sd">        scale (float): pixel scale of the image [optional]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR[moffat_kernel]: n cannot be None for Moffat&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Check the size nature (scalar and array or not)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR[moffat_kernel]: size must have at most two elements.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Calculate the gamma power for the Moffat function</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">fwhm</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">**</span><span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span>
+    <span class="n">moffat_k</span> <span class="o">=</span> <span class="n">Moffat2DKernel</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x_size</span><span class="o">=</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_size</span><span class="o">=</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">moffat_k</span><span class="o">.</span><span class="n">array</span></div>
+
+<div class="viewcode-block" id="gaussian_kernel"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.gaussian_kernel">[docs]</a><span class="k">def</span> <span class="nf">gaussian_kernel</span><span class="p">(</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gaussian kernel.</span>
+<span class="sd">    Input:</span>
+<span class="sd">        fwhm (float): fwhm of the Gaussian kernel, in arcsec.</span>
+<span class="sd">        size (int, ndarray): size of the requested kernel along each axis.</span>
+<span class="sd">            If ``size&#39;&#39; is a scalar number the final kernel will be a square of</span>
+<span class="sd">            side ``size&#39;&#39;. If ``size&#39;&#39; has two element they must be in</span>
+<span class="sd">            (y_size, x_size) order. In each case size must be an integer number</span>
+<span class="sd">            of pixels.</span>
+<span class="sd">        scale (float): pixel scale of the image</span>
+<span class="sd">        **kwargs: is there to absorb any additional parameter which could be</span>
+<span class="sd">           provided (but won&#39;t be used).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;size must have at most two elements.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Compute sigma for the gaussian in pixels</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">fwhm</span> <span class="o">*</span> <span class="n">gaussian_fwhm_to_sigma</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="n">gaussian_k</span> <span class="o">=</span> <span class="n">Gaussian2DKernel</span><span class="p">(</span><span class="n">std</span><span class="p">,</span> <span class="n">x_size</span><span class="o">=</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_size</span><span class="o">=</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">gaussian_k</span><span class="o">.</span><span class="n">array</span></div>
+
+<div class="viewcode-block" id="psf3d"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.psf3d">[docs]</a><span class="k">def</span> <span class="nf">psf3d</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">fwhm0</span><span class="p">,</span> <span class="n">lambda0</span><span class="o">=</span><span class="mf">6483.58</span><span class="p">,</span> <span class="n">b</span><span class="o">=-</span><span class="mf">3e-5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">nmoffat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">function</span><span class="o">=</span><span class="s2">&quot;moffat&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to create the cube with the  lambda dependent PSF, following</span>
+<span class="sd">    a given slope and nominal wavelength.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">        wave: np.ndarray</span>
+<span class="sd">            array with the wavelength axis of the datacube</span>
+<span class="sd">        size: int, array-like</span>
+<span class="sd">            the size of the 2D PSF.  If ``size&#39;&#39; is a scalar number the 2D PSF</span>
+<span class="sd">            kernel will be a square of side ``size&#39;&#39;. If ``size&#39;&#39; has two element</span>
+<span class="sd">            they must be in (y_size, x_size) order.</span>
+<span class="sd">        fwhm0: float</span>
+<span class="sd">            the fwhm at the reference wavelength in arcseconds.</span>
+<span class="sd">        n: float</span>
+<span class="sd">            Power index of the Moffat profile. It is usually 2.8 for NOAO cubes</span>
+<span class="sd">            and 2.3 for AO cubes.</span>
+<span class="sd">        lambda0: float</span>
+<span class="sd">            reference wavelength at which fwhm0 is measured. Default: 6483.58.</span>
+<span class="sd">            (It&#39;s the average wavelength for the WFI_BB filter)</span>
+<span class="sd">        b: float, optional</span>
+<span class="sd">            the steepness of the relation between wavelength and FWHM.</span>
+<span class="sd">            Default: -3e-5 (arcsec/A) (From MUSE team)</span>
+<span class="sd">        scale: float, optional</span>
+<span class="sd">            spatial scale of the new datacube in arcsec. Default: 0.2 (MUSE</span>
+<span class="sd">            spatial resolution).</span>
+<span class="sd">        function (str): &#39;moffat&#39; or &#39;gaussian&#39;</span>
+<span class="sd">    Returns</span>
+<span class="sd">        psf_cube: np.array</span>
+<span class="sd">            Datacube containing MUSE PSF as a function of wavelength.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dict_kernel</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gaussian&#39;</span><span class="p">:</span> <span class="n">gaussian_kernel</span><span class="p">,</span> <span class="s1">&#39;moffat&#39;</span><span class="p">:</span> <span class="n">moffat_kernel</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;size must have at most two elements.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="c1"># computing the fwhm as a function of wavelength</span>
+    <span class="n">fwhm_wave</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">wave</span> <span class="o">-</span> <span class="n">lambda0</span><span class="p">)</span> <span class="o">+</span> <span class="n">fwhm0</span>
+
+    <span class="c1"># check the maximum size of the PSF.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Max. FWHM </span><span class="si">{0:0.3f}</span><span class="s1"> at wavelength </span><span class="si">{1:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fwhm_wave</span><span class="p">),</span> <span class="n">wave</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">fwhm_wave</span><span class="p">)]))</span>
+
+    <span class="c1"># creating the 3D PSF.</span>
+    <span class="n">psf_cube</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">wave</span><span class="p">),</span> <span class="o">*</span><span class="n">size</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">function</span> <span class="ow">in</span> <span class="n">dict_kernel</span><span class="p">:</span>
+        <span class="n">function_kernel</span> <span class="o">=</span> <span class="n">dict_kernel</span><span class="p">[</span><span class="n">function</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fwhm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fwhm_wave</span><span class="p">):</span>
+            <span class="n">kernel</span> <span class="o">=</span> <span class="n">function_kernel</span><span class="p">(</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">nmoffat</span><span class="p">)</span>
+            <span class="n">psf_cube</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">kernel</span>
+        <span class="k">return</span> <span class="n">psf_cube</span><span class="p">,</span> <span class="n">fwhm_wave</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR[psf3d]: input function not part of the available ones&quot;</span>
+              <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dict_kernel</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="psf2d"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.psf2d">[docs]</a><span class="k">def</span> <span class="nf">psf2d</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">fwhm</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">nmoffat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a model of the target PSF of the convolution. The target PSF does</span>
+<span class="sd">    not vary as a function of wavelenght, therefore the output is a 2D array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">        size: int, array-like</span>
+<span class="sd">            the size of the final array. If ``size&#39;&#39; is a scalar number the</span>
+<span class="sd">            kernel will be a square of side ``size&#39;&#39;. If ``size&#39;&#39; has two</span>
+<span class="sd">            elements they must be in (y_size, x_size) order.</span>
+<span class="sd">        fwhm: float</span>
+<span class="sd">            the FWHM of the psf</span>
+<span class="sd">        function: str, optional</span>
+<span class="sd">            the function to model the target PSF. Only &#39;gaussian&#39; or &#39;moffat&#39;</span>
+<span class="sd">            are accepted. Default: &#39;gaussian&#39;</span>
+<span class="sd">        nmoffat (float): Moffat power index. It must be defined if</span>
+<span class="sd">        function = &#39;moffat&#39;.</span>
+<span class="sd">            Default: None</span>
+<span class="sd">        scale: float, optional</span>
+<span class="sd">            the spatial scale of the final kernel</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">        target: np.ndarray</span>
+<span class="sd">            a 2D array with the model of the target PSF.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dict_kernel</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gaussian&#39;</span><span class="p">:</span> <span class="n">gaussian_kernel</span><span class="p">,</span> <span class="s1">&#39;moffat&#39;</span><span class="p">:</span> <span class="n">moffat_kernel</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;size must have at most two elements.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">function</span> <span class="ow">in</span> <span class="n">dict_kernel</span><span class="p">:</span>
+        <span class="n">function_kernel</span> <span class="o">=</span> <span class="n">dict_kernel</span><span class="p">[</span><span class="n">function</span><span class="p">]</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">function_kernel</span><span class="p">(</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">nmoffat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kernel</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR[psf2d]: input function not part of the available ones&quot;</span>
+              <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dict_kernel</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="convolution_kernel"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.convolution_kernel">[docs]</a><span class="k">def</span> <span class="nf">convolution_kernel</span><span class="p">(</span><span class="n">input_psf</span><span class="p">,</span> <span class="n">target_psf</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the 3D convolution kernel starting from a 3D model of the original</span>
+<span class="sd">    PSF and a 2D model of the target PSF using pypher.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">        input_psf (np.ndarray): 3D array with the model of the original PSF</span>
+<span class="sd">        target_psf (np.ndarray): 2D array with a model of the target PSF</span>
+<span class="sd">        scale (float): spatial scale of both PSF in arcsec/pix</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">        conv_kernel (np.ndarray): 3D array with a convolution kernel</span>
+<span class="sd">            that varies as a function of wavelength.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;the target_psf must be a 2d array&#39;</span>
+
+    <span class="n">n_lam</span> <span class="o">=</span> <span class="n">input_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">conv_kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">input_psf</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_lam</span><span class="p">):</span>
+        <span class="n">conv_kernel</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pypher_script</span><span class="p">(</span><span class="n">input_psf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">target_psf</span><span class="p">,</span>
+                                             <span class="n">pixscale_source</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+                                             <span class="n">pixscale_target</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+                                             <span class="n">angle_source</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">angle_target</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">conv_kernel</span></div>
+
+
+<div class="viewcode-block" id="convolution_kernel_gaussian"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.convolution_kernel_gaussian">[docs]</a><span class="k">def</span> <span class="nf">convolution_kernel_gaussian</span><span class="p">(</span><span class="n">fwhm_wave</span><span class="p">,</span> <span class="n">target_fwhm</span><span class="p">,</span> <span class="n">target_psf</span><span class="p">,</span>
+                                <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the 3D convolution kernel starting from a 3D model of the original</span>
+<span class="sd">    PSF and a 2D model of the target PSF using both gaussian functions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fwhm_wave (array): FWHM of the original PSF as a function of</span>
+<span class="sd">            wavelength</span>
+<span class="sd">        target_fwhm (float): fwhm of the target PSF</span>
+<span class="sd">        target_psf (np.ndarray): target psf2d</span>
+<span class="sd">        scale (float): spatial scale of both PSF in arcsec/pix</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        conv_kernel: np.ndarray</span>
+<span class="sd">            3D array with a convolution kernel that varies as a function of</span>
+<span class="sd">            wavelength.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;the target_psf must be a 2d array&#39;</span>
+
+    <span class="c1"># getting the first dimension (lambda) of the input PSF</span>
+    <span class="n">n_lam</span> <span class="o">=</span> <span class="n">target_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">conv_kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">target_psf</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fwhm</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fwhm_wave</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The new PSF is smaller than the old one&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Loop over the wavelengths</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_lam</span><span class="p">):</span>
+        <span class="n">new_fwhm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">fwhm</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">input_fwhm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ker</span> <span class="o">=</span> <span class="n">gaussian_kernel</span><span class="p">(</span><span class="n">new_fwhm</span><span class="p">,</span> <span class="n">target_psf</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                              <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">conv_kernel</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">ker</span> <span class="o">/</span> <span class="n">ker</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">conv_kernel</span></div>
+
+<div class="viewcode-block" id="cube_convolve"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.cube_convolve">[docs]</a><span class="k">def</span> <span class="nf">cube_convolve</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fft</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convolve a 3D datacube</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        datacube:</span>
+<span class="sd">        kernel:</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the convolved 3D data and its variance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dict_func</span> <span class="o">=</span> <span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="n">convolve_fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="n">convolve</span><span class="p">}</span>
+    <span class="n">conv_function</span> <span class="o">=</span> <span class="n">dict_func</span><span class="p">[</span><span class="n">fft</span><span class="p">]</span>
+    <span class="c1"># if fft:</span>
+    <span class="c1">#     print(&quot;Starting the convolution with fft&quot;)</span>
+    <span class="c1">#     conv_function = convolve_fft</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     print(&quot;Starting the linear convolution&quot;)</span>
+    <span class="c1">#     conv_function = convolve</span>
+
+    <span class="n">norm_kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">kernel</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">kernel</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">var_kernel</span> <span class="o">=</span> <span class="n">norm_kernel</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="c1"># Removed the perslice option as it MUST be done per slice</span>
+    <span class="c1"># Or it provides a 3D FFT which is something different</span>
+    <span class="c1"># if perslice:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Convolution using per slice-2D convolve in astropy&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="c1"># Signal</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">conv_function</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
+                                      <span class="n">norm_kernel</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
+                                      <span class="n">allow_huge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                      <span class="n">psf_pad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                      <span class="n">fft_pad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                      <span class="n">boundary</span><span class="o">=</span><span class="s1">&#39;fill&#39;</span><span class="p">,</span>
+                                      <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
+                                      <span class="n">normalize_kernel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                      <span class="n">preserve_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">variance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">variance</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="c1"># Variance</span>
+            <span class="n">variance</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">conv_function</span><span class="p">(</span><span class="n">variance</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
+                                              <span class="n">var_kernel</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
+                                              <span class="n">allow_huge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                              <span class="n">psf_pad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                              <span class="n">fft_pad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                              <span class="n">boundary</span><span class="o">=</span><span class="s1">&#39;fill&#39;</span><span class="p">,</span>
+                                              <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
+                                              <span class="n">normalize_kernel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                              <span class="n">preserve_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     print(&quot;Convolution using 3D convolve in astropy&quot;)</span>
+    <span class="c1">#     data = conv_function(data, norm_kernel, allow_huge=True,</span>
+    <span class="c1">#                          psf_pad=True, fft_pad=False,</span>
+    <span class="c1">#                          boundary=&#39;fill&#39;, fill_value=0,</span>
+    <span class="c1">#                          normalize_kernel=False)</span>
+    <span class="c1">#     if variance is not None:</span>
+    <span class="c1">#         variance = conv_function(variance, var_kernel, allow_huge=True,</span>
+    <span class="c1">#                                  psf_pad=True, fft_pad=False,</span>
+    <span class="c1">#                                  boundary=&#39;fill&#39;, fill_value=0,</span>
+    <span class="c1">#                                  normalize_kernel=False)</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">variance</span></div>
+
+<div class="viewcode-block" id="cube_kernel"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.cube_convolve.cube_kernel">[docs]</a><span class="k">def</span> <span class="nf">cube_kernel</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">input_fwhm</span><span class="p">,</span>  <span class="n">target_fwhm</span><span class="p">,</span>
+                <span class="n">input_function</span><span class="p">,</span> <span class="n">target_function</span><span class="p">,</span> <span class="n">lambda0</span><span class="o">=</span><span class="mf">6483.58</span><span class="p">,</span>
+                <span class="n">input_nmoffat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_nmoffat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b</span><span class="o">=-</span><span class="mf">3e-5</span><span class="p">,</span>
+                <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">compute_kernel</span><span class="o">=</span><span class="s1">&#39;pypher&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main function to create the convolution kernel for the datacube</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        shape (array): the shape of the datacube that is going to be convolved.</span>
+<span class="sd">            It must be in the form (z, y, x).</span>
+<span class="sd">        wave (float array): wavelengths for the datacube</span>
+<span class="sd">        target_fwhm (float): fwhm of the target PSF.</span>
+<span class="sd">        input_fwhm (float): fwhm of the original PSF at the reference</span>
+<span class="sd">            wavelength lambda0</span>
+<span class="sd">        input_function (str): function to be used to describe the input PSF</span>
+<span class="sd">        target_function (str): function to be used to describe the target PSF</span>
+<span class="sd">        lambda0: float, optional</span>
+<span class="sd">            the wavelength at which the original_fwhm has been measured.</span>
+<span class="sd">            Default: 6483.58 (central wavelenght of WFI_BB filter)</span>
+<span class="sd">        input_nmoffat (float): power index of the original PSF if Moffat [None]</span>
+<span class="sd">        target_nmoffat (float): power index for the target PSF if Moffat [None]</span>
+<span class="sd">        b (float): steepness of the fwhm vs wavelength relation. Default: -3e-5</span>
+<span class="sd">        step (float): wavelength dispersion in AA/px</span>
+<span class="sd">        scale (float): spatial pixel scale of the PSFs in arcsec/pix</span>
+<span class="sd">        compute_kernel (str): method to compute the convolution kernel.</span>
+<span class="sd">            It can be &#39;pypher&#39; or &#39;gaussian&#39;</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Kernel: np.ndarray</span>
+<span class="sd">            3D array to be used in the convolution</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Size of the 2d PSF (x,y)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Creating the cube with the original PSF&#39;</span><span class="p">)</span>
+    <span class="n">original_psf</span><span class="p">,</span> <span class="n">fwhm_wave</span> <span class="o">=</span> <span class="n">psf3d</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">input_fwhm</span><span class="p">,</span> <span class="n">nmoffat</span><span class="o">=</span><span class="n">input_nmoffat</span><span class="p">,</span>
+                                    <span class="n">function</span><span class="o">=</span><span class="n">input_function</span><span class="p">,</span> <span class="n">lambda0</span><span class="o">=</span><span class="n">lambda0</span><span class="p">,</span>
+                                    <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Creating the image with the target PSF&#39;</span><span class="p">)</span>
+    <span class="n">target_psf</span> <span class="o">=</span> <span class="n">psf2d</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">target_fwhm</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">target_function</span><span class="p">,</span>
+                       <span class="n">nmoffat</span><span class="o">=</span><span class="n">target_nmoffat</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Creating the convolution kernel&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-----------------------------------------------------------&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input function = </span><span class="si">{</span><span class="n">input_function</span><span class="si">}</span><span class="s2">, Input FWHM = </span><span class="si">{</span><span class="n">input_fwhm</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">input_function</span> <span class="o">==</span> <span class="s2">&quot;moffat&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input N_moffat = </span><span class="si">{</span><span class="n">input_nmoffat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No Wavelength variation (b=0)&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wavelength variation given by lambda0=</span><span class="si">{</span><span class="n">lambda0</span><span class="si">}</span><span class="s2"> and b=</span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-----------------------------------------------------------&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target function = </span><span class="si">{</span><span class="n">target_function</span><span class="si">}</span><span class="s2">, target FWHM = </span><span class="si">{</span><span class="n">target_fwhm</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">target_function</span> <span class="o">==</span> <span class="s2">&quot;moffat&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target N_moffat = </span><span class="si">{</span><span class="n">target_nmoffat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">compute_kernel</span> <span class="o">==</span> <span class="s1">&#39;pypher&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Building the convolution kernel via pypher&#39;</span><span class="p">)</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">convolution_kernel</span><span class="p">(</span><span class="n">original_psf</span><span class="p">,</span> <span class="n">target_psf</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">compute_kernel</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Building Gaussian Kernel&#39;</span><span class="p">)</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">convolution_kernel_gaussian</span><span class="p">(</span><span class="n">target_psf</span><span class="p">,</span> <span class="n">target_fwhm</span><span class="p">,</span>
+                                             <span class="n">fwhm_wave</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">kernel</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Eric Emsellem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
