@@ -25,7 +25,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.gridspec as gridspec
 
 from .mpdaf_pipe import MuseSetImages, MuseSetSpectra
-from .util_pipe import my_linear_model, get_flux_range
+from .util_image import my_linear_model, get_flux_range
 
 __version__ = '0.0.1 (23 March 2018)'
 

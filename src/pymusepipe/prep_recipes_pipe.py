@@ -28,6 +28,7 @@ from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipe
                           dict_recipes_per_num, dict_recipes_per_name,
                           dict_files_iexpo_products, dict_files_products,
                           dict_products_scipost)
+from .emission_lines import get_emissionline_band
 
 try :
     import astropy as apy
@@ -720,9 +721,8 @@ class PipePrep(SofPipe) :
 
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
-        [lmin, lmax] = upipe.get_emissionline_band(line=line, 
-                                                   velocity=self.vsystemic, 
-                                                   lambda_window=lambda_window)
+        [lmin, lmax] = get_emissionline_band(line=line, velocity=self.vsystemic,
+                                             lambda_window=lambda_window)
 
         # Tag the suffix with the prealign suffix
         suffix = "{0}{1}".format(suffix, self._suffix_prealign)
@@ -761,9 +761,8 @@ class PipePrep(SofPipe) :
 
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
-        [lmin, lmax] = upipe.get_emissionline_band(line=line, 
-                                                   velocity=self.vsystemic, 
-                                                   lambda_window=lambda_window)
+        [lmin, lmax] = get_emissionline_band(line=line, velocity=self.vsystemic,
+                                             lambda_window=lambda_window)
 
         # Tag the suffix with the prealign suffix
         suffix = "{0}{1}".format(suffix, self._suffix_checkalign)
@@ -960,7 +959,7 @@ class PipePrep(SofPipe) :
             thisfile_musemode = expo_table[0]['mode']
             upipe.print_info("For this sky continuum, we use MUSE Mode = {0}".format(thisfile_musemode))
             mycont.integrate(mymusefilter, ao_mask=("-AO-" in thisfile_musemode))
-            mycont.get_normfactor(background, filter_for_alignment)
+            mycont.set_normfactor(background, filter_for_alignment)
             normalise_factor = getattr(mycont, filter_for_alignment).norm
 
         # Returning the name of the normalised continuum

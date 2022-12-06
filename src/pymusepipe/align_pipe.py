@@ -46,7 +46,7 @@ from .config_pipe import dataset_names, iexpo_names
 from .config_pipe import default_offset_table, dict_listObject
 from .graph_pipe import (plot_polypar, plot_compare_contours,
                          plot_compare_cuts, plot_compare_diff)
-from .util_pipe import my_linear_model, flatclean_image, get_normfactor
+from .util_image import my_linear_model, flatclean_image, get_normfactor, mask_stars
 
 
 try:
@@ -375,6 +375,98 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
             hd[angle_orig_keyword],
             hd[angle_keyword],
             np.float(hd[angle_keyword]) - hd[angle_orig_keyword]))
+
+
+def align_hdu(hdu_target=None, hdu_to_align=None, target_rotation=0.0, to_align_rotation=0.0,
+              conversion_factor=1.0, use_mpdaf=False):
+    """Project the reference image onto the MUSE dataset
+    Hidden function, as only used internally
+
+    Input
+    -----
+    hdu_target: HDU [None]
+        Target hdu (on to which to project)
+    hdu_to_align: HDU [None]
+         Hdu to be aligned
+    target_rotation: float [0]
+        Rotation angle in degrees of the target hdu
+    to_align_rotation: float [0]
+        Rotation angle in degrees of the to be aligned hdu
+    conversion_factor: float
+        Factor to be applied to the to_align hdu
+    use_mpdaf: bool
+        If True, use mpdaf to project. This is not recommended.
+        If False, use reproject. This is the recommended option (default)
+
+    Returns
+    -------
+    hdu_repr: HDU
+        Reprojected HDU. None if nothing is provided
+    """
+    if hdu_target is not None and hdu_to_align is not None:
+        # Getting the reference image data and WCS
+        wcs_to_align = WCS(hdr=hdu_to_align.header)
+        # If there is a rotation of the WCS we remove it
+        if to_align_rotation != 0.:
+            wcs_to_align.rotate(-to_align_rotation)
+        ima_to_align = Image(data=hdu_to_align.data * conversion_factor,
+                             wcs=wcs_to_align)
+
+        # Apply differential RA if using MPDAF to fix the reference
+        # Problem existing when using align_with_image
+        if use_mpdaf:
+            ra_target = WCS(hdu_target.header).to_header()['CRVAL1']
+            ra_to_align = ima_to_align.wcs.to_header()['CRVAL1']
+            dec_to_align = ima_to_align.wcs.to_header()['CRVAL2']
+            dra = ra_target - ra_to_align
+            diffang = np.rad2deg(np.arccos(np.cos(np.deg2rad(dra))
+                                           * (np.sin(np.deg2rad(dec_to_align))) ** 2
+                                           + (np.cos(np.deg2rad(dec_to_align))) ** 2))
+            upipe.print_warning(f"Differential angle for this comparison is "
+                                f"{diffang:.4f} (using mpdaf needs that fix)")
+        else:
+            diffang = 0.
+
+        # Getting the MUSE image data and WCS
+        wcs_target = WCS(hdr=hdu_target.header)
+
+        # Fixing the differential angle when using mpdaf
+        # For repro, the initial value is correct. For mpdaf it needs
+        # the correction as the reference RA is different when projecting
+        # - namely = keeping the original RA as a reference -
+        fixed_target_rotation = target_rotation - diffang
+
+        # Doing the rotation now on the target WCS
+        if fixed_target_rotation != 0.:
+            wcs_target.rotate(-fixed_target_rotation)
+        ima_target = Image(data=np.nan_to_num(hdu_target.data),
+                           wcs=wcs_target)
+        hdu_rot_target = ima_target.get_data_hdu()
+
+        # Aligning the reference image with the MUSE image using mpdaf
+        # align_with_image
+
+        if use_mpdaf:
+            ima_aligned = ima_to_align.align_with_image(ima_target, flux=True)
+            hdu_aligned = ima_aligned.get_data_hdu()
+        else:
+            # Change of area
+            newinc = ima_target.wcs.get_axis_increments(unit=u.deg)
+            oldinc = ima_to_align.wcs.get_axis_increments(unit=u.deg)
+            change_area = np.abs(newinc[0] / oldinc[0]) \
+                          * np.abs(newinc[1] / oldinc[1])
+            daligned = repro_interp(ima_to_align.get_data_hdu(),
+                                    ima_target.get_data_hdu().header,
+                                    return_footprint=False)
+            hdu_aligned = pyfits.PrimaryHDU(daligned * change_area)
+
+    else:
+        hdu_aligned = None
+        diffang = 0.
+        hdu_rot_target = copy.copy(hdu_target)
+        print("Warning: please provide target HDU to allow reprojection")
+
+    return hdu_rot_target, hdu_aligned, diffang
 
 
 def init_plot_optical_flow(opflow):
@@ -1214,8 +1306,8 @@ class AlignMuseDataset(object):
         return 1
 
     def get_imaref_muse(self, muse_hdu, rotation=0.0, minflux=0.0, **kwargs):
-        """Returns the ref image and muse images on the same grid assuming a given
-        rotation
+        """Returns the ref and input images on the same grid as the given
+        input hdu assuming a given rotation
 
         Input
         -----
@@ -1241,7 +1333,7 @@ class AlignMuseDataset(object):
         border = kwargs.pop("border", self.border)
 
         # Save hdr if save_hdr is True
-        if self.save_hdr :
+        if self.save_hdr:
             name_musehdr = kwargs.pop("name_musehdr", "dummy.hdr")
             _ = muse_hdu.header.totextfile(joinpath(self.header_folder_name,
                                                     name_musehdr), overwrite=True)
@@ -1249,7 +1341,7 @@ class AlignMuseDataset(object):
         # Projecting the reference image onto the MUSE dataset
         hdu_target, proj_ref_hdu, diffra_angle = self._align_reference_hdu(muse_hdu,
                                                                            target_rotation=rotation,
-                                                                           conversion=True)
+                                                                           conversion_factor=None)
 
         # Cleaning the images
         if minflux is None:
@@ -1336,8 +1428,9 @@ class AlignMuseDataset(object):
         xpix_pcc
         ypix_pcc x and y pixel coordinates of the cross-correlation peak
         """
-        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, border=10,
-                                                 remove_bkg=False, squeeze=False, **kwargs)
+        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation=rotation, minflux=minflux,
+                                                 border=10, remove_bkg=False, squeeze=False,
+                                                 **kwargs)
         if self._debug:
             self._temp_input_pccmuse = ima_muse
             self._temp_input_pccref = ima_ref
@@ -1345,10 +1438,7 @@ class AlignMuseDataset(object):
         gt = sppalign.AlignTranslationPCC(ima_muse, ima_ref, verbose=verbose)
         # Beware that get_translation from spacepylot return y, x
         # Hence the ::-1 to reverse it and the minus sign as it is the reverse than done with PCC
-        initial_guess_shifts = -gt.get_translation(split_image=2)[::-1]
-
-        # Note that get_shift_from_pcc returnx X,U while get_translation from spacepylot return Y, X
-        return initial_guess_shifts
+        return -gt.get_translation(split_image=2)[::-1]
 
     def run_optical_flow(self, list_nima=None, save_plot=True, use_rotation=True,
                          verbose=False, **kwargs):
@@ -1431,13 +1521,12 @@ class AlignMuseDataset(object):
             return
 
         if self.verbose:
-            upipe.print_info(f"Apply optical flow offset to Image {nima}")
+            upipe.print_info(f"Apply optical flow offset solution to Image #{nima:03d}")
         # Now set up the extra needed offsets as the solution from optical flow
         # We need to invert Y, X to X, Y (the [::-1]) and use the minus sign
         # considering optical flow derives the motion of ref to MUSE
         self.apply_extra_offset_ima(nima=nima,
-                                    extra_pixel=(-self.init_off_pixel[nima]
-                                                 - self.optical_flows[nima].translation[::-1]),
+                                    extra_pixel=- self.optical_flows[nima].translation[::-1],
                                     extra_rotation=-self.optical_flows[nima].rotation_deg)
         # Initialise the plot
         self.op_plots[nima] = init_plot_optical_flow(self.optical_flows[nima])
@@ -1456,8 +1545,12 @@ class AlignMuseDataset(object):
         """
         if self.verbose:
             upipe.print_info(f"Optical flow with {niter} iterations for Image {nima}")
-        reset_opf = kwargs.pop("reset_optical_flow", True)
-        if self.optical_flows[nima] is None or reset_opf:
+
+        list_guess_key = ["guess_rotation", "guess_offset_pixel", "guess_offset_arcsec"]
+        given_guess = any(guess_key in kwargs for guess_key in list_guess_key)
+        reset_opf = kwargs.pop("reset_optical_flow", False)
+
+        if self.optical_flows[nima] is None or reset_opf or given_guess:
             self.init_optical_flow_ima(nima, verbose=verbose, **kwargs)
 
         if "homography_method" in kwargs:
@@ -1492,6 +1585,7 @@ class AlignMuseDataset(object):
         for nima in list_nima:
             self.iterate_on_optical_flow_ima(nima=nima, use_rotation=use_rotation, **kwargs)
 
+
     def init_optical_flow_listima(self, list_nima=None, **kwargs):
         """Initialise the optical flow on a list of images
         given by a list of indices
@@ -1511,8 +1605,10 @@ class AlignMuseDataset(object):
             self.init_optical_flow_ima(nima=nima, **kwargs)
 
 
-    def init_optical_flow_ima(self, nima=0, minflux=None, force_pcc=False, guess_offset=(0.,0.),
-                              verbose=False, provide_header=True):
+    def init_optical_flow_ima(self, nima=0, minflux=None, guess_offset_pixel=None,
+                              guess_offset_arcsec=None, guess_rotation=None,
+                              force_pcc_guess=False, verbose=False, provide_header=True,
+                              **kwargs):
         """Initialise the optical flow using the current image with index nima
 
         Input
@@ -1522,32 +1618,54 @@ class AlignMuseDataset(object):
         minflux: float
             Minimum flux to consider
         """
-        # If forcing PCC by default, we redo it just for the sake of being close
-        # Otherwise we just take a 0 value
+        # Forcing a pcc guess if all guess are None
         # WARNING: we need to set the offset as Y, X to pass it on optical flow
-        if force_pcc:
-            self.get_shift_from_pcc_ima(nima, minflux=minflux, verbose=verbose)
-            guess_translation = self.pcc_off_pixel[nima][::-1]
-        else:
-            guess_translation = guess_offset[::-1]
+        if guess_offset_pixel is None and guess_offset_arcsec is None:
+            # Force a PCC guess
+            if force_pcc_guess:
+                self.get_shift_from_pcc_ima(nima, minflux=minflux, verbose=verbose)
+                guess_offset_pixel = self.pcc_off_pixel[nima][::-1]
+            # Or use the already defined one
+            else:
+                guess_offset_pixel = self.init_off_pixel[nima]
+
+        # Make sure guess_offset_pixel is there if arcsec are given
+        guess_offset_pixel, guess_offset_arcsec = self._sort_offset_pixel_arcsec(
+            self.list_muse_hdu[nima], guess_offset_pixel, guess_offset_arcsec)
+
+        # Retrofitting the guessed values into the init values
+        self.init_off_pixel[nima] = guess_offset_pixel
+        self.init_off_arcsec[nima] = guess_offset_arcsec
+
+        if guess_rotation is None:
+            guess_rotation = self.init_rotangles[nima]
+
+        # Do the alignment and get the off_muse and proj_ref using those guess offset
+        hdu_off_muse, hdu_proj_ref, diffra = self._apply_alignment(self.list_muse_hdu[nima],
+                                                                   total_off_pixel=guess_offset_pixel,
+                                                                   total_off_arcsec=guess_offset_arcsec,
+                                                                   total_rotangle=guess_rotation,
+                                                                   verbose=False)
+        upipe.print_info(f"Used grid with initial Offset / Rotation = "
+                         f"{guess_offset_pixel[0]:8.4f} {guess_offset_pixel[1]:8.4f} [PIX] "
+                         f"/ {guess_rotation} [DEG]")
 
         # Calling optical flow initialisation
         if provide_header:
-            header = copy.copy(self.list_muse_hdu[nima].header)
+            header = copy.copy(hdu_off_muse.header)
         else:
             header = None
-        muse_ima = copy.copy(self.list_muse_hdu[nima])
-        self.optical_flows[nima] = self.init_optical_flow(muse_ima,
-                                                          rotation=self.init_rotangles[nima],
-                                                          minflux=minflux,
-                                                          guess_translation=guess_translation,
-                                                          name_musehdr=self.list_name_musehdr[
-                                                              nima],
-                                                          header=header, verbose=verbose)
+        # Initialise optical flow with the corresponding HDU
+        # All guesses should not be 0, since they have been processed above
+        self.optical_flows[nima] = self.init_optical_flow_hdu(hdu_off_muse,
+                                                              rotation=0., minflux=minflux,
+                                                              guess_translation=[0., 0.],
+                                                              header=header, verbose=verbose,
+                                                              **kwargs)
 
 
-    def init_optical_flow(self, muse_hdu, rotation=0., minflux=None, guess_translation=[0.,0.],
-                          header=None, verbose=False, **kwargs):
+    def init_optical_flow_hdu(self, muse_hdu, rotation=0., minflux=None, guess_translation=(0.,0.),
+                              header=None, verbose=False, **kwargs):
         """Get the optical flow for this hdu
 
         Input
@@ -1558,6 +1676,8 @@ class AlignMuseDataset(object):
             Input rotation
         minflux: float
             Minimum flux to consider in the image
+        guess_translation: tuple of 2 floats
+            Guess offset in X and Y, e.g., (0., 0.)
         name_musehdr: str
             Name of hdr in case those are saved (self.save_hdr is True)
         """
@@ -1566,10 +1686,12 @@ class AlignMuseDataset(object):
         ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, minflux, border=0,
                                                  remove_bkg=False, squeeze=False, **kwargs)
         if self._debug:
-            self._temp_input_opmuse = ima_muse * 1.0
-            self._temp_input_opref = ima_ref * 1.0
+            self._temp_input_opflow_muse = ima_muse * 1.0
+            self._temp_input_opflow_ref = ima_ref * 1.0
 
         # WARNING: we pass on Y, X hence the [::-1] in the guess_translation parameter
+        upipe.print_info(f"Initialising Optical Flow, with guess_translation (x,y): "
+                         f"{guess_translation[::-1]}")
         return sppalign.AlignOpticalFlow(ima_muse, ima_ref,
                                          guess_translation=guess_translation[::-1],
                                          header=header,
@@ -1708,10 +1830,10 @@ class AlignMuseDataset(object):
             upipe.print_error("There are not yet any new hdu to save")
 
 
-
-    def _align_hdu(self, hdu_target=None, hdu_to_align=None, target_rotation=0.0,
-                   to_align_rotation=0.0, conversion=False):
-        """Project the reference image onto the MUSE dataset
+    def _align_hdu(self, hdu_target=None, hdu_to_align=None,
+              target_rotation=0.0, to_align_rotation=0.0,
+              conversion_factor=None):
+        """Project an to be aligned hdu onto the input hdu
         Hidden function, as only used internally
 
         Input
@@ -1724,91 +1846,30 @@ class AlignMuseDataset(object):
             Rotation angle in degrees of the target hdu
         to_align_rotation: float [0]
             Rotation angle in degrees of the to be aligned hdu
+        conversion_factor: float
+            If None, will use the self.conversion_factor parameter
 
         Returns
         -------
         hdu_repr: HDU
             Reprojected HDU. None if nothing is provided
         """
-        # The mpdaf way to project an image onto another one
-        # WARNING: the reference image will be converted in flux
-        if conversion:
+        if conversion_factor is None:
             conversion_factor = self.conversion_factor
-        else:
-            conversion_factor = 1.0
 
-        if hdu_target is not None and hdu_to_align is not None:
-            # Getting the reference image data and WCS
-            wcs_to_align = WCS(hdr=hdu_to_align.header)
-            # If there is a rotation of the WCS we remove it
-            if to_align_rotation != 0.:
-                wcs_to_align.rotate(-to_align_rotation)
-            ima_to_align = Image(data=hdu_to_align.data * conversion_factor,
-                                 wcs=wcs_to_align)
+        return align_hdu(hdu_target=hdu_target, hdu_to_align=hdu_to_align,
+                         target_rotation=target_rotation, to_align_rotation=to_align_rotation,
+                         conversion_factor=conversion_factor, use_mpdaf=self.use_mpdaf)
 
-            # Apply differential RA if using MPDAF to fix the reference
-            # Problem existing when using align_with_image
-            if self.use_mpdaf:
-                ra_target = WCS(hdu_target.header).to_header()['CRVAL1']
-                ra_to_align = ima_to_align.wcs.to_header()['CRVAL1']
-                dec_to_align = ima_to_align.wcs.to_header()['CRVAL2']
-                dra = ra_target - ra_to_align
-                diffang = np.rad2deg(np.arccos(np.cos(np.deg2rad(dra))
-                                               * (np.sin(np.deg2rad(dec_to_align))) ** 2
-                                               + (np.cos(np.deg2rad(dec_to_align))) ** 2))
-                upipe.print_warning(f"Differential angle for this comparison is "
-                                    f"{diffang:.4f} (using mpdaf needs that fix)")
-            else:
-                diffang = 0.
-
-            # Getting the MUSE image data and WCS
-            wcs_target = WCS(hdr=hdu_target.header)
-
-            # Fixing the differential angle when using mpdaf
-            # For repro, the initial value is correct. For mpdaf it needs
-            # the correction as the reference RA is different when projecting
-            # - namely = keeping the original RA as a reference -
-            fixed_target_rotation = target_rotation - diffang
-
-            # Doing the rotation now on the target WCS
-            if fixed_target_rotation != 0.:
-                wcs_target.rotate(-fixed_target_rotation)
-            ima_target = Image(data=np.nan_to_num(hdu_target.data),
-                               wcs=wcs_target)
-            hdu_target = ima_target.get_data_hdu()
-
-            # Aligning the reference image with the MUSE image using mpdaf
-            # align_with_image
-
-            if self.use_mpdaf:
-                ima_aligned = ima_to_align.align_with_image(ima_target, flux=True)
-                hdu_aligned = ima_aligned.get_data_hdu()
-            else:
-                # Change of area
-                newinc = ima_target.wcs.get_axis_increments(unit=u.deg)
-                oldinc = ima_to_align.wcs.get_axis_increments(unit=u.deg)
-                change_area = np.abs(newinc[0] / oldinc[0]) \
-                              * np.abs(newinc[1] / oldinc[1])
-                daligned = repro_interp(ima_to_align.get_data_hdu(),
-                                        ima_target.get_data_hdu().header,
-                                        return_footprint=False)
-                hdu_aligned = pyfits.PrimaryHDU(daligned * change_area)
-
-        else:
-            hdu_aligned = None
-            diffang = 0.
-            print("Warning: please provide target HDU to allow reprojection")
-
-        return hdu_target, hdu_aligned, diffang
 
     def _align_reference_hdu(self, hdu_target=None, target_rotation=0.0,
-                             ref_rotation=0.0, conversion=True):
-        """Project the reference image onto the MUSE dataset
+                             ref_rotation=0.0, conversion_factor=None):
+        """Project the reference image onto the target hdu
         Hidden function, as only used internally
          
         Input
         -----
-        muse_hdu: HDU [None]
+        hdu_target: HDU [None]
             Input hdu
         target_rotation: float [0]
             Target rotation angle in degrees
@@ -1821,11 +1882,9 @@ class AlignMuseDataset(object):
             Reprojected HDU. None if nothing is provided
         """
 
-        return self._align_hdu(hdu_target=hdu_target,
-                               target_rotation=target_rotation,
-                               to_align_rotation=ref_rotation,
-                               hdu_to_align=self.reference_hdu,
-                               conversion=conversion)
+        return self._align_hdu(hdu_target=hdu_target, hdu_to_align=self.reference_hdu,
+                               target_rotation=target_rotation, to_align_rotation=ref_rotation,
+                               conversion_factor=conversion_factor)
 
     @property
     def _total_rotangles(self):
@@ -1907,8 +1966,8 @@ class AlignMuseDataset(object):
 
         """
         # Call the alignment given the input nima image
-        upipe.print_info(f"- Image Offset/Rotation [{nima}] ="
-                         f" {self.list_name_museimages[nima]} -")
+        upipe.print_info(f"[#{nima:03d}] --- Regridding Image "
+                         f" {self.list_name_museimages[nima]} ---")
         hdu_offmuse, hdu_projref, diffra  = self._apply_alignment(self.list_muse_hdu[nima],
             total_off_pixel=self._total_off_pixel[nima], total_rotangle=self._total_rotangles[nima])
 
@@ -1930,8 +1989,34 @@ class AlignMuseDataset(object):
         # Saving the normalisation
         self.save_polypar_ima(nima, self.ima_polypar[nima].beta)
 
+    def _sort_offset_pixel_arcsec(self, hdu, offset_pixel=None, offset_arcsec=None):
+        """
+
+        Input
+        -----
+        hdu: HDU
+        offset_pixel: tuple of float
+        offset_arcsec: tuple of float
+
+        Returns
+        -------
+        offset_pixel, offset_arsec
+
+        """
+        # Using input offset or total
+        if offset_pixel is None:
+            if offset_arcsec is None:
+                offset_pixel = [0., 0.]
+                offset_arcsec = pixel_to_arcsec(hdu, offset_pixel)
+            else:
+                offset_pixel = arcsec_to_pixel(hdu, offset_arcsec)
+        else:
+            offset_arcsec = pixel_to_arcsec(hdu, offset_pixel)
+
+        return offset_pixel, offset_arcsec
+
     def _apply_alignment(self, hdu, total_off_pixel=None, total_off_arcsec=None,
-                         total_rotangle=0.):
+                         total_rotangle=0., **kwargs):
         """Create New HDU after shifting it with the right offset
         (only considering image with index nima)
          
@@ -1948,22 +2033,17 @@ class AlignMuseDataset(object):
         newhdr = copy.copy(hdu.header)
 
         # Using input offset or total
-        if total_off_pixel is None:
-            if total_off_arcsec is None:
-                upipe.print_warning("No input offset given: using [0., 0.]")
-                total_off_pixel = [0., 0.]
-            else:
-                total_off_pixel = arcsec_to_pixel(hdu, total_off_arcsec)
-        else:
-            total_off_arcsec = pixel_to_arcsec(hdu, total_off_pixel)
+        total_off_pixel, total_off_arcsec = self._sort_offset_pixel_arcsec(hdu, total_off_pixel,
+                                                                           total_off_arcsec)
 
         # Shift the HDU in X and Y
-        if self.verbose:
-            upipe.print_info(f"Offset [PIXELS]: {total_off_pixel[0]:8.4f}"
+        verbose = kwargs.pop("verbose", self.verbose)
+        if verbose:
+            upipe.print_info(f"       Offset   [PIXELS]: {total_off_pixel[0]:8.4f}"
                            f" {total_off_pixel[1]:8.4f}  /  "
                            f"[ARCSEC]: {total_off_arcsec[0]:8.4f}"
                            f"{total_off_arcsec[1]:8.4f}")
-            upipe.print_info(f"Rotation [DEGREE]: {total_rotangle:8.4f}")
+            upipe.print_info(f"       Rotation [DEGREE]: {total_rotangle:8.4f}")
 
         # Shifting the CRPIX values in the header
         newhdr['CRPIX1'] += total_off_pixel[0]

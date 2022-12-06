@@ -21,8 +21,7 @@ from . import util_pipe as upipe
 from .util_pipe import get_dataset_name
 from .config_pipe import (dict_user_folders, default_rc_filename,
                           dict_extra_filters, dict_calib_tables, dict_input_folders,
-                          dict_folders, dict_folders_target,
-                          default_str_dataset, default_ndigits)
+                          dict_folders, dict_folders_target)
 
 ############################################################
 # Some fixed parameters for the structure

@@ -45,6 +45,8 @@ from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
 from .util_pipe import (filter_list_with_pdict, filter_list_with_suffix_list,\
                        add_string, default_str_dataset, default_ndigits)
 from .cube_convolve import cube_kernel, cube_convolve
+from .emission_lines import get_emissionline_band
+
 
 def get_sky_spectrum(specname) :
     """Read sky spectrum from MUSE data reduction
@@ -59,6 +61,7 @@ def get_sky_spectrum(specname) :
     wavein = WaveCoord(cdelt=cdelt, crval=crval, cunit=u.angstrom)
     spec = Spectrum(wave=wavein, data=sky['data'], var=sky['stat'])
     return spec
+
 
 def integrate_spectrum(spectrum, wave_filter, throughput_filter, ao_mask=False):
     """Integrate a spectrum using a certain Muse Filter file.
@@ -97,6 +100,175 @@ def integrate_spectrum(spectrum, wave_filter, throughput_filter, ao_mask=False):
         flux_cont = 0.0
 
     return flux_cont
+
+
+def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
+                     **kwargs):
+    """Routine to remove potential Nan around an image and reconstruct
+    an optimal WCS reference image. The rotation angle is provided as a way
+    to optimise the extent of the output image, removing Nan along X and Y
+    at that angle.
+
+    Args:
+        ima_name (str): input image name. No default.
+        ima_folder (str): input image folder ['']
+        outwcs_folder (str): folder where to write the output frame. Default is
+            None which means that it will use the folder of the input image.
+        rotangle (float): rotation angle in degrees [0]
+        **kwargs:
+            in_suffix (str): in suffix to remove from name ['prealign']
+            out_suffix (str): out suffix to add to name ['rotwcs']
+            margin_factor (float): factor to extend the image [1.1]
+
+    Returns:
+
+    """
+
+    # Reading the input names and setting output folder
+    fullname = joinpath(ima_folder, ima_name)
+    ima_folder, ima_name = os.path.split(fullname)
+    if outwcs_folder is None:
+        outwcs_folder = ima_folder
+
+    # Suffix
+    in_suffix = kwargs.pop("in_suffix", "prealign")
+    out_suffix = kwargs.pop("out_suffix", "rotwcs")
+
+    # Get margin if needed
+    margin_factor = kwargs.pop("margin_factor", 1.1)
+    extend_fraction = np.maximum(0., (margin_factor - 1.))
+    upipe.print_info("Will use a {:5.2f}% extra margin".format(
+                     extend_fraction*100.))
+
+    # Opening the image via mpdaf
+    imawcs = Image(fullname)
+    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(np.int)
+
+    # New dimensions and extend current image
+    new_dim = tuple(np.array(imawcs.shape).astype(np.int) + extra_pixels)
+    ima_ext = imawcs.regrid(newdim=new_dim, refpos=imawcs.get_start(),
+                            refpix=tuple(extra_pixels / 2.),
+                            newinc=imawcs.get_step()[0]*3600.)
+
+    # Copy and rotate WCS
+    new_wcs = copy.deepcopy(ima_ext.wcs)
+    upipe.print_info("Rotating WCS by {} degrees".format(rotangle))
+    new_wcs.rotate(rotangle)
+
+    # New rotated image
+    ima_rot = Image(data=np.nan_to_num(ima_ext.data), wcs=new_wcs)
+
+    # Then resample the image using the initial one as your reference
+    ima_rot_resampled = ima_rot.align_with_image(ima_ext, flux=True)
+
+    # Crop NaN
+    ima_rot_resampled.crop()
+
+    # get the new header with wcs and rotate back
+    finalwcs = ima_rot_resampled.wcs
+    finalwcs.rotate(-rotangle)
+
+    # create the final image
+    final_rot_image = Image(data=ima_rot_resampled.data, wcs=finalwcs)
+
+    # Save image
+    if isinstance(in_suffix, str) and in_suffix != "" and in_suffix in ima_name:
+            out_name = ima_name.replace(in_suffix, out_suffix)
+    else:
+        name, extension = os.path.splitext(ima_name)
+        out_suffix = add_string(out_suffix)
+        out_name = "{0}{1}{2}".format(name, out_suffix, extension)
+
+    # write output
+    final_rot_image.write(joinpath(outwcs_folder, out_name))
+    return outwcs_folder, out_name
+
+
+def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
+                     **kwargs):
+    """Routine to remove potential Nan around an image and reconstruct
+    an optimal WCS reference image. The rotation angle is provided as a way
+    to optimise the extent of the output image, removing Nan along X and Y
+    at that angle.
+
+    Args:
+        cube_name (str): input image name. No default.
+        cube_folder (str): input image folder ['']
+        outwcs_folder (str): folder where to write the output frame. Default is
+            None which means that it will use the folder of the input image.
+        rotangle (float): rotation angle in degrees [0]
+        **kwargs:
+            in_suffix (str): in suffix to remove from name ['prealign']
+            out_suffix (str): out suffix to add to name ['rotwcs']
+            margin_factor (float): factor to extend the image [1.1]
+
+    Returns:
+
+    """
+
+    # Reading the input names and setting output folder
+    fullname = joinpath(cube_folder, cube_name)
+    cube_folder, cube_name = os.path.split(fullname)
+    if outwcs_folder is None:
+        outwcs_folder = cube_folder
+
+    # Suffix
+    in_suffix = kwargs.pop("in_suffix", "prealign")
+    out_suffix = kwargs.pop("out_suffix", "rotwcs")
+
+    # Get margin if needed
+    margin_factor = kwargs.pop("margin_factor", 1.1)
+    extend_fraction = np.maximum(0., (margin_factor - 1.))
+    upipe.print_info("Will use a {:5.2f}% extra margin".format(
+                     extend_fraction*100.))
+
+    # Opening the image via mpdaf
+    cubewcs = Cube(fullname)
+    imawcs = cubewcs.sum(axis=0)
+    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(np.int)
+
+    # New dimensions and extend current image
+    new_dim = tuple(np.array(imawcs.shape).astype(np.int) + extra_pixels)
+    ima_ext = imawcs.regrid(newdim=new_dim, refpos=imawcs.get_start(),
+                            refpix=tuple(extra_pixels / 2.),
+                            newinc=imawcs.get_step()[0]*3600.)
+
+    # Copy and rotate WCS
+    new_wcs = copy.deepcopy(ima_ext.wcs)
+    upipe.print_info("Rotating spatial WCS of Cube by {} degrees".format(rotangle))
+    new_wcs.rotate(rotangle)
+
+    # New rotated image
+    ima_rot = Image(data=np.nan_to_num(ima_ext.data), wcs=new_wcs)
+
+    # Then resample the image using the initial one as your reference
+    ima_rot_resampled = ima_rot.align_with_image(ima_ext, flux=True)
+
+    # Crop NaN
+    ima_rot_resampled.crop()
+
+    # get the new header with wcs and rotate back
+    finalwcs = ima_rot_resampled.wcs
+    finalwcs.rotate(-rotangle)
+
+    # create the final image
+    data_cube_rot = np.repeat(ima_rot_resampled[np.newaxis,:,:].data,
+                              cubewcs.shape[0], axis=0)
+    final_rot_cube = Cube(data=data_cube_rot, wave=cubewcs.wave, wcs=finalwcs)
+
+    # Save image
+    if isinstance(in_suffix, str) and in_suffix != "" and in_suffix in cube_name:
+            out_name = cube_name.replace(in_suffix, out_suffix)
+    else:
+        name, extension = os.path.splitext(cube_name)
+        if out_suffix != "":
+            out_suffix = add_string(out_suffix)
+        out_name = "{0}{1}{2}".format(name, out_suffix, extension)
+
+    # write output
+    final_rot_cube.write(joinpath(outwcs_folder, out_name))
+    return outwcs_folder, out_name
+
 
 class BasicPSF(object):
     """Basic PSF function and parameters
@@ -840,7 +1012,7 @@ class MuseCube(Cube):
         line: name of the emission line (see emission_lines dictionary)
         """
 
-        [lmin, lmax] = upipe.get_emissionline_band(line=line, velocity=velocity, 
+        [lmin, lmax] = get_emissionline_band(line=line, velocity=velocity,
                 redshift=redshift, medium=medium, lambda_window=lambda_window)
         
         return MuseImage(self.select_lambda(lmin, lmax).sum(axis=0), 
@@ -1051,7 +1223,7 @@ class MuseSkyContinuum(object):
                                                    ao_mask=ao_mask)
         setattr(self, muse_filter.filter_name, muse_filter)
 
-    def get_normfactor(self, background, filter_name="Cousins_R"):
+    def set_normfactor(self, background, filter_name="Cousins_R"):
         """Get the normalisation factor given a background value
         Takes the background value and the sky continuuum spectrum
         and convert this to the scaling Ks needed for this sky continuum
@@ -1079,7 +1251,7 @@ class MuseSkyContinuum(object):
         if not hasattr(self, filter_name):
             upipe.print_error("No integration value for filter {0}".format(
                                   filter_name))
-            norm = 1.
+            self._norm = 1.
         else :
             muse_filter = getattr(self, filter_name)
             if muse_filter.flux_cont != 0.:
@@ -1087,9 +1259,9 @@ class MuseSkyContinuum(object):
             else:
                 norm = 1.
 
-        # Saving the norm value for that filter
-        muse_filter.norm = norm
-        muse_filter.background = background
+            # Saving the norm value for that filter
+            muse_filter.norm = norm
+            muse_filter.background = background
 
     def save_normalised(self, norm_factor=1.0, prefix="norm", overwrite=False):
         """Normalises a sky continuum spectrum and save it
