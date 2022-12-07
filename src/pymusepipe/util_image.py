@@ -530,7 +530,7 @@ def flatclean_image(data, border=10, dynamic_range=10,
     return cdata
 
 
-def mask_stars(ima, fwhm=3, mask_radius=30., brightest=5, sigma=3., verbose=False):
+def mask_point_sources(ima, fwhm=3, mask_radius=30., brightest=5, sigma=3., verbose=False):
     """Find and mask point sources in an image by adding NaN
 
     Input

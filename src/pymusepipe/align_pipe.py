@@ -46,7 +46,7 @@ from .config_pipe import dataset_names, iexpo_names
 from .config_pipe import default_offset_table, dict_listObject
 from .graph_pipe import (plot_polypar, plot_compare_contours,
                          plot_compare_cuts, plot_compare_diff)
-from .util_image import my_linear_model, flatclean_image, get_normfactor, mask_stars
+from .util_image import my_linear_model, flatclean_image, get_normfactor, mask_point_sources
 
 
 try:
@@ -1331,6 +1331,7 @@ class AlignMuseDataset(object):
         remove_bkg = kwargs.pop("remove_bkg", True)
         squeeze = kwargs.pop("squeeze", True)
         border = kwargs.pop("border", self.border)
+        mask_stars = kwargs.pop("mask_stars", False)
 
         # Save hdr if save_hdr is True
         if self.save_hdr:
@@ -1352,6 +1353,11 @@ class AlignMuseDataset(object):
                                 minflux=minflux_ref, squeeze=squeeze, remove_bkg=remove_bkg)
         ima_muse = flatclean_image(muse_hdu.data, border, self.dynamic_range, self.median_window,
                                  minflux=minflux, squeeze=squeeze, remove_bkg=remove_bkg)
+
+        if mask_stars:
+            ima_ref = mask_point_sources(ima_ref)
+            ima_muse = mask_point_sources(ima_muse)
+
         if self._debug:
             self._temp_input_origmuse = muse_hdu.data * 1.0
             self._temp_input_origref = proj_ref_hdu.data * 1.0
@@ -1863,7 +1869,7 @@ class AlignMuseDataset(object):
 
 
     def _align_reference_hdu(self, hdu_target=None, target_rotation=0.0,
-                             ref_rotation=0.0, conversion_factor=None):
+                             ref_rotation=0.0, conversion_factor=None, **kwargs):
         """Project the reference image onto the target hdu
         Hidden function, as only used internally
          
@@ -1884,7 +1890,7 @@ class AlignMuseDataset(object):
 
         return self._align_hdu(hdu_target=hdu_target, hdu_to_align=self.reference_hdu,
                                target_rotation=target_rotation, to_align_rotation=ref_rotation,
-                               conversion_factor=conversion_factor)
+                               conversion_factor=conversion_factor, **kwargs)
 
     @property
     def _total_rotangles(self):

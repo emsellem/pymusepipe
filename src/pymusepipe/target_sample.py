@@ -602,7 +602,7 @@ class MusePipeSample(object):
             upipe.print_info("=========== CREATION OF WCS MASKS ==============")
             mosaic_wcs = kwargs.pop("mosaic_wcs", True)
             reference_cube = kwargs.pop("reference_cube", True)
-            datasets_wcs = kwargs.pop("datasets_wcs", True)
+            pointings_wcs = kwargs.pop("pointings_wcs", True)
             refcube_name = kwargs.pop("refcube_name", None)
             full_ref_wcs = kwargs.pop("full_ref_wcs", None)
             default_comb_folder = self.targets[targetname].combcubes_path
@@ -615,7 +615,7 @@ class MusePipeSample(object):
                                       reference_cube=reference_cube,
                                       refcube_name=refcube_name,
                                       mosaic_wcs=mosaic_wcs,
-                                      datasets_wcs=datasets_wcs,
+                                      pointings_wcs=pointings_wcs,
                                       list_datasets=list_datasets,
                                       ref_wcs=full_ref_wcs,
                                       folder_ref_wcs=folder_full_ref_wcs,
@@ -686,7 +686,7 @@ class MusePipeSample(object):
 
         # Running the scipost_perexpo for all datasets individually
         for dataset in list_datasets:
-            obname = self.pipes[targetname][dataset]._get_dataset_name(dataset=dataset)
+            obname = self.pipes[targetname][dataset]._get_dataset_name()
             if wcs_auto:
                 ref_wcs = f"{wcs_suffix}_{obname}.fits"
             if ref_wcs is not None:
