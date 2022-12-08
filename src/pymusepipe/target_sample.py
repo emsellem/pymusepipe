@@ -330,7 +330,7 @@ class MusePipeSample(object):
             if self.init_pipes:
                 self.set_pipe_target(targetname, **kwargs_init)
 
-    def _check_list_datasets(self, targetname, list_datasets):
+    def _check_list_datasets_for_target(self, targetname, list_datasets):
         """Check if dataset is in the list of datasets
         Returns the list of datasets if ok. If not, return an empty list
 
@@ -408,7 +408,7 @@ class MusePipeSample(object):
         upipe.print_info("=== Initialising MusePipe for Target {name} ===".format(name=targetname))
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
@@ -658,7 +658,7 @@ class MusePipeSample(object):
 
         """
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
         upipe.print_info(f"List of datasets to be reduced: {list_datasets}")
         if len(list_datasets) == 0:
             return
@@ -736,7 +736,7 @@ class MusePipeSample(object):
                 first_recipe=recipe_name, last_recipe=recipe_name, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
@@ -801,7 +801,7 @@ class MusePipeSample(object):
             self.set_pipe_target(targetname=targetname, list_datasets=list_datasets, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
@@ -835,7 +835,7 @@ class MusePipeSample(object):
                                  list_datasets=list_datasets, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
 
         if len(list_datasets) == 0:
             return

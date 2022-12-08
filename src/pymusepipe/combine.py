@@ -385,10 +385,10 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.init_default_param(dict_combined_folders)
         self._dict_combined_folders = dict_combined_folders
 
-        # List of pointings to process
-        self.list_pointings = list_pointings
         # List of datasets to process
         self.list_datasets = self._check_list_datasets(list_datasets)
+        # List of pointings to process
+        self.list_pointings = self._check_list_pointings(list_pointings)
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
@@ -425,22 +425,48 @@ class MusePointings(SofPipe, PipeRecipes):
         # Going back to initial working directory
         self.goto_origfolder()
 
+    def _check_list_pointings(self, list_pointings=None, default_list=None):
+        """Check which datasets exist
+
+        Input
+        -----
+        list_pointings: list of int
+                List of datasets to consider
+        default_list: list
+            Default list. If None, will use the full list of available datasets
+
+        Returns
+        --------
+        list_datasets after checking they exist
+        """
+        return self._check_list_datasets(list_datasets=list_pointings,
+                                         default_list=default_list,
+                                         listname="Pointings")
+
+
     @property
     def full_list_datasets(self):
         return get_list_datasets(joinpath(self.pipe_params.root, self.targetname),
                                  ndigits=self.pipe_params.ndigits,
                                  str_dataset=self.pipe_params.str_dataset)
 
-    def _check_list_datasets(self, list_datasets=None, default_list=None):
+
+    def _check_list_datasets(self, list_datasets=None, default_list=None, **kwargs):
         """Check which datasets exist
 
         Input
-            list_datasets: list of int
-                List of datasets to consider
+        ------
+        list_datasets: list of int
+            List of datasets to consider
+        default_list: list
+            Default list. If None, will use the full list of available datasets
 
-        Returns:
-            list_datasets after checking they exist
+        Returns
+        -------
+        list_datasets after checking they exist
         """
+        listname = kwargs.pop("listname", "Datasets")
+
         if default_list is None:
             default_list = self.full_list_datasets
         # Now the list of datasets
@@ -448,14 +474,14 @@ class MusePointings(SofPipe, PipeRecipes):
             # This is using all the existing datasets
             return default_list
         else:
-            upipe.print_info(f"Wished dataset list = {list_datasets}")
-            upipe.print_warning(f"Target default dataset list = {default_list}")
+            upipe.print_info(f"Wished {listname} list = {list_datasets}")
+            upipe.print_warning(f"Target default {listname} list = {default_list}")
             # Checked ones
             checked_list_datasets = list(set(list_datasets) & set(default_list))
             # Not existing ones
             notfound = list(set(list_datasets) - set(default_list))
             for l in notfound:
-                upipe.print_warning(f"No dataset {l} for the given target")
+                upipe.print_warning(f"No {listname} {l} for the given target")
 
             return checked_list_datasets
 
@@ -624,7 +650,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Checking existence of each pixel_table in the offset table
         nexcluded_pixtab = 0
         nincluded_pixtab = 0
-        for dataset in self.list_dataset:
+        for dataset in self.list_datasets:
             pixtab_to_exclude = []
             for pixtab_name in self.dict_pixtabs_in_datasets[dataset]:
                 pixtab_header = pyfits.getheader(pixtab_name)
@@ -791,8 +817,7 @@ class MusePointings(SofPipe, PipeRecipes):
             Default is 4000 and 10000 for the lower and upper limits, resp.
         """
         # If list_pointings is None using the initially set up one
-        list_pointings = self._check_pointings_list(list_pointings,
-                                                    self.list_pointings)
+        list_pointings = self._check_list_pointings(list_pointings, self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
@@ -867,8 +892,7 @@ class MusePointings(SofPipe, PipeRecipes):
             List of filter names to be used. 
         """
         # If list_pointings is None using the initially set up one
-        list_pointings = self._check_pointings_list(list_pointings,
-                                                    self.list_pointings)
+        list_pointings = self._check_list_pointings(list_pointings, self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
@@ -1108,7 +1132,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.goto_folder(self.paths.data, addtolog=True)
 
         # If list_pointings is None using the initially set up one
-        list_pointings = self._check_pointings_list(list_pointings, self.list_pointings)
+        list_pointings = self._check_list_pointings(list_pointings, self.list_pointings)
 
         # If only 1 exposure, duplicate the pixtable
         # as exp_combine needs at least 2 pixtables
