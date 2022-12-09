@@ -439,6 +439,8 @@ class MusePointings(SofPipe, PipeRecipes):
         --------
         list_datasets after checking they exist
         """
+        # Using the function check_list_datasets for this usage
+        # But it will just check the list
         return self._check_list_datasets(list_datasets=list_pointings,
                                          default_list=default_list,
                                          listname="Pointings")
@@ -449,7 +451,6 @@ class MusePointings(SofPipe, PipeRecipes):
         return get_list_datasets(joinpath(self.pipe_params.root, self.targetname),
                                  ndigits=self.pipe_params.ndigits,
                                  str_dataset=self.pipe_params.str_dataset)
-
 
     def _check_list_datasets(self, list_datasets=None, default_list=None, **kwargs):
         """Check which datasets exist

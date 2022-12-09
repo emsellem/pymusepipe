@@ -201,6 +201,27 @@ def get_tpl_nexpo(filename):
     except ValueError:
         return "", -1
 
+
+def get_pointing_name(pointing=1, str_pointing=default_str_pointing, ndigits=default_ndigits):
+    """Formatting for the names using the number and
+    the number of digits and prefix string
+
+    Input
+    -----
+    pointing: int
+       Pointing number
+    str_pointing: str
+        Prefix representing the pointing
+    ndigits: int
+        Number of digits to be used for formatting
+
+    Returns
+    -------
+    string for the dataset/pointing name prefix
+    """
+    return f"{str_pointing}{int(pointing):0{int(ndigits)}}"
+
+
 def get_dataset_name(dataset=1, str_dataset=default_str_dataset, ndigits=default_ndigits):
     """Formatting for the dataset/pointing names using the number and
     the number of digits and prefix string

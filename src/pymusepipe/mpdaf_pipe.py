@@ -43,7 +43,8 @@ import pymusepipe
 from . import util_pipe as upipe
 from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
 from .util_pipe import (filter_list_with_pdict, filter_list_with_suffix_list,\
-                       add_string, default_str_dataset, default_ndigits)
+                        add_string, default_str_dataset, default_ndigits,
+                        get_dataset_name)
 from .cube_convolve import cube_kernel, cube_convolve
 from .emission_lines import get_emissionline_band
 
@@ -502,7 +503,8 @@ class MuseCubeMosaic(CubeMosaic):
                 for key in self.dict_psf:
                     if found:
                         break
-                    keyword = f"{self.prefix_cubes}_{get_obname(int(key), str_dataset, ndigits)}"
+                    keyword = f"{self.prefix_cubes}_" \
+                              f"{get_dataset_name(int(key), str_dataset, ndigits)}"
                     if keyword in name:
                         psf = self.dict_psf[key]
                         self.list_cubes[-1].psf = BasicPSF(psf_array=psf)

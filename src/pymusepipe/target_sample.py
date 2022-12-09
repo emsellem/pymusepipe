@@ -31,7 +31,7 @@ from .align_pipe import rotate_pixtables
 from .mpdaf_pipe import MuseCubeMosaic, MuseCube
 from .prep_recipes_pipe import dict_products_scipost
 from .version import __version__ as version_pack
-from .util_pipe import add_string
+from .util_pipe import add_string, get_pointing_name
 
 from astropy.table import Table
 
@@ -870,20 +870,18 @@ class MusePipeSample(object):
         -----
         targetname: str [None]
             Name of target
-        list_pointings: list [or None=default meaning all pointings]
-            List of pointings (e.g., [1,2,3])
+        list_datasets: list [or None=default meaning all datasets]
+            List of datasets (e.g., [1,2,3])
         """
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
-        # Check if pointings are valid
-        list_pointings = self._check_pointings_list(targetname, list_pointings)
-        # Using the obname of the first pointing to define the function
-        get_pointing_name = self.pipes[targetname][list_pointings[0]]._get_pointing_name
+        # # Check if datasets are valid
+        # list_pointings = self._check_list_datasets_for_target(targetname, list_pointings)
         if len(list_pointings) == 0:
             return
 
         # Make a list for the masking of the cubes to take into account
-        list_pointing_names = [f"{get_pointing_name(pointing)}"
-                              for pointing in list_pointings]
+        list_pointings_names = [f"{get_pointing_name(pointing)}"
+                                for pointing in list_pointings]
 
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
@@ -900,7 +898,7 @@ class MusePipeSample(object):
                                                        folder_ref_wcs=folder_ref_wcs,
                                                        folder_cubes=folder_cubes,
                                                        prefix_cubes=prefix_cubes,
-                                                       list_suffix=list_pointing_names,
+                                                       list_suffix=list_pointings_names,
                                                        **kwargs)
 
     def convolve_mosaic_per_pointing(self, targetname=None, list_pointings=None,
