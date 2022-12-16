@@ -19,7 +19,7 @@ from astropy.io import fits as pyfits
 
 # Import package modules
 from .config_pipe import (default_filter_list, dict_musemodes,
-                          default_ndigits, default_str_dataset)
+                          default_ndigits, default_str_pointing, default_str_dataset)
 from . import util_pipe as upipe
 
 
