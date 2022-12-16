@@ -16,15 +16,18 @@ from scipy import ndimage as nd
 from astropy.stats import mad_std, sigma_clip, sigma_clipped_stats
 from astropy.convolution import Gaussian2DKernel, convolve
 
+# Import package modules
+from . import util_pipe as upipe
+
+
 try:
     from photutils.detection import IRAFStarFinder
     _photutils = True
 except ImportError:
+    upipe.print_warning("The python packages photutils is not available. "
+                        "If you wish to use star masking. Please install it.")
     _photutils = False
 
-
-# Import package modules
-from . import util_pipe as upipe
 
 
 def select_spaxels(maskdict, maskname, x, y):
