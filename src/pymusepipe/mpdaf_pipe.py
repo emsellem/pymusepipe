@@ -143,10 +143,10 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
 
     # Opening the image via mpdaf
     imawcs = Image(fullname)
-    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(np.int)
+    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(int)
 
     # New dimensions and extend current image
-    new_dim = tuple(np.array(imawcs.shape).astype(np.int) + extra_pixels)
+    new_dim = tuple(np.array(imawcs.shape).astype(int) + extra_pixels)
     ima_ext = imawcs.regrid(newdim=new_dim, refpos=imawcs.get_start(),
                             refpix=tuple(extra_pixels / 2.),
                             newinc=imawcs.get_step()[0]*3600.)
@@ -226,10 +226,10 @@ def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
     # Opening the image via mpdaf
     cubewcs = Cube(fullname)
     imawcs = cubewcs.sum(axis=0)
-    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(np.int)
+    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(int)
 
     # New dimensions and extend current image
-    new_dim = tuple(np.array(imawcs.shape).astype(np.int) + extra_pixels)
+    new_dim = tuple(np.array(imawcs.shape).astype(int) + extra_pixels)
     ima_ext = imawcs.regrid(newdim=new_dim, refpos=imawcs.get_start(),
                             refpix=tuple(extra_pixels / 2.),
                             newinc=imawcs.get_step()[0]*3600.)
@@ -705,7 +705,7 @@ class MuseCube(Cube):
         # Use the same reduction factor for all dimensions?
         # Copy from the mpdaf _rebin (in data.py)
         nfacarr = np.ones((res.ndim), dtype=int)
-        if isinstance(factor, np.int):
+        if isinstance(factor, int):
             nfacarr[1:] *= factor
         elif len(factor) == 2:
             nfacarr[1:] = np.asarray(factor)
@@ -875,7 +875,7 @@ class MuseCube(Cube):
 
         # Getting the shape of the Kernel
         scale_spaxel = self.get_step(unit_wcs=u.arcsec)[1]
-        nspaxel = np.int(factor_fwhm * target_fwhm / scale_spaxel)
+        nspaxel = int(factor_fwhm * target_fwhm / scale_spaxel)
         # Make nspaxel odd to have a PSF centred at the centre of the frame
         if nspaxel % 2 == 0:
             nspaxel += 1
@@ -940,12 +940,12 @@ class MuseCube(Cube):
         # Creating the outcube filename
         if outcube_name is None:
             prefix = kwargs.pop("prefix", "l{0:4d}l{1:4d}_".format(
-                np.int(lambdamin), np.int(lambdamax)))
+                int(lambdamin), int(lambdamax)))
             outcube_name = "{0}{1}".format(prefix, cube_name)
 
         # Range of lambd and number of spectral pixels
         range_lambda = lambdamax - lambdamin
-        npix_spec = np.int(range_lambda // step + 1.0)
+        npix_spec = int(range_lambda // step + 1.0)
 
         # if filter_nan remove the Nan
         if filter_for_nan:
@@ -1182,7 +1182,7 @@ class MuseCube(Cube):
         """Save the mask into a 0-1 image
         """
         newimage = self.copy()
-        newimage.data = np.where(self.mask, 0, 1).astype(np.int)
+        newimage.data = np.where(self.mask, 0, 1).astype(int)
         newimage.mask[:, :] = False
         newimage.write(mask_name)
 
@@ -1357,7 +1357,7 @@ class MuseImage(Image):
         # Arguments for the plots
         self.title = kwargs.pop('title', "Frame")
         self.scale = kwargs.pop('scale', "log")
-        self.vmin = np.int(kwargs.pop('vmin', 0))
+        self.vmin = int(kwargs.pop('vmin', 0))
         self.colorbar = kwargs.pop('colorbar', "v")
 
         if source is not None:
@@ -1429,7 +1429,7 @@ class MuseImage(Image):
         """Save the mask into a 0-1 image
         """
         newimage = self.copy()
-        newimage.data = np.where(self.mask, 0, 1).astype(np.int)
+        newimage.data = np.where(self.mask, 0, 1).astype(int)
         newimage.mask[:,:] = False
         newimage.write(mask_name)
 

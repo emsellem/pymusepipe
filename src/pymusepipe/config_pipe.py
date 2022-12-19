@@ -65,12 +65,12 @@ dict_listMasterObject = {**dict_listMaster, **dict_listObject}
 listexpo_files = {
         "OBJECT": ['object', 'OBJECT', str, '20A'],
         "TYPE": ['type', 'ESO DPR TYPE', str, '20A'],
-        "DATE":  ['mjd', 'MJD-OBS', np.float, 'E'],
+        "DATE":  ['mjd', 'MJD-OBS', float, 'E'],
         "MODE":  ['mode', 'ESO INS MODE', str, '10A'],
         "EXPTIME":  ['exptime', 'EXPTIME', float, 'E'],
         "TPLS":  ['tpls', 'ESO TPL START', str, '30A'],
-        "TPLN":  ['tplnexp', 'ESO TPL NEXP', np.int, 'J'],
-        "TPLNO":  ['tplno', 'ESO TPL EXPNO', np.int, 'J']
+        "TPLN":  ['tplnexp', 'ESO TPL NEXP', int, 'J'],
+        "TPLNO":  ['tplno', 'ESO TPL EXPNO', int, 'J']
         }
 
 # Excluding files from the checking of their MUSE mode (AO, noAO, N/E etc)

@@ -568,7 +568,7 @@ class PipePrep(SofPipe) :
             # Run the recipe to reduce the standard (muse_scibasic)
             suffix = get_suffix_product(expotype)
             name_products = []
-            list_expo = np.arange(Nexpo).astype(np.int) + 1
+            list_expo = np.arange(Nexpo).astype(int) + 1
             for iexpo in list_expo:
                 name_products += ['{0:04d}-{1:02d}.fits'.format(iexpo, j+1) for j in range(24)]
             self.recipe_scibasic(self.current_sof, tpl, expotype, dir_products, name_products, suffix)
@@ -613,7 +613,7 @@ class PipePrep(SofPipe) :
         # Create the dictionary for the STD Sof
         for i in range(len(std_table)):
             mytpl = std_table['tpls'][i]
-            iexpo = np.int(std_table['iexpo'][i])
+            iexpo = int(std_table['iexpo'][i])
             if tpl != "ALL" and tpl != mytpl :
                 continue
             # Now starting with the standard recipe
@@ -662,7 +662,7 @@ class PipePrep(SofPipe) :
         for i in range(len(sky_table)):
             mytpl = sky_table['tpls'][i]
             mymjd = sky_table['mjd'][i]
-            iexpo = np.int(sky_table['iexpo'][i])
+            iexpo = int(sky_table['iexpo'][i])
             if tpl != "ALL" and tpl != mytpl :
                 continue
             # Now starting with the standard recipe
@@ -695,7 +695,7 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo(expotype, "processed")
 
         for i in range(len(object_table)):
-            iexpo = np.int(object_table['iexpo'][i])
+            iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             if tpl != "ALL" and tpl != mytpl :
                 continue
@@ -732,7 +732,7 @@ class PipePrep(SofPipe) :
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
-            iexpo = np.int(object_table['iexpo'][i])
+            iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             if tpl != "ALL" and tpl != mytpl :
                 continue
@@ -772,7 +772,7 @@ class PipePrep(SofPipe) :
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
-            iexpo = np.int(object_table['iexpo'][i])
+            iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             if tpl != "ALL" and tpl != mytpl :
                 continue
@@ -800,7 +800,7 @@ class PipePrep(SofPipe) :
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
-            iexpo = np.int(object_table['iexpo'][i])
+            iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             # Skip this exposure if tpl does not match
             if tpl != "ALL" and tpl != mytpl :

@@ -346,7 +346,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
                                    dict_listObject['OBJECT'])
     prefix = kwargs.pop("prefix", "")
     name_pixtable = "{0}{1}_{2}-{3:02d}.fits".format(prefix, pixtable_basename,
-                                                     name_suffix, np.int(nifu))
+                                                     name_suffix, int(nifu))
     fullname_pixtable = joinpath(folder, name_pixtable)
     fakemode = kwargs.pop("fakemode", False)
 
@@ -374,7 +374,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
         print("Orig / New / Rotation Angle (deg): {0:8.4f} / {1:8.4f} / {2:8.4f}".format(
             hd[angle_orig_keyword],
             hd[angle_keyword],
-            np.float(hd[angle_keyword]) - hd[angle_orig_keyword]))
+            float(hd[angle_keyword]) - hd[angle_orig_keyword]))
 
 
 def align_hdu(hdu_target=None, hdu_to_align=None, target_rotation=0.0, to_align_rotation=0.0,
@@ -590,8 +590,8 @@ class AlignMuseDataset(object):
             upipe.print_info("Will use image_registration for image regridding.")
 
         # Set of input parameters for the image processing
-        self.border = np.int(border)
-        self.chunk_size = np.int(chunk_size)
+        self.border = int(border)
+        self.chunk_size = int(chunk_size)
         self.subim_window = subim_window
         self.median_window = median_window
         self.dynamic_range = dynamic_range

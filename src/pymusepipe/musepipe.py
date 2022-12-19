@@ -188,7 +188,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Setting the default attibutes #####################
         self.targetname = targetname
-        self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
+        self.vsystemic = float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
         if log_filename is None:

@@ -289,8 +289,8 @@ def chunk_stats(list_arrays, chunk_size=15):
 
     narrays = len(list_arrays)
 
-    nchunk_x = np.int(list_arrays[0].shape[0] // chunk_size - 1)
-    nchunk_y = np.int(list_arrays[0].shape[1] // chunk_size - 1)
+    nchunk_x = int(list_arrays[0].shape[0] // chunk_size - 1)
+    nchunk_y = int(list_arrays[0].shape[1] // chunk_size - 1)
     # Check that all arrays have the same size
     med_array = np.zeros((narrays, nchunk_x * nchunk_y), dtype=np.float64)
     std_array = np.zeros_like(med_array)

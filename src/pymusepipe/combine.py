@@ -74,7 +74,7 @@ def get_list_periods(root_path=""):
     for folder in list_folders:
         lint = re.findall(r'(\d{3})', folder)
         if len(lint) > 0:
-            list_periods.append(np.int(lint[-1]))
+            list_periods.append(int(lint[-1]))
 
     list_periods.sort()
     upipe.print_info("Periods list: {0}".format(str(list_periods)))
@@ -171,7 +171,7 @@ def get_list_datasets(target_path="", str_dataset=default_str_dataset,
     upipe.print_info(f"All good folder names  = {good_datasets}")
     list_datasets = []
     for folder in good_datasets:
-        list_datasets.append(np.int(folder[-int(ndigits):]))
+        list_datasets.append(int(folder[-int(ndigits):]))
 
     list_datasets.sort()
     upipe.print_info("Dataset list: {0}".format(str(list_datasets)))
@@ -265,10 +265,10 @@ def get_list_reduced_pixtables(target_path="", list_datasets=None,
             tpl = sl[1].split("_" + expo)[0]
             # If not already there, add it
             if tpl not in dict_tpl:
-                dict_tpl[tpl] = [np.int(expo)]
+                dict_tpl[tpl] = [int(expo)]
             # if already accounted for, add the expo number
             else:
-                dict_tpl[tpl].append(np.int(expo))
+                dict_tpl[tpl].append(int(expo))
 
         # Creating the full list for that dataset
         full_list = []
@@ -349,7 +349,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                           default_filter_list)
 
         self.combined_folder_name = combined_folder_name
-        self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
+        self.vsystemic = float(kwargs.pop("vsystemic", 0.))
 
         # Including or not the masked Pixtables in place of the original ones
         self.use_masked_pixtables = kwargs.pop("use_masked_pixtables", False)
@@ -729,7 +729,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Creating the filenames for Master files
         self.dict_name_datasets = {}
         for dataset in self.list_datasets:
-            name_dataset = "P{0:02d}".format(np.int(dataset))
+            name_dataset = "P{0:02d}".format(int(dataset))
             self.dict_name_datasets[dataset] = name_dataset
             # Adding the path of the folder
             setattr(self.paths, name_dataset,
@@ -823,7 +823,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Combining single pointings - Pointing {0:02d}".format(
-                             np.int(pointing)))
+                             int(pointing)))
             self.run_combine_single_pointing(pointing, add_suffix=add_suffix,
                                           sof_filename=sof_filename,
                                           **kwargs)
@@ -853,7 +853,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # getting the suffix with the additional PXX
         ### ICI ICI ICI
-        suffix = "{0}_P{1:02d}".format(add_suffix, np.int(pointing))
+        suffix = "{0}_P{1:02d}".format(add_suffix, int(pointing))
 
         ref_wcs = kwargs.pop("ref_wcs", None)
         wcs_from_pointing = kwargs.pop("wcs_from_pointing", False)
@@ -871,10 +871,10 @@ class MusePointings(SofPipe, PipeRecipes):
                 prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
                 ref_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
                                                         prefix_final_cube,
-                                                        np.int(pointing))
+                                                        int(pointing))
 
         # Running the combine for that single pointing
-        self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix,
+        self.run_combine(list_pointings=[int(pointing)], suffix=suffix,
                          sof_filename=sof_filename,
                          ref_wcs=ref_wcs,
                          **kwargs)
@@ -898,7 +898,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Making WCS Mask for "
-                             "Pointing {0:02d}".format(np.int(pointing)))
+                             "Pointing {0:02d}".format(int(pointing)))
             _ = self.create_pointing_wcs(pointing=pointing,
                                          filter_list=filter_list, **kwargs)
 
@@ -950,17 +950,17 @@ class MusePointings(SofPipe, PipeRecipes):
         # ICI ICI ICI
         name_mask = "{0}{1}_P{2:02d}.fits".format(prefix_mask,
                                                   prefix_final_cube,
-                                                  np.int(pointing))
+                                                  int(pointing))
         finalname_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
                                                prefix_final_cube,
-                                               np.int(pointing))
+                                               int(pointing))
 
         # First create a subcube without all the Nan
         mask_cube = MuseCube(filename=joinpath(dir_mask, name_mask))
 
         # Creating the new cube
         upipe.print_info("Now creating the Reference WCS cube "
-                         "for pointing {0}".format(np.int(pointing)))
+                         "for pointing {0}".format(int(pointing)))
         cfolder, cname = mask_cube.create_reference_cube(
                 lambdamin=lambdaminmax_mosaic[0],
                 lambdamax=lambdaminmax_mosaic[1], 
