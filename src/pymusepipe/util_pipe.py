@@ -429,7 +429,13 @@ def filter_list_with_pdict(input_list, list_datasets=None,
         # Returning the default input list
         selected_filename_list = input_list
         # Just one dummy pointing with all files
-        dict_exposures_per_pointing = {0: input_list}
+        # Still use the dataset number if provided
+        if len(list_datasets) == 1:
+            dict_exposures_per_pointing = {list_datasets[0]: input_list}
+        # if more than 1, then we need to pass them all
+        # to a dummy dataset number
+        else:
+            dict_exposures_per_pointing = {0: input_list}
         # Building the dummy list of tpl and nexpo for
         # this input list, decrypting with get_tpl_nexpo
         list_tplexpo = []
