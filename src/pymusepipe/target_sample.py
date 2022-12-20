@@ -446,8 +446,7 @@ class MusePipeSample(object):
             upipe.print_info("Initialise Pipe for Target = {0:10s} / Dataset {1:03d} ".format(
                                  targetname, dataset))
             # New log file name with dataset included
-            log_filename_dataset = "{0}_P{1:03d}{2}".format(
-                                    log_filename, dataset, log_fileext)
+            log_filename_dataset = f"{log_filename}_{get_pointing_name(dataset)}{log_fileext}"
             # Setting up the names of the output files
             python_command = ("mypipe = musepipe.MusePipe(targetname='{0}', "
                               "dataset={1}, folder_config='{2}', " 

@@ -36,7 +36,7 @@ from .recipes_pipe import PipeRecipes
 from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
-from .util_pipe import (filter_list_with_pdict, get_dataset_name, 
+from .util_pipe import (filter_list_with_pdict, get_dataset_name, get_pointing_name, 
                         get_tpl_nexpo, merge_dict, add_string)
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
@@ -853,7 +853,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # getting the suffix with the additional PXX
         ### ICI ICI ICI
-        suffix = "{0}_P{1:02d}".format(add_suffix, int(pointing))
+        suffix = f"{add_suffix}_{get_pointing_name(pointing)}"
 
         ref_wcs = kwargs.pop("ref_wcs", None)
         wcs_from_pointing = kwargs.pop("wcs_from_pointing", False)
@@ -869,9 +869,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
                 self.add_targetname = kwargs.pop("add_targetname", True)
                 prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
-                ref_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
-                                                        prefix_final_cube,
-                                                        int(pointing))
+                ref_wcs = f"{prefix_wcs}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
 
         # Running the combine for that single pointing
         self.run_combine(list_pointings=[int(pointing)], suffix=suffix,
@@ -898,7 +896,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Making WCS Mask for "
-                             "Pointing {0:02d}".format(int(pointing)))
+                             "Pointing {get_pointing_name(pointing)}")
             _ = self.create_pointing_wcs(pointing=pointing,
                                          filter_list=filter_list, **kwargs)
 
@@ -948,12 +946,8 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
 
         # ICI ICI ICI
-        name_mask = "{0}{1}_P{2:02d}.fits".format(prefix_mask,
-                                                  prefix_final_cube,
-                                                  int(pointing))
-        finalname_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
-                                               prefix_final_cube,
-                                               int(pointing))
+        name_mask = f"{prefix_mask}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
+        finalname_wcs = f"{prefix_wcs}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
 
         # First create a subcube without all the Nan
         mask_cube = MuseCube(filename=joinpath(dir_mask, name_mask))
@@ -1177,15 +1171,14 @@ class MusePointings(SofPipe, PipeRecipes):
                 # getting the name of the final datacube (mosaic)
                 cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
                 cube_suffix = self._add_targetname(cube_suffix)
-                ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
-            upipe.print_warning("ref_wcs used is {0}".format(ref_wcs))
+                ref_wcs = f"{prefix_wcs}{cube_suffix}.fits"
+            upipe.print_warning("ref_wcs used is {ref_wcs}")
 
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", upipe.normpath(self.paths.cubes))
         if ref_wcs is not None:
             full_ref_wcs = joinpath(folder_ref_wcs, ref_wcs)
             if not os.path.isfile(full_ref_wcs):
-                upipe.print_error("Reference WCS file {0} does not exist".format(
-                    full_ref_wcs))
+                upipe.print_error("Reference WCS file {full_ref_wcs} does not exist")
                 upipe.print_error("Consider using the create_combined_wcs recipe"
                                   " if you wish to create pointing masks. Else"
                                   " just check that the WCS reference file exists.")

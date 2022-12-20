@@ -335,7 +335,7 @@ class PipeRecipes(object) :
             lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for pointings
         """
-        self.run_oscommand(f"{self.esorex}  --log-file=exp_combine_datasets.log "
+        self.run_oscommand(f"{self.esorex}  --log-file=exp_combine_pointings.log "
                            f" muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                            f"--format={format_out} --filter={filter_list} "
                            f"--lambdamin={lambdamin} --lambdamax={lambdamax} "
