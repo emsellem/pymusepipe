@@ -117,6 +117,18 @@ def print_error(text, **kwargs):
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
 # -----------  END PRINTING FUNCTIONS -----------------------
+def check_filter_list(filter_list):
+    if filter_list is None:
+        return ""
+
+    if type(filter_list) is list:
+        return filter_list
+    elif type(filter_list) is str:
+        return filter_list.split(',')
+    else
+        upipe.print_warning(f"Could not recognise type of filter_list {filter_list}")
+        return []
+
 
 def analyse_musemode(musemode, field, delimiter='-'):
     """Extract the named field from the musemode
@@ -149,6 +161,7 @@ def analyse_musemode(musemode, field, delimiter='-'):
     else:
         val = musemode.split(delimiter)[index]
     return val.lower()
+
 
 def add_string(text, word="_", loc=0):
     """Adding string at given location

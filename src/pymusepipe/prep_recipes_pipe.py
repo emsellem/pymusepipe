@@ -24,6 +24,7 @@ from .create_sof import SofPipe
 from .align_pipe import create_offset_table, AlignMuseDataset
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
+from .util_pipe import check_filter_list
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
                           dict_recipes_per_num, dict_recipes_per_name,
                           dict_files_iexpo_products, dict_files_products,
@@ -75,9 +76,10 @@ def _get_combine_products(filter_list='white', prefix_all=""):
     suffix_products = []
     suffix_prefinalnames = []
     prefix_products = []
+    filter_list = check_filter_list(filter_list)
     for prod in dict_products_scipost['cube']:
         if prod == "IMAGE_FOV":
-            for i, value in enumerate(filter_list.split(','), start=1):
+            for i, value in enumerate(filter_list, start=1):
                 suffix_products.append(f"_{i:04d}")
                 suffix_prefinalnames.append(f"_{value}")
                 name_products.append(prod)
@@ -821,14 +823,17 @@ class PipePrep(SofPipe) :
         suffix_postfinalnames = []
         extlist_expo = []
         list_options = save.split(',')
-        if filter_list is None: filter_list = self.filter_list
+
+        if filter_list is None:
+            filter_list = self.filter_list
+        filter_list = check_filter_list(filter_list)
+
         if self.verbose:
             upipe.print_info("Filter list is {0}".format(filter_list), pipe=self)
         for option in list_options:
             for prod in dict_products_scipost[option]:
                 if prod == "IMAGE_FOV":
-                    for i, value in enumerate(filter_list.split(','), 
-                            start=1):
+                    for i, value in enumerate(filter_list, start=1):
                         name_products.append(prod)
                         suffix_products.append("_{0:04d}".format(i))
                         suffix_prefinalnames.append("_{0}".format(value))

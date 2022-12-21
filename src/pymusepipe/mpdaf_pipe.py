@@ -44,7 +44,7 @@ from . import util_pipe as upipe
 from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
 from .util_pipe import (filter_list_with_pdict, filter_list_with_suffix_list,\
                         add_string, default_str_dataset, default_ndigits,
-                        get_dataset_name)
+                        get_dataset_name, check_filter_list)
 from .cube_convolve import cube_kernel, cube_convolve
 from .emission_lines import get_emissionline_band
 
@@ -1042,6 +1042,7 @@ class MuseCube(Cube):
 
         suffix = add_string(suffix)
 
+        filter_list = check_filter_list(filter_list)
         for filtername in filter_list:
             upipe.print_info(f"Filter = {filtername}")
             ima = self.get_filter_image(filter_name=filtername, **kwargs)

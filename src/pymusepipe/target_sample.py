@@ -31,7 +31,7 @@ from .align_pipe import rotate_pixtables
 from .mpdaf_pipe import MuseCubeMosaic, MuseCube
 from .prep_recipes_pipe import dict_products_scipost
 from .version import __version__ as version_pack
-from .util_pipe import add_string, get_pointing_name
+from .util_pipe import add_string, get_pointing_name, check_filter_list
 
 from astropy.table import Table
 
@@ -946,8 +946,8 @@ class MusePipeSample(object):
 
         """
         # Filter list for the convolved exposures
-        filter_list = (kwargs.pop("filter_list",
-                                  self._short_filter_list)).split(',')
+        filter_list = kwargs.pop("filter_list", self._short_filter_list)
+        filter_list = check_filter_list(filter_list)
 
         # Initialise and filter with list of datasets
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
@@ -1012,8 +1012,8 @@ class MusePipeSample(object):
 
         """
         # Constructing the images for that mosaic
-        filter_list = (kwargs.pop("filter_list",
-                                  self._filter_list)).split(',')
+        filter_list = kwargs.pop("filter_list", self._filter_list)
+        filter_list = check_filter_list(filter_list)
 
         # Doing the mosaic with mad
         default_comb_folder = self.targets[targetname].combcubes_path
