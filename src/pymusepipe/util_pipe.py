@@ -493,6 +493,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
         # Building the dummy list of tpl and nexpo for
         # this input list, decrypting with get_tpl_nexpo
         dict_files = {}
+        dict_files_with_tpl = {}
         for filename in input_list:
             fdataset, ftpl, fnexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
                                                            ndigits=ndigits)
@@ -504,9 +505,21 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                 # Record only if the input list
                 if fdataset in list_datasets:
                     if fdataset not in dict_files:
-                        dict_files[fdataset] = [[ftpl, fnexpo]]
+                        dict_files_with_tpl[fdataset] = {ftpl: [fnexpo]}
                     else:
-                        dict_files[fdataset].append([ftpl, fnexpo])
+                        if ftpl not in dict_files_with_tpl:
+                            dict_files_with_tpl[fdataset][ftpl] = [fnexpo]
+                        else:
+                            dict_files_with_tpl[fdataset][ftpl].append(fnexpo)
+
+                for dataset in dict_files_with_tpl:
+                    dict_files[dataset] = []
+                    for tpl in dict_files_with_tpl[dataset]:
+                        list_nexpo = []
+                        for nexpo in dict_files_with_tpl[dataset][tpl]:
+                            list_nexpo.append(nexpo)
+                        dict_files[dataset].append((tpl, list_nexpo))
+
 
         # if len(dict_files) == 0:
         #     list_tplexpo = []
