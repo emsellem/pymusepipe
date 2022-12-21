@@ -805,7 +805,7 @@ class PipePrep(SofPipe) :
             iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             # Skip this exposure if tpl does not match
-            if tplexpo != "ALL" and [mytpl, iexpo] not in list_tplexpo:
+            if list_tplexpo != "ALL" and [mytpl, iexpo] not in list_tplexpo:
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
