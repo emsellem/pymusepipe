@@ -585,9 +585,9 @@ class MusePointings(SofPipe, PipeRecipes):
             self.dict_pixtabs_in_pointings = merge_dict(self.dict_pixtabs_in_pointings, 
                                                         tempp_dict_pixtabs)
             self.dict_tplexpo_per_pointing = merge_dict(self.dict_tplexpo_per_pointing,
-                                                        tempp_dict_tplexpo_per_pointings)
+                                                        tempp_dict_tplexpo_per_pointing)
             self.dict_tplexpo_per_dataset = merge_dict(self.dict_tplexpo_per_dataset,
-                                                        tempp_dict_tplexpo_per_datasets)
+                                                        tempp_dict_tplexpo_per_dataset)
             select_list_pixtabs.sort()
             self.dict_pixtabs_in_datasets[dataset] = copy.copy(select_list_pixtabs)
 
