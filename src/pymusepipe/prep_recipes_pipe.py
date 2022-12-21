@@ -774,7 +774,7 @@ class PipePrep(SofPipe) :
         for i in range(len(object_table)):
             iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
-            if tpl != "ALL" and tpl != mytpl :
+            if tpl != "ALL" and tpl != mytpl:
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
@@ -787,7 +787,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT", 
-                            tpl="ALL", stage="processed", 
+                            list_tplexpo="ALL", stage="processed",
                             suffix="", offset_list=False, **kwargs):
         """Launch the scipost command exposure per exposure
 
@@ -803,7 +803,7 @@ class PipePrep(SofPipe) :
             iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             # Skip this exposure if tpl does not match
-            if tpl != "ALL" and tpl != mytpl :
+            if tplexpo != "ALL" and [mytpl, iexpo] not in list_tplexpo:
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,

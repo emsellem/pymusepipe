@@ -520,6 +520,8 @@ class MusePointings(SofPipe, PipeRecipes):
         self.dict_pixtabs_in_datasets = {}
         self.dict_allpixtabs_in_datasets = {}
         self.dict_pixtabs_in_pointings = {}
+        self.dict_tplexpo_per_pointing = {}
+        self.dict_tplexpo_per_dataset = {}
         # Loop on Datasets
         for dataset in self.list_datasets:
             # get the path
@@ -574,13 +576,18 @@ class MusePointings(SofPipe, PipeRecipes):
             self.dict_allpixtabs_in_datasets[dataset] = full_list
 
             # Filter the list with the dataset dictionary if given
-            select_list_pixtabs, tempp_dict_pixtabs = filter_list_with_pdict(list_pixtabs,
-                                                         list_datasets=[dataset],
-                                                         dict_files=self.dict_exposures,
-                                                         verbose=self.verbose)
+            select_list_pixtabs, tempp_dict_pixtabs, tempp_dict_tplexpo_per_pointing, \
+                tempp_dict_tplexpo_per_dataset = filter_list_with_pdict(list_pixtabs,
+                                                                        list_datasets=[dataset],
+                                                                        dict_files=self.dict_exposures,
+                                                                        verbose=self.verbose)
 
             self.dict_pixtabs_in_pointings = merge_dict(self.dict_pixtabs_in_pointings, 
                                                         tempp_dict_pixtabs)
+            self.dict_tplexpo_per_pointing = merge_dict(self.dict_tplexpo_per_pointing,
+                                                        tempp_dict_tplexpo_per_pointings)
+            self.dict_tplexpo_per_dataset = merge_dict(self.dict_tplexpo_per_dataset,
+                                                        tempp_dict_tplexpo_per_datasets)
             select_list_pixtabs.sort()
             self.dict_pixtabs_in_datasets[dataset] = copy.copy(select_list_pixtabs)
 
@@ -852,7 +859,6 @@ class MusePointings(SofPipe, PipeRecipes):
         """
 
         # getting the suffix with the additional PXX
-        ### ICI ICI ICI
         suffix = f"{add_suffix}_{get_pointing_name(pointing)}"
 
         ref_wcs = kwargs.pop("ref_wcs", None)

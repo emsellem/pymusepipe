@@ -645,7 +645,7 @@ class MusePipeSample(object):
 
     def run_target_scipost_perexpo(self, targetname=None, list_datasets=None,
                                    folder_offset_table=None, name_offset_table=None,
-                                   **kwargs):
+                                   dict_exposures=None, **kwargs):
         """Build the cube per exposure using a given WCS
 
         Args:
@@ -683,28 +683,41 @@ class MusePipeSample(object):
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
         filter_list = kwargs.pop("filter_list", self._short_filter_list)
 
+        # initialisation of the combination to make sure we get the pointings right
+        # We will thus make use of the dict_tplexpo_in_pointing
+        self.init_combine(targetname=targetname, list_datasets=list_datasets,
+                          dict_exposures=dict_exposures)
+
         # Running the scipost_perexpo for all datasets individually
+        dict_tplexpo_per_dataset = self.pipes_combine[targetname].dict_tplexpo_per_dataset
         for dataset in list_datasets:
             obname = self.pipes[targetname][dataset]._get_dataset_name()
-            if wcs_auto:
-                ref_wcs = f"{wcs_suffix}_{obname}.fits"
-            if ref_wcs is not None:
-                suffix = f"_WCS_{obname}"
-            else:
-                suffix = f"_{obname}"
-            kwargs_dataset = {'ref_wcs': ref_wcs,
-                               'suffix': suffix,
-                               'folder_ref_wcs': folder_ref_wcs,
-                               'sof_filename': 'scipost_wcs',
-                               'dir_products': default_comb_folder,
-                               'name_offset_table': name_offset_table,
-                               'folder_offset_table': folder_offset_table,
-                               'offset_list': True,
-                               'filter_list': filter_list,
-                               'prefix_all': prefix_all,
-                               'save': save}
-            kwargs.update(kwargs_dataset)
-            self.pipes[targetname][dataset].run_scipost_perexpo(**kwargs)
+            # We now need to identify which tpls are there and which ref_wcs (pointing)
+            # For each dataset, we go through all pointings one by one since each has a ref_wcs
+            # We then use the list tpl and iexpo to pass to run_scipost_perexpo as list_tplexpo
+            for pointing in dict_tplexpo_per_dataset[dataset]:
+                pointing_name = get_pointing_name(pointing)
+                list_tplexpo = dict_tplexpo_per_dataset[dataset][pointing]
+                if wcs_auto:
+                    ref_wcs = f"{wcs_suffix}_{pointing_name}.fits"
+                if ref_wcs is not None:
+                    suffix = f"_WCS_{obname}"
+                else:
+                    suffix = f"_{obname}"
+                kwargs_dataset = {'ref_wcs': ref_wcs,
+                                  'suffix': suffix,
+                                  'folder_ref_wcs': folder_ref_wcs,
+                                  'sof_filename': 'scipost_wcs',
+                                  'dir_products': default_comb_folder,
+                                  'name_offset_table': name_offset_table,
+                                  'folder_offset_table': folder_offset_table,
+                                  'offset_list': True,
+                                  'filter_list': filter_list,
+                                  'prefix_all': prefix_all,
+                                  'list_tplexpo': list_tplexpo,
+                                  'save': save}
+                kwargs.update(kwargs_dataset)
+                self.pipes[targetname][dataset].run_scipost_perexpo(**kwargs)
 
     def run_target_recipe(self, recipe_name, targetname=None,
                           list_datasets=None, **kwargs):

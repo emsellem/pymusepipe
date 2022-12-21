@@ -440,9 +440,10 @@ class MuseCubeMosaic(CubeMosaic):
             if self.dict_exposures is not None:
                 upipe.print_info("Will be using a dictionary for "
                                  "further selecting the appropriate cubes")
-            list_cubes = filter_list_with_pdict(list_existing_cubes,
-                                                list_pointings=None,
-                                                dict_files=self.dict_exposures)
+            list_cubes, dict_exposures_per_pointing, dict_tplexpo_per_pointing,\
+                dict_tplexpo_per_dataset = filter_list_with_pdict(list_existing_cubes,
+                                                                  list_datasets=None,
+                                                                  dict_files=self.dict_exposures)
 
             # Take (or not) the fixed Cubes
             if self.use_fixed_cubes:
