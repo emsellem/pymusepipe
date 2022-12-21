@@ -591,7 +591,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             dict_exposures_per_pointing[pointing].append(filename)
                             dict_tplexpo_per_pointing[pointing].append([dataset, tpl,
                                                                         nexpo])
-                            if pointing not in dict_tplexpo_per_dataset:
+                            if pointing not in dict_tplexpo_per_dataset[dataset]:
                                 dict_tplexpo_per_dataset[dataset][pointing] = []
                             dict_tplexpo_per_dataset[dataset][pointing].append([tpl, nexpo])
                             # And remove it from the list
