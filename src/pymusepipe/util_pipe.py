@@ -18,7 +18,7 @@ import re
 from astropy.io import fits as pyfits
 
 # Import package modules
-from .config_pipe import (default_filter_list, dict_musemodes,
+from .config_pipe import (default_filter_list, dict_musemodes, default_short_filter_list,
                           default_ndigits, default_str_pointing, default_str_dataset)
 from . import util_pipe as upipe
 
@@ -117,9 +117,25 @@ def print_error(text, **kwargs):
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
 # -----------  END PRINTING FUNCTIONS -----------------------
+def filter_list_to_str(filter_list):
+    if filter_list is None:
+        return default_short_filter_list
+
+    if type(filter_list) is list:
+        fl = str(filter_list[0])
+        for f in filter_list[1:]:
+            fl += ",f"
+        return fl
+    elif type(filter_list) is str:
+        return filter_list
+    else
+        upipe.print_warning(f"Could not recognise type of filter_list {filter_list}")
+        return ""
+
+
 def check_filter_list(filter_list):
     if filter_list is None:
-        return ""
+        return []
 
     if type(filter_list) is list:
         return filter_list

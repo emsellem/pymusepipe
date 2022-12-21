@@ -21,6 +21,7 @@ import subprocess
 from . import util_pipe as upipe
 from .version import __version__ as pipeversion
 from .config_pipe import dict_products_scipost
+from .util_pipe import filter_list_to_str
 
 # Likwid command
 default_likwid = "likwid-pin -c N:"
@@ -237,6 +238,7 @@ class PipeRecipes(object) :
         """
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         prefix_all = kwargs.pop("prefix_all", "")
+        filter_list = filter_list_to_str(filter_list)
         self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
                 "--astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
@@ -313,6 +315,7 @@ class PipeRecipes(object) :
             lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for one single dataset
         """
+        filter_list = filter_list_to_str(filter_list)
         self.run_oscommand("{esorex}  --log-file=exp_combine_cube_{expotype}_{tpl}.log "
                " muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                "--format={form} --filter={filt} "
@@ -335,6 +338,7 @@ class PipeRecipes(object) :
             lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for pointings
         """
+        filter_list = filter_list_to_str(filter_list)
         self.run_oscommand(f"{self.esorex}  --log-file=exp_combine_pointings.log "
                            f" muse_exp_combine --save={save} --pixfrac={pixfrac:0.2f} "
                            f"--format={format_out} --filter={filter_list} "
