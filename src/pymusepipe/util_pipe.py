@@ -128,7 +128,7 @@ def filter_list_to_str(filter_list):
         return fl
     elif type(filter_list) is str:
         return filter_list
-    else
+    else:
         upipe.print_warning(f"Could not recognise type of filter_list {filter_list}")
         return ""
 
@@ -141,7 +141,7 @@ def check_filter_list(filter_list):
         return filter_list
     elif type(filter_list) is str:
         return filter_list.split(',')
-    else
+    else:
         upipe.print_warning(f"Could not recognise type of filter_list {filter_list}")
         return []
 
