@@ -523,6 +523,10 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     if list_datasets is None:
         list_datasets = dict_files.keys()
 
+    if self.verbose:
+        print(f"Verbose printing: dict_files is : {dict_files}")
+        print(f"Verbose printing: list_datasets is : {list_datasets}")
+
         # if len(dict_files) == 0:
         #     list_tplexpo = []
         #     for filename in input_list:
