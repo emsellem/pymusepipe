@@ -520,8 +520,8 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             list_nexpo.append(nexpo)
                         dict_files[dataset].append((tpl, list_nexpo))
 
-        if list_datasets is None:
-            list_datasets = dict_files.keys()
+    if list_datasets is None:
+        list_datasets = dict_files.keys()
 
         # if len(dict_files) == 0:
         #     list_tplexpo = []
