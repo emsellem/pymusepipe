@@ -503,7 +503,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
             # or found it, then record it
             else:
                 # Record only if the input list
-                if fdataset in list_datasets:
+                if fdataset in list_datasets or list_datasets is None:
                     if fdataset not in dict_files:
                         dict_files_with_tpl[fdataset] = {ftpl: [fnexpo]}
                     else:
@@ -520,6 +520,8 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             list_nexpo.append(nexpo)
                         dict_files[dataset].append((tpl, list_nexpo))
 
+        if list_datasets is None:
+            list_datasets = dict_files.keys()
 
         # if len(dict_files) == 0:
         #     list_tplexpo = []
