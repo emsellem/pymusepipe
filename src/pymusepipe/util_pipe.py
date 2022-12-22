@@ -480,7 +480,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
 
     """
     nfiles_input_list = len(input_list)
-    if list_datasets is None:
+    if list_datasets is None and dict_files is not None:
         list_datasets = dict_files.keys()
     elif not isinstance(list_datasets, list):
         upipe.print_error("Cannot recognise input dataset(s)")

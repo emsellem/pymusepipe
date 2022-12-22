@@ -886,10 +886,10 @@ class MusePipeSample(object):
             List of datasets (e.g., [1,2,3])
         """
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
-        # # Check if datasets are valid
-        # list_pointings = self._check_list_datasets_for_target(targetname, list_pointings)
-        if len(list_pointings) == 0:
-            return
+        # Check if pointings are ok
+        if list_pointings is not None:
+            if len(list_pointings) == 0:
+                return
 
         # Make a list for the masking of the cubes to take into account
         list_pointings_names = [f"{get_pointing_name(pointing)}"

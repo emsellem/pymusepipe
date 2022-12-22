@@ -419,7 +419,7 @@ class MuseCubeMosaic(CubeMosaic):
         if prefix_cubes is not None:
             self.prefix_cubes = prefix_cubes
 
-        if list_cubes == None:
+        if list_cubes is None:
             # get the list of cubes and return if 0 found
             list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                          self.prefix_cubes))
