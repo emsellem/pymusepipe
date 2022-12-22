@@ -891,6 +891,9 @@ class MusePipeSample(object):
             if len(list_pointings) == 0:
                 return
 
+        if list_pointings is None:
+            list_pointings = copy.copy(self.targets[targetname].list_datasets)
+
         # Make a list for the masking of the cubes to take into account
         list_pointings_names = [f"{get_pointing_name(pointing)}"
                                 for pointing in list_pointings]
