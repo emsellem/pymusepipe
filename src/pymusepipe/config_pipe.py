@@ -162,7 +162,7 @@ default_rc_filename = "~/.musepiperc"
 PHANGS_reduc_config = {'fakemode': False,
                        'nocache': False,
                        'checkmode': False,
-                       'overwrite_astropy_table': True,
+                       'overwrite_astropy_tables': True,
                        'filter_list': "white,WFI_BB,DUPONT_R",
                        'filter_for_alignment': "WFI_BB"}
 

@@ -422,7 +422,7 @@ class MusePipeSample(object):
         if self.__phangs:
             config_args = PHANGS_reduc_config
             # Set overwrite to False to keep existing tables
-            config_args['overwrite_astropy_table'] = False
+            config_args['overwrite_astropy_tables'] = False
         else:
             config_args = kwargs.pop("config_args", None)
 
@@ -899,6 +899,7 @@ class MusePipeSample(object):
         # Make a list for the masking of the cubes to take into account
         list_pointings_names = [f"{get_pointing_name(pointing)}"
                                 for pointing in list_pointings]
+        upipe.print_info(f"List of pointing names: {list_pointings_names}")
 
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
@@ -910,6 +911,7 @@ class MusePipeSample(object):
             wcs_prefix = ""
         ref_wcs = kwargs.pop("ref_wcs", "{0}{1}DATACUBE_FINAL.fits".format(
                              default_prefix_wcs_mosaic, wcs_prefix))
+        upipe.print_info(f"Check file: ref_wcs is {ref_wcs}")
 
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
                                                        folder_ref_wcs=folder_ref_wcs,

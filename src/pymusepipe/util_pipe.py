@@ -20,7 +20,6 @@ from astropy.io import fits as pyfits
 # Import package modules
 from .config_pipe import (default_filter_list, dict_musemodes, default_short_filter_list,
                           default_ndigits, default_str_pointing, default_str_dataset)
-from . import util_pipe as upipe
 
 
 #  PRINTING FUNCTIONS #
@@ -129,7 +128,7 @@ def filter_list_to_str(filter_list):
     elif type(filter_list) is str:
         return filter_list
     else:
-        upipe.print_warning(f"Could not recognise type of filter_list {filter_list}")
+        print_warning(f"Could not recognise type of filter_list {filter_list}")
         return ""
 
 
@@ -142,7 +141,7 @@ def check_filter_list(filter_list):
     elif type(filter_list) is str:
         return filter_list.split(',')
     else:
-        upipe.print_warning(f"Could not recognise type of filter_list {filter_list}")
+        print_warning(f"Could not recognise type of filter_list {filter_list}")
         return []
 
 
@@ -164,14 +163,14 @@ def analyse_musemode(musemode, field, delimiter='-'):
         Value of the field which was analysed (e.g., 'AO' or 'NOAO')
     """
     if field not in dict_musemodes:
-        upipe.print_error(f"Cannot find such a field ({field}) in the dict_musemodes")
+        print_error(f"Cannot find such a field ({field}) in the dict_musemodes")
         return ""
 
     index = dict_musemodes[field]
     sval = musemode.split(delimiter)
 
     if len(sval) < index+1:
-        upipe.print_error(f"Error in analyse_musemode. Cannot access field {index} "
+        print_error(f"Error in analyse_musemode. Cannot access field {index} "
                           f"After splitting the musemode {musemode} = sval")
         val = ""
     else:
@@ -483,7 +482,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     if list_datasets is None and dict_files is not None:
         list_datasets = dict_files.keys()
     elif not isinstance(list_datasets, list):
-        upipe.print_error("Cannot recognise input dataset(s)")
+        print_error("Cannot recognise input dataset(s)")
         list_datasets = []
 
     # If not dictionary is provided, we try to build it
@@ -524,8 +523,8 @@ def filter_list_with_pdict(input_list, list_datasets=None,
         list_datasets = dict_files.keys()
 
     if verbose:
-        print(f"Verbose printing: dict_files is : {dict_files}")
-        print(f"Verbose printing: list_datasets is : {list_datasets}")
+        print_info(f"Check file = dict_files is : {dict_files}")
+        print_info(f"Check file = list_datasets is : {list_datasets}")
 
         # if len(dict_files) == 0:
         #     list_tplexpo = []
@@ -557,7 +556,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     for dataset in list_datasets:
         dict_tplexpo_per_dataset[dataset] = {}
         if dataset not in dict_files:
-            upipe.print_warning("Dataset {} not in dictionary "
+            print_warning("Dataset {} not in dictionary "
                                 "- skipping".format(dataset))
         else:
             list_tpltuple = dict_files[dataset]
@@ -580,9 +579,9 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                         nexpo = int(expo[0])
                         pointing = int(expo[1])
                     else:
-                        upipe.print_warning(f"Dictionary entry {expotuple} "
-                                            f"ignored (type of expo - {expo} - "
-                                            f"is {type(expo)}")
+                        print_warning(f"Dictionary entry {expotuple} "
+                                      f"ignored (type of expo - {expo} - "
+                                      f"is {type(expo)}")
                         break
 
                     # Check whether this exists in the our cube list
@@ -606,15 +605,15 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             break
 
     if verbose:
-        upipe.print_info("Datasets {0} - Selected {1}/{2} exposures after "
-                         "dictionary filtering".format(list_datasets,
-                                                len(selected_filename_list),
-                                                nfiles_input_list))
+        print_info("Datasets {0} - Selected {1}/{2} exposures after "
+                   "dictionary filtering".format(list_datasets,
+                                          len(selected_filename_list),
+                                          nfiles_input_list))
 
         for pointing in dict_tplexpo_per_pointing:
-            upipe.print_info(f"Pointing {pointing} - Detected exposures [DATASET / TPL / NEXPO]:")
+            print_info(f"Pointing {pointing} - Detected exposures [DATASET / TPL / NEXPO]:")
             for tplexpo in dict_tplexpo_per_pointing[pointing]:
-                upipe.print_info(f"     {tplexpo[0]} / {tplexpo[1]} / {tplexpo[2]}")
+                print_info(f"     {tplexpo[0]} / {tplexpo[1]} / {tplexpo[2]}")
 
     return selected_filename_list, dict_exposures_per_pointing, dict_tplexpo_per_pointing, \
         dict_tplexpo_per_dataset
@@ -638,8 +637,8 @@ def filter_list_with_suffix_list(list_names, included_suffix_list=[],
 
     # if the list of inclusion suffix is empty, just use all cubes
     if len(included_suffix_list) > 0:
-        upipe.print_info(f"Using suffixes {included_suffix_list} "
-                         f"as an inclusive condition {add_message}")
+        print_info(f"Using suffixes {included_suffix_list} "
+                   f"as an inclusive condition {add_message}")
         # Filtering out the ones that don't have any of the suffixes
         temp_list = copy.copy(list_names)
         for l in temp_list:
@@ -648,8 +647,8 @@ def filter_list_with_suffix_list(list_names, included_suffix_list=[],
 
     # if the list of exclusion suffix is empty, just use all cubes
     if len(excluded_suffix_list) > 0:
-        upipe.print_info(f"Using suffixes {excluded_suffix_list} "
-                         f"as an exclusive condition {add_message}")
+        print_info(f"Using suffixes {excluded_suffix_list} "
+                   f"as an exclusive condition {add_message}")
         # Filtering out the ones that have any of the suffixes
         temp_list = copy.copy(list_names)
         for l in temp_list:
