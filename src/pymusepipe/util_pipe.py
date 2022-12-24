@@ -494,8 +494,13 @@ def filter_list_with_pdict(input_list, list_datasets=None,
         dict_files = {}
         dict_files_with_tpl = {}
         for filename in input_list:
+            if verbose:
+                print_info(f"Adressing File name: {filename}")
             fdataset, ftpl, fnexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
                                                            ndigits=ndigits)
+            if verbose:
+                print_info(f"Adressing File name: {filename}")
+                print_info(f"    Detected = Dataset/TPLS/Nexpo: {fdataset} / {ftpl} / {fnexpo}")
             # Did not find the string associated with dataset
             if fdataset == -1:
                 continue
@@ -520,7 +525,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                         dict_files[dataset].append((tpl, list_nexpo))
 
     if len(list_datasets) == 0:
-        list_datasets = dict_files.keys()
+        list_datasets = list(dict_files.keys())
 
     if verbose:
         print_info(f"Check file = dict_files is : {dict_files}")
