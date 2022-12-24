@@ -31,7 +31,8 @@ from .align_pipe import rotate_pixtables
 from .mpdaf_pipe import MuseCubeMosaic, MuseCube
 from .prep_recipes_pipe import dict_products_scipost
 from .version import __version__ as version_pack
-from .util_pipe import add_string, get_pointing_name, check_filter_list
+from .util_pipe import (add_string, get_pointing_name, get_dataset_name,
+                        check_filter_list)
 
 from astropy.table import Table
 
