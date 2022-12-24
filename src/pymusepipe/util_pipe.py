@@ -523,6 +523,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                         list_nexpo = []
                         for nexpo in dict_files_with_tpl[dataset][tpl]:
                             list_nexpo.append(nexpo)
+                        list_nexpo.sort()
                         dict_files[dataset].append((tpl, list_nexpo))
 
     if len(list_datasets) == 0:
