@@ -427,14 +427,13 @@ class MuseCubeMosaic(CubeMosaic):
             upipe.print_info("Found {} existing Cubes in this folder".format(
                 len(list_existing_cubes)))
 
-            upipe.print_info("Found {} Cubes after suffix filtering".format(
-                len(list_existing_cubes)))
-
             # if the list of exclusion suffix is empty, just use all cubes
             list_existing_cubes = filter_list_with_suffix_list(list_existing_cubes,
                                                     self.included_suffix,
                                                     self.excluded_suffix,
                                                     name_list="Existing Cubes")
+            upipe.print_info("Found {} Cubes after suffix filtering".format(
+                len(list_existing_cubes)))
 
             # Filter the list with the pointing dictionary if given
             if self.dict_exposures is not None:
