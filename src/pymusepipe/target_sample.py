@@ -56,7 +56,7 @@ def insert_suffix(filename, suffix=""):
     """
     # Create new name
     sfilename, extension = os.path.splitext(filename)
-    if suffix is != "":
+    if suffix != "":
         suffix = f"_{suffix}"
     return "{0}{1}{2}".format(sfilename, suffix, extension)
 
