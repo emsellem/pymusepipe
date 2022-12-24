@@ -446,14 +446,14 @@ class MuseCubeMosaic(CubeMosaic):
 
             # Take (or not) the fixed Cubes
             if self.use_fixed_cubes:
-                upipe.print_warning("Using Fixed cubes with prefix {} "
+                upipe.print_warning("Using Corrected cubes with prefix {} "
                                     "when relevant".format(self.prefix_fixed_cubes))
                 prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
                                                      self.prefix_cubes)
                 list_fixed_cubes = glob.glob("{0}{1}*fits".format(
                                                    self.folder_cubes,
                                                    prefix_to_consider))
-                upipe.print_info("Initial set of {:02d} fixed "
+                upipe.print_info("Initial set of {:02d} Corrected "
                                  "cubes found".format(len(list_fixed_cubes)))
 
                 # if the list of exclusion suffix is empty, just use all cubes

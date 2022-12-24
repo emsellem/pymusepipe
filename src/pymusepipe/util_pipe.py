@@ -478,12 +478,13 @@ def filter_list_with_pdict(input_list, list_datasets=None,
         exposure_list_per_pointing: selected list of files for each pointing
 
     """
-    nfiles_input_list = len(input_list)
-    if list_datasets is None and dict_files is not None:
-        list_datasets = dict_files.keys()
+    if list_datasets is None:
+        list_datasets = []
     elif not isinstance(list_datasets, list):
         print_error("Cannot recognise input dataset(s)")
         list_datasets = []
+
+    nfiles_input_list = len(input_list)
 
     # If not dictionary is provided, we try to build it
     if dict_files is None:
