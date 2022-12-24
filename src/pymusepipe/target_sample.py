@@ -56,7 +56,9 @@ def insert_suffix(filename, suffix=""):
     """
     # Create new name
     sfilename, extension = os.path.splitext(filename)
-    return "{0}_{1}{2}".format(sfilename, suffix, extension)
+    if suffix is != "":
+        suffix = f"_{suffix}"
+    return "{0}{1}{2}".format(sfilename, suffix, extension)
 
 
 def update_calib_file(filename, subfolder="", folder_config=""):
