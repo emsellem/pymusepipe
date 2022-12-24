@@ -424,8 +424,8 @@ class MuseCubeMosaic(CubeMosaic):
             list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                          self.prefix_cubes))
 
-            upipe.print_info("Found {} existing Cubes in this folder".format(
-                len(list_existing_cubes)))
+            upipe.print_info(f"Found {len(list_existing_cubes)} existing Cubes "
+                             f"in this folder with prefix {self.prefix_cubes}")
 
             # if the list of exclusion suffix is empty, just use all cubes
             list_existing_cubes = filter_list_with_suffix_list(list_existing_cubes,
