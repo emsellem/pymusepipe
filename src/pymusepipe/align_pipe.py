@@ -1329,6 +1329,8 @@ class AlignMuseDataset(object):
         border = kwargs.pop("border", self.border)
         mask_stars = kwargs.pop("mask_stars", False)
         threshold = kwargs.pop("threshold", self.default_threshold)
+        if threshold is None:
+            threshold = self.default_threshold
 
         # Save hdr if save_hdr is True
         if self.save_hdr:
@@ -1663,7 +1665,6 @@ class AlignMuseDataset(object):
                                                               header=header, verbose=verbose,
                                                               **kwargs)
 
-
     def init_optical_flow_hdu(self, muse_hdu, rotation=0., threshold=None, guess_translation=(0.,0.),
                               header=None, verbose=False, **kwargs):
         """Get the optical flow for this hdu
@@ -1683,7 +1684,7 @@ class AlignMuseDataset(object):
         """
         # Getting the images. Note that border must be 0 as otherwise you will need to change
         # the WCS (header passed to AlignOpticalFlow
-        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, threshold, border=0,
+        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, threshold=threshold, border=0,
                                                  remove_bkg=False, squeeze=False, **kwargs)
         if self._debug:
             self._temp_input_opflow_muse = ima_muse * 1.0
@@ -1759,7 +1760,7 @@ class AlignMuseDataset(object):
         xpix_cross
         ypix_cross: x and y pixel coordinates of the cross-correlation peak
         """
-        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, threshold, **kwargs)
+        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, threshold=threshold, **kwargs)
 
         if self.phase_corr:
             shifts, shift_errors, phasediff = phase_cross_correlation(ima_ref, ima_muse,
