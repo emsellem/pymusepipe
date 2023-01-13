@@ -198,6 +198,10 @@ def get_polynorm(array1, array2, chunk_size=15, threshold1=0.,
     med, std = chunk_stats([array1, array2], chunk_size=chunk_size)
 
     # Selecting where data is supposed to be good
+    if threshold1 is None:
+        threshold1 = 0.
+    if threshold2 is None:
+        threshold2 = 0.
     pos = (med[0] > threshold1) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > threshold2)
     # Guess the slope from this selection
     guess_slope = 1.0
@@ -487,7 +491,7 @@ def prepare_image(data, median_filter=True, sigma=0., border=0):
 
 
 def flatclean_image(data, border=10, dynamic_range=10,
-                  median_window=10, minflux=0.0, squeeze=True,
+                  median_window=10, threshold=0.0, squeeze=True,
                   remove_bkg=True):
     """Process image by squeezing the range, removing
     the borders and filtering it. The image is first filtered,
@@ -496,14 +500,14 @@ def flatclean_image(data, border=10, dynamic_range=10,
 
     Input
     -----
-    data: 2d array
+    data: 2d ndarray
         Input array to process
     dynamic_range: float [10]
         Dynamic range used to squash the bright pixels down
     median_window: int [10]
         Size of the window used for the median filtering.
-    minflux: float [0]
-        Value of the minimum flux allowed.
+    threshold: float [0]
+        Value of the minimum value allowed.
     squeeze: bool
         Squeeze the dynamic range by using the dynamic_range variable
     crop: bool
@@ -512,20 +516,24 @@ def flatclean_image(data, border=10, dynamic_range=10,
 
     Returns
     -------
+    flatcleaned_array: 2d ndarray
     """
     if squeeze:
         # Squish bright pixels down
         data = np.arctan(data / np.nanmedian(data) / dynamic_range)
 
     if remove_bkg:
-        # Omit the border pixels
+        # Remove a median filtered value from the data
         data -= filtermed_image(data, 0, median_window)
 
+    # Crop the border
     cdata = crop_data(data, border)
 
-    # Removing the zeros
+    # Removing all values below threshold
     with np.errstate(invalid='ignore'):
-        cdata[cdata < minflux] = 0.
+        if threshold is None:
+            threshold = 0.
+        cdata = np.clip(cdata, threshold, None)
 
     # Clean up the NaNs
     cdata = np.nan_to_num(cdata)
