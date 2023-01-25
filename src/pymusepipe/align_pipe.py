@@ -105,7 +105,8 @@ default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
 default_reference_unit = u.microJansky
 
 dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
-                      "DUPONT_R": u.spectral_density(6483.58 * u.AA)}
+                      "DUPONT_R": u.spectral_density(6483.58 * u.AA),
+                      "Legacy_r": u.spectral_density(6483.58 * u.AA)}
 # ================== Useful function ====================== #
 
 
@@ -520,6 +521,9 @@ class AlignMuseDataset(object):
             Suffix to be used for muse image names if only a subset should be selected.
         filter_name: str
             Name of filter to consider when filtering the muse image names
+        filter_suffix: str
+            String defined to filter the image names. If not provided, will be defaulted
+            to the provided filter_name.
         firstguess: str
             If "crosscorr", will use cross-correlation to guess the alignment offsets.
             If "fits", will use input fits OFFSET table to start with
@@ -639,6 +643,7 @@ class AlignMuseDataset(object):
         self.name_offmusehdr = kwargs.pop("name_offmusehdr", "offsetmuse")
         self.suffix_images = kwargs.pop("suffix_muse_images", "IMAGE_FOV")
         self.filter_name = kwargs.pop("filter_name", "Cousins_R")
+        self.filter_suffix = kwargs.pop("filter_suffix", self.filter_name)
 
         # Use polynorm or not
         self.use_polynorm = kwargs.pop("use_polynorm", True)
@@ -1188,7 +1193,7 @@ class AlignMuseDataset(object):
         if self.name_muse_images is None:
             set_of_paths = glob.glob("{0}*{1}*.fits".format(
                 joinpath(self.folder_muse_images,
-                         self.suffix_images), self.filter_name))
+                         self.suffix_images), self.filter_suffix))
             self.list_name_museimages = [Path(muse_path).name
                                          for muse_path in set_of_paths]
             # Sort alphabetically

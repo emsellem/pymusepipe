@@ -333,7 +333,7 @@ class MuseCubeMosaic(CubeMosaic):
         self.dict_psf = dict_psf
 
         # Building the list of cubes
-        self.build_list(list_cubes)
+        self.build_list(list_cubes=list_cubes)
 
         # Initialise the super class
         super(MuseCubeMosaic, self).__init__(self.cube_names, self.full_wcs_name)
@@ -429,9 +429,9 @@ class MuseCubeMosaic(CubeMosaic):
 
             # if the list of exclusion suffix is empty, just use all cubes
             list_existing_cubes = filter_list_with_suffix_list(list_existing_cubes,
-                                                    self.included_suffix,
-                                                    self.excluded_suffix,
-                                                    name_list="Existing Cubes")
+                                                               self.included_suffix,
+                                                               self.excluded_suffix,
+                                                               name_list="Existing Cubes")
             upipe.print_info("Found {} Cubes after suffix filtering".format(
                 len(list_existing_cubes)))
 
