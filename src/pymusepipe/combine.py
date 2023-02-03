@@ -435,9 +435,9 @@ class MusePointings(SofPipe, PipeRecipes):
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
 
+        # List of datasets to process
+        self.list_datasets = self._check_list_datasets(list_datasets)
         if check:
-            # List of datasets to process
-            self.list_datasets = self._check_list_datasets(list_datasets)
             # List of pointings to process
             self.list_pointings = self._check_list_pointings(list_pointings)
         # END Set up params =======================================
@@ -784,11 +784,11 @@ class MusePointings(SofPipe, PipeRecipes):
         # Creating the filenames for Master files
         self.dict_name_datasets = {}
         for dataset in self.list_datasets:
-            name_dataset = "P{0:02d}".format(int(dataset))
+            name_dataset = get_dataset_name(dataset, str_dataset, ndigits)
             self.dict_name_datasets[dataset] = name_dataset
             # Adding the path of the folder
-            setattr(self.paths, name_dataset,
-                    joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.targetname, dataset)))
+            setattr(self.paths, name_dataset, joinpath(self.paths.root,
+                                                       "{self.targetname}/{name_dataset}/")
 
         # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
         for name in self.pipe_params._dict_folders_target:
