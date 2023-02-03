@@ -788,7 +788,7 @@ class MusePointings(SofPipe, PipeRecipes):
             self.dict_name_datasets[dataset] = name_dataset
             # Adding the path of the folder
             setattr(self.paths, name_dataset, joinpath(self.paths.root,
-                                                       "{self.targetname}/{name_dataset}/")
+                                                       f"{self.targetname}/{name_dataset}/")
 
         # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
         for name in self.pipe_params._dict_folders_target:
