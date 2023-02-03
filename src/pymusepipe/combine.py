@@ -427,6 +427,11 @@ class MusePointings(SofPipe, PipeRecipes):
 
         self.pipe_params.init_default_param(dict_combined_folders)
         self._dict_combined_folders = dict_combined_folders
+        # List of datasets to process
+        self.list_datasets = self._check_list_datasets(list_datasets)
+        if check:
+            # List of pointings to process
+            self.list_pointings = self._check_list_pointings(list_pointings)
 
         # Setting all the useful paths
         self.set_fullpath_names()
@@ -435,11 +440,6 @@ class MusePointings(SofPipe, PipeRecipes):
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
 
-        # List of datasets to process
-        self.list_datasets = self._check_list_datasets(list_datasets)
-        if check:
-            # List of pointings to process
-            self.list_pointings = self._check_list_pointings(list_pointings)
         # END Set up params =======================================
 
         # =========================================================== 
