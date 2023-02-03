@@ -784,7 +784,8 @@ class MusePointings(SofPipe, PipeRecipes):
         # Creating the filenames for Master files
         self.dict_name_datasets = {}
         for dataset in self.list_datasets:
-            name_dataset = get_dataset_name(dataset, str_dataset, ndigits)
+            name_dataset = get_dataset_name(dataset, self.pipe_params.str_dataset,
+                                            self.pipe_params.ndigits)
             self.dict_name_datasets[dataset] = name_dataset
             # Adding the path of the folder
             setattr(self.paths, name_dataset, joinpath(self.paths.root,
