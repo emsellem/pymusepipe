@@ -458,6 +458,7 @@ class MuseCubeMosaic(CubeMosaic):
 
         """
 
+        upipe.print_info('Building the list of appropriate Cubes for the mosaick')
         self.list_suffix = kwargs.pop("list_suffix", self.list_suffix)
         # Get the folder if needed
         if folder_cubes is not None:

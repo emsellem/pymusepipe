@@ -180,7 +180,7 @@ def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
     return dict_expos
 
 def get_list_datasets(target_path="", str_dataset=default_str_dataset,
-                      ndigits=default_ndigits):
+                      ndigits=default_ndigits, verbose=False):
     """Getting the list of existing datasets for a given target path
 
     Input
@@ -197,16 +197,20 @@ def get_list_datasets(target_path="", str_dataset=default_str_dataset,
     list_datasets: list of int
     """
     # Done by scanning the target path
-    upipe.print_info(f"Searching datasets in {target_path} with {str_dataset} prefix")
+    if verbose:
+        upipe.print_info(f"Searching datasets in {target_path} with {str_dataset} prefix")
     all_folders = glob.glob(f"{target_path}/{str_dataset}*")
-    upipe.print_info(f"All folder names  = {all_folders}")
+    if verbose:
+        upipe.print_info(f"All folder names  = {all_folders}")
     all_datasets = [os.path.split(s)[-1] for s in all_folders]
     all_datasets.sort()
-    upipe.print_info(f"All detected folder names  = {all_datasets}")
+    if verbose:
+        upipe.print_info(f"All detected folder names  = {all_datasets}")
     r = re.compile(f"{str_dataset}\d{{{ndigits}}}$")
     good_datasets = [f for f in all_datasets if r.match(f)]
     good_datasets.sort()
-    upipe.print_info(f"All good folder names  = {good_datasets}")
+    if verbose:
+        upipe.print_info(f"All good folder names  = {good_datasets}")
     list_datasets = []
     for folder in good_datasets:
         list_datasets.append(int(folder[-int(ndigits):]))
@@ -423,10 +427,6 @@ class MusePointings(SofPipe, PipeRecipes):
         self.pipe_params.init_default_param(dict_combined_folders)
         self._dict_combined_folders = dict_combined_folders
 
-        # List of datasets to process
-        self.list_datasets = self._check_list_datasets(list_datasets)
-        # List of pointings to process
-        self.list_pointings = self._check_list_pointings(list_pointings)
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
@@ -434,11 +434,20 @@ class MusePointings(SofPipe, PipeRecipes):
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
 
+        check = kwargs.pop("check", True)
+        if check:
+            # List of datasets to process
+            self.list_datasets = self._check_list_datasets(list_datasets)
+            # List of pointings to process
+            self.list_pointings = self._check_list_pointings(list_pointings)
         # END Set up params =======================================
 
         # =========================================================== 
         # ---------------------------------------------------------
         # Create the Combined folder
+        # Making the output folders in a safe mode
+        if self.verbose:
+            upipe.print_info("Creating directory structure")
         upipe.safely_create_folder(self.paths.data, verbose=verbose)
 
         # Go to the Combined Folder
@@ -450,15 +459,13 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Checking input datasets and pixtables
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
-        self._get_list_reduced_pixtables(dict_exposures)
+        if check:
+            self._get_list_reduced_pixtables(dict_exposures)
 
         # Checking input offset table and corresponding pixtables
-        self._check_offset_table(name_offset_table, folder_offset_table)
+        if check:
+            self._check_offset_table(name_offset_table, folder_offset_table)
         # END CHECK UP ============================================
-
-        # Making the output folders in a safe mode
-        if self.verbose:
-            upipe.print_info("Creating directory structure")
 
         # Going back to initial working directory
         self.goto_origfolder()
@@ -505,6 +512,7 @@ class MusePointings(SofPipe, PipeRecipes):
         list_datasets after checking they exist
         """
         listname = kwargs.pop("listname", "Datasets")
+        verbose = kwargs.pop("verbose", False)
 
         if default_list is None:
             default_list = self.full_list_datasets
@@ -513,8 +521,9 @@ class MusePointings(SofPipe, PipeRecipes):
             # This is using all the existing datasets
             return default_list
         else:
-            upipe.print_info(f"Wished {listname} list = {list_datasets}")
-            upipe.print_warning(f"Target default {listname} list = {default_list}")
+            if verbose:
+                upipe.print_info(f"Wished {listname} list = {list_datasets}")
+                upipe.print_warning(f"Target default {listname} list = {default_list}")
             # Checked ones
             checked_list_datasets = list(set(list_datasets) & set(default_list))
             # Not existing ones
@@ -546,6 +555,7 @@ class MusePointings(SofPipe, PipeRecipes):
     def _get_list_reduced_pixtables(self, dict_exposures=None):
         """Check if datasets and dictionary are compatible
         """
+        upipe.print_info("Checking the list of reduced PixTables")
         # Dictionary of exposures to select per dataset
         self.dict_exposures = dict_exposures
 
