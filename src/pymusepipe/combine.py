@@ -374,6 +374,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self._debug = debug
         if self._debug:
             upipe.print_warning("In DEBUG Mode [more printing]")
+        check = kwargs.pop("check", True)
 
         # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')
@@ -434,7 +435,6 @@ class MusePointings(SofPipe, PipeRecipes):
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
 
-        check = kwargs.pop("check", True)
         if check:
             # List of datasets to process
             self.list_datasets = self._check_list_datasets(list_datasets)
