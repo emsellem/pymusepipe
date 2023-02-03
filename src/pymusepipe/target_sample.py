@@ -877,9 +877,8 @@ class MusePipeSample(object):
                              list_ifu=None, angle=angle, fakemode=fakemode,
                              prefix=prefix, **kwargs)
 
-    def init_mosaic(self, targetname=None, list_datasets=None, 
-                    prefix_cubes="DATACUBE_FINAL_WCS", 
-                    list_pointings=None, **kwargs):
+    def init_mosaic(self, targetname=None, list_datasets=None, prefix_cubes="DATACUBE_FINAL_WCS",
+                    **kwargs):
         """Prepare the combination of targets
 
         Input
@@ -888,6 +887,8 @@ class MusePipeSample(object):
             Name of target
         list_datasets: list [or None=default meaning all datasets]
             List of datasets (e.g., [1,2,3])
+        prefix_cubes: str default="DATACUBE_FINAL_WCS", optional
+            Prefix to be used to list the cubes to consider
         """
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         # Check if pointings are ok
@@ -895,17 +896,13 @@ class MusePipeSample(object):
             if len(list_pointings) == 0:
                 return
 
-        if list_pointings is None:
-            list_pointings = copy.copy(self.targets[targetname].list_datasets)
         if list_datasets is None:
             list_datasets = copy.copy(self.targets[targetname].list_datasets)
 
         # Make a list for the masking of the cubes to take into account
-        list_pointings_names = [f"{get_pointing_name(pointing)}"
-                                for pointing in list_pointings]
         list_datasets_names = [f"{get_dataset_name(dataset)}"
                                 for dataset in list_datasets]
-        upipe.print_info(f"List of pointing names: {list_pointings_names}")
+        upipe.print_info(f"List of datasets names: {list_datasets_names}")
 
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)

@@ -33,7 +33,7 @@ from astropy import wcs as awcs
 from astropy.io import fits as pyfits
 from astropy.io import ascii
 from astropy.modeling import models, fitting
-from astropy.table import Table, Column
+from astropy.table import Table
 from astropy import units as u
 
 # Import mpdaf
@@ -42,8 +42,7 @@ from mpdaf.obj import Image, WCS
 # Import needed modules from pymusepipe
 from . import util_pipe as upipe  # noqua: E402
 from .config_pipe import mjd_names, date_names, tpl_names
-from .config_pipe import dataset_names, iexpo_names
-from .config_pipe import default_offset_table, dict_listObject
+from .config_pipe import dataset_names, iexpo_names, dict_listObject
 from .graph_pipe import (plot_polypar, plot_compare_contours,
                          plot_compare_cuts, plot_compare_diff)
 from .util_image import my_linear_model, flatclean_image, get_normfactor, mask_point_sources
@@ -108,80 +107,6 @@ dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
                       "DUPONT_R": u.spectral_density(6483.58 * u.AA),
                       "Legacy_r": u.spectral_density(6483.58 * u.AA)}
 # ================== Useful function ====================== #
-
-
-def create_offset_table(image_names, table_folder="",
-                        table_name="dummy_offset_table.fits", overwrite=False):
-    """Create an offset list table from a given set of images. It will use
-    the MJD and DATE as read from the descriptors of the images. The names for
-    these keywords is stored in the dictionary default_offset_table from
-    config_pipe.py
-
-    Parameters
-    ----------
-    image_names : list of str
-        List of image names to be considered. (Default value = [])
-    table_folder : str
-        folder of the table (Default value = "")
-    table_name : str
-        name of the table to save ['dummy_offset_table.fits']
-        (Default value = "dummy_offset_table.fits")
-    overwrite : bool
-        if the table exists, it will be overwritten if set
-        to True only. (Default value = False)
-    overwrite : bool
-        if the table exists, it will be overwritten if set
-        to True only. (Default value = False)
-
-    Returns
-    -------
-        A fits table with the output given name. (Default value = False)
-    """
-
-    # Check if table exists and see if overwrite is set up
-    table_fullname = joinpath(table_folder, table_name)
-    if not overwrite and os.path.isfile(table_fullname):
-        upipe.print_warning("[create_offset_table] Table {0} "
-                            "already exists".format(table_fullname))
-        upipe.print_warning("Use overwrite=True if you wish to proceed")
-        return
-
-    nimages = len(image_names)
-    if nimages == 0:
-        upipe.print_warning("No image names provided for create_offset_table")
-        return
-
-    # Gather the values of DATE and MJD from the images
-    date, mjd, tpls, iexpo, dataset = [], [], [], [], []
-    for ima in image_names:
-        if not os.path.isfile(ima):
-            upipe.print_warning("[create_offset] Image {0} does not exists".format(ima))
-            continue
-
-        head = pyfits.getheader(ima)
-        date.append(head[date_names['image']])
-        mjd.append(head[mjd_names['image']])
-        tpls.append(head[tpl_names['image']])
-        iexpo.append(head[iexpo_names['image']])
-        dataset.append(head[dataset_names['image']])
-
-    nlines = len(date)
-
-    # Create and fill the table
-    offset_table = Table()
-    for col in default_offset_table:
-        [name, form, default] = default_offset_table[col]
-        offset_table[name] = Column([default for i in range(nlines)],
-                                    dtype=form)
-
-    offset_table[date_names['table']] = date
-    offset_table[mjd_names['table']] = mjd
-    offset_table[tpl_names['table']] = tpls
-    offset_table[iexpo_names['table']] = iexpo
-    offset_table[dataset_names['table']] = dataset
-
-    # Write the table
-    offset_table.write(table_fullname, overwrite=overwrite)
 
 
 def get_conversion_factor(input_unit, output_unit, filter_name="WFI"):

@@ -35,16 +35,17 @@ from mpdaf.drs import PixTable
 # Astropy
 from astropy.io import fits as pyfits
 from astropy import units as u
+from astropy.coordinates import SkyCoord
 
 # Scipy erosion
 from scipy import ndimage as ndi
 
 import pymusepipe
-from . import util_pipe as upipe
 from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
 from .util_pipe import (filter_list_with_pdict, filter_list_with_suffix_list,\
                         add_string, default_str_dataset, default_ndigits,
                         get_dataset_name, check_filter_list)
+from .util_pipe import (print_error, print_info, print_warning, print_debug)
 from .cube_convolve import cube_kernel, cube_convolve
 from .emission_lines import get_emissionline_band
 
@@ -53,7 +54,7 @@ def get_sky_spectrum(specname) :
     """Read sky spectrum from MUSE data reduction
     """
     if not os.path.isfile(specname):
-        upipe.print_error("{0} not found".format(specname))
+        print_error("{0} not found".format(specname))
         return None
 
     sky = pyfits.getdata(specname)
@@ -110,18 +111,26 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
     to optimise the extent of the output image, removing Nan along X and Y
     at that angle.
 
-    Args:
-        ima_name (str): input image name. No default.
-        ima_folder (str): input image folder ['']
-        outwcs_folder (str): folder where to write the output frame. Default is
-            None which means that it will use the folder of the input image.
-        rotangle (float): rotation angle in degrees [0]
-        **kwargs:
-            in_suffix (str): in suffix to remove from name ['prealign']
-            out_suffix (str): out suffix to add to name ['rotwcs']
-            margin_factor (float): factor to extend the image [1.1]
+    Input
+    -----
+    ima_name: str
+        input image name. No default.
+    ima_folder: str default='', optional
+        input image folder
+    outwcs_folder: str, optional
+        folder where to write the output frame. Default is
+        None which means that it will use the folder of the input image.
+    rotangle: float default=0, optional
+        rotation angle in degrees
+    in_suffix: str default='prealign'
+        in suffix to remove from name
+    out_suffix: str default='rotwcs'
+        out suffix to add to name
+    margin_factor: float
+        factor to extend the image [1.1]
 
-    Returns:
+    Returns
+    -------
 
     """
 
@@ -138,7 +147,7 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
     # Get margin if needed
     margin_factor = kwargs.pop("margin_factor", 1.1)
     extend_fraction = np.maximum(0., (margin_factor - 1.))
-    upipe.print_info("Will use a {:5.2f}% extra margin".format(
+    print_info("Will use a {:5.2f}% extra margin".format(
                      extend_fraction*100.))
 
     # Opening the image via mpdaf
@@ -153,7 +162,7 @@ def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
 
     # Copy and rotate WCS
     new_wcs = copy.deepcopy(ima_ext.wcs)
-    upipe.print_info("Rotating WCS by {} degrees".format(rotangle))
+    print_info("Rotating WCS by {} degrees".format(rotangle))
     new_wcs.rotate(rotangle)
 
     # New rotated image
@@ -220,7 +229,7 @@ def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
     # Get margin if needed
     margin_factor = kwargs.pop("margin_factor", 1.1)
     extend_fraction = np.maximum(0., (margin_factor - 1.))
-    upipe.print_info("Will use a {:5.2f}% extra margin".format(
+    print_info("Will use a {:5.2f}% extra margin".format(
                      extend_fraction*100.))
 
     # Opening the image via mpdaf
@@ -236,7 +245,7 @@ def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
 
     # Copy and rotate WCS
     new_wcs = copy.deepcopy(ima_ext.wcs)
-    upipe.print_info("Rotating spatial WCS of Cube by {} degrees".format(rotangle))
+    print_info("Rotating spatial WCS of Cube by {} degrees".format(rotangle))
     new_wcs.rotate(rotangle)
 
     # New rotated image
@@ -269,6 +278,47 @@ def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
     # write output
     final_rot_cube.write(joinpath(outwcs_folder, out_name))
     return outwcs_folder, out_name
+
+
+def get_centre_from_pixtable(pixtable_name):
+    """Get the center of the FOV from pixtables
+
+    Input
+    -----
+    pixtable_name: str
+        name of the pixeltable
+
+    Returns
+    -------
+    SkyCoord: astropy.coordinates.Skycoord
+        Coordinates of the center of the field
+    """
+
+    table = PixTable(pixtable_name)
+
+    # get the x and y coordinates of each pixel
+    x = table.get_xpos()
+    y = table.get_ypos()
+
+    # it seems like the x and y are the position from the center of the field
+    # see: https://mpdaf.readthedocs.io/en/latest/pixtable.html#pixtable-format
+    # so the centre should just be the pixel close to 0 in both dimensions
+
+    xcen_id = np.argmin(np.abs(x))
+    ycen_id = np.argmin(np.abs(y))
+
+    xcen = x[xcen_id]
+    ycen = y[ycen_id]
+
+    # get the position on the sky of the barycenter
+    # and transform to SkyCoord for consistency
+    bary = table.get_pos_sky(xcen, ycen)
+    coord = SkyCoord(bary[0], bary[1], unit=(u.deg, u.deg))
+
+    # Printing the result
+    print_info(f"{pixtable_name} = {coord}")
+
+    return coord
 
 
 class BasicPSF(object):
@@ -370,11 +420,11 @@ class MuseCubeMosaic(CubeMosaic):
 
     def _check_folder(self):
         if not os.path.isdir(self.folder_cubes):
-            upipe.print_error("Cube Folder {} does not exists \n"
+            print_error("Cube Folder {} does not exists \n"
                               "- Aborting".format(self.folder_cubes))
             return False
         if not os.path.isdir(self.folder_ref_wcs):
-            upipe.print_error("WCS Folder {} does not exists \n"
+            print_error("WCS Folder {} does not exists \n"
                               "- Aborting".format(self.folder_ref_wcs))
             return False
         return True
@@ -424,7 +474,7 @@ class MuseCubeMosaic(CubeMosaic):
             list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
                                                          self.prefix_cubes))
 
-            upipe.print_info(f"Found {len(list_existing_cubes)} existing Cubes "
+            print_info(f"Found {len(list_existing_cubes)} existing Cubes "
                              f"in this folder with prefix {self.prefix_cubes}")
 
             # if the list of exclusion suffix is empty, just use all cubes
@@ -432,12 +482,12 @@ class MuseCubeMosaic(CubeMosaic):
                                                                self.included_suffix,
                                                                self.excluded_suffix,
                                                                name_list="Existing Cubes")
-            upipe.print_info("Found {} Cubes after suffix filtering".format(
+            print_info("Found {} Cubes after suffix filtering".format(
                 len(list_existing_cubes)))
 
             # Filter the list with the pointing dictionary if given
             if self.dict_exposures is not None:
-                upipe.print_info("Will be using a dictionary for "
+                print_info("Will be using a dictionary for "
                                  "further selecting the appropriate cubes")
             list_cubes, dict_exposures_per_pointing, dict_tplexpo_per_pointing,\
                 dict_tplexpo_per_dataset = filter_list_with_pdict(list_existing_cubes,
@@ -446,14 +496,14 @@ class MuseCubeMosaic(CubeMosaic):
 
             # Take (or not) the fixed Cubes
             if self.use_fixed_cubes:
-                upipe.print_warning("Using Corrected cubes with prefix {} "
+                print_warning("Using Corrected cubes with prefix {} "
                                     "when relevant".format(self.prefix_fixed_cubes))
                 prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
                                                      self.prefix_cubes)
                 list_fixed_cubes = glob.glob("{0}{1}*fits".format(
                                                    self.folder_cubes,
                                                    prefix_to_consider))
-                upipe.print_info("Initial set of {:02d} Corrected "
+                print_info("Initial set of {:02d} Corrected "
                                  "cubes found".format(len(list_fixed_cubes)))
 
                 # if the list of exclusion suffix is empty, just use all cubes
@@ -471,15 +521,15 @@ class MuseCubeMosaic(CubeMosaic):
                     if orig_cube in temp_list:
                         # If it exists, remove it
                         list_cubes.remove(orig_cube)
-                        upipe.print_warning(f"Cube {orig_cube} was removed from "
+                        print_warning(f"Cube {orig_cube} was removed from "
                                             f"the list (fixed one will be used)")
                     else:
-                        upipe.print_warning(f"Original Cube {orig_cube} not "
+                        print_warning(f"Original Cube {orig_cube} not "
                                             f"found (but fixed cube will "
                                             f"be used nevertheless)")
                     # and add the fixed one
                     list_cubes.append(fixed_cube)
-                    upipe.print_warning(f"Fixed Cube {fixed_cube} has been included "
+                    print_warning(f"Fixed Cube {fixed_cube} has been included "
                                         f"in the list")
 
             # if the list of suffix is empty, just use all cubes
@@ -511,7 +561,7 @@ class MuseCubeMosaic(CubeMosaic):
                         found = True
                 # If none correspond, set to the 0 FWHM Gaussian
                 if not found:
-                    upipe.print_warning(f"No PSF found for cube {name}. "
+                    print_warning(f"No PSF found for cube {name}. "
                                         f"Using default")
                     self.list_cubes[-1].psf = BasicPSF()
             else:
@@ -519,14 +569,14 @@ class MuseCubeMosaic(CubeMosaic):
 
         if self.verbose:
             for i, c in enumerate(self.list_cubes):
-                upipe.print_info("Cube {0:03d}: {1}".format(i+1, c.filename))
+                print_info("Cube {0:03d}: {1}".format(i+1, c.filename))
 
         if self.ncubes == 0:
-            upipe.print_error("Found 0 cubes in this folder with suffix"
+            print_error("Found 0 cubes in this folder with suffix"
                               " {}: please change suffix".format(
                                   self.prefix_cubes))
         else:
-            upipe.print_info("Found {} cubes to be processed".format(
+            print_info("Found {} cubes to be processed".format(
                                  self.ncubes))
 
     def convolve_cubes(self, target_fwhm, target_nmoffat=None,
@@ -579,7 +629,7 @@ class MuseCubeMosaic(CubeMosaic):
         """
 
         # Combine
-        upipe.print_info("Starting the combine of "
+        print_info("Starting the combine of "
                          "all {} input cubes".format(self.ncubes))
         if not fakemode:
             cube, expmap, statpix, rejmap = self.pycombine(mad=mad)
@@ -593,7 +643,7 @@ class MuseCubeMosaic(CubeMosaic):
         full_cube_name = joinpath(self.folder_cubes, outcube_name)
         self.mosaic_cube_name = full_cube_name
         if not fakemode:
-            upipe.print_info("Writing the new Cube {}".format(full_cube_name))
+            print_info("Writing the new Cube {}".format(full_cube_name))
             cube.write(full_cube_name)
 
 class MuseCube(Cube):
@@ -669,7 +719,7 @@ class MuseCube(Cube):
             prefix = kwargs.pop("prefix", "l{0:.0f}_".format(wave1))
             outcube_name = "{0}{1}".format(prefix, cube_name)
 
-        upipe.print_info("Writing up single wave-cube {0}\n"
+        print_info("Writing up single wave-cube {0}\n"
                          "in folder {1}".format(outcube_name, cube_folder))
         subcube.write(joinpath(cube_folder, outcube_name))
         return cube_folder, outcube_name
@@ -870,8 +920,8 @@ class MuseCube(Cube):
                                                        target_fwhm, cube_name)
         else:
             _, outcube_name = os.path.split(outcube_name)
-        upipe.print_info(f"The new cube will be named: {outcube_name}")
-        upipe.print_info(f"Products will be written in {outcube_folder}")
+        print_info(f"The new cube will be named: {outcube_name}")
+        print_info(f"Products will be written in {outcube_folder}")
 
         # Getting the shape of the Kernel
         scale_spaxel = self.get_step(unit_wcs=u.arcsec)[1]
@@ -904,11 +954,11 @@ class MuseCube(Cube):
             conv_cube._mask = nmask
 
         # Write the output
-        upipe.print_info("Writing up the derived cube")
+        print_info("Writing up the derived cube")
         conv_cube.write(joinpath(outcube_folder, outcube_name))
 
         # Write the kernel3D
-        upipe.print_info("Writing up the used kernel")
+        print_info("Writing up the used kernel")
         kercube = Cube(data=kernel3d)
         kercube.write(joinpath(outcube_folder, "ker3d_{}".format(outcube_name)))
 
@@ -952,7 +1002,7 @@ class MuseCube(Cube):
             ind = np.indices(self.data[0].shape)
             selgood = np.any(~np.isnan(self.data), axis=0)
             if self._debug:
-                upipe.print_debug("Xmin={0} Xmax={1} / Ymin={2} Ymax={3}".format(
+                print_debug("Xmin={0} Xmax={1} / Ymin={2} Ymax={3}".format(
                                   np.min(ind[0][selgood]), np.max(ind[0][selgood]),
                                   np.min(ind[1][selgood]), np.max(ind[1][selgood])))
             subcube = self[:,np.min(ind[0][selgood]): np.max(ind[0][selgood]),
@@ -1034,7 +1084,7 @@ class MuseCube(Cube):
         Returns:
 
         """
-        upipe.print_info("Building images for each filter in given list")
+        print_info("Building images for each filter in given list")
         cube_folder, cube_name = os.path.split(self.filename)
         if folder is None:
             folder = cube_folder
@@ -1043,14 +1093,14 @@ class MuseCube(Cube):
 
         filter_list = check_filter_list(filter_list)
         for filtername in filter_list:
-            upipe.print_info(f"Filter = {filtername}")
+            print_info(f"Filter = {filtername}")
             ima = self.get_filter_image(filter_name=filtername, **kwargs)
             if ima is None:
-                upipe.print_error(f"Could not reconstruct Image with Filter {filtername}")
+                print_error(f"Could not reconstruct Image with Filter {filtername}")
                 continue
 
             ima_name = f"{prefix}_{filtername}{suffix}.fits"
-            upipe.print_info(f"Writing image {ima_name}")
+            print_info(f"Writing image {ima_name}")
             ima.write(joinpath(folder, ima_name))
 
     def get_filter_image(self, filter_name=None, own_filter_file=None, filter_folder="",
@@ -1059,7 +1109,7 @@ class MuseCube(Cube):
         the filter list, then use that, otherwise use the given file
         """
         try:
-            upipe.print_info("Building Image with MUSE "
+            print_info("Building Image with MUSE "
                              "filter {0}".format(filter_name))
             if filter_name.lower() == "white":
                 # filter_wave = np.array([4000.,5000.,6000.,7000.,
@@ -1072,7 +1122,7 @@ class MuseCube(Cube):
                 refimage = self.get_band_image(filter_name)
         except ValueError:
             # initialise the filter file
-            upipe.print_info("Reading private reference filter {0}".format(filter_name))
+            print_info("Reading private reference filter {0}".format(filter_name))
 
             # First we check the extra dictionary if provided
             if dict_filters is not None:
@@ -1080,15 +1130,15 @@ class MuseCube(Cube):
                     filter_file = dict_filters[filter_name]
             # then we check the package internal filter list
             elif filter_name in dict_extra_filters:
-                upipe.print_info("Found filter in pymusepipe internal dictionary "
+                print_info("Found filter in pymusepipe internal dictionary "
                                  "(see data/Filters)")
                 filter_folder = pymusepipe.__path__[0]
                 filter_file = dict_extra_filters[filter_name]
             else:
-                upipe.print_warning("[mpdaf_pipe / get_filter_image] "
+                print_warning("[mpdaf_pipe / get_filter_image] "
                                   "Filter name not in private dictionary - Aborting")
                 if own_filter_file is None:
-                    upipe.print_error("[mpdaf_pipe / get_filter_image] "
+                    print_error("[mpdaf_pipe / get_filter_image] "
                                       "No extra filter dictionary and "
                                       "the private filter file is not set - Aborting")
                     return None
@@ -1097,7 +1147,7 @@ class MuseCube(Cube):
             # Now reading the filter data
             path_filter = joinpath(filter_folder, filter_file)
             filter_wave, filter_sensitivity = np.loadtxt(path_filter, unpack=True)
-            upipe.print_info("Building Image with filter {}".format(filter_name))
+            print_info("Building Image with filter {}".format(filter_name))
             # using mpdaf bandpass_image to build the image
             refimage = self.bandpass_image(filter_wave, filter_sensitivity,
                                            interpolation='linear')
@@ -1136,7 +1186,7 @@ class MuseCube(Cube):
         """
         # If width = 0 just don't do anything
         if width <= 0.:
-            upipe.print_warning("Trail width is 0, hence no doing anything")
+            print_warning("Trail width is 0, hence no doing anything")
             return
         w2 = width / 2.
 
@@ -1176,7 +1226,7 @@ class MuseCube(Cube):
             if use_folder:
                 trailcube_name = joinpath(cube_folder, trailcube_name)
 
-            upipe.print_info("Writing the new Cube {}".format(trailcube_name))
+            print_info("Writing the new Cube {}".format(trailcube_name))
             out.write(trailcube_name)
 
     def save_mask(self, mask_name="dummy_mask.fits"):
@@ -1197,7 +1247,7 @@ class MuseSkyContinuum(object):
         """Read sky continuum spectrum from MUSE data reduction
         """
         if not os.path.isfile(self.filename):
-            upipe.print_error("{0} not found".format(self.filename))
+            print_error("{0} not found".format(self.filename))
             crval = 0.0
             data = np.zeros(0)
             cdelt = 1.0
@@ -1252,7 +1302,7 @@ class MuseSkyContinuum(object):
             Name of the filter to consider
         """
         if not hasattr(self, filter_name):
-            upipe.print_error("No integration value for filter {0}".format(
+            print_error("No integration value for filter {0}".format(
                                   filter_name))
             self._norm = 1.
         else :
@@ -1282,9 +1332,9 @@ class MuseSkyContinuum(object):
             Default is False.
         """
         if prefix == "":
-            upipe.print_error("[mpdaf_pipe / save_normalised] The new and old sky "
+            print_error("[mpdaf_pipe / save_normalised] The new and old sky "
                               "continuum fits files will share the same name")
-            upipe.print_error("This is not recommended - Aborting")
+            print_error("This is not recommended - Aborting")
             return
     
         folder_spec, filename = os.path.split(self.filename)
@@ -1304,14 +1354,13 @@ class MuseSkyContinuum(object):
     
         # Writing to the new file
         skycont.writeto(norm_filename, overwrite=overwrite)
-        upipe.print_info('Normalised Factor used = {0:8.4f}'.format(norm_factor))
-        upipe.print_info('Normalised Sky Continuum {} has been created'.format(norm_filename))
+        print_info('Normalised Factor used = {0:8.4f}'.format(norm_factor))
+        print_info('Normalised Sky Continuum {} has been created'.format(norm_filename))
 
 # Routine to read filters
 class MuseFilter(object):
-    def __init__(self, filter_name="Cousins_R", 
-        filter_fits_file="filter_list.fits", 
-        filter_ascii_file=None):
+    def __init__(self, filter_name="Cousins_R", filter_fits_file="filter_list.fits",
+                 filter_ascii_file=None):
         """Routine to read the throughput of a filter
 
         Input
@@ -1335,17 +1384,17 @@ class MuseFilter(object):
         """
         if self.filter_ascii_file is None:
             try:
-                upipe.print_info("Using the fits file {0} as input".format(self.filter_fits_file))
+                print_info("Using the fits file {0} as input".format(self.filter_fits_file))
                 filter_data = pyfits.getdata(self.filter_fits_file, extname=self.filter_name)
                 self.wave = filter_data['lambda']
                 self.throughput = filter_data['throughput']
             except:
-                upipe.print_error("Problem opening the filter fits file {0}".format(self.filter_fits_file))
-                upipe.print_error("Did not manage to get the filter {0} throughput".format(self.filter_name))
+                print_error("Problem opening the filter fits file {0}".format(self.filter_fits_file))
+                print_error("Did not manage to get the filter {0} throughput".format(self.filter_name))
                 self.wave = np.zeros(0)
                 self.throughput = np.zeros(0)
         else:
-            upipe.print_info("Using the ascii file {0} as input".format(self.filter_ascii_file))
+            print_info("Using the ascii file {0} as input".format(self.filter_ascii_file))
             self.wave, self.throughput = np.loadtxt(self.filter_ascii_file, unpack=True)
 
 class MuseImage(Image): 
@@ -1392,7 +1441,7 @@ class MuseImage(Image):
         """
         # If width = 0 just don't do anything
         if width <= 0.:
-            upipe.print_warning("Trail width is 0, hence no doing anything")
+            print_warning("Trail width is 0, hence no doing anything")
             return
 
         # Create an index grid using the Image shape
@@ -1457,7 +1506,7 @@ class MuseSetImages(list) :
         # 1 required attribute
         if not hasattr(self, 'subtitle') :
             if 'subtitle' in kwargs :
-                upipe.print_warning("Overiding subtitle")
+                print_warning("Overiding subtitle")
             self.subtitle = kwargs.get('subtitle', "")
 
 class MuseSpectrum(Spectrum): 
@@ -1503,7 +1552,7 @@ class MuseSetSpectra(list) :
         ## 1 required attribute
         if not hasattr(self, 'subtitle') :
             if 'subtitle' in kwargs :
-                upipe.print_warning("Overiding subtitle")
+                print_warning("Overiding subtitle")
             self.subtitle = kwargs.get('subtitle', "")
 
 class PixTableToMask(object):
@@ -1527,10 +1576,10 @@ class PixTableToMask(object):
         """
         self.suffix_out = suffix_out
         if not os.path.isfile(pixtable_name):
-            upipe.print_error("Input PixTable does not exist")
+            print_error("Input PixTable does not exist")
             return
         if not os.path.isfile(image_name):
-            upipe.print_error("Input Image does not exist")
+            print_error("Input Image does not exist")
             return
         self.image_name = image_name
         self.pixtable_name = pixtable_name
@@ -1606,7 +1655,7 @@ class PixTableToMask(object):
             If provided, will overwrite the one in self.suffix_out
         """
         # Open the PixTable
-        upipe.print_info("Opening the Pixtable {0}".format(
+        print_info("Opening the Pixtable {0}".format(
                           self.pixtable_name))
         pixtable = PixTable(self.pixtable_name)
 
@@ -1615,15 +1664,15 @@ class PixTableToMask(object):
             self.mask_name = mask_name
         else:
             if not hasattr(self, "mask_name"):
-                upipe.print_error("Please provide a mask name (FITS file)")
+                print_error("Please provide a mask name (FITS file)")
                 return
 
-        upipe.print_info("Creating a column Mask from file {0}".format(
+        print_info("Creating a column Mask from file {0}".format(
                           self.mask_name))
         mask_col = pixtable.mask_column(self.mask_name)
 
         # extract the right data using the pixtable mask
-        upipe.print_info("Extracting the Mask")
+        print_info("Extracting the Mask")
         newpixtable = pixtable.extract_from_mask(mask_col.maskcol)
 
         # Rewrite a new pixtable
@@ -1635,7 +1684,7 @@ class PixTableToMask(object):
         else :
             self.newpixtable_name = "{0}{1}".format(self.suffix_out, self.pixtable_name)
 
-        upipe.print_info("Writing the new PixTable in {0}".format(
+        print_info("Writing the new PixTable in {0}".format(
                           self.newpixtable_name))
         newpixtable.write(self.newpixtable_name)
 
@@ -1645,18 +1694,18 @@ class PixTableToMask(object):
             # Test if Extension exists by reading header
             # If it exists then do nothing
             test_data = pyfits.getheader(self.newpixtable_name, ext_name)
-            upipe.print_warning("Flat field extension already exists in masked PixTable - all good")
+            print_warning("Flat field extension already exists in masked PixTable - all good")
         # If it does not exist test if it exists in the original PixTable
         except KeyError:
             try:
                 # Read data and header
                 ff_ext_data = pyfits.getdata(self.pixtable_name, ext_name)
                 ff_ext_h = pyfits.getheader(self.pixtable_name, ext_name)
-                upipe.print_warning("Flat field extension will be transferred from PixTable")
+                print_warning("Flat field extension will be transferred from PixTable")
                 # Append it to the new pixtable
                 pyfits.append(self.newpixtable_name, ff_ext_data, ff_ext_h)
             except KeyError:
-                upipe.print_warning("No Flat field extension to transfer - all good")
+                print_warning("No Flat field extension to transfer - all good")
             except:
                 pass
         except:
@@ -1670,9 +1719,8 @@ class PixTableToMask(object):
             try:
                 pyfits.setval(self.newpixtable_name, keyword='EXTNAME', 
                         value=d, extname=d.upper())
-                upipe.print_warning("Rewriting extension name {0} as lowercase".format(
+                print_warning("Rewriting extension name {0} as lowercase".format(
                                        d.upper()))
             except:
-                upipe.print_warning("Extension {0} not present - patch ignored".format(
+                print_warning("Extension {0} not present - patch ignored".format(
                                        d.upper()))
-

@@ -100,13 +100,49 @@ def get_list_targets(folder=""):
     upipe.print_info("Potential Targets -- list: {0}".format(str(list_targets)))
     return list_targets
 
+
+def build_dict_datasets(data_path="", str_dataset=default_str_dataset, ndigits=default_ndigits):
+    """Build a dictionary of datasets for each target in the sample
+
+    Input
+    ------
+    data_path: str
+       Path of the target data
+    str_dataset: str
+        Prefix string for datasets
+    ndigits: int
+       Number of digits to format the name of the dataset
+
+    Returns
+    -------
+    dict_dataset: dict
+
+    """
+    list_targets = get_list_targets(data_path)
+    dict_dataset = {}
+
+    npath = os.path.normpath(data_path)
+    s_npath = npath.split(os.sep)
+
+    for target in list_targets:
+        target_path = f"{data_path}/{target}/"
+        list_datasets = get_list_datasets(target_path, str_dataset, ndigits)
+        dict_t = {}
+        for ds in list_datasets:
+            dict_t[ds] = 1
+
+        dict_dataset[target] = [s_npath[-1], dict_t]
+
+    return dict_dataset
+        
+
 def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
                          ndigits=default_ndigits, show_pointings=False):
     """Build a dictionary of exposures using the list of datasets found for the
     given dataset path
 
-    Parameters
-    ----------
+    Input
+    ------
     target_path: str
        Path of the target data
     str_dataset: str
@@ -165,9 +201,11 @@ def get_list_datasets(target_path="", str_dataset=default_str_dataset,
     all_folders = glob.glob(f"{target_path}/{str_dataset}*")
     upipe.print_info(f"All folder names  = {all_folders}")
     all_datasets = [os.path.split(s)[-1] for s in all_folders]
+    all_datasets.sort()
     upipe.print_info(f"All detected folder names  = {all_datasets}")
     r = re.compile(f"{str_dataset}\d{{{ndigits}}}$")
     good_datasets = [f for f in all_datasets if r.match(f)]
+    good_datasets.sort()
     upipe.print_info(f"All good folder names  = {good_datasets}")
     list_datasets = []
     for folder in good_datasets:
@@ -746,9 +784,8 @@ class MusePointings(SofPipe, PipeRecipes):
         for name in self.pipe_params._dict_folders_target:
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dict_folders_target[name]))
 
-    def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True,
-                             reference_cube=True, refcube_name=None,
-                             **kwargs):
+    def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True, reference_cube=True,
+                             refcube_name=None, **kwargs):
         """Create the WCS reference files, for all individual pointings and for
         the mosaic.
 
@@ -800,10 +837,8 @@ class MusePointings(SofPipe, PipeRecipes):
                                         lambdaminmax_wcs=lambdaminmax_for_mosaic,
                                         refcube_name=wcs_refcube_name)
 
-    def run_combine_all_single_pointings(self, add_suffix="",
-                                         sof_filename='pointings_combine',
-                                         list_pointings=None,
-                                         **kwargs):
+    def run_combine_all_single_pointings(self, add_suffix="", sof_filename='pointings_combine',
+                                         list_pointings=None, **kwargs):
         """Run for all pointings individually, provided in the
         list of pointings, by just looping over the pointings.
 
@@ -835,8 +870,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                           sof_filename=sof_filename,
                                           **kwargs)
 
-    def run_combine_single_pointing(self, pointing, add_suffix="",
-                                    sof_filename='pointing_combine',
+    def run_combine_single_pointing(self, pointing, add_suffix="", sof_filename='pointing_combine',
                                     **kwargs):
         """Running the combine routine on just one single pointing
 
@@ -878,13 +912,10 @@ class MusePointings(SofPipe, PipeRecipes):
                 ref_wcs = f"{prefix_wcs}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
 
         # Running the combine for that single pointing
-        self.run_combine(list_pointings=[int(pointing)], suffix=suffix,
-                         sof_filename=sof_filename,
-                         ref_wcs=ref_wcs,
-                         **kwargs)
+        self.run_combine(list_pointings=[int(pointing)], suffix=suffix, sof_filename=sof_filename,
+                         ref_wcs=ref_wcs, **kwargs)
 
-    def create_all_pointings_wcs(self, filter_list="white",
-                                 list_pointings=None, **kwargs):
+    def create_all_pointings_wcs(self, filter_list="white", list_pointings=None, **kwargs):
         """Create all pointing masks one by one
         as well as the wcs for each individual pointings. Using the grid
         from the global WCS of the mosaic but restricting it to the 
@@ -906,9 +937,8 @@ class MusePointings(SofPipe, PipeRecipes):
             _ = self.create_pointing_wcs(pointing=pointing,
                                          filter_list=filter_list, **kwargs)
 
-    def create_pointing_wcs(self, pointing,
-            lambdaminmax_mosaic=lambdaminmax_for_mosaic,
-            filter_list="white", **kwargs):
+    def create_pointing_wcs(self, pointing, lambdaminmax_mosaic=lambdaminmax_for_mosaic,
+                            filter_list="white", **kwargs):
         """Create the mask of a given pointing
         And also a WCS file which can then be used to compute individual
         pointings with a fixed WCS.
@@ -977,23 +1007,21 @@ class MusePointings(SofPipe, PipeRecipes):
         return full_cname
 
     def extract_combined_narrow_wcs(self, name_cube=None, **kwargs):
-        """Create the reference WCS from the full mosaic with
-        only 2 lambdas
+        """Create the reference WCS from the full mosaic with only 2 lambdas
 
         Input
         -----
         name_cube: str
-            Name of the cube. Can be None, and then the final
-            datacube from the combine folder will be used.
+            Name of the cube. Can be None, and then the final datacube from the combine
+            folder will be used.
         wave1: float - optional
-            Wavelength taken for the extraction. Should only
-            be present in all spaxels you wish to get.
+            Wavelength taken for the extraction. Should only be present in all spaxels
+            you wish to get.
         prefix_wcs: str - optional
-            Prefix to be added to the name of the input cube.
-            By default, will use "refwcs".
-        add_targetname: bool [True]
-            Add the name of the target to the name of the output
-            WCS reference cube. Default is True.
+            Prefix to be added to the name of the input cube. By default, will use "refwcs".
+        add_targetname: bool default=True
+            Add the name of the target to the name of the output WCS reference cube.
+            Default is True.
 
         Creates:
             Combined narrow band WCS cube
@@ -1034,9 +1062,8 @@ class MusePointings(SofPipe, PipeRecipes):
         upipe.print_info("...Done")
         return full_cname
 
-    def create_combined_wcs(self, refcube_name=None,
-            lambdaminmax_wcs=lambdaminmax_for_wcs,
-            **kwargs):
+    def create_combined_wcs(self, refcube_name=None, lambdaminmax_wcs=lambdaminmax_for_wcs,
+                            **kwargs):
         """Create the reference WCS from the full mosaic
         with a given range of lambda.
 

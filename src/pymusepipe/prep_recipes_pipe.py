@@ -21,10 +21,11 @@ import numpy as np
 # pymusepipe modules
 from . import util_pipe as upipe
 from .create_sof import SofPipe
-from .align_pipe import create_offset_table, AlignMuseDataset
+from .align_pipe import AlignMuseDataset
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
 from .util_pipe import check_filter_list
+from .util_image import create_offset_table
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
                           dict_recipes_per_num, dict_recipes_per_name,
                           dict_files_iexpo_products, dict_files_products,

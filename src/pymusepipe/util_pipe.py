@@ -3,18 +3,19 @@
 """MUSE-PHANGS utility functions for pymusepipe
 """
 
-__authors__   = "Eric Emsellem"
+__authors__ = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "MIT License"
-__contact__   = " <eric.emsellem@eso.org>"
+__license__ = "MIT License"
+__contact__ = " <eric.emsellem@eso.org>"
 
-# Importing modules
+# Importing generic modules
 import os
 import time
 import copy
 from collections import OrderedDict
 import re
 
+# Astropy
 from astropy.io import fits as pyfits
 
 # Import package modules
@@ -33,23 +34,26 @@ ENDC = '\033[0m'
 BOLD = '\033[1m'
 DEBUG = '\033[1m'
 
+
 def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)
+
 
 def print_warning(text, **kwargs):
     toprint = "# MusePipeWarning " + text
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-    except:
+    except AttributeError:
         pass
     try:
         verbose = mypipe.verbose
-    except:
+    except AttributeError:
         verbose = kwargs.pop("verbose", True)
     
     if verbose:
         print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
+
 
 def print_info(text, **kwargs):
     """Print processing information
@@ -64,17 +68,18 @@ def print_info(text, **kwargs):
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-    except:
+    except AttributeError:
         pass
     try:
         verbose = mypipe.verbose
-    except:
+    except AttributeError:
         verbose = kwargs.pop("verbose", True)
     
     if verbose:
         print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
-def print_debug(text, **kwargs) :
+
+def print_debug(text, **kwargs):
     """Print debugging information
 
     Input
@@ -86,11 +91,12 @@ def print_debug(text, **kwargs) :
     mypipe = kwargs.pop("pipe", None)
     try:
         verbose = mypipe.verbose
-    except:
+    except AttributeError:
         verbose = kwargs.pop("verbose", True)
     
     if verbose:
         print(DEBUG + "# DebugInfo " + ENDC + text, **kwargs)
+
 
 def print_error(text, **kwargs):
     """Print error information
@@ -105,15 +111,16 @@ def print_error(text, **kwargs):
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-    except:
+    except AttributeError:
         pass
     try:
         verbose = mypipe.verbose
-    except:
+    except AttributeError:
         verbose = kwargs.pop("verbose", True)
     
     if verbose:
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
+
 
 # -----------  END PRINTING FUNCTIONS -----------------------
 def filter_list_to_str(filter_list):
@@ -122,8 +129,8 @@ def filter_list_to_str(filter_list):
 
     if type(filter_list) is list:
         fl = str(filter_list[0])
-        for f in filter_list[1:]:
-            fl += ",f"
+        for fi in filter_list[1:]:
+            fl += f",{fi}"
         return fl
     elif type(filter_list) is str:
         return filter_list
@@ -171,7 +178,7 @@ def analyse_musemode(musemode, field, delimiter='-'):
 
     if len(sval) < index+1:
         print_error(f"Error in analyse_musemode. Cannot access field {index} "
-                          f"After splitting the musemode {musemode} = sval")
+                    f"After splitting the musemode {musemode} = sval")
         val = ""
     else:
         val = musemode.split(delimiter)[index]
@@ -201,12 +208,14 @@ def add_string(text, word="_", loc=0):
                 if text[loc] != "_":
                     text = f"{text[:loc]}{word}{text[loc:]}"
 
-            except:
+            except IndexError:
                 print(f"String index [{loc}] out of range [{len(text)}] in add_string")
 
     return text
 
-def get_dataset_tpl_nexpo(filename, str_dataset=default_str_dataset, ndigits=default_ndigits):
+
+def get_dataset_tpl_nexpo(filename, str_dataset=default_str_dataset, ndigits=default_ndigits,
+                          filtername=None):
     """Get the tpl and nexpo from a filename assuming it is at the end
     of the filename
 
@@ -220,9 +229,14 @@ def get_dataset_tpl_nexpo(filename, str_dataset=default_str_dataset, ndigits=def
     tpl, nexpo: str, int
     """
     basestr, ext = os.path.splitext(filename)
+    if filtername is None:
+        filtername = ""
+    else:
+        filtername = f"_{filtername}"
+
     try:
-        [(dataset, tpl, nexpo)] = re.findall("_" + str_dataset + r'(\d{' + str(ndigits)
-                                             + r'})' + r'\_(\S{19})\_(\d{4})', basestr)
+        [(dataset, tpl, nexpo)] = re.findall("_" + str_dataset + r'(\d{' + str(ndigits) + r'})'
+                                             + str(filtername) + r'_(\S{19})_(\d{4})', basestr)
         if len(nexpo) > 0:
             return int(dataset), tpl, int(nexpo)
         else:
@@ -294,6 +308,7 @@ def get_dataset_name(dataset=1, str_dataset=default_str_dataset, ndigits=default
     """
     return f"{str_dataset}{int(dataset):0{int(ndigits)}}"
 
+
 def lower_rep(text):
     """Lower the text and return it after removing all underscores
 
@@ -306,10 +321,12 @@ def lower_rep(text):
     """
     return text.replace("_", "").lower()
 
+
 def lower_allbutfirst_letter(mystring):
     """Lowercase all letters except the first one
     """
     return mystring[0].upper() + mystring[1:].lower()
+
 
 class TimeStampDict(OrderedDict):
     """Class which builds a time stamp driven
@@ -338,6 +355,7 @@ class TimeStampDict(OrderedDict):
         """
         _ = self.pop(tstamp)
 
+
 def merge_dict(dict1, dict2):
     """Merging two dictionaries by appending
     keys which are duplicated
@@ -359,29 +377,39 @@ def merge_dict(dict1, dict2):
             dict1[key] = value
     return dict1
 
-def create_time_name() :
+
+def create_time_name():
     """Create a time-link name for file saving purposes
 
     Return: a string including the YearMonthDay_HourMinSec
     """
     return str(time.strftime("%Y%m%d_%H%M%S", time.localtime()))
 
-def formatted_time() :
+
+def formatted_time():
     """ Return: a string including the formatted time
     """
     return str(time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()))
 
+
 def safely_create_folder(path, verbose=True):
-    """Create a folder given by the input path
-    This small function tries to create it and if it fails
-    it checks whether the reason is because it is not a path
-    and then warn the user
-    and then warn the user
+    """Create a folder given by the input path This small function tries to create it
+    and if it fails it checks whether the reason is that it is not a path and then warn the user
+
+    Input
+    -----
+    path: str
+    verbose: bool
+
+    Creates
+    -------
+    A new folder if the folder does not yet exist
     """
-    if path is None :
-        if verbose : print_info("Input path is None, not doing anything")
+    if path is None:
+        if verbose:
+            print_info("Input path is None, not doing anything")
         return
-    if verbose : 
+    if verbose:
         print_info("Trying to create {folder} folder".format(folder=path), end='')
     try: 
         os.makedirs(path)
@@ -403,20 +431,20 @@ def append_file(filename, content):
         myfile.write(content)
 
 
-def abspath(path) :
+def abspath(path):
     """Normalise the path to get it short but absolute
     """
     return os.path.abspath(os.path.realpath(path))
 
 
-def normpath(path) :
+def normpath(path):
     """Normalise the path to get it short
     """
     return os.path.normpath(os.path.realpath(path))
 
 
 def reconstruct_filter_images(cubename, filter_list=default_filter_list,
-        filter_fits_file="filter_list.fits"):
+                              filter_fits_file="filter_list.fits"):
     """ Reconstruct all images in a list of Filters
     cubename: str
         Name of the cube
@@ -429,8 +457,7 @@ def reconstruct_filter_images(cubename, filter_list=default_filter_list,
         Usually in filter_list.fits (MUSE default)
     """
     
-    command = "muse_cube_filter -f {0} {1} {2}".format(
-                  filter_list, cubename, filter_fits_file)
+    command = "muse_cube_filter -f {0} {1} {2}".format(filter_list, cubename, filter_fits_file)
     os.system(command)
 
 
@@ -463,15 +490,20 @@ class ExposureInfo(object):
         self.nexpo = nexpo
 
 
-def filter_list_with_pdict(input_list, list_datasets=None,
-                           dict_files=None, verbose=True,
-                           str_dataset=default_str_dataset, ndigits=default_ndigits):
+def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verbose=True,
+                           str_dataset=default_str_dataset, ndigits=default_ndigits,
+                           filtername=None):
     """Filter out exposures (pixtab or cube namelist) using a dictionary which
     has a list of datasets and for each dataset a list of exposure number.
 
     Args:
         input_list (list of str):  input list to filter
         dict_files (dict):  dictionary used to filter
+        list_datasets: list of int
+        dict_files: dictionary
+        verbose: bool
+        str_dataset: str
+        ndigits: int
 
     Returns:
         selected_filename_list: selected list of files
@@ -488,8 +520,6 @@ def filter_list_with_pdict(input_list, list_datasets=None,
 
     # If not dictionary is provided, we try to build it
     if dict_files is None:
-        # Returning the default input list
-        selected_filename_list = input_list
         # Building the dummy list of tpl and nexpo for
         # this input list, decrypting with get_tpl_nexpo
         dict_files = {}
@@ -498,7 +528,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
             if verbose:
                 print_info(f"Adressing File name: {filename}")
             fdataset, ftpl, fnexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
-                                                           ndigits=ndigits)
+                                                           ndigits=ndigits, filtername=filtername)
             if verbose:
                 print_info(f"Adressing File name: {filename}")
                 print_info(f"    Detected = Dataset/TPLS/Nexpo: {fdataset} / {ftpl} / {fnexpo}")
@@ -508,7 +538,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
             # or found it, then record it
             else:
                 # Record only if the input list
-                if fdataset in list_datasets or len(list_datasets)==0:
+                if fdataset in list_datasets or len(list_datasets) == 0:
                     if fdataset not in dict_files_with_tpl:
                         dict_files_with_tpl[fdataset] = {ftpl: [fnexpo]}
                     else:
@@ -563,8 +593,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     for dataset in list_datasets:
         dict_tplexpo_per_dataset[dataset] = {}
         if dataset not in dict_files:
-            print_warning("Dataset {} not in dictionary "
-                                "- skipping".format(dataset))
+            print_warning(f"Dataset {dataset} not in dictionary - skipping")
         else:
             list_tpltuple = dict_files[dataset]
             # We loop on that list which should contain
@@ -577,7 +606,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                 # if this is just a number
                 # or also a pointing association
                 for expo in list_expo:
-                    # By default we assign the dataset as
+                    # By default, we assign the dataset as
                     # pointing number
                     if type(expo) in [str, int]:
                         nexpo = int(expo)
@@ -591,7 +620,7 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                                       f"is {type(expo)}")
                         break
 
-                    # Check whether this exists in the our cube list
+                    # Check whether this exists in the cube list
                     for filename in input_list:
                         ftpl, fnexpo = get_tpl_nexpo(filename)
                         if (nexpo == int(fnexpo)) & (ftpl == tpl):
@@ -612,10 +641,9 @@ def filter_list_with_pdict(input_list, list_datasets=None,
                             break
 
     if verbose:
-        print_info("Datasets {0} - Selected {1}/{2} exposures after "
-                   "dictionary filtering".format(list_datasets,
-                                          len(selected_filename_list),
-                                          nfiles_input_list))
+        print_info(f"Datasets {list_datasets} - "
+                   f"Selected {len(selected_filename_list)}/{nfiles_input_list} "
+                   f"exposures after dictionary filtering")
 
         for pointing in dict_tplexpo_per_pointing:
             print_info(f"Pointing {pointing} - Detected exposures [DATASET / TPL / NEXPO]:")
@@ -625,16 +653,20 @@ def filter_list_with_pdict(input_list, list_datasets=None,
     return selected_filename_list, dict_exposures_per_pointing, dict_tplexpo_per_pointing, \
         dict_tplexpo_per_dataset
 
+
 def filter_list_with_suffix_list(list_names, included_suffix_list=[],
                                  excluded_suffix_list=[], name_list=""):
-    """
+    """Filter a list using suffixes (to exclude or include)
 
-    Args:
-        list_names (list of str):
-        included_suffix_list (list of str):
-        excluded_suffix_list (list of str):
+    Input
+    -----
+    list_names: list of str
+    included_suffix_list: list of str
+    excluded_suffix_list: list of str
+    name_list: str default=""
 
-    Returns:
+    Returns
+    -------
 
     """
     if name_list is not None:
@@ -648,9 +680,9 @@ def filter_list_with_suffix_list(list_names, included_suffix_list=[],
                    f"as an inclusive condition {add_message}")
         # Filtering out the ones that don't have any of the suffixes
         temp_list = copy.copy(list_names)
-        for l in temp_list:
-            if any([suff not in l for suff in included_suffix_list]):
-                _ = list_names.remove(l)
+        for litem in temp_list:
+            if any([suff not in litem for suff in included_suffix_list]):
+                _ = list_names.remove(litem)
 
     # if the list of exclusion suffix is empty, just use all cubes
     if len(excluded_suffix_list) > 0:
@@ -658,8 +690,8 @@ def filter_list_with_suffix_list(list_names, included_suffix_list=[],
                    f"as an exclusive condition {add_message}")
         # Filtering out the ones that have any of the suffixes
         temp_list = copy.copy(list_names)
-        for l in temp_list:
-            if any([suff in l for suff in excluded_suffix_list]):
-                _ = list_names.remove(l)
+        for litem in temp_list:
+            if any([suff in litem for suff in excluded_suffix_list]):
+                _ = list_names.remove(litem)
 
     return list_names

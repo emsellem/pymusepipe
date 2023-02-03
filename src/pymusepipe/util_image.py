@@ -7,18 +7,31 @@ __license__ = "MIT License"
 __contact__ = " <eric.emsellem@eso.org>"
 
 # Importing modules
+import os
+from os.path import join as joinpath
+import glob
 
 # Numpy
 import numpy as np
 from scipy.odr import ODR, Model, RealData
 from scipy import ndimage as nd
 
+from astropy.io import fits as pyfits
+from astropy import units as u
+from astropy.wcs import WCS
+from astropy.table import QTable, Column
+
 from astropy.stats import mad_std, sigma_clip, sigma_clipped_stats
 from astropy.convolution import Gaussian2DKernel, convolve
+from astropy.coordinates import concatenate as concat_skycoords
+from astropy.coordinates import SkyCoord
 
 # Import package modules
 from . import util_pipe as upipe
-
+from .util_pipe import get_dataset_tpl_nexpo
+from .config_pipe import (default_ndigits, default_str_dataset, default_offset_table)
+from .config_pipe import mjd_names, date_names, tpl_names, iexpo_names, dataset_names
+from .mpdaf_pipe import get_centre_from_pixtable
 
 try:
     from photutils.detection import IRAFStarFinder
@@ -27,7 +40,6 @@ except ImportError:
     upipe.print_warning("The python packages photutils is not available. "
                         "If you wish to use star masking. Please install it.")
     _photutils = False
-
 
 
 def select_spaxels(maskdict, maskname, x, y):
@@ -586,8 +598,663 @@ def mask_point_sources(ima, fwhm=3, mask_radius=30., brightest=5, sigma=3., verb
             print(f'{len(sources)} detected')
 
         for source in sources:
-            dist_from_source = np.sqrt((xx - source['xcentroid'])**2 + (yy - source['ycentroid'])**2)
+            dist_from_source = np.sqrt((xx - source['xcentroid'])**2 +
+                                       (yy - source['ycentroid'])**2)
             mask = dist_from_source < mask_radius
             mima[mask] = np.nan
 
     return mima
+
+
+def create_offset_table(image_names, table_folder="", table_name="dummy_offset_table.fits",
+                        overwrite=False):
+    """Create an offset list table from a given set of images. It will use
+    the MJD and DATE as read from the descriptors of the images. The names for
+    these keywords is stored in the dictionary default_offset_table from
+    config_pipe.py
+
+    Parameters
+    ----------
+    image_names : list of str
+        List of image names to be considered. (Default value = [])
+    table_folder : str
+        folder of the table (Default value = "")
+    table_name : str
+        name of the table to save ['dummy_offset_table.fits']
+        (Default value = "dummy_offset_table.fits")
+    overwrite : bool
+        if the table exists, it will be overwritten if set
+        to True only. (Default value = False)
+    overwrite : bool
+        if the table exists, it will be overwritten if set
+        to True only. (Default value = False)
+
+    Returns
+    -------
+        A fits table with the output given name. (Default value = False)
+    """
+
+    # Check if table exists and see if overwrite is set up
+    table_fullname = joinpath(table_folder, table_name)
+    if not overwrite and os.path.isfile(table_fullname):
+        upipe.print_warning("[create_offset_table] Table {0} "
+                            "already exists".format(table_fullname))
+        upipe.print_warning("Use overwrite=True if you wish to proceed")
+        return
+
+    nimages = len(image_names)
+    if nimages == 0:
+        upipe.print_warning("No image names provided for create_offset_table")
+        return
+
+    # Gather the values of DATE and MJD from the images
+    date, mjd, tpls, iexpo, dataset = [], [], [], [], []
+    for ima in image_names:
+        if not os.path.isfile(ima):
+            upipe.print_warning("[create_offset] Image {0} does not exists".format(ima))
+            continue
+
+        head = pyfits.getheader(ima)
+        date.append(head[date_names['image']])
+        mjd.append(head[mjd_names['image']])
+        tpls.append(head[tpl_names['image']])
+        iexpo.append(head[iexpo_names['image']])
+        dataset.append(head[dataset_names['image']])
+
+    nlines = len(date)
+
+    # Create and fill the table
+    offset_table = QTable()
+    for col in default_offset_table:
+        [name, form, default] = default_offset_table[col]
+        offset_table[name] = Column([default for i in range(nlines)],
+                                    dtype=form)
+
+    offset_table[date_names['table']] = date
+    offset_table[mjd_names['table']] = mjd
+    offset_table[tpl_names['table']] = tpls
+    offset_table[iexpo_names['table']] = iexpo
+    offset_table[dataset_names['table']] = dataset
+
+    # Write the table
+    offset_table.write(table_fullname, overwrite=overwrite)
+
+
+def group_xy_per_fieldofview(center_dict, limit=10*u.arcsec):
+    """Group exposures in pointings based on their proximity.
+
+    Input
+    -----
+    center_dict: dict
+        Dictionary containing a list of filenames and their coordinates.
+    limit: Quantity default=10*.u.arcsec, optional
+        maximum separation for files to belong to the same pointing. Defaults to 10*u.arcsec.
+
+    Returns:
+    Dict: [int, list]
+        Dictionary grouping the input files by pointing. The keys of the dictionary are the
+        pointing numbers, and to each pointing a list of filenames is associated.
+    """
+
+    # transform from lists to array, better masking
+    # and concatenate single coordinates in a single SkyCoord object
+    allnames = np.array(list(center_dict.keys()))
+    allcoords = concat_skycoords(list(center_dict.values()))
+
+    # empty list. Here I will put the lists of files belonging to pointings
+    pointing_lists = []
+    files_pointing_dict = {}
+
+    for coord in allcoords:
+        # measuring the distance between the center of this file and all the files
+        distance = coord.separation(allcoords)
+
+        # finding all the files closer than the limit
+        mask = distance < limit
+
+        # saving these files. Transforming each list in tuple to allow set to work later
+        selnames = allnames[mask]
+        selnames.sort()
+        pointing_lists.append(tuple(selnames))
+
+    # Remove duplicates if any and sort
+    pointing_lists = list(set(pointing_lists))
+    pointing_lists.sort()
+
+    # generating output dictionary
+    pointing_dict = {}
+    for i, list_files in enumerate(pointing_lists):
+        pointing = i+1
+        pointing_dict[pointing] = list(list_files)  # requirements said list
+        # Also a reverse dictionary to have a direct access to the pointing associated with a file
+        for f in list_files:
+            files_pointing_dict[f] = pointing
+
+    return pointing_dict, files_pointing_dict
+
+
+def compute_diagnostics(pointing_dict, center_dict):
+    """
+    Compute the average and std of the distance between the exposures belonging
+    to the same pointing.
+
+    Input
+    -----
+    pointing_dict: dict
+        Dictionary for the pointings
+    center_dict: dict
+        dictionary of the files to be used
+
+    Returns
+    -------
+    Diagnostic: dict
+        Each pointing key has its [mean, std] as value of the distionary
+    """
+
+    # Creating the containers
+    diags = {}
+
+    for i, pointing in pointing_dict.items():
+        # selecting only the interesting files
+        selected_coords = []
+        for name in pointing:
+            selected_coords.append(center_dict[name])
+        # putting all the other coords in the same SkyCoord object
+        if len(selected_coords) > 1:
+            selected_coords = concat_skycoords(selected_coords)
+        else:
+            selected_coords = selected_coords[0]
+
+        ra_cen = selected_coords.ra.mean()
+        dec_cen = selected_coords.dec.mean()
+
+        ref = SkyCoord(ra_cen, dec_cen, unit=(u.deg, u.deg))
+
+        distance = ref.separation(selected_coords)
+        mean = np.round(distance.mean().to(u.arcsec).value, 3)
+        std = np.round(distance.std().to(u.arcsec).value, 3)
+        diags[i] = [mean, std]
+
+    return diags
+
+
+def group_exposures_per_pointing(list_files, target_path='', limit=10., unit=u.arcsec, ext=1,
+                                 dtype='image'):
+    """Separate a list of files in pointings based on their proximity.
+
+    This function assign each file to a pointing. Pointings are defined as groups of exposures
+    whose distance between the centers falls within a certain limit. Once the groups of exposures
+    have been defined, they are sorted, and then a pointing number starting from 1 is assigned to
+    all of them. Some info on the average std of the eparation between exposures can be optionally
+    computed.
+
+    Input
+    ------
+    list_files: list
+        list of files to be reorganized in pointings
+    target_path: str default=''
+        path of the target files
+    limit: float default=10
+        maximum separation for files to belong to the same pointing
+    unit: astropy unit default=u.arcsec
+        Unit of spatial distance (e.g., astropy.unit.arcsec)
+    ext: int default=1, optional
+        header extension where the WCS information is located.
+    dtype: str default 'image', optional
+        type of file to be analyzed. It can be pixtable, image or cube. Defaults to image.
+
+    Returns
+    -------
+    Pointing dictionary: Dict of [int, list]
+        Dictionary grouping the input files by pointing. The keys of the dictionary are the
+        pointing numbers, and to each pointing a list of filenames is associated.
+    Diagnostic dictionary: Dict of [int, list], only if diagnostics
+        Dictionary containing basic information on the distance between exposures belonging to
+        the same pointing. For each pointing, the mean and std of the distance with respect to
+        a reference exposure is reported.
+    """
+
+    # open all the files and recover the RA and dec informations
+    center_dict = {}
+
+    dict_dtype = ['pixtable', 'image', 'cube', 'guess']
+    if dtype not in dict_dtype:
+        print(f'{dtype} is not a supported data type.')
+        return None, None
+
+    for name in list_files :
+        # open file and recover the primary header
+        fullname = joinpath(target_path, name)
+        if dtype == "guess":
+            ldtype = [dtype for dtype in dict_dtype if dtype in name]
+            if len(ldtype) == 0:
+                upipe.print_warning(f"Could not guess type of file {name} - Skipping")
+                continue
+            thistype = ldtype[0]
+        else:
+            thistype = dtype
+
+        if thistype == 'pixtable':
+            coord_center = get_centre_from_pixtable(fullname)
+        else:
+            coord_center = get_centre_from_image_or_cube(fullname, ext=ext, dtype=dtype)
+
+        # save in a dictionary the file names and the coordinates
+        # Note that we only store the name, not the full name with folder
+        center_dict[name] = coord_center
+
+    pointing_dict, files_pointing_dict = group_xy_per_fieldofview(center_dict, limit=limit * unit)
+
+    return center_dict, pointing_dict, files_pointing_dict
+
+
+def get_centre_from_image_or_cube(filename, ext=1, dtype='image'):
+    """Compute the coordinate of the center of the FOV from an image. Only pixels with
+    actual signal are considered.
+
+    Input
+    -----
+    file_name: st
+        name of the file to analyse
+    ext: int default=1, optional
+        extension where the data and WCS info are located. Defaults to 1.
+    dtype: str default='image', optional
+        type of file to be analyzed. It can be either image or cube. Defaults to image.
+
+    Returns
+    -------
+    SkyCoord: astropy.coordinates.SkyCoord
+        Coordinate of the center of the FOV
+    """
+
+    # open the file and extract data and header
+    with pyfits.open(filename) as hdu:
+        data = hdu[ext].data
+        head = hdu[ext].header
+
+    # recover the WCS
+    wcs = WCS(head)
+
+    if dtype == 'cube':
+        nz, ny, nx = data.shape
+        # considering only central slice
+        slice_id = nz // 2
+        data = data[slice_id, :, :]
+    elif dtype == 'image':
+        ny, nx = data.shape
+    else:
+        return None
+
+    # selecting only part of the image with signal
+    mask = ~np.isnan(data)
+    xx, yy = np.mgrid[0: ny, 0: nx]
+
+    xx = xx[mask]
+    yy = yy[mask]
+
+    # computing the barycenter
+    xcen = xx.sum() / len(xx)
+    ycen = yy.sum() / len(yy)
+
+    # from pixels to sky coordinates
+    if dtype == 'image':
+        coord = wcs.pixel_to_world(xcen, ycen)
+    elif dtype == 'cube':
+        coord = wcs.pixel_to_world(xcen, ycen, slice_id)[0]
+
+    return coord
+
+
+def get_pointing_table_from_folder(folder="", prefix="", suffix="", ext="fits", **kwargs):
+    """Scan a given folder and look for a set of filenames that could enter a pointing
+    table. Those names are decrypted following a given scheme.
+
+    Input
+    ------
+    folder: str default=''
+        Name of the folder to scan
+    prefix: str default=''
+        Prefix to be used to filter the filenames
+    suffix: str default=''
+        End of the word before the stem (extension)
+    ext: str default='fits'
+        Extension
+
+    Create the self.pointing_table attribute
+    """
+    # First check that the folder exists
+    realfolder = os.path.relpath(os.path.realpath(folder))
+    if not os.path.isdir(realfolder):
+        upipe.print_error(f"Folder {folder} does not exist - Aborting folder scan [pointing_table]")
+        return None
+
+    # initialise the table
+    column_formats = kwargs.pop("column_formats", ('S50', 'S30', 'i4', 'i4'))
+    pointing_table = QTable(names=('filename', 'tpls', 'dataset', 'expo'), dtype=column_formats)
+    str_dataset = kwargs.pop("str_dataset", default_str_dataset)
+    ndigits = kwargs.pop("ndigits", default_ndigits)
+    filtername = kwargs.pop("filtername", None)
+
+    # List the files in the folder, using the prefix
+    this_folder = os.path
+    list_existing_files = glob.glob(f"{folder}{prefix}*{suffix}.{ext}")
+    upipe.print_info(f"Building the pointing table from the list of {len(list_existing_files)} "
+                     "files")
+
+    for filename in list_existing_files:
+        fdataset, ftpls, fexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
+                                                       ndigits=ndigits, filtername=filtername)
+        # Exclude file which didn't have a proper dataset
+        if int(fdataset) > 0:
+            pointing_table.add_row((filename, ftpls, fdataset, fexpo))
+
+    pointing_table.sort("filename")
+    return pointing_table
+
+
+class PointingTable(object):
+    list_colnames_ptable = ['filename', 'dataset', 'tpls', 'expo']
+
+    def __init__(self, tablename=None, folder='', **kwargs):
+        """Set up the Pointing Table which contains information about datasets and
+        pointings. This is initialised by a given filename.
+
+        Input
+        -----
+        tablename: str
+        folder: str
+
+        """
+        self.tablename = tablename
+        realfolder = os.path.relpath(os.path.realpath(folder))
+        if not os.path.isdir(realfolder):
+            upipe.print_error(f"Folder {folder} does not exist. Using local folder")
+            folder = ""
+
+        self.folder = folder
+        self.folderout = kwargs.pop("folderout", self.folder)
+
+        self.format_read = kwargs.pop("format", "ascii")
+        self.guess = kwargs.pop("guess", False)
+        self.verbose = kwargs.pop("verbose", False)
+        # Init an empty table
+        self.pointing_table = QTable()
+
+        # if filename exists is not None we read
+        if tablename is not None:
+            # If path name does not exist abort
+            if not os.path.exists(self.fullname):
+                upipe.print_error(f"Filename {tablename} does not exist in folder {folder}")
+                return
+
+            self.read(filename=tablename, folder=folder, format=self.format_read, guess=self.guess)
+        # else we just scan the folder
+        else:
+            self.scan_folder(folder=folder, **kwargs)
+
+    @property
+    def fulltablename(self):
+        return joinpath(self.folder, self.tablename)
+
+    @property
+    def fullnameout(self):
+        if self.tablenameout is None:
+            tablenameout = self.tablename
+        else:
+            tablenameout = self.tablenameout
+        return joinpath(self.folderout, tablenameout)
+
+    def _exist(self):
+        if not hasattr(self, 'pointing_table'):
+            upipe.print_error("Object does not have pointing_table attribute")
+            return False
+
+        return True
+
+    def _check(self):
+        """Check if the pointing table has the right minimum entries. Namely:
+        filename, dataset, tpls, expo, pointing. If pointing does not exist,
+        will create it following the logic : pointing=dataset.
+        Returns boolean: True means it's all good. False will follow a specific message.
+
+        """
+        if not self._exist():
+            return False
+
+        missing_cols = [colname for colname in self.list_colnames_ptable if colname not in
+                        self.pointing_table.colnames]
+        if len(missing_cols) > 0:
+            upipe.print_error(f"Missing columns in input file: {missing_cols}")
+            return False
+        else:
+            return True
+
+    def scan_folder(self, folder=None, **kwargs):
+        """Scan a folder to create a full pointing table
+
+        Input
+        -----
+        folder: str default to None
+           If not provided, will use the default self.folder
+        **kwargs:
+            Other keywords are passed to create_pointing_table_from_folder
+
+        Creates
+        -------
+        Attribute pointing_table
+        """
+        if folder is not None:
+            self.folder = folder
+        upipe.print_info(f"Scanning folder {self.folder}")
+
+        self.pointing_table = get_pointing_table_from_folder(folder=self.folder, **kwargs)
+        self._reset_select()
+        self._reset_pointing()
+
+    def write(self, overwrite=False, **kwargs):
+        """Write out the pointing_table on disk, using the nameout and provided folder.
+
+        Parameters
+        ----------
+        overwrite: bool default=False
+        **kwargs:
+            Valid keywords are
+            folder: str
+            nameout: str
+            Extra keywords are passed to the astropy QTable.write() function
+
+        Writes the pointing table on disk
+        """
+        # Reading the input
+        folder = kwargs.pop("folder", self.folder)
+        nameout = kwargs.pop("nameout", self.tablename)
+        if nameout is None:
+            upipe.print_error("No provided output filename")
+
+        # Writing up using the astropy QTable write
+        fullnameout = joinpath(folder, nameout)
+        self.pointing_table.write(fullnameout, overwrite=overwrite, **kwargs)
+
+    def _reset_select(self, value=1):
+        """Reset the select column with 1 by default
+
+        Input
+        -----
+        value: int default=1
+        """
+        # If no selection is done, just select all by default
+        if "select" not in self.pointing_table.colnames:
+            self.pointing_table['select'] = int(value)
+
+    def _reset_pointing(self, overwrite=False):
+        """Reset the pointing column in the pointing table
+        """
+        if 'pointing' in self.pointing_table.colnames:
+            if overwrite==True:
+                self.pointing_table.replace_column(int(0), name='pointing')
+        else:
+            self.pointing_table.add_column(int(0), name='pointing')
+
+    def read(self, **kwargs):
+        """Read the input filename in given folder assuming a given format.
+
+        Input
+        -----
+        filename: str, optional
+            Name of the filename
+        folder: str default='', optional
+            Name of the folder where to find the filename
+        format: str default='ascii'
+
+        Returns
+        -------
+        self.pointing_table with the content of the file
+        """
+        self.filename = kwargs.pop("filename", self.filename)
+        self.folder = kwargs.pop("folder", self.folder)
+        fullname = joinpath(self.folder, self.filename)
+        self.format_read = kwargs.pop("format", 'ascii')
+        self.guess = kwargs.pop("guess", False)
+        if not os.path.exists(fullname):
+            upipe.print_error(f"Pointing Table {fullname} does not exist. Cannot open")
+            return
+
+        self.pointing_table = QTable.read(fullname, format=self.format_read, guess=self.guess,
+                                         **kwargs)
+        if not self._check():
+            upipe.print_warning("Please consider updating the pointing table")
+
+        self._reset_select()
+        self._reset_pointing()
+
+        # After reading, save the selection to an original one to backup
+        self.pointing_table['select_orig'] = self.pointing_table('select')
+
+        self._get_centres()
+
+    def _get_centres(self, dtype="image", center_dict=None, **kwargs):
+        """Get the centre of each exposure, assuming a given type
+
+        Input
+        ------
+        dtype: str
+            Must be 'image', 'cube' or 'pixeltable'
+        center_dict: dictionary, optional
+            Dictionary including the filenames and their centres
+            If not provided, it will just use the filenames and rederive the centres
+
+        **kwargs:
+            Additional keywords. Valid ones are
+               ext: int
+                   Number of the extension to look at for thw WCS
+
+        Add column centre in the pointing_table
+
+        """
+        if dtype not in ["image", "cube", "pixtable", "guess"]:
+            upipe.print_error(f"Dtype {dtype} not recognised ['image', 'cube', 'pixtable', 'guess']")
+            return
+
+        dict_dtype = {'IMAGE': 'image', 'CUBE': 'cube', 'PIXTABLE': 'pixtable'}
+
+        # initialise the centre column
+        if 'centre' not in self.pointing_table.colnames:
+            dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.pointing_table)
+            self.pointing_table.add_column(dummycoord, name="centre")
+
+        # Loop over the pointing table and find the centre
+        for i in range(len(self.pointing_table)):
+            filename = self.pointing_table['filename'][i]
+
+            centre = None
+            if center_dict is None:
+                fullname = joinpath(self.folder, filename)
+                if dtype == "guess":
+                    ldtype = [dtype for dtype in dict_dtype if dtype in filename]
+                    if len(ldtype) == 0:
+                        upipe.print_warning(f"Could not guess type of file {filename} - Skipping")
+                        continue
+                    thistype = ldtype[0]
+                else:
+                    thistype = dtype
+
+                if thistype in ["image", "cube"]:
+                    centre = get_centre_from_image_or_cube(fullname, dtype=thistype, **kwargs)
+                else:
+                    centre = get_centre_from_pixtable(fullname, **kwargs)
+            else:
+                if filename in center_dict:
+                    centre = center_dict[filename]
+
+            # Assigning the centre to the right row
+            self.pointing_table['centre'][i] = centre
+
+    def assign_pointings(self, **kwargs):
+        """Assign pointing according to distance rules. Will also update the centre values.
+
+        Returns
+        -------
+
+        """
+        verbose = kwargs.pop("verbose", self.verbose)
+        overwrite = kwargs.pop("overwrite", False)
+        self._reset_pointing(overwrite=overwrite)
+
+        self.center_dict, self.pointing_dict, self.file_pointing_dict = \
+            group_exposures_per_pointing(self.selected_filenames, target_path=self.folder, **kwargs)
+
+        # Assign centres
+        self._get_centres(center_dict=self.center_dict)
+
+        # Now writing the pointing in the pointing table
+        upipe.print_info(f"Assigning Pointings ---")
+        for filename in self.file_pointing_dict:
+            pointing = self.file_pointing_dict[filename]
+            self.pointing_table['pointing'][self.pointing_table['filename'] == filename] = pointing
+            if verbose:
+                upipe.print_info(f"File: {filename} = Pointing {pointing:02d}")
+
+    def select_from_list(self, **kwargs):
+        """Select all filenames with that pointing number.
+
+        Input
+        -----
+        **kwargs: default lists are empty ones
+            Valid keywords are:
+                list_datasets: list of int
+                list_pointings: list of int
+
+        Returns
+        -------
+        An astropy table selected according to the list of datasets and pointings
+        """
+        list_pointings = kwargs.pop("list_pointings", [])
+        list_datasets = kwargs.pop("list_datasets", [])
+
+        # Now getting the selections
+        for i in range(len(self.pointing_table)):
+            p = self.pointing_table['pointing'][i]
+            d = self.pointing_table['dataset'][i]
+            if (p not in list_pointings) or (d not in list_datasets):
+                self.pointing_table['select'] = 0
+
+    @property
+    def selected_filenames(self):
+        """Return the list of filenames following the selection
+
+        Returns
+        -------
+        list_filename
+
+        """
+        if not hasattr(self, 'pointing_table'):
+            upipe.print_warning("Missing a pointing table - returning an empty filename list")
+            return []
+
+        self.pointing_table.add_index('select')
+        inds = self.pointing_table.loc_indices['select', 1]
+
+        lfiles = list(self.pointing_table['filename'][inds])
+        lfiles.sort()
+
+        return lfiles
