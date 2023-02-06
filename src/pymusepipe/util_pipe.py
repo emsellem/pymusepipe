@@ -504,6 +504,7 @@ def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verb
         verbose: bool
         str_dataset: str
         ndigits: int
+        filtername: str
 
     Returns:
         selected_filename_list: selected list of files

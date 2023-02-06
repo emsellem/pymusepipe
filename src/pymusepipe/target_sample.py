@@ -892,10 +892,6 @@ class MusePipeSample(object):
         """
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         # Check if pointings are ok
-        if list_pointings is not None:
-            if len(list_pointings) == 0:
-                return
-
         if list_datasets is None:
             list_datasets = copy.copy(self.targets[targetname].list_datasets)
 

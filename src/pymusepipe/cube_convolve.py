@@ -334,14 +334,14 @@ def convolution_kernel_gaussian(fwhm_wave, target_fwhm, target_psf,
     n_lam = target_psf.shape[0]
     conv_kernel = np.zeros_like(target_psf)
 
-    if fwhm <= np.max(fwhm_wave):
+    if target_fwhm <= np.max(fwhm_wave):
         raise ValueError('The new PSF is smaller than the old one')
 
     # Loop over the wavelengths
     for i in range(n_lam):
-        new_fwhm = np.sqrt(fwhm**2 - input_fwhm[i]**2)
+        new_fwhm = np.sqrt(target_fwhm**2 - fwhm_wave[i]**2)
         ker = gaussian_kernel(new_fwhm, target_psf.shape,
-                              scale=0.2)
+                              scale=scale)
         conv_kernel[i, :, :] = ker / ker.sum()
 
     return conv_kernel
