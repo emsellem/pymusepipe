@@ -241,16 +241,18 @@ class MusePipe(PipePrep, PipeRecipes):
         # Create full path folder 
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
+        # Create Log folder if needed
+        upipe.safely_create_folder(self.paths.log, verbose=verbose)
 
         # Go to the data directory
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
 
-        # Making the output folders in a safe mode
-        upipe.print_info("Creating directory structure", pipe=self)
         self.goto_folder(self.paths.data)
 
         # ==============================================
+        # Making the output folders in a safe mode
+        upipe.print_info("Creating directory structure", pipe=self)
         # Creating the extra pipeline folder structure
         for folder in self.pipe_params._dict_input_folders:
             upipe.safely_create_folder(self.pipe_params._dict_input_folders[folder],
