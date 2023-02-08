@@ -1,73 +1,34 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pymusepipe.mpdaf_pipe &mdash; pymusepipe 2.19.9 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>pymusepipe.mpdaf_pipe &mdash; pymusepipe 2.16.1 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> pymusepipe
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.16.1
+                2.19.9
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,17 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
@@ -100,66 +51,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">pymusepipe</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>pymusepipe.mpdaf_pipe</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pymusepipe.mpdaf_pipe</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for pymusepipe.mpdaf_pipe</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Licensed under a MIT license - see LICENSE</span>
 
@@ -198,22 +113,26 @@
 <span class="c1"># Astropy</span>
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
 <span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">astropy.coordinates</span> <span class="kn">import</span> <span class="n">SkyCoord</span>
 
 <span class="c1"># Scipy erosion</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">ndimage</span> <span class="k">as</span> <span class="n">ndi</span>
 
 <span class="kn">import</span> <span class="nn">pymusepipe</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
 <span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="n">default_wave_wcs</span><span class="p">,</span> <span class="n">ao_mask_lambda</span><span class="p">,</span> <span class="n">dict_extra_filters</span>
 <span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">filter_list_with_pdict</span><span class="p">,</span> <span class="n">filter_list_with_suffix_list</span><span class="p">,</span>\
-                       <span class="n">add_string</span><span class="p">,</span> <span class="n">default_str_dataset</span><span class="p">,</span> <span class="n">default_ndigits</span><span class="p">)</span>
+                        <span class="n">add_string</span><span class="p">,</span> <span class="n">default_str_dataset</span><span class="p">,</span> <span class="n">default_ndigits</span><span class="p">,</span>
+                        <span class="n">get_dataset_name</span><span class="p">,</span> <span class="n">check_filter_list</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">print_error</span><span class="p">,</span> <span class="n">print_info</span><span class="p">,</span> <span class="n">print_warning</span><span class="p">,</span> <span class="n">print_debug</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.cube_convolve</span> <span class="kn">import</span> <span class="n">cube_kernel</span><span class="p">,</span> <span class="n">cube_convolve</span>
+<span class="kn">from</span> <span class="nn">.emission_lines</span> <span class="kn">import</span> <span class="n">get_emissionline_band</span>
+
 
 <div class="viewcode-block" id="get_sky_spectrum"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.get_sky_spectrum">[docs]</a><span class="k">def</span> <span class="nf">get_sky_spectrum</span><span class="p">(</span><span class="n">specname</span><span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Read sky spectrum from MUSE data reduction</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">specname</span><span class="p">):</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">specname</span><span class="p">))</span>
+        <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">specname</span><span class="p">))</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">sky</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">getdata</span><span class="p">(</span><span class="n">specname</span><span class="p">)</span>
@@ -222,6 +141,7 @@
     <span class="n">wavein</span> <span class="o">=</span> <span class="n">WaveCoord</span><span class="p">(</span><span class="n">cdelt</span><span class="o">=</span><span class="n">cdelt</span><span class="p">,</span> <span class="n">crval</span><span class="o">=</span><span class="n">crval</span><span class="p">,</span> <span class="n">cunit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
     <span class="n">spec</span> <span class="o">=</span> <span class="n">Spectrum</span><span class="p">(</span><span class="n">wave</span><span class="o">=</span><span class="n">wavein</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sky</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">var</span><span class="o">=</span><span class="n">sky</span><span class="p">[</span><span class="s1">&#39;stat&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">spec</span></div>
+
 
 <div class="viewcode-block" id="integrate_spectrum"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.integrate_spectrum">[docs]</a><span class="k">def</span> <span class="nf">integrate_spectrum</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="n">wave_filter</span><span class="p">,</span> <span class="n">throughput_filter</span><span class="p">,</span> <span class="n">ao_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Integrate a spectrum using a certain Muse Filter file.</span>
@@ -260,6 +180,224 @@
         <span class="n">flux_cont</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="k">return</span> <span class="n">flux_cont</span></div>
+
+
+<div class="viewcode-block" id="rotate_image_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.rotate_image_wcs">[docs]</a><span class="k">def</span> <span class="nf">rotate_image_wcs</span><span class="p">(</span><span class="n">ima_name</span><span class="p">,</span> <span class="n">ima_folder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">outwcs_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rotangle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Routine to remove potential Nan around an image and reconstruct</span>
+<span class="sd">    an optimal WCS reference image. The rotation angle is provided as a way</span>
+<span class="sd">    to optimise the extent of the output image, removing Nan along X and Y</span>
+<span class="sd">    at that angle.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    ima_name: str</span>
+<span class="sd">        input image name. No default.</span>
+<span class="sd">    ima_folder: str default=&#39;&#39;, optional</span>
+<span class="sd">        input image folder</span>
+<span class="sd">    outwcs_folder: str, optional</span>
+<span class="sd">        folder where to write the output frame. Default is</span>
+<span class="sd">        None which means that it will use the folder of the input image.</span>
+<span class="sd">    rotangle: float default=0, optional</span>
+<span class="sd">        rotation angle in degrees</span>
+<span class="sd">    in_suffix: str default=&#39;prealign&#39;</span>
+<span class="sd">        in suffix to remove from name</span>
+<span class="sd">    out_suffix: str default=&#39;rotwcs&#39;</span>
+<span class="sd">        out suffix to add to name</span>
+<span class="sd">    margin_factor: float</span>
+<span class="sd">        factor to extend the image [1.1]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Reading the input names and setting output folder</span>
+    <span class="n">fullname</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="n">ima_folder</span><span class="p">,</span> <span class="n">ima_name</span><span class="p">)</span>
+    <span class="n">ima_folder</span><span class="p">,</span> <span class="n">ima_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outwcs_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outwcs_folder</span> <span class="o">=</span> <span class="n">ima_folder</span>
+
+    <span class="c1"># Suffix</span>
+    <span class="n">in_suffix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;in_suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;prealign&quot;</span><span class="p">)</span>
+    <span class="n">out_suffix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;out_suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;rotwcs&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get margin if needed</span>
+    <span class="n">margin_factor</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;margin_factor&quot;</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+    <span class="n">extend_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="p">(</span><span class="n">margin_factor</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">))</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Will use a </span><span class="si">{:5.2f}% e</span><span class="s2">xtra margin&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">extend_fraction</span><span class="o">*</span><span class="mf">100.</span><span class="p">))</span>
+
+    <span class="c1"># Opening the image via mpdaf</span>
+    <span class="n">imawcs</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+    <span class="n">extra_pixels</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imawcs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">extend_fraction</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># New dimensions and extend current image</span>
+    <span class="n">new_dim</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imawcs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">+</span> <span class="n">extra_pixels</span><span class="p">)</span>
+    <span class="n">ima_ext</span> <span class="o">=</span> <span class="n">imawcs</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">newdim</span><span class="o">=</span><span class="n">new_dim</span><span class="p">,</span> <span class="n">refpos</span><span class="o">=</span><span class="n">imawcs</span><span class="o">.</span><span class="n">get_start</span><span class="p">(),</span>
+                            <span class="n">refpix</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">extra_pixels</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">),</span>
+                            <span class="n">newinc</span><span class="o">=</span><span class="n">imawcs</span><span class="o">.</span><span class="n">get_step</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">3600.</span><span class="p">)</span>
+
+    <span class="c1"># Copy and rotate WCS</span>
+    <span class="n">new_wcs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ima_ext</span><span class="o">.</span><span class="n">wcs</span><span class="p">)</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Rotating WCS by </span><span class="si">{}</span><span class="s2"> degrees&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rotangle</span><span class="p">))</span>
+    <span class="n">new_wcs</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">rotangle</span><span class="p">)</span>
+
+    <span class="c1"># New rotated image</span>
+    <span class="n">ima_rot</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">ima_ext</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">wcs</span><span class="o">=</span><span class="n">new_wcs</span><span class="p">)</span>
+
+    <span class="c1"># Then resample the image using the initial one as your reference</span>
+    <span class="n">ima_rot_resampled</span> <span class="o">=</span> <span class="n">ima_rot</span><span class="o">.</span><span class="n">align_with_image</span><span class="p">(</span><span class="n">ima_ext</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Crop NaN</span>
+    <span class="n">ima_rot_resampled</span><span class="o">.</span><span class="n">crop</span><span class="p">()</span>
+
+    <span class="c1"># get the new header with wcs and rotate back</span>
+    <span class="n">finalwcs</span> <span class="o">=</span> <span class="n">ima_rot_resampled</span><span class="o">.</span><span class="n">wcs</span>
+    <span class="n">finalwcs</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="n">rotangle</span><span class="p">)</span>
+
+    <span class="c1"># create the final image</span>
+    <span class="n">final_rot_image</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ima_rot_resampled</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">wcs</span><span class="o">=</span><span class="n">finalwcs</span><span class="p">)</span>
+
+    <span class="c1"># Save image</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_suffix</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">in_suffix</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">in_suffix</span> <span class="ow">in</span> <span class="n">ima_name</span><span class="p">:</span>
+            <span class="n">out_name</span> <span class="o">=</span> <span class="n">ima_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">in_suffix</span><span class="p">,</span> <span class="n">out_suffix</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">ima_name</span><span class="p">)</span>
+        <span class="n">out_suffix</span> <span class="o">=</span> <span class="n">add_string</span><span class="p">(</span><span class="n">out_suffix</span><span class="p">)</span>
+        <span class="n">out_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">out_suffix</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
+
+    <span class="c1"># write output</span>
+    <span class="n">final_rot_image</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">outwcs_folder</span><span class="p">,</span> <span class="n">out_name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">outwcs_folder</span><span class="p">,</span> <span class="n">out_name</span></div>
+
+
+<div class="viewcode-block" id="rotate_cube_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.rotate_cube_wcs">[docs]</a><span class="k">def</span> <span class="nf">rotate_cube_wcs</span><span class="p">(</span><span class="n">cube_name</span><span class="p">,</span> <span class="n">cube_folder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">outwcs_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rotangle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Routine to remove potential Nan around an image and reconstruct</span>
+<span class="sd">    an optimal WCS reference image. The rotation angle is provided as a way</span>
+<span class="sd">    to optimise the extent of the output image, removing Nan along X and Y</span>
+<span class="sd">    at that angle.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cube_name (str): input image name. No default.</span>
+<span class="sd">        cube_folder (str): input image folder [&#39;&#39;]</span>
+<span class="sd">        outwcs_folder (str): folder where to write the output frame. Default is</span>
+<span class="sd">            None which means that it will use the folder of the input image.</span>
+<span class="sd">        rotangle (float): rotation angle in degrees [0]</span>
+<span class="sd">        **kwargs:</span>
+<span class="sd">            in_suffix (str): in suffix to remove from name [&#39;prealign&#39;]</span>
+<span class="sd">            out_suffix (str): out suffix to add to name [&#39;rotwcs&#39;]</span>
+<span class="sd">            margin_factor (float): factor to extend the image [1.1]</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Reading the input names and setting output folder</span>
+    <span class="n">fullname</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="n">cube_folder</span><span class="p">,</span> <span class="n">cube_name</span><span class="p">)</span>
+    <span class="n">cube_folder</span><span class="p">,</span> <span class="n">cube_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outwcs_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outwcs_folder</span> <span class="o">=</span> <span class="n">cube_folder</span>
+
+    <span class="c1"># Suffix</span>
+    <span class="n">in_suffix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;in_suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;prealign&quot;</span><span class="p">)</span>
+    <span class="n">out_suffix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;out_suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;rotwcs&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get margin if needed</span>
+    <span class="n">margin_factor</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;margin_factor&quot;</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+    <span class="n">extend_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="p">(</span><span class="n">margin_factor</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">))</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Will use a </span><span class="si">{:5.2f}% e</span><span class="s2">xtra margin&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">extend_fraction</span><span class="o">*</span><span class="mf">100.</span><span class="p">))</span>
+
+    <span class="c1"># Opening the image via mpdaf</span>
+    <span class="n">cubewcs</span> <span class="o">=</span> <span class="n">Cube</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+    <span class="n">imawcs</span> <span class="o">=</span> <span class="n">cubewcs</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">extra_pixels</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imawcs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">extend_fraction</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># New dimensions and extend current image</span>
+    <span class="n">new_dim</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imawcs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">+</span> <span class="n">extra_pixels</span><span class="p">)</span>
+    <span class="n">ima_ext</span> <span class="o">=</span> <span class="n">imawcs</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">newdim</span><span class="o">=</span><span class="n">new_dim</span><span class="p">,</span> <span class="n">refpos</span><span class="o">=</span><span class="n">imawcs</span><span class="o">.</span><span class="n">get_start</span><span class="p">(),</span>
+                            <span class="n">refpix</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">extra_pixels</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">),</span>
+                            <span class="n">newinc</span><span class="o">=</span><span class="n">imawcs</span><span class="o">.</span><span class="n">get_step</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">3600.</span><span class="p">)</span>
+
+    <span class="c1"># Copy and rotate WCS</span>
+    <span class="n">new_wcs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ima_ext</span><span class="o">.</span><span class="n">wcs</span><span class="p">)</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Rotating spatial WCS of Cube by </span><span class="si">{}</span><span class="s2"> degrees&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rotangle</span><span class="p">))</span>
+    <span class="n">new_wcs</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">rotangle</span><span class="p">)</span>
+
+    <span class="c1"># New rotated image</span>
+    <span class="n">ima_rot</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">ima_ext</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">wcs</span><span class="o">=</span><span class="n">new_wcs</span><span class="p">)</span>
+
+    <span class="c1"># Then resample the image using the initial one as your reference</span>
+    <span class="n">ima_rot_resampled</span> <span class="o">=</span> <span class="n">ima_rot</span><span class="o">.</span><span class="n">align_with_image</span><span class="p">(</span><span class="n">ima_ext</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Crop NaN</span>
+    <span class="n">ima_rot_resampled</span><span class="o">.</span><span class="n">crop</span><span class="p">()</span>
+
+    <span class="c1"># get the new header with wcs and rotate back</span>
+    <span class="n">finalwcs</span> <span class="o">=</span> <span class="n">ima_rot_resampled</span><span class="o">.</span><span class="n">wcs</span>
+    <span class="n">finalwcs</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="n">rotangle</span><span class="p">)</span>
+
+    <span class="c1"># create the final image</span>
+    <span class="n">data_cube_rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">ima_rot_resampled</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                              <span class="n">cubewcs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">final_rot_cube</span> <span class="o">=</span> <span class="n">Cube</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_cube_rot</span><span class="p">,</span> <span class="n">wave</span><span class="o">=</span><span class="n">cubewcs</span><span class="o">.</span><span class="n">wave</span><span class="p">,</span> <span class="n">wcs</span><span class="o">=</span><span class="n">finalwcs</span><span class="p">)</span>
+
+    <span class="c1"># Save image</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_suffix</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">in_suffix</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">in_suffix</span> <span class="ow">in</span> <span class="n">cube_name</span><span class="p">:</span>
+            <span class="n">out_name</span> <span class="o">=</span> <span class="n">cube_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">in_suffix</span><span class="p">,</span> <span class="n">out_suffix</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">cube_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out_suffix</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">out_suffix</span> <span class="o">=</span> <span class="n">add_string</span><span class="p">(</span><span class="n">out_suffix</span><span class="p">)</span>
+        <span class="n">out_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">out_suffix</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
+
+    <span class="c1"># write output</span>
+    <span class="n">final_rot_cube</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">outwcs_folder</span><span class="p">,</span> <span class="n">out_name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">outwcs_folder</span><span class="p">,</span> <span class="n">out_name</span></div>
+
+
+<div class="viewcode-block" id="get_centre_from_pixtable"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.get_centre_from_pixtable">[docs]</a><span class="k">def</span> <span class="nf">get_centre_from_pixtable</span><span class="p">(</span><span class="n">pixtable_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the center of the FOV from pixtables</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    pixtable_name: str</span>
+<span class="sd">        name of the pixeltable</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SkyCoord: astropy.coordinates.Skycoord</span>
+<span class="sd">        Coordinates of the center of the field</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">table</span> <span class="o">=</span> <span class="n">PixTable</span><span class="p">(</span><span class="n">pixtable_name</span><span class="p">)</span>
+
+    <span class="c1"># get the x and y coordinates of each pixel</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">get_xpos</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">get_ypos</span><span class="p">()</span>
+
+    <span class="c1"># it seems like the x and y are the position from the center of the field</span>
+    <span class="c1"># see: https://mpdaf.readthedocs.io/en/latest/pixtable.html#pixtable-format</span>
+    <span class="c1"># so the centre should just be the pixel close to 0 in both dimensions</span>
+
+    <span class="n">xcen_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">ycen_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+    <span class="n">xcen</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">xcen_id</span><span class="p">]</span>
+    <span class="n">ycen</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">ycen_id</span><span class="p">]</span>
+
+    <span class="c1"># get the position on the sky of the barycenter</span>
+    <span class="c1"># and transform to SkyCoord for consistency</span>
+    <span class="n">bary</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">get_pos_sky</span><span class="p">(</span><span class="n">xcen</span><span class="p">,</span> <span class="n">ycen</span><span class="p">)</span>
+    <span class="n">coord</span> <span class="o">=</span> <span class="n">SkyCoord</span><span class="p">(</span><span class="n">bary</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bary</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">))</span>
+
+    <span class="c1"># Printing the result</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pixtable_name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">coord</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">coord</span></div>
+
 
 <div class="viewcode-block" id="BasicPSF"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.BasicPSF">[docs]</a><span class="k">class</span> <span class="nc">BasicPSF</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Basic PSF function and parameters</span>
@@ -323,7 +461,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dict_psf</span> <span class="o">=</span> <span class="n">dict_psf</span>
 
         <span class="c1"># Building the list of cubes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">build_list</span><span class="p">(</span><span class="n">list_cubes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_list</span><span class="p">(</span><span class="n">list_cubes</span><span class="o">=</span><span class="n">list_cubes</span><span class="p">)</span>
 
         <span class="c1"># Initialise the super class</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MuseCubeMosaic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_wcs_name</span><span class="p">)</span>
@@ -360,11 +498,11 @@
 
     <span class="k">def</span> <span class="nf">_check_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_cubes</span><span class="p">):</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Cube Folder </span><span class="si">{}</span><span class="s2"> does not exists </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Cube Folder </span><span class="si">{}</span><span class="s2"> does not exists </span><span class="se">\n</span><span class="s2">&quot;</span>
                               <span class="s2">&quot;- Aborting&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_cubes</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_ref_wcs</span><span class="p">):</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;WCS Folder </span><span class="si">{}</span><span class="s2"> does not exists </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;WCS Folder </span><span class="si">{}</span><span class="s2"> does not exists </span><span class="se">\n</span><span class="s2">&quot;</span>
                               <span class="s2">&quot;- Aborting&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_ref_wcs</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -398,6 +536,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">print_info</span><span class="p">(</span><span class="s1">&#39;Building the list of appropriate Cubes for the mosaick&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list_suffix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;list_suffix&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_suffix</span><span class="p">)</span>
         <span class="c1"># Get the folder if needed</span>
         <span class="k">if</span> <span class="n">folder_cubes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -409,41 +548,41 @@
         <span class="k">if</span> <span class="n">prefix_cubes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prefix_cubes</span> <span class="o">=</span> <span class="n">prefix_cubes</span>
 
-        <span class="k">if</span> <span class="n">list_cubes</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">list_cubes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># get the list of cubes and return if 0 found</span>
             <span class="n">list_existing_cubes</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">*.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_cubes</span><span class="p">,</span>
                                                          <span class="bp">self</span><span class="o">.</span><span class="n">prefix_cubes</span><span class="p">))</span>
 
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> existing Cubes in this folder&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">list_existing_cubes</span><span class="p">)))</span>
-
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> Cubes after suffix filtering&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">list_existing_cubes</span><span class="p">)))</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">list_existing_cubes</span><span class="p">)</span><span class="si">}</span><span class="s2"> existing Cubes &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;in this folder with prefix </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix_cubes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="c1"># if the list of exclusion suffix is empty, just use all cubes</span>
             <span class="n">list_existing_cubes</span> <span class="o">=</span> <span class="n">filter_list_with_suffix_list</span><span class="p">(</span><span class="n">list_existing_cubes</span><span class="p">,</span>
-                                                    <span class="bp">self</span><span class="o">.</span><span class="n">included_suffix</span><span class="p">,</span>
-                                                    <span class="bp">self</span><span class="o">.</span><span class="n">excluded_suffix</span><span class="p">,</span>
-                                                    <span class="n">name_list</span><span class="o">=</span><span class="s2">&quot;Existing Cubes&quot;</span><span class="p">)</span>
+                                                               <span class="bp">self</span><span class="o">.</span><span class="n">included_suffix</span><span class="p">,</span>
+                                                               <span class="bp">self</span><span class="o">.</span><span class="n">excluded_suffix</span><span class="p">,</span>
+                                                               <span class="n">name_list</span><span class="o">=</span><span class="s2">&quot;Existing Cubes&quot;</span><span class="p">)</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> Cubes after suffix filtering&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">list_existing_cubes</span><span class="p">)))</span>
 
             <span class="c1"># Filter the list with the pointing dictionary if given</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict_exposures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Will be using a dictionary for &quot;</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Will be using a dictionary for &quot;</span>
                                  <span class="s2">&quot;further selecting the appropriate cubes&quot;</span><span class="p">)</span>
-            <span class="n">list_cubes</span> <span class="o">=</span> <span class="n">filter_list_with_pdict</span><span class="p">(</span><span class="n">list_existing_cubes</span><span class="p">,</span>
-                                                <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                                <span class="n">dict_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_exposures</span><span class="p">)</span>
+            <span class="n">list_cubes</span><span class="p">,</span> <span class="n">dict_exposures_per_pointing</span><span class="p">,</span> <span class="n">dict_tplexpo_per_pointing</span><span class="p">,</span>\
+                <span class="n">dict_tplexpo_per_dataset</span> <span class="o">=</span> <span class="n">filter_list_with_pdict</span><span class="p">(</span><span class="n">list_existing_cubes</span><span class="p">,</span>
+                                                                  <span class="n">list_datasets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                                  <span class="n">dict_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_exposures</span><span class="p">)</span>
 
             <span class="c1"># Take (or not) the fixed Cubes</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_fixed_cubes</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Using Fixed cubes with prefix </span><span class="si">{}</span><span class="s2"> &quot;</span>
+                <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Using Corrected cubes with prefix </span><span class="si">{}</span><span class="s2"> &quot;</span>
                                     <span class="s2">&quot;when relevant&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix_fixed_cubes</span><span class="p">))</span>
                 <span class="n">prefix_to_consider</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix_fixed_cubes</span><span class="p">,</span>
                                                      <span class="bp">self</span><span class="o">.</span><span class="n">prefix_cubes</span><span class="p">)</span>
                 <span class="n">list_fixed_cubes</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">*fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                                    <span class="bp">self</span><span class="o">.</span><span class="n">folder_cubes</span><span class="p">,</span>
                                                    <span class="n">prefix_to_consider</span><span class="p">))</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Initial set of </span><span class="si">{:02d}</span><span class="s2"> fixed &quot;</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Initial set of </span><span class="si">{:02d}</span><span class="s2"> Corrected &quot;</span>
                                  <span class="s2">&quot;cubes found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_fixed_cubes</span><span class="p">)))</span>
 
                 <span class="c1"># if the list of exclusion suffix is empty, just use all cubes</span>
@@ -461,15 +600,15 @@
                     <span class="k">if</span> <span class="n">orig_cube</span> <span class="ow">in</span> <span class="n">temp_list</span><span class="p">:</span>
                         <span class="c1"># If it exists, remove it</span>
                         <span class="n">list_cubes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">orig_cube</span><span class="p">)</span>
-                        <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cube </span><span class="si">{</span><span class="n">orig_cube</span><span class="si">}</span><span class="s2"> was removed from &quot;</span>
+                        <span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cube </span><span class="si">{</span><span class="n">orig_cube</span><span class="si">}</span><span class="s2"> was removed from &quot;</span>
                                             <span class="sa">f</span><span class="s2">&quot;the list (fixed one will be used)&quot;</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original Cube </span><span class="si">{</span><span class="n">orig_cube</span><span class="si">}</span><span class="s2"> not &quot;</span>
+                        <span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original Cube </span><span class="si">{</span><span class="n">orig_cube</span><span class="si">}</span><span class="s2"> not &quot;</span>
                                             <span class="sa">f</span><span class="s2">&quot;found (but fixed cube will &quot;</span>
                                             <span class="sa">f</span><span class="s2">&quot;be used nevertheless)&quot;</span><span class="p">)</span>
                     <span class="c1"># and add the fixed one</span>
                     <span class="n">list_cubes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fixed_cube</span><span class="p">)</span>
-                    <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fixed Cube </span><span class="si">{</span><span class="n">fixed_cube</span><span class="si">}</span><span class="s2"> has been included &quot;</span>
+                    <span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fixed Cube </span><span class="si">{</span><span class="n">fixed_cube</span><span class="si">}</span><span class="s2"> has been included &quot;</span>
                                         <span class="sa">f</span><span class="s2">&quot;in the list&quot;</span><span class="p">)</span>
 
             <span class="c1"># if the list of suffix is empty, just use all cubes</span>
@@ -493,14 +632,15 @@
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict_psf</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
                         <span class="k">break</span>
-                    <span class="n">keyword</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix_cubes</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">get_obname</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">str_dataset</span><span class="p">,</span> <span class="n">ndigits</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">keyword</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix_cubes</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_dataset_name</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">str_dataset</span><span class="p">,</span> <span class="n">ndigits</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
                         <span class="n">psf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict_psf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">list_cubes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">psf</span> <span class="o">=</span> <span class="n">BasicPSF</span><span class="p">(</span><span class="n">psf_array</span><span class="o">=</span><span class="n">psf</span><span class="p">)</span>
                         <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="c1"># If none correspond, set to the 0 FWHM Gaussian</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
-                    <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No PSF found for cube </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No PSF found for cube </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">. &quot;</span>
                                         <span class="sa">f</span><span class="s2">&quot;Using default&quot;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">list_cubes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">psf</span> <span class="o">=</span> <span class="n">BasicPSF</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
@@ -508,14 +648,14 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">list_cubes</span><span class="p">):</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Cube </span><span class="si">{0:03d}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Cube </span><span class="si">{0:03d}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncubes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Found 0 cubes in this folder with suffix&quot;</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Found 0 cubes in this folder with suffix&quot;</span>
                               <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">: please change suffix&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                   <span class="bp">self</span><span class="o">.</span><span class="n">prefix_cubes</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> cubes to be processed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> cubes to be processed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                  <span class="bp">self</span><span class="o">.</span><span class="n">ncubes</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="MuseCubeMosaic.convolve_cubes"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCubeMosaic.convolve_cubes">[docs]</a>    <span class="k">def</span> <span class="nf">convolve_cubes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_fwhm</span><span class="p">,</span> <span class="n">target_nmoffat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -568,7 +708,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Combine</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Starting the combine of &quot;</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Starting the combine of &quot;</span>
                          <span class="s2">&quot;all </span><span class="si">{}</span><span class="s2"> input cubes&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncubes</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fakemode</span><span class="p">:</span>
             <span class="n">cube</span><span class="p">,</span> <span class="n">expmap</span><span class="p">,</span> <span class="n">statpix</span><span class="p">,</span> <span class="n">rejmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pycombine</span><span class="p">(</span><span class="n">mad</span><span class="o">=</span><span class="n">mad</span><span class="p">)</span>
@@ -582,7 +722,7 @@
         <span class="n">full_cube_name</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_cubes</span><span class="p">,</span> <span class="n">outcube_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mosaic_cube_name</span> <span class="o">=</span> <span class="n">full_cube_name</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fakemode</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing the new Cube </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">full_cube_name</span><span class="p">))</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing the new Cube </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">full_cube_name</span><span class="p">))</span>
             <span class="n">cube</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">full_cube_name</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="MuseCube"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube">[docs]</a><span class="k">class</span> <span class="nc">MuseCube</span><span class="p">(</span><span class="n">Cube</span><span class="p">):</span>
@@ -658,7 +798,7 @@
             <span class="n">prefix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;prefix&quot;</span><span class="p">,</span> <span class="s2">&quot;l</span><span class="si">{0:.0f}</span><span class="s2">_&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">wave1</span><span class="p">))</span>
             <span class="n">outcube_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">cube_name</span><span class="p">)</span>
 
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing up single wave-cube </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing up single wave-cube </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span>
                          <span class="s2">&quot;in folder </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">outcube_name</span><span class="p">,</span> <span class="n">cube_folder</span><span class="p">))</span>
         <span class="n">subcube</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">cube_folder</span><span class="p">,</span> <span class="n">outcube_name</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">cube_folder</span><span class="p">,</span> <span class="n">outcube_name</span></div>
@@ -694,7 +834,7 @@
         <span class="c1"># Use the same reduction factor for all dimensions?</span>
         <span class="c1"># Copy from the mpdaf _rebin (in data.py)</span>
         <span class="n">nfacarr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">res</span><span class="o">.</span><span class="n">ndim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="n">nfacarr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">*=</span> <span class="n">factor</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">nfacarr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
@@ -859,12 +999,12 @@
                                                        <span class="n">target_fwhm</span><span class="p">,</span> <span class="n">cube_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">outcube_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">outcube_name</span><span class="p">)</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The new cube will be named: </span><span class="si">{</span><span class="n">outcube_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Products will be written in </span><span class="si">{</span><span class="n">outcube_folder</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The new cube will be named: </span><span class="si">{</span><span class="n">outcube_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Products will be written in </span><span class="si">{</span><span class="n">outcube_folder</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Getting the shape of the Kernel</span>
         <span class="n">scale_spaxel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">(</span><span class="n">unit_wcs</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">arcsec</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">nspaxel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">factor_fwhm</span> <span class="o">*</span> <span class="n">target_fwhm</span> <span class="o">/</span> <span class="n">scale_spaxel</span><span class="p">)</span>
+        <span class="n">nspaxel</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">factor_fwhm</span> <span class="o">*</span> <span class="n">target_fwhm</span> <span class="o">/</span> <span class="n">scale_spaxel</span><span class="p">)</span>
         <span class="c1"># Make nspaxel odd to have a PSF centred at the centre of the frame</span>
         <span class="k">if</span> <span class="n">nspaxel</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">nspaxel</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -893,11 +1033,11 @@
             <span class="n">conv_cube</span><span class="o">.</span><span class="n">_mask</span> <span class="o">=</span> <span class="n">nmask</span>
 
         <span class="c1"># Write the output</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing up the derived cube&quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing up the derived cube&quot;</span><span class="p">)</span>
         <span class="n">conv_cube</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">outcube_folder</span><span class="p">,</span> <span class="n">outcube_name</span><span class="p">))</span>
 
         <span class="c1"># Write the kernel3D</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing up the used kernel&quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing up the used kernel&quot;</span><span class="p">)</span>
         <span class="n">kercube</span> <span class="o">=</span> <span class="n">Cube</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">kernel3d</span><span class="p">)</span>
         <span class="n">kercube</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">outcube_folder</span><span class="p">,</span> <span class="s2">&quot;ker3d_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">outcube_name</span><span class="p">)))</span>
 
@@ -929,19 +1069,19 @@
         <span class="c1"># Creating the outcube filename</span>
         <span class="k">if</span> <span class="n">outcube_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">prefix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;prefix&quot;</span><span class="p">,</span> <span class="s2">&quot;l</span><span class="si">{0:4d}</span><span class="s2">l</span><span class="si">{1:4d}</span><span class="s2">_&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">lambdamin</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">lambdamax</span><span class="p">)))</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">lambdamin</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">lambdamax</span><span class="p">)))</span>
             <span class="n">outcube_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">cube_name</span><span class="p">)</span>
 
         <span class="c1"># Range of lambd and number of spectral pixels</span>
         <span class="n">range_lambda</span> <span class="o">=</span> <span class="n">lambdamax</span> <span class="o">-</span> <span class="n">lambdamin</span>
-        <span class="n">npix_spec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">range_lambda</span> <span class="o">//</span> <span class="n">step</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">npix_spec</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">range_lambda</span> <span class="o">//</span> <span class="n">step</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
 
         <span class="c1"># if filter_nan remove the Nan</span>
         <span class="k">if</span> <span class="n">filter_for_nan</span><span class="p">:</span>
             <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="n">selgood</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_debug</span><span class="p">(</span><span class="s2">&quot;Xmin=</span><span class="si">{0}</span><span class="s2"> Xmax=</span><span class="si">{1}</span><span class="s2"> / Ymin=</span><span class="si">{2}</span><span class="s2"> Ymax=</span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">print_debug</span><span class="p">(</span><span class="s2">&quot;Xmin=</span><span class="si">{0}</span><span class="s2"> Xmax=</span><span class="si">{1}</span><span class="s2"> / Ymin=</span><span class="si">{2}</span><span class="s2"> Ymax=</span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                   <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">selgood</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">selgood</span><span class="p">]),</span>
                                   <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">selgood</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">selgood</span><span class="p">])))</span>
             <span class="n">subcube</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[:,</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">selgood</span><span class="p">]):</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">selgood</span><span class="p">]),</span>
@@ -1003,7 +1143,7 @@
 <span class="sd">        line: name of the emission line (see emission_lines dictionary)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="p">[</span><span class="n">lmin</span><span class="p">,</span> <span class="n">lmax</span><span class="p">]</span> <span class="o">=</span> <span class="n">upipe</span><span class="o">.</span><span class="n">get_emissionline_band</span><span class="p">(</span><span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">,</span> <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span> 
+        <span class="p">[</span><span class="n">lmin</span><span class="p">,</span> <span class="n">lmax</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_emissionline_band</span><span class="p">(</span><span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">,</span> <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span>
                 <span class="n">redshift</span><span class="o">=</span><span class="n">redshift</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="n">medium</span><span class="p">,</span> <span class="n">lambda_window</span><span class="o">=</span><span class="n">lambda_window</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="n">MuseImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">select_lambda</span><span class="p">(</span><span class="n">lmin</span><span class="p">,</span> <span class="n">lmax</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> 
@@ -1023,22 +1163,23 @@
 <span class="sd">        Returns:</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Building images for each filter in given list&quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Building images for each filter in given list&quot;</span><span class="p">)</span>
         <span class="n">cube_folder</span><span class="p">,</span> <span class="n">cube_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">folder</span> <span class="o">=</span> <span class="n">cube_folder</span>
 
         <span class="n">suffix</span> <span class="o">=</span> <span class="n">add_string</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
 
+        <span class="n">filter_list</span> <span class="o">=</span> <span class="n">check_filter_list</span><span class="p">(</span><span class="n">filter_list</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">filtername</span> <span class="ow">in</span> <span class="n">filter_list</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filter = </span><span class="si">{</span><span class="n">filtername</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filter = </span><span class="si">{</span><span class="n">filtername</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">ima</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filter_image</span><span class="p">(</span><span class="n">filter_name</span><span class="o">=</span><span class="n">filtername</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ima</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not reconstruct Image with Filter </span><span class="si">{</span><span class="n">filtername</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">print_error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not reconstruct Image with Filter </span><span class="si">{</span><span class="n">filtername</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
 
             <span class="n">ima_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filtername</span><span class="si">}{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.fits&quot;</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing image </span><span class="si">{</span><span class="n">ima_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing image </span><span class="si">{</span><span class="n">ima_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">ima</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">ima_name</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="MuseCube.get_filter_image"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.get_filter_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_filter_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">own_filter_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filter_folder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1047,7 +1188,7 @@
 <span class="sd">        the filter list, then use that, otherwise use the given file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Building Image with MUSE &quot;</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Building Image with MUSE &quot;</span>
                              <span class="s2">&quot;filter </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_name</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">filter_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;white&quot;</span><span class="p">:</span>
                 <span class="c1"># filter_wave = np.array([4000.,5000.,6000.,7000.,</span>
@@ -1060,7 +1201,7 @@
                 <span class="n">refimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_band_image</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="c1"># initialise the filter file</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Reading private reference filter </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_name</span><span class="p">))</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Reading private reference filter </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_name</span><span class="p">))</span>
 
             <span class="c1"># First we check the extra dictionary if provided</span>
             <span class="k">if</span> <span class="n">dict_filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1068,15 +1209,15 @@
                     <span class="n">filter_file</span> <span class="o">=</span> <span class="n">dict_filters</span><span class="p">[</span><span class="n">filter_name</span><span class="p">]</span>
             <span class="c1"># then we check the package internal filter list</span>
             <span class="k">elif</span> <span class="n">filter_name</span> <span class="ow">in</span> <span class="n">dict_extra_filters</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found filter in pymusepipe internal dictionary &quot;</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found filter in pymusepipe internal dictionary &quot;</span>
                                  <span class="s2">&quot;(see data/Filters)&quot;</span><span class="p">)</span>
                 <span class="n">filter_folder</span> <span class="o">=</span> <span class="n">pymusepipe</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">filter_file</span> <span class="o">=</span> <span class="n">dict_extra_filters</span><span class="p">[</span><span class="n">filter_name</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;[mpdaf_pipe / get_filter_image] &quot;</span>
+                <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;[mpdaf_pipe / get_filter_image] &quot;</span>
                                   <span class="s2">&quot;Filter name not in private dictionary - Aborting&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">own_filter_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;[mpdaf_pipe / get_filter_image] &quot;</span>
+                    <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;[mpdaf_pipe / get_filter_image] &quot;</span>
                                       <span class="s2">&quot;No extra filter dictionary and &quot;</span>
                                       <span class="s2">&quot;the private filter file is not set - Aborting&quot;</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">None</span>
@@ -1085,7 +1226,7 @@
             <span class="c1"># Now reading the filter data</span>
             <span class="n">path_filter</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="n">filter_folder</span><span class="p">,</span> <span class="n">filter_file</span><span class="p">)</span>
             <span class="n">filter_wave</span><span class="p">,</span> <span class="n">filter_sensitivity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">path_filter</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Building Image with filter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_name</span><span class="p">))</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Building Image with filter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_name</span><span class="p">))</span>
             <span class="c1"># using mpdaf bandpass_image to build the image</span>
             <span class="n">refimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandpass_image</span><span class="p">(</span><span class="n">filter_wave</span><span class="p">,</span> <span class="n">filter_sensitivity</span><span class="p">,</span>
                                            <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
@@ -1124,7 +1265,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If width = 0 just don&#39;t do anything</span>
         <span class="k">if</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Trail width is 0, hence no doing anything&quot;</span><span class="p">)</span>
+            <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Trail width is 0, hence no doing anything&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="n">w2</span> <span class="o">=</span> <span class="n">width</span> <span class="o">/</span> <span class="mf">2.</span>
 
@@ -1164,14 +1305,14 @@
             <span class="k">if</span> <span class="n">use_folder</span><span class="p">:</span>
                 <span class="n">trailcube_name</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="n">cube_folder</span><span class="p">,</span> <span class="n">trailcube_name</span><span class="p">)</span>
 
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing the new Cube </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trailcube_name</span><span class="p">))</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing the new Cube </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trailcube_name</span><span class="p">))</span>
             <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">trailcube_name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MuseCube.save_mask"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseCube.save_mask">[docs]</a>    <span class="k">def</span> <span class="nf">save_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_name</span><span class="o">=</span><span class="s2">&quot;dummy_mask.fits&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Save the mask into a 0-1 image</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">newimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">newimage</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="n">newimage</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">newimage</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">newimage</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mask_name</span><span class="p">)</span></div></div>
 
@@ -1185,7 +1326,7 @@
         <span class="sd">&quot;&quot;&quot;Read sky continuum spectrum from MUSE data reduction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
             <span class="n">crval</span> <span class="o">=</span> <span class="mf">0.0</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">cdelt</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -1214,7 +1355,7 @@
                                                    <span class="n">ao_mask</span><span class="o">=</span><span class="n">ao_mask</span><span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">muse_filter</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span> <span class="n">muse_filter</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MuseSkyContinuum.get_normfactor"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSkyContinuum.get_normfactor">[docs]</a>    <span class="k">def</span> <span class="nf">get_normfactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">background</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="s2">&quot;Cousins_R&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="MuseSkyContinuum.set_normfactor"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSkyContinuum.set_normfactor">[docs]</a>    <span class="k">def</span> <span class="nf">set_normfactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">background</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="s2">&quot;Cousins_R&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the normalisation factor given a background value</span>
 <span class="sd">        Takes the background value and the sky continuuum spectrum</span>
 <span class="sd">        and convert this to the scaling Ks needed for this sky continuum</span>
@@ -1240,9 +1381,9 @@
 <span class="sd">            Name of the filter to consider</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">):</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;No integration value for filter </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;No integration value for filter </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                   <span class="n">filter_name</span><span class="p">))</span>
-            <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_norm</span> <span class="o">=</span> <span class="mf">1.</span>
         <span class="k">else</span> <span class="p">:</span>
             <span class="n">muse_filter</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">muse_filter</span><span class="o">.</span><span class="n">flux_cont</span> <span class="o">!=</span> <span class="mf">0.</span><span class="p">:</span>
@@ -1250,9 +1391,9 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.</span>
 
-        <span class="c1"># Saving the norm value for that filter</span>
-        <span class="n">muse_filter</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span>
-        <span class="n">muse_filter</span><span class="o">.</span><span class="n">background</span> <span class="o">=</span> <span class="n">background</span></div>
+            <span class="c1"># Saving the norm value for that filter</span>
+            <span class="n">muse_filter</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span>
+            <span class="n">muse_filter</span><span class="o">.</span><span class="n">background</span> <span class="o">=</span> <span class="n">background</span></div>
 
 <div class="viewcode-block" id="MuseSkyContinuum.save_normalised"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSkyContinuum.save_normalised">[docs]</a>    <span class="k">def</span> <span class="nf">save_normalised</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norm_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Normalises a sky continuum spectrum and save it</span>
@@ -1270,9 +1411,9 @@
 <span class="sd">            Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">prefix</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;[mpdaf_pipe / save_normalised] The new and old sky &quot;</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;[mpdaf_pipe / save_normalised] The new and old sky &quot;</span>
                               <span class="s2">&quot;continuum fits files will share the same name&quot;</span><span class="p">)</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;This is not recommended - Aborting&quot;</span><span class="p">)</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;This is not recommended - Aborting&quot;</span><span class="p">)</span>
             <span class="k">return</span>
     
         <span class="n">folder_spec</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
@@ -1292,14 +1433,13 @@
     
         <span class="c1"># Writing to the new file</span>
         <span class="n">skycont</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">norm_filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s1">&#39;Normalised Factor used = </span><span class="si">{0:8.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">norm_factor</span><span class="p">))</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s1">&#39;Normalised Sky Continuum </span><span class="si">{}</span><span class="s1"> has been created&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">norm_filename</span><span class="p">))</span></div></div>
+        <span class="n">print_info</span><span class="p">(</span><span class="s1">&#39;Normalised Factor used = </span><span class="si">{0:8.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">norm_factor</span><span class="p">))</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s1">&#39;Normalised Sky Continuum </span><span class="si">{}</span><span class="s1"> has been created&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">norm_filename</span><span class="p">))</span></div></div>
 
 <span class="c1"># Routine to read filters</span>
 <div class="viewcode-block" id="MuseFilter"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseFilter">[docs]</a><span class="k">class</span> <span class="nc">MuseFilter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="s2">&quot;Cousins_R&quot;</span><span class="p">,</span> 
-        <span class="n">filter_fits_file</span><span class="o">=</span><span class="s2">&quot;filter_list.fits&quot;</span><span class="p">,</span> 
-        <span class="n">filter_ascii_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="s2">&quot;Cousins_R&quot;</span><span class="p">,</span> <span class="n">filter_fits_file</span><span class="o">=</span><span class="s2">&quot;filter_list.fits&quot;</span><span class="p">,</span>
+                 <span class="n">filter_ascii_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Routine to read the throughput of a filter</span>
 
 <span class="sd">        Input</span>
@@ -1323,17 +1463,17 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_ascii_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Using the fits file </span><span class="si">{0}</span><span class="s2"> as input&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_fits_file</span><span class="p">))</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Using the fits file </span><span class="si">{0}</span><span class="s2"> as input&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_fits_file</span><span class="p">))</span>
                 <span class="n">filter_data</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">getdata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_fits_file</span><span class="p">,</span> <span class="n">extname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">wave</span> <span class="o">=</span> <span class="n">filter_data</span><span class="p">[</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">throughput</span> <span class="o">=</span> <span class="n">filter_data</span><span class="p">[</span><span class="s1">&#39;throughput&#39;</span><span class="p">]</span>
             <span class="k">except</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Problem opening the filter fits file </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_fits_file</span><span class="p">))</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Did not manage to get the filter </span><span class="si">{0}</span><span class="s2"> throughput&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">))</span>
+                <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Problem opening the filter fits file </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_fits_file</span><span class="p">))</span>
+                <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Did not manage to get the filter </span><span class="si">{0}</span><span class="s2"> throughput&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">throughput</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Using the ascii file </span><span class="si">{0}</span><span class="s2"> as input&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_ascii_file</span><span class="p">))</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Using the ascii file </span><span class="si">{0}</span><span class="s2"> as input&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_ascii_file</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wave</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">throughput</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_ascii_file</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="MuseImage"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseImage">[docs]</a><span class="k">class</span> <span class="nc">MuseImage</span><span class="p">(</span><span class="n">Image</span><span class="p">):</span> 
@@ -1346,7 +1486,7 @@
         <span class="c1"># Arguments for the plots</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s2">&quot;Frame&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;vmin&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vmin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;vmin&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">colorbar</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;colorbar&#39;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1380,7 +1520,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If width = 0 just don&#39;t do anything</span>
         <span class="k">if</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Trail width is 0, hence no doing anything&quot;</span><span class="p">)</span>
+            <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Trail width is 0, hence no doing anything&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="c1"># Create an index grid using the Image shape</span>
@@ -1418,7 +1558,7 @@
         <span class="sd">&quot;&quot;&quot;Save the mask into a 0-1 image</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">newimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">newimage</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="n">newimage</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">newimage</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,:]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">newimage</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mask_name</span><span class="p">)</span></div></div>
 
@@ -1445,7 +1585,7 @@
         <span class="c1"># 1 required attribute</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;subtitle&#39;</span><span class="p">)</span> <span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;subtitle&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Overiding subtitle&quot;</span><span class="p">)</span>
+                <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Overiding subtitle&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">subtitle</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtitle&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="MuseSpectrum"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.MuseSpectrum">[docs]</a><span class="k">class</span> <span class="nc">MuseSpectrum</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span> 
@@ -1491,7 +1631,7 @@
         <span class="c1">## 1 required attribute</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;subtitle&#39;</span><span class="p">)</span> <span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;subtitle&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Overiding subtitle&quot;</span><span class="p">)</span>
+                <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Overiding subtitle&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">subtitle</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtitle&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="PixTableToMask"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.mpdaf_pipe.PixTableToMask">[docs]</a><span class="k">class</span> <span class="nc">PixTableToMask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -1515,10 +1655,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix_out</span> <span class="o">=</span> <span class="n">suffix_out</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">pixtable_name</span><span class="p">):</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Input PixTable does not exist&quot;</span><span class="p">)</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Input PixTable does not exist&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">image_name</span><span class="p">):</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Input Image does not exist&quot;</span><span class="p">)</span>
+            <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Input Image does not exist&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_name</span> <span class="o">=</span> <span class="n">image_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pixtable_name</span> <span class="o">=</span> <span class="n">pixtable_name</span>
@@ -1594,7 +1734,7 @@
 <span class="sd">            If provided, will overwrite the one in self.suffix_out</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Open the PixTable</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Opening the Pixtable </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Opening the Pixtable </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">pixtable_name</span><span class="p">))</span>
         <span class="n">pixtable</span> <span class="o">=</span> <span class="n">PixTable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixtable_name</span><span class="p">)</span>
 
@@ -1603,15 +1743,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mask_name</span> <span class="o">=</span> <span class="n">mask_name</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;mask_name&quot;</span><span class="p">):</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Please provide a mask name (FITS file)&quot;</span><span class="p">)</span>
+                <span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Please provide a mask name (FITS file)&quot;</span><span class="p">)</span>
                 <span class="k">return</span>
 
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating a column Mask from file </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating a column Mask from file </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">mask_name</span><span class="p">))</span>
         <span class="n">mask_col</span> <span class="o">=</span> <span class="n">pixtable</span><span class="o">.</span><span class="n">mask_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask_name</span><span class="p">)</span>
 
         <span class="c1"># extract the right data using the pixtable mask</span>
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Extracting the Mask&quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Extracting the Mask&quot;</span><span class="p">)</span>
         <span class="n">newpixtable</span> <span class="o">=</span> <span class="n">pixtable</span><span class="o">.</span><span class="n">extract_from_mask</span><span class="p">(</span><span class="n">mask_col</span><span class="o">.</span><span class="n">maskcol</span><span class="p">)</span>
 
         <span class="c1"># Rewrite a new pixtable</span>
@@ -1623,7 +1763,7 @@
         <span class="k">else</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">newpixtable_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">suffix_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixtable_name</span><span class="p">)</span>
 
-        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing the new PixTable in </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing the new PixTable in </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">newpixtable_name</span><span class="p">))</span>
         <span class="n">newpixtable</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newpixtable_name</span><span class="p">)</span>
 
@@ -1633,18 +1773,18 @@
             <span class="c1"># Test if Extension exists by reading header</span>
             <span class="c1"># If it exists then do nothing</span>
             <span class="n">test_data</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newpixtable_name</span><span class="p">,</span> <span class="n">ext_name</span><span class="p">)</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Flat field extension already exists in masked PixTable - all good&quot;</span><span class="p">)</span>
+            <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Flat field extension already exists in masked PixTable - all good&quot;</span><span class="p">)</span>
         <span class="c1"># If it does not exist test if it exists in the original PixTable</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># Read data and header</span>
                 <span class="n">ff_ext_data</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">getdata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixtable_name</span><span class="p">,</span> <span class="n">ext_name</span><span class="p">)</span>
                 <span class="n">ff_ext_h</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixtable_name</span><span class="p">,</span> <span class="n">ext_name</span><span class="p">)</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Flat field extension will be transferred from PixTable&quot;</span><span class="p">)</span>
+                <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Flat field extension will be transferred from PixTable&quot;</span><span class="p">)</span>
                 <span class="c1"># Append it to the new pixtable</span>
                 <span class="n">pyfits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newpixtable_name</span><span class="p">,</span> <span class="n">ff_ext_data</span><span class="p">,</span> <span class="n">ff_ext_h</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;No Flat field extension to transfer - all good&quot;</span><span class="p">)</span>
+                <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;No Flat field extension to transfer - all good&quot;</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="k">except</span><span class="p">:</span>
@@ -1658,51 +1798,38 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">pyfits</span><span class="o">.</span><span class="n">setval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newpixtable_name</span><span class="p">,</span> <span class="n">keyword</span><span class="o">=</span><span class="s1">&#39;EXTNAME&#39;</span><span class="p">,</span> 
                         <span class="n">value</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">extname</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Rewriting extension name </span><span class="si">{0}</span><span class="s2"> as lowercase&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Rewriting extension name </span><span class="si">{0}</span><span class="s2"> as lowercase&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                        <span class="n">d</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
             <span class="k">except</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Extension </span><span class="si">{0}</span><span class="s2"> not present - patch ignored&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;Extension </span><span class="si">{0}</span><span class="s2"> not present - patch ignored&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                        <span class="n">d</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span></div></div>
-
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Eric Emsellem
-
-    </p>
+    <p>&#169; Copyright 2019, Eric Emsellem.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,0 +1,42 @@
+==============================
+Reduce to Prealign
+==============================
+
+Basic Usage - The reduction worksflow up to prealign
+""""""""""""""""""""""""""""""""""""""""""""""
+The pymusepipe wrapper consists of wrappers around the esorex recipes and closely mirrors 
+the esoreflex worksflow up to the pipeline stage just before alignment of different exposures.
+
+
+The prealign workflow
+""""""""""""""""""""""""""""""""""""""""""""""
+``run_recipes()`` launches a default set of functions listed below::
+
+  # generate the master bias using the muse_bias esorex recipe
+  mypipe.run_bias()
+  # generate the master flat using the muse_flat esorex recipe
+  mypipe.run_flat()
+  # generate the wavelength calibration using the muse_wavecal esorex recipe
+  mypipe.run_wave()
+  # generate the lsf using the muse_lsf esorex recipe
+  mypipe.run_lsf()
+  # generate the illumination correction using the muse_lsf esorex recipe
+  mypipe.run_twilight(illum=True)
+  # process individual exposures to remove the instrumental signature usign the muse_scibasic 
+  # esorex recipes. It runs on both the object, standard star and sky exposures
+  mypipe.run_scibasic_all(illum=True)
+  # generates the response function using the standard star observations and the muse_standard 
+  # esorex recipe
+  mypipe.run_standard()
+  # uses the sky exposures to generate a sky spectrum
+  mypipe.run_sky(fraction=0.8)
+  # runs the esosex muse_scipost recipe individually on each object exposures generating 
+  # a datacubes and image in the requested filter for each exposure. 
+  # These images are then used for aligment.
+  mypipe.run_prep_align()
+    
+Individual pipeline stages can be (re)run by calling any of the individual functions
+above. The order is important, as in any data reduction process. This is equivalent to::
+
+  mypipe.run_recipes(last='prep_align')
+

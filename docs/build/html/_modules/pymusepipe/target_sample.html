@@ -1,73 +1,34 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pymusepipe.target_sample &mdash; pymusepipe 2.19.9 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>pymusepipe.target_sample &mdash; pymusepipe 2.16.1 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> pymusepipe
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.16.1
+                2.19.9
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,17 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
@@ -100,66 +51,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">pymusepipe</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>pymusepipe.target_sample</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pymusepipe.target_sample</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for pymusepipe.target_sample</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Licensed under a MIT style license - see LICENSE.rst</span>
 
@@ -194,7 +109,8 @@
 <span class="kn">from</span> <span class="nn">.mpdaf_pipe</span> <span class="kn">import</span> <span class="n">MuseCubeMosaic</span><span class="p">,</span> <span class="n">MuseCube</span>
 <span class="kn">from</span> <span class="nn">.prep_recipes_pipe</span> <span class="kn">import</span> <span class="n">dict_products_scipost</span>
 <span class="kn">from</span> <span class="nn">.version</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">version_pack</span>
-<span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="n">add_string</span>
+<span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">add_string</span><span class="p">,</span> <span class="n">get_pointing_name</span><span class="p">,</span> <span class="n">get_dataset_name</span><span class="p">,</span>
+                        <span class="n">check_filter_list</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
 
@@ -219,7 +135,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Create new name</span>
     <span class="n">sfilename</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sfilename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">suffix</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sfilename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="update_calib_file"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.target_sample.update_calib_file">[docs]</a><span class="k">def</span> <span class="nf">update_calib_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">subfolder</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">folder_config</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
@@ -487,13 +405,13 @@
                                              <span class="n">rc_filename</span><span class="o">=</span><span class="n">rc_filename</span><span class="p">,</span>
                                              <span class="n">cal_filename</span><span class="o">=</span><span class="n">cal_filename</span><span class="p">,</span>
                                              <span class="n">folder_config</span><span class="o">=</span><span class="n">folder_config</span><span class="p">,</span>
-                                             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                                             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="n">targetname</span><span class="p">]</span><span class="o">.</span><span class="n">combcubes_path</span> <span class="o">=</span> <span class="n">init_comb_target</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">cubes</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_pipes</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_pipe_target</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_init</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_list_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_check_list_datasets_for_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if dataset is in the list of datasets</span>
 <span class="sd">        Returns the list of datasets if ok. If not, return an empty list</span>
 
@@ -571,7 +489,7 @@
         <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;=== Initialising MusePipe for Target </span><span class="si">{name}</span><span class="s2"> ===&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">targetname</span><span class="p">))</span>
 
         <span class="c1"># Check if datasets are valid</span>
-        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
+        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets_for_target</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -583,7 +501,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phangs</span><span class="p">:</span>
             <span class="n">config_args</span> <span class="o">=</span> <span class="n">PHANGS_reduc_config</span>
             <span class="c1"># Set overwrite to False to keep existing tables</span>
-            <span class="n">config_args</span><span class="p">[</span><span class="s1">&#39;overwrite_astropy_table&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">config_args</span><span class="p">[</span><span class="s1">&#39;overwrite_astropy_tables&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">config_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;config_args&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -609,8 +527,7 @@
             <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Initialise Pipe for Target = </span><span class="si">{0:10s}</span><span class="s2"> / Dataset </span><span class="si">{1:03d}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                  <span class="n">targetname</span><span class="p">,</span> <span class="n">dataset</span><span class="p">))</span>
             <span class="c1"># New log file name with dataset included</span>
-            <span class="n">log_filename_dataset</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_P</span><span class="si">{1:03d}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                    <span class="n">log_filename</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">log_fileext</span><span class="p">)</span>
+            <span class="n">log_filename_dataset</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">log_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">get_pointing_name</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}{</span><span class="n">log_fileext</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="c1"># Setting up the names of the output files</span>
             <span class="n">python_command</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mypipe = musepipe.MusePipe(targetname=&#39;</span><span class="si">{0}</span><span class="s2">&#39;, &quot;</span>
                               <span class="s2">&quot;dataset=</span><span class="si">{1}</span><span class="s2">, folder_config=&#39;</span><span class="si">{2}</span><span class="s2">&#39;, &quot;</span> 
@@ -765,7 +682,7 @@
             <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;=========== CREATION OF WCS MASKS ==============&quot;</span><span class="p">)</span>
             <span class="n">mosaic_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;mosaic_wcs&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="n">reference_cube</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;reference_cube&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-            <span class="n">datasets_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;datasets_wcs&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">pointings_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;pointings_wcs&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="n">refcube_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;refcube_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">full_ref_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;full_ref_wcs&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">default_comb_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="n">targetname</span><span class="p">]</span><span class="o">.</span><span class="n">combcubes_path</span>
@@ -778,7 +695,7 @@
                                       <span class="n">reference_cube</span><span class="o">=</span><span class="n">reference_cube</span><span class="p">,</span>
                                       <span class="n">refcube_name</span><span class="o">=</span><span class="n">refcube_name</span><span class="p">,</span>
                                       <span class="n">mosaic_wcs</span><span class="o">=</span><span class="n">mosaic_wcs</span><span class="p">,</span>
-                                      <span class="n">datasets_wcs</span><span class="o">=</span><span class="n">datasets_wcs</span><span class="p">,</span>
+                                      <span class="n">pointings_wcs</span><span class="o">=</span><span class="n">pointings_wcs</span><span class="p">,</span>
                                       <span class="n">list_datasets</span><span class="o">=</span><span class="n">list_datasets</span><span class="p">,</span>
                                       <span class="n">ref_wcs</span><span class="o">=</span><span class="n">full_ref_wcs</span><span class="p">,</span>
                                       <span class="n">folder_ref_wcs</span><span class="o">=</span><span class="n">folder_full_ref_wcs</span><span class="p">,</span>
@@ -809,7 +726,7 @@
 
 <div class="viewcode-block" id="MusePipeSample.run_target_scipost_perexpo"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.target_sample.MusePipeSample.run_target_scipost_perexpo">[docs]</a>    <span class="k">def</span> <span class="nf">run_target_scipost_perexpo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">list_datasets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                    <span class="n">folder_offset_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name_offset_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                                   <span class="n">dict_exposures</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build the cube per exposure using a given WCS</span>
 
 <span class="sd">        Args:</span>
@@ -821,7 +738,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check if datasets are valid</span>
-        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
+        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets_for_target</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
         <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;List of datasets to be reduced: </span><span class="si">{</span><span class="n">list_datasets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
@@ -847,28 +764,41 @@
         <span class="n">folder_ref_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;folder_ref_wcs&quot;</span><span class="p">,</span> <span class="n">default_comb_folder</span><span class="p">)</span>
         <span class="n">filter_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_list&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_short_filter_list</span><span class="p">)</span>
 
+        <span class="c1"># initialisation of the combination to make sure we get the pointings right</span>
+        <span class="c1"># We will thus make use of the dict_tplexpo_in_pointing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_combine</span><span class="p">(</span><span class="n">targetname</span><span class="o">=</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="o">=</span><span class="n">list_datasets</span><span class="p">,</span>
+                          <span class="n">dict_exposures</span><span class="o">=</span><span class="n">dict_exposures</span><span class="p">)</span>
+
         <span class="c1"># Running the scipost_perexpo for all datasets individually</span>
+        <span class="n">dict_tplexpo_per_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipes_combine</span><span class="p">[</span><span class="n">targetname</span><span class="p">]</span><span class="o">.</span><span class="n">dict_tplexpo_per_dataset</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">list_datasets</span><span class="p">:</span>
-            <span class="n">obname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipes</span><span class="p">[</span><span class="n">targetname</span><span class="p">][</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">wcs_auto</span><span class="p">:</span>
-                <span class="n">ref_wcs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wcs_suffix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">obname</span><span class="si">}</span><span class="s2">.fits&quot;</span>
-            <span class="k">if</span> <span class="n">ref_wcs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_WCS_</span><span class="si">{</span><span class="n">obname</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">obname</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">kwargs_dataset</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ref_wcs&#39;</span><span class="p">:</span> <span class="n">ref_wcs</span><span class="p">,</span>
-                               <span class="s1">&#39;suffix&#39;</span><span class="p">:</span> <span class="n">suffix</span><span class="p">,</span>
-                               <span class="s1">&#39;folder_ref_wcs&#39;</span><span class="p">:</span> <span class="n">folder_ref_wcs</span><span class="p">,</span>
-                               <span class="s1">&#39;sof_filename&#39;</span><span class="p">:</span> <span class="s1">&#39;scipost_wcs&#39;</span><span class="p">,</span>
-                               <span class="s1">&#39;dir_products&#39;</span><span class="p">:</span> <span class="n">default_comb_folder</span><span class="p">,</span>
-                               <span class="s1">&#39;name_offset_table&#39;</span><span class="p">:</span> <span class="n">name_offset_table</span><span class="p">,</span>
-                               <span class="s1">&#39;folder_offset_table&#39;</span><span class="p">:</span> <span class="n">folder_offset_table</span><span class="p">,</span>
-                               <span class="s1">&#39;offset_list&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                               <span class="s1">&#39;filter_list&#39;</span><span class="p">:</span> <span class="n">filter_list</span><span class="p">,</span>
-                               <span class="s1">&#39;prefix_all&#39;</span><span class="p">:</span> <span class="n">prefix_all</span><span class="p">,</span>
-                               <span class="s1">&#39;save&#39;</span><span class="p">:</span> <span class="n">save</span><span class="p">}</span>
-            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs_dataset</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pipes</span><span class="p">[</span><span class="n">targetname</span><span class="p">][</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">run_scipost_perexpo</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+            <span class="n">obname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipes</span><span class="p">[</span><span class="n">targetname</span><span class="p">][</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">_get_dataset_name</span><span class="p">()</span>
+            <span class="c1"># We now need to identify which tpls are there and which ref_wcs (pointing)</span>
+            <span class="c1"># For each dataset, we go through all pointings one by one since each has a ref_wcs</span>
+            <span class="c1"># We then use the list tpl and iexpo to pass to run_scipost_perexpo as list_tplexpo</span>
+            <span class="k">for</span> <span class="n">pointing</span> <span class="ow">in</span> <span class="n">dict_tplexpo_per_dataset</span><span class="p">[</span><span class="n">dataset</span><span class="p">]:</span>
+                <span class="n">pointing_name</span> <span class="o">=</span> <span class="n">get_pointing_name</span><span class="p">(</span><span class="n">pointing</span><span class="p">)</span>
+                <span class="n">list_tplexpo</span> <span class="o">=</span> <span class="n">dict_tplexpo_per_dataset</span><span class="p">[</span><span class="n">dataset</span><span class="p">][</span><span class="n">pointing</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">wcs_auto</span><span class="p">:</span>
+                    <span class="n">ref_wcs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wcs_suffix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pointing_name</span><span class="si">}</span><span class="s2">.fits&quot;</span>
+                <span class="k">if</span> <span class="n">ref_wcs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_WCS_</span><span class="si">{</span><span class="n">obname</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">obname</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">kwargs_dataset</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ref_wcs&#39;</span><span class="p">:</span> <span class="n">ref_wcs</span><span class="p">,</span>
+                                  <span class="s1">&#39;suffix&#39;</span><span class="p">:</span> <span class="n">suffix</span><span class="p">,</span>
+                                  <span class="s1">&#39;folder_ref_wcs&#39;</span><span class="p">:</span> <span class="n">folder_ref_wcs</span><span class="p">,</span>
+                                  <span class="s1">&#39;sof_filename&#39;</span><span class="p">:</span> <span class="s1">&#39;scipost_wcs&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;dir_products&#39;</span><span class="p">:</span> <span class="n">default_comb_folder</span><span class="p">,</span>
+                                  <span class="s1">&#39;name_offset_table&#39;</span><span class="p">:</span> <span class="n">name_offset_table</span><span class="p">,</span>
+                                  <span class="s1">&#39;folder_offset_table&#39;</span><span class="p">:</span> <span class="n">folder_offset_table</span><span class="p">,</span>
+                                  <span class="s1">&#39;offset_list&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                                  <span class="s1">&#39;filter_list&#39;</span><span class="p">:</span> <span class="n">filter_list</span><span class="p">,</span>
+                                  <span class="s1">&#39;prefix_all&#39;</span><span class="p">:</span> <span class="n">prefix_all</span><span class="p">,</span>
+                                  <span class="s1">&#39;list_tplexpo&#39;</span><span class="p">:</span> <span class="n">list_tplexpo</span><span class="p">,</span>
+                                  <span class="s1">&#39;save&#39;</span><span class="p">:</span> <span class="n">save</span><span class="p">}</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs_dataset</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pipes</span><span class="p">[</span><span class="n">targetname</span><span class="p">][</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">run_scipost_perexpo</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MusePipeSample.run_target_recipe"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.target_sample.MusePipeSample.run_target_recipe">[docs]</a>    <span class="k">def</span> <span class="nf">run_target_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_name</span><span class="p">,</span> <span class="n">targetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">list_datasets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -899,7 +829,7 @@
                 <span class="n">first_recipe</span><span class="o">=</span><span class="n">recipe_name</span><span class="p">,</span> <span class="n">last_recipe</span><span class="o">=</span><span class="n">recipe_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Check if datasets are valid</span>
-        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
+        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets_for_target</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -964,7 +894,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_pipe_target</span><span class="p">(</span><span class="n">targetname</span><span class="o">=</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="o">=</span><span class="n">list_datasets</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Check if datasets are valid</span>
-        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
+        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets_for_target</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -998,7 +928,7 @@
                                  <span class="n">list_datasets</span><span class="o">=</span><span class="n">list_datasets</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Check if datasets are valid</span>
-        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
+        <span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets_for_target</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
@@ -1025,28 +955,28 @@
                              <span class="n">list_ifu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">fakemode</span><span class="o">=</span><span class="n">fakemode</span><span class="p">,</span>
                              <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MusePipeSample.init_mosaic"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.target_sample.MusePipeSample.init_mosaic">[docs]</a>    <span class="k">def</span> <span class="nf">init_mosaic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="n">prefix_cubes</span><span class="o">=</span><span class="s2">&quot;DATACUBE_FINAL_WCS&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MusePipeSample.init_mosaic"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.target_sample.MusePipeSample.init_mosaic">[docs]</a>    <span class="k">def</span> <span class="nf">init_mosaic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">list_datasets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix_cubes</span><span class="o">=</span><span class="s2">&quot;DATACUBE_FINAL_WCS&quot;</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Prepare the combination of targets</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        -----</span>
 <span class="sd">        targetname: str [None]</span>
 <span class="sd">            Name of target</span>
-<span class="sd">        list_pointings: list [or None=default meaning all pointings]</span>
-<span class="sd">            List of pointings (e.g., [1,2,3])</span>
+<span class="sd">        list_datasets: list [or None=default meaning all datasets]</span>
+<span class="sd">            List of datasets (e.g., [1,2,3])</span>
+<span class="sd">        prefix_cubes: str default=&quot;DATACUBE_FINAL_WCS&quot;, optional</span>
+<span class="sd">            Prefix to be used to list the cubes to consider</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">add_targetname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;add_targetname&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_targetname</span><span class="p">)</span>
-        <span class="c1"># Check if pointings are valid</span>
-        <span class="n">list_pointings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pointings_list</span><span class="p">(</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_pointings</span><span class="p">)</span>
-        <span class="c1"># Using the obname of the first pointing to define the function</span>
-        <span class="n">get_pointing_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipes</span><span class="p">[</span><span class="n">targetname</span><span class="p">][</span><span class="n">list_pointings</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">_get_pointing_name</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span>
+        <span class="c1"># Check if pointings are ok</span>
+        <span class="k">if</span> <span class="n">list_datasets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">list_datasets</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="n">targetname</span><span class="p">]</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">)</span>
 
         <span class="c1"># Make a list for the masking of the cubes to take into account</span>
-        <span class="n">list_pointing_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_pointing_name</span><span class="p">(</span><span class="n">pointing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                              <span class="k">for</span> <span class="n">pointing</span> <span class="ow">in</span> <span class="n">list_pointings</span><span class="p">]</span>
+        <span class="n">list_datasets_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_dataset_name</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                                <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">list_datasets</span><span class="p">]</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;List of datasets names: </span><span class="si">{</span><span class="n">list_datasets_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">default_comb_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="n">targetname</span><span class="p">]</span><span class="o">.</span><span class="n">combcubes_path</span>
         <span class="n">folder_ref_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;folder_ref_wcs&quot;</span><span class="p">,</span> <span class="n">default_comb_folder</span><span class="p">)</span>
@@ -1058,12 +988,13 @@
             <span class="n">wcs_prefix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">ref_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ref_wcs&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">DATACUBE_FINAL.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                              <span class="n">default_prefix_wcs_mosaic</span><span class="p">,</span> <span class="n">wcs_prefix</span><span class="p">))</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Check file: ref_wcs is </span><span class="si">{</span><span class="n">ref_wcs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pipes_mosaic</span><span class="p">[</span><span class="n">targetname</span><span class="p">]</span> <span class="o">=</span> <span class="n">MuseCubeMosaic</span><span class="p">(</span><span class="n">ref_wcs</span><span class="o">=</span><span class="n">ref_wcs</span><span class="p">,</span>
                                                        <span class="n">folder_ref_wcs</span><span class="o">=</span><span class="n">folder_ref_wcs</span><span class="p">,</span>
                                                        <span class="n">folder_cubes</span><span class="o">=</span><span class="n">folder_cubes</span><span class="p">,</span>
                                                        <span class="n">prefix_cubes</span><span class="o">=</span><span class="n">prefix_cubes</span><span class="p">,</span>
-                                                       <span class="n">list_suffix</span><span class="o">=</span><span class="n">list_pointing_names</span><span class="p">,</span>
+                                                       <span class="n">list_suffix</span><span class="o">=</span><span class="n">list_datasets_names</span><span class="p">,</span>
                                                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MusePipeSample.convolve_mosaic_per_pointing"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.target_sample.MusePipeSample.convolve_mosaic_per_pointing">[docs]</a>    <span class="k">def</span> <span class="nf">convolve_mosaic_per_pointing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1099,8 +1030,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Filter list for the convolved exposures</span>
-        <span class="n">filter_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_list&quot;</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">_short_filter_list</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">filter_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_list&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_short_filter_list</span><span class="p">)</span>
+        <span class="n">filter_list</span> <span class="o">=</span> <span class="n">check_filter_list</span><span class="p">(</span><span class="n">filter_list</span><span class="p">)</span>
 
         <span class="c1"># Initialise and filter with list of datasets</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_mosaic</span><span class="p">(</span><span class="n">targetname</span><span class="o">=</span><span class="n">targetname</span><span class="p">,</span> <span class="n">list_pointings</span><span class="o">=</span><span class="n">list_pointings</span><span class="p">,</span>
@@ -1165,8 +1096,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Constructing the images for that mosaic</span>
-        <span class="n">filter_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_list&quot;</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">_filter_list</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">filter_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;filter_list&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_list</span><span class="p">)</span>
+        <span class="n">filter_list</span> <span class="o">=</span> <span class="n">check_filter_list</span><span class="p">(</span><span class="n">filter_list</span><span class="p">)</span>
 
         <span class="c1"># Doing the mosaic with mad</span>
         <span class="n">default_comb_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="n">targetname</span><span class="p">]</span><span class="o">.</span><span class="n">combcubes_path</span>
@@ -1270,42 +1201,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Eric Emsellem
-
-    </p>
+    <p>&#169; Copyright 2019, Eric Emsellem.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

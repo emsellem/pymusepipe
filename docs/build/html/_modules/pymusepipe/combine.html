@@ -1,73 +1,34 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pymusepipe.combine &mdash; pymusepipe 2.19.9 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>pymusepipe.combine &mdash; pymusepipe 2.16.1 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> pymusepipe
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.16.1
+                2.19.9
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,17 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
@@ -100,66 +51,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">Module Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">pymusepipe</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>pymusepipe.combine</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pymusepipe.combine</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for pymusepipe.combine</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Licensed under a MIT license - see LICENSE</span>
 
@@ -199,7 +114,7 @@
 <span class="kn">from</span> <span class="nn">.create_sof</span> <span class="kn">import</span> <span class="n">SofPipe</span>
 <span class="kn">from</span> <span class="nn">.init_musepipe</span> <span class="kn">import</span> <span class="n">InitMuseParameters</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util_pipe</span> <span class="k">as</span> <span class="n">upipe</span>
-<span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">filter_list_with_pdict</span><span class="p">,</span> <span class="n">get_dataset_name</span><span class="p">,</span> 
+<span class="kn">from</span> <span class="nn">.util_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">filter_list_with_pdict</span><span class="p">,</span> <span class="n">get_dataset_name</span><span class="p">,</span> <span class="n">get_pointing_name</span><span class="p">,</span> 
                         <span class="n">get_tpl_nexpo</span><span class="p">,</span> <span class="n">merge_dict</span><span class="p">,</span> <span class="n">add_string</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">musepipe</span><span class="p">,</span> <span class="n">prep_recipes_pipe</span>
 <span class="kn">from</span> <span class="nn">.config_pipe</span> <span class="kn">import</span> <span class="p">(</span><span class="n">default_filter_list</span><span class="p">,</span> <span class="n">default_PHANGS_filter_list</span><span class="p">,</span>
@@ -237,7 +152,7 @@
     <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">list_folders</span><span class="p">:</span>
         <span class="n">lint</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\d</span><span class="si">{3}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">folder</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lint</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">list_periods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">lint</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">list_periods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lint</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
 
     <span class="n">list_periods</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
     <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Periods list: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">list_periods</span><span class="p">)))</span>
@@ -263,13 +178,49 @@
     <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Potential Targets -- list: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">list_targets</span><span class="p">)))</span>
     <span class="k">return</span> <span class="n">list_targets</span></div>
 
+
+<div class="viewcode-block" id="build_dict_datasets"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.build_dict_datasets">[docs]</a><span class="k">def</span> <span class="nf">build_dict_datasets</span><span class="p">(</span><span class="n">data_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">str_dataset</span><span class="o">=</span><span class="n">default_str_dataset</span><span class="p">,</span> <span class="n">ndigits</span><span class="o">=</span><span class="n">default_ndigits</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Build a dictionary of datasets for each target in the sample</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    data_path: str</span>
+<span class="sd">       Path of the target data</span>
+<span class="sd">    str_dataset: str</span>
+<span class="sd">        Prefix string for datasets</span>
+<span class="sd">    ndigits: int</span>
+<span class="sd">       Number of digits to format the name of the dataset</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict_dataset: dict</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">list_targets</span> <span class="o">=</span> <span class="n">get_list_targets</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+    <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">npath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+    <span class="n">s_npath</span> <span class="o">=</span> <span class="n">npath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">list_targets</span><span class="p">:</span>
+        <span class="n">target_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">/&quot;</span>
+        <span class="n">list_datasets</span> <span class="o">=</span> <span class="n">get_list_datasets</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="n">str_dataset</span><span class="p">,</span> <span class="n">ndigits</span><span class="p">)</span>
+        <span class="n">dict_t</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">list_datasets</span><span class="p">:</span>
+            <span class="n">dict_t</span><span class="p">[</span><span class="n">ds</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">dict_dataset</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">s_npath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dict_t</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">dict_dataset</span></div>
+        
+
 <div class="viewcode-block" id="build_dict_exposures"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.build_dict_exposures">[docs]</a><span class="k">def</span> <span class="nf">build_dict_exposures</span><span class="p">(</span><span class="n">target_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">str_dataset</span><span class="o">=</span><span class="n">default_str_dataset</span><span class="p">,</span>
                          <span class="n">ndigits</span><span class="o">=</span><span class="n">default_ndigits</span><span class="p">,</span> <span class="n">show_pointings</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Build a dictionary of exposures using the list of datasets found for the</span>
 <span class="sd">    given dataset path</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
 <span class="sd">    target_path: str</span>
 <span class="sd">       Path of the target data</span>
 <span class="sd">    str_dataset: str</span>
@@ -307,7 +258,7 @@
     <span class="k">return</span> <span class="n">dict_expos</span></div>
 
 <div class="viewcode-block" id="get_list_datasets"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.get_list_datasets">[docs]</a><span class="k">def</span> <span class="nf">get_list_datasets</span><span class="p">(</span><span class="n">target_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">str_dataset</span><span class="o">=</span><span class="n">default_str_dataset</span><span class="p">,</span>
-                      <span class="n">ndigits</span><span class="o">=</span><span class="n">default_ndigits</span><span class="p">):</span>
+                      <span class="n">ndigits</span><span class="o">=</span><span class="n">default_ndigits</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Getting the list of existing datasets for a given target path</span>
 
 <span class="sd">    Input</span>
@@ -324,17 +275,23 @@
 <span class="sd">    list_datasets: list of int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Done by scanning the target path</span>
-    <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Searching datasets in </span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">str_dataset</span><span class="si">}</span><span class="s2"> prefix&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Searching datasets in </span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">str_dataset</span><span class="si">}</span><span class="s2"> prefix&quot;</span><span class="p">)</span>
     <span class="n">all_folders</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">str_dataset</span><span class="si">}</span><span class="s2">*&quot;</span><span class="p">)</span>
-    <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All folder names  = </span><span class="si">{</span><span class="n">all_folders</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All folder names  = </span><span class="si">{</span><span class="n">all_folders</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">all_datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">all_folders</span><span class="p">]</span>
-    <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All detected folder names  = </span><span class="si">{</span><span class="n">all_datasets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">all_datasets</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All detected folder names  = </span><span class="si">{</span><span class="n">all_datasets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">str_dataset</span><span class="si">}</span><span class="s2">\d</span><span class="se">{{</span><span class="si">{</span><span class="n">ndigits</span><span class="si">}</span><span class="se">}}</span><span class="s2">$&quot;</span><span class="p">)</span>
     <span class="n">good_datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">all_datasets</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
-    <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All good folder names  = </span><span class="si">{</span><span class="n">good_datasets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">good_datasets</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All good folder names  = </span><span class="si">{</span><span class="n">good_datasets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">list_datasets</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">good_datasets</span><span class="p">:</span>
-        <span class="n">list_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">folder</span><span class="p">[</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">ndigits</span><span class="p">):]))</span>
+        <span class="n">list_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">folder</span><span class="p">[</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">ndigits</span><span class="p">):]))</span>
 
     <span class="n">list_datasets</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
     <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Dataset list: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)))</span>
@@ -428,10 +385,10 @@
             <span class="n">tpl</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">expo</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="c1"># If not already there, add it</span>
             <span class="k">if</span> <span class="n">tpl</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_tpl</span><span class="p">:</span>
-                <span class="n">dict_tpl</span><span class="p">[</span><span class="n">tpl</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">expo</span><span class="p">)]</span>
+                <span class="n">dict_tpl</span><span class="p">[</span><span class="n">tpl</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">expo</span><span class="p">)]</span>
             <span class="c1"># if already accounted for, add the expo number</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">dict_tpl</span><span class="p">[</span><span class="n">tpl</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">expo</span><span class="p">))</span>
+                <span class="n">dict_tpl</span><span class="p">[</span><span class="n">tpl</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">expo</span><span class="p">))</span>
 
         <span class="c1"># Creating the full list for that dataset</span>
         <span class="n">full_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -495,6 +452,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="n">debug</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
             <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;In DEBUG Mode [more printing]&quot;</span><span class="p">)</span>
+        <span class="n">check</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;check&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Warnings for astropy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;warnings&quot;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
@@ -512,7 +470,7 @@
                                           <span class="n">default_filter_list</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">combined_folder_name</span> <span class="o">=</span> <span class="n">combined_folder_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vsystemic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;vsystemic&quot;</span><span class="p">,</span> <span class="mf">0.</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vsystemic</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;vsystemic&quot;</span><span class="p">,</span> <span class="mf">0.</span><span class="p">))</span>
 
         <span class="c1"># Including or not the masked Pixtables in place of the original ones</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_masked_pixtables</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;use_masked_pixtables&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -547,11 +505,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">init_default_param</span><span class="p">(</span><span class="n">dict_combined_folders</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dict_combined_folders</span> <span class="o">=</span> <span class="n">dict_combined_folders</span>
-
-        <span class="c1"># List of pointings to process</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">list_pointings</span> <span class="o">=</span> <span class="n">list_pointings</span>
         <span class="c1"># List of datasets to process</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list_datasets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check</span><span class="p">:</span>
+            <span class="c1"># List of pointings to process</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">list_pointings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_pointings</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">)</span>
+
         <span class="c1"># Setting all the useful paths</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_fullpath_names</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">log_filename</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">log_filename</span><span class="p">)</span>
@@ -564,6 +523,9 @@
         <span class="c1"># =========================================================== </span>
         <span class="c1"># ---------------------------------------------------------</span>
         <span class="c1"># Create the Combined folder</span>
+        <span class="c1"># Making the output folders in a safe mode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating directory structure&quot;</span><span class="p">)</span>
         <span class="n">upipe</span><span class="o">.</span><span class="n">safely_create_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
         <span class="c1"># Go to the Combined Folder</span>
@@ -575,18 +537,37 @@
 
         <span class="c1"># Checking input datasets and pixtables</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pixtab_in_comb_folder</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;pixtab_in_comb_folder&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_get_list_reduced_pixtables</span><span class="p">(</span><span class="n">dict_exposures</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_list_reduced_pixtables</span><span class="p">(</span><span class="n">dict_exposures</span><span class="p">)</span>
 
         <span class="c1"># Checking input offset table and corresponding pixtables</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_offset_table</span><span class="p">(</span><span class="n">name_offset_table</span><span class="p">,</span> <span class="n">folder_offset_table</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_offset_table</span><span class="p">(</span><span class="n">name_offset_table</span><span class="p">,</span> <span class="n">folder_offset_table</span><span class="p">)</span>
         <span class="c1"># END CHECK UP ============================================</span>
-
-        <span class="c1"># Making the output folders in a safe mode</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating directory structure&quot;</span><span class="p">)</span>
 
         <span class="c1"># Going back to initial working directory</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_origfolder</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_check_list_pointings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check which datasets exist</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        -----</span>
+<span class="sd">        list_pointings: list of int</span>
+<span class="sd">                List of datasets to consider</span>
+<span class="sd">        default_list: list</span>
+<span class="sd">            Default list. If None, will use the full list of available datasets</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        list_datasets after checking they exist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Using the function check_list_datasets for this usage</span>
+        <span class="c1"># But it will just check the list</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_datasets</span><span class="p">(</span><span class="n">list_datasets</span><span class="o">=</span><span class="n">list_pointings</span><span class="p">,</span>
+                                         <span class="n">default_list</span><span class="o">=</span><span class="n">default_list</span><span class="p">,</span>
+                                         <span class="n">listname</span><span class="o">=</span><span class="s2">&quot;Pointings&quot;</span><span class="p">)</span>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">full_list_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -594,16 +575,23 @@
                                  <span class="n">ndigits</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">ndigits</span><span class="p">,</span>
                                  <span class="n">str_dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">str_dataset</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_list_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_datasets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_check_list_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_datasets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check which datasets exist</span>
 
 <span class="sd">        Input</span>
-<span class="sd">            list_datasets: list of int</span>
-<span class="sd">                List of datasets to consider</span>
+<span class="sd">        ------</span>
+<span class="sd">        list_datasets: list of int</span>
+<span class="sd">            List of datasets to consider</span>
+<span class="sd">        default_list: list</span>
+<span class="sd">            Default list. If None, will use the full list of available datasets</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            list_datasets after checking they exist</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list_datasets after checking they exist</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">listname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;listname&quot;</span><span class="p">,</span> <span class="s2">&quot;Datasets&quot;</span><span class="p">)</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">default_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_list_datasets</span>
         <span class="c1"># Now the list of datasets</span>
@@ -611,14 +599,15 @@
             <span class="c1"># This is using all the existing datasets</span>
             <span class="k">return</span> <span class="n">default_list</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wished dataset list = </span><span class="si">{</span><span class="n">list_datasets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target default dataset list = </span><span class="si">{</span><span class="n">default_list</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wished </span><span class="si">{</span><span class="n">listname</span><span class="si">}</span><span class="s2"> list = </span><span class="si">{</span><span class="n">list_datasets</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target default </span><span class="si">{</span><span class="n">listname</span><span class="si">}</span><span class="s2"> list = </span><span class="si">{</span><span class="n">default_list</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="c1"># Checked ones</span>
             <span class="n">checked_list_datasets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">default_list</span><span class="p">))</span>
             <span class="c1"># Not existing ones</span>
             <span class="n">notfound</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">list_datasets</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">default_list</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">notfound</span><span class="p">:</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No dataset </span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s2"> for the given target&quot;</span><span class="p">)</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">listname</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s2"> for the given target&quot;</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">checked_list_datasets</span>
 
@@ -644,6 +633,7 @@
     <span class="k">def</span> <span class="nf">_get_list_reduced_pixtables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_exposures</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if datasets and dictionary are compatible</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Checking the list of reduced PixTables&quot;</span><span class="p">)</span>
         <span class="c1"># Dictionary of exposures to select per dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dict_exposures</span> <span class="o">=</span> <span class="n">dict_exposures</span>
 
@@ -656,6 +646,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dict_pixtabs_in_datasets</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dict_allpixtabs_in_datasets</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dict_pixtabs_in_pointings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dict_tplexpo_per_pointing</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dict_tplexpo_per_dataset</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># Loop on Datasets</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">:</span>
             <span class="c1"># get the path</span>
@@ -710,13 +702,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">dict_allpixtabs_in_datasets</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_list</span>
 
             <span class="c1"># Filter the list with the dataset dictionary if given</span>
-            <span class="n">select_list_pixtabs</span><span class="p">,</span> <span class="n">tempp_dict_pixtabs</span> <span class="o">=</span> <span class="n">filter_list_with_pdict</span><span class="p">(</span><span class="n">list_pixtabs</span><span class="p">,</span>
-                                                         <span class="n">list_datasets</span><span class="o">=</span><span class="p">[</span><span class="n">dataset</span><span class="p">],</span>
-                                                         <span class="n">dict_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_exposures</span><span class="p">,</span>
-                                                         <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="n">select_list_pixtabs</span><span class="p">,</span> <span class="n">tempp_dict_pixtabs</span><span class="p">,</span> <span class="n">tempp_dict_tplexpo_per_pointing</span><span class="p">,</span> \
+                <span class="n">tempp_dict_tplexpo_per_dataset</span> <span class="o">=</span> <span class="n">filter_list_with_pdict</span><span class="p">(</span><span class="n">list_pixtabs</span><span class="p">,</span>
+                                                                        <span class="n">list_datasets</span><span class="o">=</span><span class="p">[</span><span class="n">dataset</span><span class="p">],</span>
+                                                                        <span class="n">dict_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_exposures</span><span class="p">,</span>
+                                                                        <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">dict_pixtabs_in_pointings</span> <span class="o">=</span> <span class="n">merge_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_pixtabs_in_pointings</span><span class="p">,</span> 
                                                         <span class="n">tempp_dict_pixtabs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dict_tplexpo_per_pointing</span> <span class="o">=</span> <span class="n">merge_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_tplexpo_per_pointing</span><span class="p">,</span>
+                                                        <span class="n">tempp_dict_tplexpo_per_pointing</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dict_tplexpo_per_dataset</span> <span class="o">=</span> <span class="n">merge_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_tplexpo_per_dataset</span><span class="p">,</span>
+                                                        <span class="n">tempp_dict_tplexpo_per_dataset</span><span class="p">)</span>
             <span class="n">select_list_pixtabs</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dict_pixtabs_in_datasets</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">select_list_pixtabs</span><span class="p">)</span>
 
@@ -787,7 +784,7 @@
         <span class="c1"># Checking existence of each pixel_table in the offset table</span>
         <span class="n">nexcluded_pixtab</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">nincluded_pixtab</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_dataset</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">:</span>
             <span class="n">pixtab_to_exclude</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">pixtab_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict_pixtabs_in_datasets</span><span class="p">[</span><span class="n">dataset</span><span class="p">]:</span>
                 <span class="n">pixtab_header</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="n">pixtab_name</span><span class="p">)</span>
@@ -865,19 +862,19 @@
         <span class="c1"># Creating the filenames for Master files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dict_name_datasets</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">:</span>
-            <span class="n">name_dataset</span> <span class="o">=</span> <span class="s2">&quot;P</span><span class="si">{0:02d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+            <span class="n">name_dataset</span> <span class="o">=</span> <span class="n">get_dataset_name</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">str_dataset</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">ndigits</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dict_name_datasets</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">name_dataset</span>
             <span class="c1"># Adding the path of the folder</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">name_dataset</span><span class="p">,</span>
-                    <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">/P</span><span class="si">{1:02d}</span><span class="s2">/&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetname</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)))</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">name_dataset</span><span class="p">,</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
+                                                       <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">targetname</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name_dataset</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">))</span>
 
         <span class="c1"># Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_folders_target</span><span class="p">:</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_params</span><span class="o">.</span><span class="n">_dict_folders_target</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span></div>
 
-<div class="viewcode-block" id="MusePointings.create_reference_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.create_reference_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">create_reference_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointings_wcs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mosaic_wcs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                             <span class="n">reference_cube</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">refcube_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MusePointings.create_reference_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.create_reference_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">create_reference_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointings_wcs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mosaic_wcs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reference_cube</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">refcube_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create the WCS reference files, for all individual pointings and for</span>
 <span class="sd">        the mosaic.</span>
 
@@ -929,10 +926,8 @@
                                         <span class="n">lambdaminmax_wcs</span><span class="o">=</span><span class="n">lambdaminmax_for_mosaic</span><span class="p">,</span>
                                         <span class="n">refcube_name</span><span class="o">=</span><span class="n">wcs_refcube_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MusePointings.run_combine_all_single_pointings"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.run_combine_all_single_pointings">[docs]</a>    <span class="k">def</span> <span class="nf">run_combine_all_single_pointings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-                                         <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;pointings_combine&#39;</span><span class="p">,</span>
-                                         <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MusePointings.run_combine_all_single_pointings"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.run_combine_all_single_pointings">[docs]</a>    <span class="k">def</span> <span class="nf">run_combine_all_single_pointings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;pointings_combine&#39;</span><span class="p">,</span>
+                                         <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run for all pointings individually, provided in the</span>
 <span class="sd">        list of pointings, by just looping over the pointings.</span>
 
@@ -954,19 +949,17 @@
 <span class="sd">            Default is 4000 and 10000 for the lower and upper limits, resp.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If list_pointings is None using the initially set up one</span>
-        <span class="n">list_pointings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pointings_list</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">,</span>
-                                                    <span class="bp">self</span><span class="o">.</span><span class="n">list_pointings</span><span class="p">)</span>
+        <span class="n">list_pointings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_pointings</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_pointings</span><span class="p">)</span>
 
         <span class="c1"># Additional suffix if needed</span>
         <span class="k">for</span> <span class="n">pointing</span> <span class="ow">in</span> <span class="n">list_pointings</span><span class="p">:</span>
             <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Combining single pointings - Pointing </span><span class="si">{0:02d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                             <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">)))</span>
+                             <span class="nb">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">)))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">run_combine_single_pointing</span><span class="p">(</span><span class="n">pointing</span><span class="p">,</span> <span class="n">add_suffix</span><span class="o">=</span><span class="n">add_suffix</span><span class="p">,</span>
                                           <span class="n">sof_filename</span><span class="o">=</span><span class="n">sof_filename</span><span class="p">,</span>
                                           <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MusePointings.run_combine_single_pointing"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.run_combine_single_pointing">[docs]</a>    <span class="k">def</span> <span class="nf">run_combine_single_pointing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span> <span class="n">add_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-                                    <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;pointing_combine&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="MusePointings.run_combine_single_pointing"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.run_combine_single_pointing">[docs]</a>    <span class="k">def</span> <span class="nf">run_combine_single_pointing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span> <span class="n">add_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="s1">&#39;pointing_combine&#39;</span><span class="p">,</span>
                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Running the combine routine on just one single pointing</span>
 
@@ -989,8 +982,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># getting the suffix with the additional PXX</span>
-        <span class="c1">### ICI ICI ICI</span>
-        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_P</span><span class="si">{1:02d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">add_suffix</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">))</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">add_suffix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">get_pointing_name</span><span class="p">(</span><span class="n">pointing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="n">ref_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ref_wcs&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">wcs_from_pointing</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;wcs_from_pointing&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -1006,18 +998,13 @@
                 <span class="n">prefix_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;prefix_wcs&quot;</span><span class="p">,</span> <span class="n">default_prefix_wcs</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_targetname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;add_targetname&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
                 <span class="n">prefix_wcs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_targetname</span><span class="p">(</span><span class="n">prefix_wcs</span><span class="p">,</span> <span class="n">asprefix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                <span class="n">ref_wcs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">_P</span><span class="si">{2:02d}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix_wcs</span><span class="p">,</span>
-                                                        <span class="n">prefix_final_cube</span><span class="p">,</span>
-                                                        <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">))</span>
+                <span class="n">ref_wcs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix_wcs</span><span class="si">}{</span><span class="n">prefix_final_cube</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">get_pointing_name</span><span class="p">(</span><span class="n">pointing</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits&quot;</span>
 
         <span class="c1"># Running the combine for that single pointing</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_combine</span><span class="p">(</span><span class="n">list_pointings</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">)],</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-                         <span class="n">sof_filename</span><span class="o">=</span><span class="n">sof_filename</span><span class="p">,</span>
-                         <span class="n">ref_wcs</span><span class="o">=</span><span class="n">ref_wcs</span><span class="p">,</span>
-                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_combine</span><span class="p">(</span><span class="n">list_pointings</span><span class="o">=</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">)],</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> <span class="n">sof_filename</span><span class="o">=</span><span class="n">sof_filename</span><span class="p">,</span>
+                         <span class="n">ref_wcs</span><span class="o">=</span><span class="n">ref_wcs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MusePointings.create_all_pointings_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.create_all_pointings_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">create_all_pointings_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
-                                 <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MusePointings.create_all_pointings_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.create_all_pointings_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">create_all_pointings_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">list_pointings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create all pointing masks one by one</span>
 <span class="sd">        as well as the wcs for each individual pointings. Using the grid</span>
 <span class="sd">        from the global WCS of the mosaic but restricting it to the </span>
@@ -1030,19 +1017,17 @@
 <span class="sd">            List of filter names to be used. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If list_pointings is None using the initially set up one</span>
-        <span class="n">list_pointings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pointings_list</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">,</span>
-                                                    <span class="bp">self</span><span class="o">.</span><span class="n">list_pointings</span><span class="p">)</span>
+        <span class="n">list_pointings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_pointings</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_pointings</span><span class="p">)</span>
 
         <span class="c1"># Additional suffix if needed</span>
         <span class="k">for</span> <span class="n">pointing</span> <span class="ow">in</span> <span class="n">list_pointings</span><span class="p">:</span>
             <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Making WCS Mask for &quot;</span>
-                             <span class="s2">&quot;Pointing </span><span class="si">{0:02d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">)))</span>
+                             <span class="s2">&quot;Pointing {get_pointing_name(pointing)}&quot;</span><span class="p">)</span>
             <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_pointing_wcs</span><span class="p">(</span><span class="n">pointing</span><span class="o">=</span><span class="n">pointing</span><span class="p">,</span>
                                          <span class="n">filter_list</span><span class="o">=</span><span class="n">filter_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MusePointings.create_pointing_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.create_pointing_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">create_pointing_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span>
-            <span class="n">lambdaminmax_mosaic</span><span class="o">=</span><span class="n">lambdaminmax_for_mosaic</span><span class="p">,</span>
-            <span class="n">filter_list</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MusePointings.create_pointing_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.create_pointing_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">create_pointing_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointing</span><span class="p">,</span> <span class="n">lambdaminmax_mosaic</span><span class="o">=</span><span class="n">lambdaminmax_for_mosaic</span><span class="p">,</span>
+                            <span class="n">filter_list</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create the mask of a given pointing</span>
 <span class="sd">        And also a WCS file which can then be used to compute individual</span>
 <span class="sd">        pointings with a fixed WCS.</span>
@@ -1086,19 +1071,15 @@
         <span class="n">prefix_wcs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_targetname</span><span class="p">(</span><span class="n">prefix_wcs</span><span class="p">,</span> <span class="n">asprefix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># ICI ICI ICI</span>
-        <span class="n">name_mask</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">_P</span><span class="si">{2:02d}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix_mask</span><span class="p">,</span>
-                                                  <span class="n">prefix_final_cube</span><span class="p">,</span>
-                                                  <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">))</span>
-        <span class="n">finalname_wcs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">_P</span><span class="si">{2:02d}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix_wcs</span><span class="p">,</span>
-                                               <span class="n">prefix_final_cube</span><span class="p">,</span>
-                                               <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">))</span>
+        <span class="n">name_mask</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix_mask</span><span class="si">}{</span><span class="n">prefix_final_cube</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">get_pointing_name</span><span class="p">(</span><span class="n">pointing</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits&quot;</span>
+        <span class="n">finalname_wcs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix_wcs</span><span class="si">}{</span><span class="n">prefix_final_cube</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">get_pointing_name</span><span class="p">(</span><span class="n">pointing</span><span class="p">)</span><span class="si">}</span><span class="s2">.fits&quot;</span>
 
         <span class="c1"># First create a subcube without all the Nan</span>
         <span class="n">mask_cube</span> <span class="o">=</span> <span class="n">MuseCube</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">joinpath</span><span class="p">(</span><span class="n">dir_mask</span><span class="p">,</span> <span class="n">name_mask</span><span class="p">))</span>
 
         <span class="c1"># Creating the new cube</span>
         <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Now creating the Reference WCS cube &quot;</span>
-                         <span class="s2">&quot;for pointing </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">)))</span>
+                         <span class="s2">&quot;for pointing </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pointing</span><span class="p">)))</span>
         <span class="n">cfolder</span><span class="p">,</span> <span class="n">cname</span> <span class="o">=</span> <span class="n">mask_cube</span><span class="o">.</span><span class="n">create_reference_cube</span><span class="p">(</span>
                 <span class="n">lambdamin</span><span class="o">=</span><span class="n">lambdaminmax_mosaic</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                 <span class="n">lambdamax</span><span class="o">=</span><span class="n">lambdaminmax_mosaic</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> 
@@ -1115,23 +1096,21 @@
         <span class="k">return</span> <span class="n">full_cname</span></div>
 
 <div class="viewcode-block" id="MusePointings.extract_combined_narrow_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.extract_combined_narrow_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">extract_combined_narrow_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_cube</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create the reference WCS from the full mosaic with</span>
-<span class="sd">        only 2 lambdas</span>
+        <span class="sd">&quot;&quot;&quot;Create the reference WCS from the full mosaic with only 2 lambdas</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        -----</span>
 <span class="sd">        name_cube: str</span>
-<span class="sd">            Name of the cube. Can be None, and then the final</span>
-<span class="sd">            datacube from the combine folder will be used.</span>
+<span class="sd">            Name of the cube. Can be None, and then the final datacube from the combine</span>
+<span class="sd">            folder will be used.</span>
 <span class="sd">        wave1: float - optional</span>
-<span class="sd">            Wavelength taken for the extraction. Should only</span>
-<span class="sd">            be present in all spaxels you wish to get.</span>
+<span class="sd">            Wavelength taken for the extraction. Should only be present in all spaxels</span>
+<span class="sd">            you wish to get.</span>
 <span class="sd">        prefix_wcs: str - optional</span>
-<span class="sd">            Prefix to be added to the name of the input cube.</span>
-<span class="sd">            By default, will use &quot;refwcs&quot;.</span>
-<span class="sd">        add_targetname: bool [True]</span>
-<span class="sd">            Add the name of the target to the name of the output</span>
-<span class="sd">            WCS reference cube. Default is True.</span>
+<span class="sd">            Prefix to be added to the name of the input cube. By default, will use &quot;refwcs&quot;.</span>
+<span class="sd">        add_targetname: bool default=True</span>
+<span class="sd">            Add the name of the target to the name of the output WCS reference cube.</span>
+<span class="sd">            Default is True.</span>
 
 <span class="sd">        Creates:</span>
 <span class="sd">            Combined narrow band WCS cube</span>
@@ -1172,9 +1151,8 @@
         <span class="n">upipe</span><span class="o">.</span><span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;...Done&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">full_cname</span></div>
 
-<div class="viewcode-block" id="MusePointings.create_combined_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.create_combined_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">create_combined_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refcube_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">lambdaminmax_wcs</span><span class="o">=</span><span class="n">lambdaminmax_for_wcs</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MusePointings.create_combined_wcs"><a class="viewcode-back" href="../../api/pymusepipe.html#pymusepipe.combine.MusePointings.create_combined_wcs">[docs]</a>    <span class="k">def</span> <span class="nf">create_combined_wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refcube_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambdaminmax_wcs</span><span class="o">=</span><span class="n">lambdaminmax_for_wcs</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create the reference WCS from the full mosaic</span>
 <span class="sd">        with a given range of lambda.</span>
 
@@ -1271,7 +1249,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">goto_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">addtolog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># If list_pointings is None using the initially set up one</span>
-        <span class="n">list_pointings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pointings_list</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_pointings</span><span class="p">)</span>
+        <span class="n">list_pointings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_list_pointings</span><span class="p">(</span><span class="n">list_pointings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_pointings</span><span class="p">)</span>
 
         <span class="c1"># If only 1 exposure, duplicate the pixtable</span>
         <span class="c1"># as exp_combine needs at least 2 pixtables</span>
@@ -1315,15 +1293,14 @@
                 <span class="c1"># getting the name of the final datacube (mosaic)</span>
                 <span class="n">cube_suffix</span> <span class="o">=</span> <span class="n">prep_recipes_pipe</span><span class="o">.</span><span class="n">dict_products_scipost</span><span class="p">[</span><span class="s1">&#39;cube&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">cube_suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_targetname</span><span class="p">(</span><span class="n">cube_suffix</span><span class="p">)</span>
-                <span class="n">ref_wcs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix_wcs</span><span class="p">,</span> <span class="n">cube_suffix</span><span class="p">)</span>
-            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;ref_wcs used is </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ref_wcs</span><span class="p">))</span>
+                <span class="n">ref_wcs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix_wcs</span><span class="si">}{</span><span class="n">cube_suffix</span><span class="si">}</span><span class="s2">.fits&quot;</span>
+            <span class="n">upipe</span><span class="o">.</span><span class="n">print_warning</span><span class="p">(</span><span class="s2">&quot;ref_wcs used is </span><span class="si">{ref_wcs}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">folder_ref_wcs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;folder_ref_wcs&quot;</span><span class="p">,</span> <span class="n">upipe</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">cubes</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">ref_wcs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">full_ref_wcs</span> <span class="o">=</span> <span class="n">joinpath</span><span class="p">(</span><span class="n">folder_ref_wcs</span><span class="p">,</span> <span class="n">ref_wcs</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">full_ref_wcs</span><span class="p">):</span>
-                <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Reference WCS file </span><span class="si">{0}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">full_ref_wcs</span><span class="p">))</span>
+                <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Reference WCS file </span><span class="si">{full_ref_wcs}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
                 <span class="n">upipe</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s2">&quot;Consider using the create_combined_wcs recipe&quot;</span>
                                   <span class="s2">&quot; if you wish to create pointing masks. Else&quot;</span>
                                   <span class="s2">&quot; just check that the WCS reference file exists.&quot;</span><span class="p">)</span>
@@ -1364,42 +1341,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Eric Emsellem
-
-    </p>
+    <p>&#169; Copyright 2019, Eric Emsellem.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

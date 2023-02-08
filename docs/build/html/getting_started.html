@@ -1,76 +1,36 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; pymusepipe 2.19.9 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <title>Getting Started &mdash; pymusepipe 2.16.1 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Alignment" href="alignment.html" />
+    <link rel="next" title="Reduce to Prealign" href="reduce_to_prealign.html" />
     <link rel="prev" title="Install" href="install.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> pymusepipe
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.16.1
+                2.19.9
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -78,17 +38,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="welcome.html">Welcome</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
@@ -97,7 +47,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#step-1-preparing-your-data">Step 1: Preparing your data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-2-preparing-your-configuration-files">Step 2: Preparing your configuration files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-3-running-the-pipeline">Step 3: Running the pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#under-the-hood-of-run-recipes">Under the hood of run_recipes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#structure-of-the-output">Structure of the output</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#folders">Folders</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#log-files">Log files</a></li>
@@ -108,6 +57,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="reduce_to_prealign.html">Reduce to Prealign</a></li>
 <li class="toctree-l1"><a class="reference internal" href="alignment.html">Alignment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mosaicking.html">Mosaicking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="convolution.html">Convolution</a></li>
@@ -118,73 +68,35 @@
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">Module Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pymusepipe</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Getting Started</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <section id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a>
+             
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a>
 </h1>
-<section id="basic-usage-dealing-with-obs-individually">
-<h2>Basic Usage - Dealing with OBs, individually<a class="headerlink" href="#basic-usage-dealing-with-obs-individually" title="Permalink to this heading">¶</a>
+<div class="section" id="basic-usage-dealing-with-obs-individually">
+<h2>Basic Usage - Dealing with OBs, individually<a class="headerlink" href="#basic-usage-dealing-with-obs-individually" title="Permalink to this headline"></a>
 </h2>
 <p>The pymusepipe wrapper is meant to provide the user with a simple way to
 run the MUSE pipeline.</p>
@@ -201,9 +113,9 @@ run the MUSE pipeline.</p>
 <p>I recommend to use <code class="docutils literal notranslate"><span class="pre">Ipython</span></code> as an environment, possibly via
 a <code class="docutils literal notranslate"><span class="pre">screen</span></code> or <code class="docutils literal notranslate"><span class="pre">tmux</span></code> which would allow you to disconnect from the server that
 actually runs the commands.</p>
-</section>
-<section id="step-1-preparing-your-data">
-<h2>Step 1: Preparing your data<a class="headerlink" href="#step-1-preparing-your-data" title="Permalink to this heading">¶</a>
+</div>
+<div class="section" id="step-1-preparing-your-data">
+<h2>Step 1: Preparing your data<a class="headerlink" href="#step-1-preparing-your-data" title="Permalink to this headline"></a>
 </h2>
 <p>The first thing to do is to prepare the folder structure to welcome your
 MUSE datasets.</p>
@@ -214,7 +126,7 @@ MUSE datasets.</p>
 MUSE Observing Block (OB), including all the calibration and science object raw data files, as
 downloaded from the ESO archive. In practice pymusepipe will also reduce several OBs, provided
 all the necessary calibrations are avaiable. Some functionality requires a distinction between
-<strong>dataset</strong> and <strong>pointing</strong>. This distinction is described in <a class="reference internal" href="mosaicking.html"><span class="doc">Targets and Mosaicking</span></a>.</p></li>
+<strong>pointing</strong>,  <strong>dataset</strong>, and <strong>group</strong>. This distinction is described in <a class="reference internal" href="mosaicking.html"><span class="doc">Targets and Mosaicking</span></a>, but in the simplest terms a pointing is a set of exposures covering the same FoV on the sky, a dataset is a set of exposures obtained within the same OB, which therefore share the same calibration data, and a group is a set od datasets which the user wishes to mosaic together, usually because they cover the same science target.</p></li>
 </ul>
 <p>Then under your data root folder &lt;my_data_folder&gt; create the following folder structure:</p>
 <div class="highlight-default notranslate">
@@ -229,11 +141,11 @@ all the necessary calibrations are avaiable. Some functionality requires a disti
 </div>
 <p>Each dataset, or OB for short, has a <code class="docutils literal notranslate"><span class="pre">Raw</span></code> folder.</p>
 <p>The next step is to download your MUSE data (including raw calibrations) from the
-ESO web site, and put all the raw files (in fitsor fits.gz format) into each individual
+ESO web site, and put all the raw files (in fits or fits.gz format) into each individual
 <code class="docutils literal notranslate"><span class="pre">Raw</span></code> folders, associated with the right dataset.</p>
-</section>
-<section id="step-2-preparing-your-configuration-files">
-<h2>Step 2: Preparing your configuration files<a class="headerlink" href="#step-2-preparing-your-configuration-files" title="Permalink to this heading">¶</a>
+</div>
+<div class="section" id="step-2-preparing-your-configuration-files">
+<h2>Step 2: Preparing your configuration files<a class="headerlink" href="#step-2-preparing-your-configuration-files" title="Permalink to this headline"></a>
 </h2>
 <p>pymusepipe only needs two configurations ascii files:</p>
 <ol class="arabic simple">
@@ -263,9 +175,9 @@ between observing run dates and specific files are hard-coded into pymusepipe).<
 </li>
 </ol>
 <p>Examples of such files are provided in the <code class="docutils literal notranslate"><span class="pre">config_templates</span></code> folder of the pymusepipe package.</p>
-</section>
-<section id="step-3-running-the-pipeline">
-<h2>Step 3: Running the pipeline<a class="headerlink" href="#step-3-running-the-pipeline" title="Permalink to this heading">¶</a>
+</div>
+<div class="section" id="step-3-running-the-pipeline">
+<h2>Step 3: Running the pipeline<a class="headerlink" href="#step-3-running-the-pipeline" title="Permalink to this headline"></a>
 </h2>
 <p>Here is an example of how to run the pipeline to reduce a single OB (dataset):</p>
 <div class="highlight-default notranslate">
@@ -317,49 +229,6 @@ config file).</p></li>
 </ul>
 </div>
 </blockquote>
-</section>
-<section id="under-the-hood-of-run-recipes">
-<h2>Under the hood of run_recipes<a class="headerlink" href="#under-the-hood-of-run-recipes" title="Permalink to this heading">¶</a>
-</h2>
-<p><code class="docutils literal notranslate"><span class="pre">run_recipes()</span></code> launches a default set of functions listed below:</p>
-<div class="highlight-default notranslate">
-<div class="highlight"><pre><span></span><span class="c1"># generate the master bias using the muse_bias esorex recipe</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_bias</span><span class="p">()</span>
-<span class="c1"># generate the master flat using the muse_flat esorex recipe</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_flat</span><span class="p">()</span>
-<span class="c1"># generate the wavelength calibration using the muse_wavecal esorex recipe</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_wave</span><span class="p">()</span>
-<span class="c1"># generate the lsf using the muse_lsf esorex recipe</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_lsf</span><span class="p">()</span>
-<span class="c1"># generate the illumination correction using the muse_lsf esorex recipe</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_twilight</span><span class="p">(</span><span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># process individual exposures to remove the instrumental signature usign the muse_scibasic</span>
-<span class="c1"># esorex recipes. It runs on both the object, standard star and sky exposures</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_scibasic_all</span><span class="p">(</span><span class="n">illum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># generates the response function using the standard star observations and the muse_standard</span>
-<span class="c1"># esorex recipe</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_standard</span><span class="p">()</span>
-<span class="c1"># uses the sky exposures to generate a sky spectrum</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_sky</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
-<span class="c1"># runs the esosex muse_scipost recipe individually on each object exposures generating</span>
-<span class="c1"># a datacubes and image in the requested filter for each exposure.</span>
-<span class="c1"># These images are then used for aligment.</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_prep_align</span><span class="p">()</span>
-<span class="c1"># runs the muse_exp_align recipe to generate an OFFSET_TABLE files containing the astrometric</span>
-<span class="c1"># shifts between individual exposures. Pymusepipe provides more refined options for this</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_align_bydataset</span><span class="p">()</span>
-<span class="c1"># ??</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_align_bygroup</span><span class="p">()</span>
-<span class="c1"># generates the final aligned datacubes for individual exposures using muse_scipost</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_scipost_perexpo</span><span class="p">()</span>
-<span class="c1"># generates the sky datacube</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">run_scipost_sky</span><span class="p">()</span>
-<span class="c1"># merge exposures in the final datacube</span>
-<span class="n">mypipe</span><span class="o">.</span><span class="n">combine_dataset</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Individual pipeline stages can be (re)run by calling any of the individual functions
-above. The order is important, as in any data reduction process</p>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
 <p>This pipeline flow closely mirrors the standard data reduction for MUSE data implemented
@@ -367,21 +236,21 @@ by the e.g. EsoReflex workflow. Pymusepipe offers alternative recipes to perform
 (<a class="reference internal" href="alignment.html"><span class="doc">Alignment</span></a>) and mosaicking (<a class="reference internal" href="mosaicking.html"><span class="doc">Targets and Mosaicking</span></a>). For best results, therefore, we do not
 recommend running the above workflow. Examples workflows are presented in <a class="reference internal" href="phangs_example.html"><span class="doc">PHANGS pipeline example</span></a>.</p>
 </div>
-</section>
-<section id="structure-of-the-output">
-<h2>Structure of the output<a class="headerlink" href="#structure-of-the-output" title="Permalink to this heading">¶</a>
+</div>
+<div class="section" id="structure-of-the-output">
+<h2>Structure of the output<a class="headerlink" href="#structure-of-the-output" title="Permalink to this headline"></a>
 </h2>
-<section id="folders">
-<h3>Folders<a class="headerlink" href="#folders" title="Permalink to this heading">¶</a>
+<div class="section" id="folders">
+<h3>Folders<a class="headerlink" href="#folders" title="Permalink to this headline"></a>
 </h3>
 <p>The structure of the output is driven by a set of folder names described in
 <a class="reference internal" href="api/pymusepipe.html#module-pymusepipe.init_musepipe" title="pymusepipe.init_musepipe"><code class="xref py py-func docutils literal notranslate"><span class="pre">pymusepipe.init_musepipe()</span></code></a> in a few dictionaries (<code class="xref py py-func docutils literal notranslate"><span class="pre">dic_input_folders()</span></code>,
 <code class="xref py py-func docutils literal notranslate"><span class="pre">dic_folders()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">dic_folders_target()</span></code>). You can in principle change the names
 of the folders themselves, although it is not advisable.</p>
 <p>The pipeline will create the folder structure automatically, checking whether the folders exist or not.</p>
-</section>
-<section id="log-files">
-<h3>Log files<a class="headerlink" href="#log-files" title="Permalink to this heading">¶</a>
+</div>
+<div class="section" id="log-files">
+<h3>Log files<a class="headerlink" href="#log-files" title="Permalink to this headline"></a>
 </h3>
 <p>Two basic log files are produced: one is the Esorex output which will be stored in the
 “Esorex_log” folder. The other one will be in the “Log” folder with the name provided at start:
@@ -389,77 +258,61 @@ that one is like a shell script which can be used to rerun things directly via t
 In the “Log” folder, there will also be, for each log file, a file “.out” and one with “.err”
 extensions, respectively including all the stdout and stderr messages. This may be useful to trace
 details in the data reduction and problems.</p>
-</section>
-<section id="astropy-tables">
-<h3>Astropy Tables<a class="headerlink" href="#astropy-tables" title="Permalink to this heading">¶</a>
+</div>
+<div class="section" id="astropy-tables">
+<h3>Astropy Tables<a class="headerlink" href="#astropy-tables" title="Permalink to this headline"></a>
 </h3>
 <p>Each recipe will trigger the creation of a astropy Table.
 These are stored under “Astro_Tables”. You can use these to monitor which files have been
 processed or used.</p>
-</section>
-<section id="sof-files">
-<h3>Sof files<a class="headerlink" href="#sof-files" title="Permalink to this heading">¶</a>
+</div>
+<div class="section" id="sof-files">
+<h3>Sof files<a class="headerlink" href="#sof-files" title="Permalink to this headline"></a>
 </h3>
 <p>Sof files are saved under the “Sof” directory for each esorex recipes used in the pipeline.
 These are useful to see exactly which files are processed by each esorex recipe.</p>
-</section>
-<section id="python-structure">
-<h3>Python structure<a class="headerlink" href="#python-structure" title="Permalink to this heading">¶</a>
+</div>
+<div class="section" id="python-structure">
+<h3>Python structure<a class="headerlink" href="#python-structure" title="Permalink to this headline"></a>
 </h3>
 <p>Most of the information you may need is actually stored in the python
 <a class="reference internal" href="api/pymusepipe.html#pymusepipe.musepipe.MusePipe" title="pymusepipe.musepipe.MusePipe"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymusepipe.musepipe.MusePipe</span></code></a> class structure. More details to come.</p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
+</body>
+
 
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="alignment.html" class="btn btn-neutral float-right" title="Alignment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="install.html" class="btn btn-neutral float-left" title="Install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reduce_to_prealign.html" class="btn btn-neutral float-right" title="Reduce to Prealign" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Eric Emsellem
-
-    </p>
+    <p>&#169; Copyright 2019, Eric Emsellem.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

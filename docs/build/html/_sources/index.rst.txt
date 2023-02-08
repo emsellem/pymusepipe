@@ -35,6 +35,7 @@ Contents
    Welcome <welcome>
    Install <install>
    Getting Started <getting_started>
+   Reduce to Prealign <reduce_to_prealign>
    Alignment <alignment>
    Mosaicking <mosaicking>
    Convolution <convolution>

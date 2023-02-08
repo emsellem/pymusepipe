@@ -1046,7 +1046,7 @@ class PipePrep(SofPipe) :
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
 
-        # Offsets
+        # Offsets (default is false, i.e. ignore the offset list)
         offset_list = kwargs.pop("offset_list", False)
         name_offset_table = kwargs.pop("name_offset_table", None)
         folder_offset_table = kwargs.pop("folder_offset_table", None)

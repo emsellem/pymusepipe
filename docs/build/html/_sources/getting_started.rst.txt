@@ -29,7 +29,7 @@ Imagine you have:
   MUSE Observing Block (OB), including all the calibration and science object raw data files, as
   downloaded from the ESO archive. In practice pymusepipe will also reduce several OBs, provided
   all the necessary calibrations are avaiable. Some functionality requires a distinction between
-  **dataset** and **pointing**. This distinction is described in :doc:`mosaicking`.
+  **pointing**,  **dataset**, and **group**. This distinction is described in :doc:`mosaicking`, but in the simplest terms a pointing is a set of exposures covering the same FoV on the sky, a dataset is a set of exposures obtained within the same OB, which therefore share the same calibration data, and a group is a set od datasets which the user wishes to mosaic together, usually because they cover the same science target.
 
 Then under your data root folder <my_data_folder> create the following folder structure::
 
@@ -44,7 +44,7 @@ Then under your data root folder <my_data_folder> create the following folder st
 Each dataset, or OB for short, has a ``Raw`` folder.
 
 The next step is to download your MUSE data (including raw calibrations) from the
-ESO web site, and put all the raw files (in fitsor fits.gz format) into each individual
+ESO web site, and put all the raw files (in fits or fits.gz format) into each individual
 ``Raw`` folders, associated with the right dataset.
 
 Step 2: Preparing your configuration files
@@ -119,47 +119,6 @@ Other options can be useful:
    * ``overwrite_astropy_table``: by default this is False. If True, new runs will rewrite the Astropy output tables.
    * ``time_astrometry```: by default it is False, meaning the pipeline will try to detect a GEOMETRY and ASTROMETRY Files delivered with the Rawfiles by ESO. If set to True, it will use the time dependent astro/geo files provided by the GTO Team but you would need to make these available on your system.Hence I would recommend to keep the default (False).
 
-Under the hood of run_recipes
-""""""""""""""""""""""""""""""""""""""""""""""
-
-``run_recipes()`` launches a default set of functions listed below::
-
-   # generate the master bias using the muse_bias esorex recipe
-   mypipe.run_bias()
-   # generate the master flat using the muse_flat esorex recipe
-   mypipe.run_flat()
-   # generate the wavelength calibration using the muse_wavecal esorex recipe
-   mypipe.run_wave()
-   # generate the lsf using the muse_lsf esorex recipe
-   mypipe.run_lsf()
-   # generate the illumination correction using the muse_lsf esorex recipe
-   mypipe.run_twilight(illum=True)
-   # process individual exposures to remove the instrumental signature usign the muse_scibasic 
-   # esorex recipes. It runs on both the object, standard star and sky exposures
-   mypipe.run_scibasic_all(illum=True)
-   # generates the response function using the standard star observations and the muse_standard 
-   # esorex recipe
-   mypipe.run_standard()
-   # uses the sky exposures to generate a sky spectrum
-   mypipe.run_sky(fraction=0.8)
-   # runs the esosex muse_scipost recipe individually on each object exposures generating 
-   # a datacubes and image in the requested filter for each exposure. 
-   # These images are then used for aligment.
-   mypipe.run_prep_align()
-   # runs the muse_exp_align recipe to generate an OFFSET_TABLE files containing the astrometric
-   # shifts between individual exposures. Pymusepipe provides more refined options for this
-   mypipe.run_align_bydataset()
-   # ??
-   mypipe.run_align_bygroup()
-   # generates the final aligned datacubes for individual exposures using muse_scipost
-   mypipe.run_scipost_perexpo()
-   # generates the sky datacube
-   mypipe.run_scipost_sky()
-   # merge exposures in the final datacube
-   mypipe.combine_dataset()
-       
-Individual pipeline stages can be (re)run by calling any of the individual functions
-above. The order is important, as in any data reduction process
 
 .. attention:: 
    This pipeline flow closely mirrors the standard data reduction for MUSE data implemented
