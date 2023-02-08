@@ -229,7 +229,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Checking input datasets and pixtables
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
         if check:
-            self._get_all_pixtables()
+            self.get_all_pixtables()
         # Setting of pointing table ---------------------------------------
             self.assign_pointing_table(input_table=pointing_table, format=pointing_table_format,
                                        folder=pointing_table_folder)
