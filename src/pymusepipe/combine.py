@@ -426,7 +426,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
             # For this dataset, now sort things according to the dictionary
             list_pixtabs.sort()
-            upipe.print_info(f"Found {len(list_pixtabs)} for Dataset {dataset:03d}")
+            upipe.print_info(f"Found {len(list_pixtabs)} PixTables for Dataset {dataset:03d}")
             self.dict_allpixtabs_in_datasets[dataset] = list_pixtabs
 
     def assign_pointing_table(self, input_table=None, folder='', format='ascii'):

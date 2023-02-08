@@ -985,7 +985,7 @@ def scan_filenames_from_list(list_files, **kwargs):
     filtername = kwargs.pop("filtername", None)
 
     for filename in list_files:
-        shortname = os.split(filename)[1]
+        shortname = os.path.split(filename)[1]
         fdataset, ftpls, fexpo = get_dataset_tpl_nexpo(shortname, str_dataset=str_dataset,
                                                        ndigits=ndigits, filtername=filtername)
         # Exclude file which didn't have a proper dataset
