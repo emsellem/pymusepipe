@@ -105,7 +105,8 @@ default_reference_unit = u.microJansky
 
 dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
                       "DUPONT_R": u.spectral_density(6483.58 * u.AA),
-                      "Legacy_r": u.spectral_density(6483.58 * u.AA)}
+                      "Legacy_r": u.spectral_density(6483.58 * u.AA),
+                      "SDSS_r": u.spectral_density(6231 * u.AA)}
 # ================== Useful function ====================== #
 
 
