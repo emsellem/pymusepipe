@@ -21,13 +21,16 @@ import numpy as np
 # pymusepipe modules
 from . import util_pipe as upipe
 from .create_sof import SofPipe
-from .align_pipe import create_offset_table, AlignMuseDataset
+from .align_pipe import AlignMuseDataset
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
+from .util_pipe import check_filter_list
+from .util_image import create_offset_table
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
                           dict_recipes_per_num, dict_recipes_per_name,
                           dict_files_iexpo_products, dict_files_products,
                           dict_products_scipost)
+from .emission_lines import get_emissionline_band
 
 try :
     import astropy as apy
@@ -74,9 +77,10 @@ def _get_combine_products(filter_list='white', prefix_all=""):
     suffix_products = []
     suffix_prefinalnames = []
     prefix_products = []
+    filter_list = check_filter_list(filter_list)
     for prod in dict_products_scipost['cube']:
         if prod == "IMAGE_FOV":
-            for i, value in enumerate(filter_list.split(','), start=1):
+            for i, value in enumerate(filter_list, start=1):
                 suffix_products.append(f"_{i:04d}")
                 suffix_prefinalnames.append(f"_{value}")
                 name_products.append(prod)
@@ -567,7 +571,7 @@ class PipePrep(SofPipe) :
             # Run the recipe to reduce the standard (muse_scibasic)
             suffix = get_suffix_product(expotype)
             name_products = []
-            list_expo = np.arange(Nexpo).astype(np.int) + 1
+            list_expo = np.arange(Nexpo).astype(int) + 1
             for iexpo in list_expo:
                 name_products += ['{0:04d}-{1:02d}.fits'.format(iexpo, j+1) for j in range(24)]
             self.recipe_scibasic(self.current_sof, tpl, expotype, dir_products, name_products, suffix)
@@ -612,7 +616,7 @@ class PipePrep(SofPipe) :
         # Create the dictionary for the STD Sof
         for i in range(len(std_table)):
             mytpl = std_table['tpls'][i]
-            iexpo = np.int(std_table['iexpo'][i])
+            iexpo = int(std_table['iexpo'][i])
             if tpl != "ALL" and tpl != mytpl :
                 continue
             # Now starting with the standard recipe
@@ -661,7 +665,7 @@ class PipePrep(SofPipe) :
         for i in range(len(sky_table)):
             mytpl = sky_table['tpls'][i]
             mymjd = sky_table['mjd'][i]
-            iexpo = np.int(sky_table['iexpo'][i])
+            iexpo = int(sky_table['iexpo'][i])
             if tpl != "ALL" and tpl != mytpl :
                 continue
             # Now starting with the standard recipe
@@ -694,7 +698,7 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo(expotype, "processed")
 
         for i in range(len(object_table)):
-            iexpo = np.int(object_table['iexpo'][i])
+            iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             if tpl != "ALL" and tpl != mytpl :
                 continue
@@ -713,16 +717,15 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo("OBJECT", "processed")
 
         # Filter used for the alignment
-        filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_for_alignment = extra_kwargs.get("filter_for_alignment", self.filter_for_alignment)
         if self.verbose:
             upipe.print_info("Filter for alignment is {0}".format(
                 filter_for_alignment), pipe=self)
 
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
-        [lmin, lmax] = upipe.get_emissionline_band(line=line, 
-                                                   velocity=self.vsystemic, 
-                                                   lambda_window=lambda_window)
+        [lmin, lmax] = get_emissionline_band(line=line, velocity=self.vsystemic,
+                                             lambda_window=lambda_window)
 
         # Tag the suffix with the prealign suffix
         suffix = "{0}{1}".format(suffix, self._suffix_prealign)
@@ -732,7 +735,7 @@ class PipePrep(SofPipe) :
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
-            iexpo = np.int(object_table['iexpo'][i])
+            iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             if tpl != "ALL" and tpl != mytpl :
                 continue
@@ -754,16 +757,15 @@ class PipePrep(SofPipe) :
         object_table = self._get_table_expo("OBJECT", "processed")
 
         # Filter used for the alignment
-        filter_for_alignment = extra_kwargs.pop("filter_for_alignment", self.filter_for_alignment)
+        filter_for_alignment = extra_kwargs.get("filter_for_alignment", self.filter_for_alignment)
         if self.verbose:
             upipe.print_info("Filter for alignment is {0}".format(
                 filter_for_alignment), pipe=self)
 
         # Getting the band corresponding to the line
         lambda_window = extra_kwargs.pop("lambda_window", 10.0)
-        [lmin, lmax] = upipe.get_emissionline_band(line=line, 
-                                                   velocity=self.vsystemic, 
-                                                   lambda_window=lambda_window)
+        [lmin, lmax] = get_emissionline_band(line=line, velocity=self.vsystemic,
+                                             lambda_window=lambda_window)
 
         # Tag the suffix with the prealign suffix
         suffix = "{0}{1}".format(suffix, self._suffix_checkalign)
@@ -773,9 +775,9 @@ class PipePrep(SofPipe) :
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
-            iexpo = np.int(object_table['iexpo'][i])
+            iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
-            if tpl != "ALL" and tpl != mytpl :
+            if tpl != "ALL" and tpl != mytpl:
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
@@ -788,7 +790,7 @@ class PipePrep(SofPipe) :
 
     @print_my_function_name
     def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT", 
-                            tpl="ALL", stage="processed", 
+                            list_tplexpo="ALL", stage="processed",
                             suffix="", offset_list=False, **kwargs):
         """Launch the scipost command exposure per exposure
 
@@ -801,10 +803,10 @@ class PipePrep(SofPipe) :
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
-            iexpo = np.int(object_table['iexpo'][i])
+            iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
             # Skip this exposure if tpl does not match
-            if tpl != "ALL" and tpl != mytpl :
+            if list_tplexpo != "ALL" and [mytpl, iexpo] not in list_tplexpo:
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
@@ -822,14 +824,17 @@ class PipePrep(SofPipe) :
         suffix_postfinalnames = []
         extlist_expo = []
         list_options = save.split(',')
-        if filter_list is None: filter_list = self.filter_list
+
+        if filter_list is None:
+            filter_list = self.filter_list
+        filter_list = check_filter_list(filter_list)
+
         if self.verbose:
             upipe.print_info("Filter list is {0}".format(filter_list), pipe=self)
         for option in list_options:
             for prod in dict_products_scipost[option]:
                 if prod == "IMAGE_FOV":
-                    for i, value in enumerate(filter_list.split(','), 
-                            start=1):
+                    for i, value in enumerate(filter_list, start=1):
                         name_products.append(prod)
                         suffix_products.append("_{0:04d}".format(i))
                         suffix_prefinalnames.append("_{0}".format(value))
@@ -960,7 +965,7 @@ class PipePrep(SofPipe) :
             thisfile_musemode = expo_table[0]['mode']
             upipe.print_info("For this sky continuum, we use MUSE Mode = {0}".format(thisfile_musemode))
             mycont.integrate(mymusefilter, ao_mask=("-AO-" in thisfile_musemode))
-            mycont.get_normfactor(background, filter_for_alignment)
+            mycont.set_normfactor(background, filter_for_alignment)
             normalise_factor = getattr(mycont, filter_for_alignment).norm
 
         # Returning the name of the normalised continuum
@@ -1041,7 +1046,7 @@ class PipePrep(SofPipe) :
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         filter_list = kwargs.pop("filter_list", self.filter_list)
 
-        # Offsets
+        # Offsets (default is false, i.e. ignore the offset list)
         offset_list = kwargs.pop("offset_list", False)
         name_offset_table = kwargs.pop("name_offset_table", None)
         folder_offset_table = kwargs.pop("folder_offset_table", None)

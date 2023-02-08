@@ -36,7 +36,7 @@ from .recipes_pipe import PipeRecipes
 from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
-from .util_pipe import (filter_list_with_pdict, get_dataset_name, 
+from .util_pipe import (filter_list_with_pdict, get_dataset_name, get_pointing_name, 
                         get_tpl_nexpo, merge_dict, add_string)
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
@@ -74,7 +74,7 @@ def get_list_periods(root_path=""):
     for folder in list_folders:
         lint = re.findall(r'(\d{3})', folder)
         if len(lint) > 0:
-            list_periods.append(np.int(lint[-1]))
+            list_periods.append(int(lint[-1]))
 
     list_periods.sort()
     upipe.print_info("Periods list: {0}".format(str(list_periods)))
@@ -100,13 +100,49 @@ def get_list_targets(folder=""):
     upipe.print_info("Potential Targets -- list: {0}".format(str(list_targets)))
     return list_targets
 
+
+def build_dict_datasets(data_path="", str_dataset=default_str_dataset, ndigits=default_ndigits):
+    """Build a dictionary of datasets for each target in the sample
+
+    Input
+    ------
+    data_path: str
+       Path of the target data
+    str_dataset: str
+        Prefix string for datasets
+    ndigits: int
+       Number of digits to format the name of the dataset
+
+    Returns
+    -------
+    dict_dataset: dict
+
+    """
+    list_targets = get_list_targets(data_path)
+    dict_dataset = {}
+
+    npath = os.path.normpath(data_path)
+    s_npath = npath.split(os.sep)
+
+    for target in list_targets:
+        target_path = f"{data_path}/{target}/"
+        list_datasets = get_list_datasets(target_path, str_dataset, ndigits)
+        dict_t = {}
+        for ds in list_datasets:
+            dict_t[ds] = 1
+
+        dict_dataset[target] = [s_npath[-1], dict_t]
+
+    return dict_dataset
+        
+
 def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
                          ndigits=default_ndigits, show_pointings=False):
     """Build a dictionary of exposures using the list of datasets found for the
     given dataset path
 
-    Parameters
-    ----------
+    Input
+    ------
     target_path: str
        Path of the target data
     str_dataset: str
@@ -144,7 +180,7 @@ def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
     return dict_expos
 
 def get_list_datasets(target_path="", str_dataset=default_str_dataset,
-                      ndigits=default_ndigits):
+                      ndigits=default_ndigits, verbose=False):
     """Getting the list of existing datasets for a given target path
 
     Input
@@ -161,17 +197,23 @@ def get_list_datasets(target_path="", str_dataset=default_str_dataset,
     list_datasets: list of int
     """
     # Done by scanning the target path
-    upipe.print_info(f"Searching datasets in {target_path} with {str_dataset} prefix")
+    if verbose:
+        upipe.print_info(f"Searching datasets in {target_path} with {str_dataset} prefix")
     all_folders = glob.glob(f"{target_path}/{str_dataset}*")
-    upipe.print_info(f"All folder names  = {all_folders}")
+    if verbose:
+        upipe.print_info(f"All folder names  = {all_folders}")
     all_datasets = [os.path.split(s)[-1] for s in all_folders]
-    upipe.print_info(f"All detected folder names  = {all_datasets}")
+    all_datasets.sort()
+    if verbose:
+        upipe.print_info(f"All detected folder names  = {all_datasets}")
     r = re.compile(f"{str_dataset}\d{{{ndigits}}}$")
     good_datasets = [f for f in all_datasets if r.match(f)]
-    upipe.print_info(f"All good folder names  = {good_datasets}")
+    good_datasets.sort()
+    if verbose:
+        upipe.print_info(f"All good folder names  = {good_datasets}")
     list_datasets = []
     for folder in good_datasets:
-        list_datasets.append(np.int(folder[-int(ndigits):]))
+        list_datasets.append(int(folder[-int(ndigits):]))
 
     list_datasets.sort()
     upipe.print_info("Dataset list: {0}".format(str(list_datasets)))
@@ -265,10 +307,10 @@ def get_list_reduced_pixtables(target_path="", list_datasets=None,
             tpl = sl[1].split("_" + expo)[0]
             # If not already there, add it
             if tpl not in dict_tpl:
-                dict_tpl[tpl] = [np.int(expo)]
+                dict_tpl[tpl] = [int(expo)]
             # if already accounted for, add the expo number
             else:
-                dict_tpl[tpl].append(np.int(expo))
+                dict_tpl[tpl].append(int(expo))
 
         # Creating the full list for that dataset
         full_list = []
@@ -332,6 +374,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self._debug = debug
         if self._debug:
             upipe.print_warning("In DEBUG Mode [more printing]")
+        check = kwargs.pop("check", True)
 
         # Warnings for astropy
         self.warnings = kwargs.pop("warnings", 'ignore')
@@ -349,7 +392,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                           default_filter_list)
 
         self.combined_folder_name = combined_folder_name
-        self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
+        self.vsystemic = float(kwargs.pop("vsystemic", 0.))
 
         # Including or not the masked Pixtables in place of the original ones
         self.use_masked_pixtables = kwargs.pop("use_masked_pixtables", False)
@@ -384,11 +427,12 @@ class MusePointings(SofPipe, PipeRecipes):
 
         self.pipe_params.init_default_param(dict_combined_folders)
         self._dict_combined_folders = dict_combined_folders
-
-        # List of pointings to process
-        self.list_pointings = list_pointings
         # List of datasets to process
         self.list_datasets = self._check_list_datasets(list_datasets)
+        if check:
+            # List of pointings to process
+            self.list_pointings = self._check_list_pointings(list_pointings)
+
         # Setting all the useful paths
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
@@ -401,6 +445,9 @@ class MusePointings(SofPipe, PipeRecipes):
         # =========================================================== 
         # ---------------------------------------------------------
         # Create the Combined folder
+        # Making the output folders in a safe mode
+        if self.verbose:
+            upipe.print_info("Creating directory structure")
         upipe.safely_create_folder(self.paths.data, verbose=verbose)
 
         # Go to the Combined Folder
@@ -412,18 +459,37 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Checking input datasets and pixtables
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
-        self._get_list_reduced_pixtables(dict_exposures)
+        if check:
+            self._get_list_reduced_pixtables(dict_exposures)
 
         # Checking input offset table and corresponding pixtables
-        self._check_offset_table(name_offset_table, folder_offset_table)
+        if check:
+            self._check_offset_table(name_offset_table, folder_offset_table)
         # END CHECK UP ============================================
-
-        # Making the output folders in a safe mode
-        if self.verbose:
-            upipe.print_info("Creating directory structure")
 
         # Going back to initial working directory
         self.goto_origfolder()
+
+    def _check_list_pointings(self, list_pointings=None, default_list=None):
+        """Check which datasets exist
+
+        Input
+        -----
+        list_pointings: list of int
+                List of datasets to consider
+        default_list: list
+            Default list. If None, will use the full list of available datasets
+
+        Returns
+        --------
+        list_datasets after checking they exist
+        """
+        # Using the function check_list_datasets for this usage
+        # But it will just check the list
+        return self._check_list_datasets(list_datasets=list_pointings,
+                                         default_list=default_list,
+                                         listname="Pointings")
+
 
     @property
     def full_list_datasets(self):
@@ -431,16 +497,23 @@ class MusePointings(SofPipe, PipeRecipes):
                                  ndigits=self.pipe_params.ndigits,
                                  str_dataset=self.pipe_params.str_dataset)
 
-    def _check_list_datasets(self, list_datasets=None, default_list=None):
+    def _check_list_datasets(self, list_datasets=None, default_list=None, **kwargs):
         """Check which datasets exist
 
         Input
-            list_datasets: list of int
-                List of datasets to consider
+        ------
+        list_datasets: list of int
+            List of datasets to consider
+        default_list: list
+            Default list. If None, will use the full list of available datasets
 
-        Returns:
-            list_datasets after checking they exist
+        Returns
+        -------
+        list_datasets after checking they exist
         """
+        listname = kwargs.pop("listname", "Datasets")
+        verbose = kwargs.pop("verbose", False)
+
         if default_list is None:
             default_list = self.full_list_datasets
         # Now the list of datasets
@@ -448,14 +521,15 @@ class MusePointings(SofPipe, PipeRecipes):
             # This is using all the existing datasets
             return default_list
         else:
-            upipe.print_info(f"Wished dataset list = {list_datasets}")
-            upipe.print_warning(f"Target default dataset list = {default_list}")
+            if verbose:
+                upipe.print_info(f"Wished {listname} list = {list_datasets}")
+                upipe.print_warning(f"Target default {listname} list = {default_list}")
             # Checked ones
             checked_list_datasets = list(set(list_datasets) & set(default_list))
             # Not existing ones
             notfound = list(set(list_datasets) - set(default_list))
             for l in notfound:
-                upipe.print_warning(f"No dataset {l} for the given target")
+                upipe.print_warning(f"No {listname} {l} for the given target")
 
             return checked_list_datasets
 
@@ -481,6 +555,7 @@ class MusePointings(SofPipe, PipeRecipes):
     def _get_list_reduced_pixtables(self, dict_exposures=None):
         """Check if datasets and dictionary are compatible
         """
+        upipe.print_info("Checking the list of reduced PixTables")
         # Dictionary of exposures to select per dataset
         self.dict_exposures = dict_exposures
 
@@ -493,6 +568,8 @@ class MusePointings(SofPipe, PipeRecipes):
         self.dict_pixtabs_in_datasets = {}
         self.dict_allpixtabs_in_datasets = {}
         self.dict_pixtabs_in_pointings = {}
+        self.dict_tplexpo_per_pointing = {}
+        self.dict_tplexpo_per_dataset = {}
         # Loop on Datasets
         for dataset in self.list_datasets:
             # get the path
@@ -547,13 +624,18 @@ class MusePointings(SofPipe, PipeRecipes):
             self.dict_allpixtabs_in_datasets[dataset] = full_list
 
             # Filter the list with the dataset dictionary if given
-            select_list_pixtabs, tempp_dict_pixtabs = filter_list_with_pdict(list_pixtabs,
-                                                         list_datasets=[dataset],
-                                                         dict_files=self.dict_exposures,
-                                                         verbose=self.verbose)
+            select_list_pixtabs, tempp_dict_pixtabs, tempp_dict_tplexpo_per_pointing, \
+                tempp_dict_tplexpo_per_dataset = filter_list_with_pdict(list_pixtabs,
+                                                                        list_datasets=[dataset],
+                                                                        dict_files=self.dict_exposures,
+                                                                        verbose=self.verbose)
 
             self.dict_pixtabs_in_pointings = merge_dict(self.dict_pixtabs_in_pointings, 
                                                         tempp_dict_pixtabs)
+            self.dict_tplexpo_per_pointing = merge_dict(self.dict_tplexpo_per_pointing,
+                                                        tempp_dict_tplexpo_per_pointing)
+            self.dict_tplexpo_per_dataset = merge_dict(self.dict_tplexpo_per_dataset,
+                                                        tempp_dict_tplexpo_per_dataset)
             select_list_pixtabs.sort()
             self.dict_pixtabs_in_datasets[dataset] = copy.copy(select_list_pixtabs)
 
@@ -624,7 +706,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Checking existence of each pixel_table in the offset table
         nexcluded_pixtab = 0
         nincluded_pixtab = 0
-        for dataset in self.list_dataset:
+        for dataset in self.list_datasets:
             pixtab_to_exclude = []
             for pixtab_name in self.dict_pixtabs_in_datasets[dataset]:
                 pixtab_header = pyfits.getheader(pixtab_name)
@@ -702,19 +784,19 @@ class MusePointings(SofPipe, PipeRecipes):
         # Creating the filenames for Master files
         self.dict_name_datasets = {}
         for dataset in self.list_datasets:
-            name_dataset = "P{0:02d}".format(np.int(dataset))
+            name_dataset = get_dataset_name(dataset, self.pipe_params.str_dataset,
+                                            self.pipe_params.ndigits)
             self.dict_name_datasets[dataset] = name_dataset
             # Adding the path of the folder
-            setattr(self.paths, name_dataset,
-                    joinpath(self.paths.root, "{0}/P{1:02d}/".format(self.targetname, dataset)))
+            setattr(self.paths, name_dataset, joinpath(self.paths.root,
+                                                       f"{self.targetname}/{name_dataset}/"))
 
         # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
         for name in self.pipe_params._dict_folders_target:
             setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dict_folders_target[name]))
 
-    def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True,
-                             reference_cube=True, refcube_name=None,
-                             **kwargs):
+    def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True, reference_cube=True,
+                             refcube_name=None, **kwargs):
         """Create the WCS reference files, for all individual pointings and for
         the mosaic.
 
@@ -766,10 +848,8 @@ class MusePointings(SofPipe, PipeRecipes):
                                         lambdaminmax_wcs=lambdaminmax_for_mosaic,
                                         refcube_name=wcs_refcube_name)
 
-    def run_combine_all_single_pointings(self, add_suffix="",
-                                         sof_filename='pointings_combine',
-                                         list_pointings=None,
-                                         **kwargs):
+    def run_combine_all_single_pointings(self, add_suffix="", sof_filename='pointings_combine',
+                                         list_pointings=None, **kwargs):
         """Run for all pointings individually, provided in the
         list of pointings, by just looping over the pointings.
 
@@ -791,19 +871,17 @@ class MusePointings(SofPipe, PipeRecipes):
             Default is 4000 and 10000 for the lower and upper limits, resp.
         """
         # If list_pointings is None using the initially set up one
-        list_pointings = self._check_pointings_list(list_pointings,
-                                                    self.list_pointings)
+        list_pointings = self._check_list_pointings(list_pointings, self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Combining single pointings - Pointing {0:02d}".format(
-                             np.int(pointing)))
+                             int(pointing)))
             self.run_combine_single_pointing(pointing, add_suffix=add_suffix,
                                           sof_filename=sof_filename,
                                           **kwargs)
 
-    def run_combine_single_pointing(self, pointing, add_suffix="",
-                                    sof_filename='pointing_combine',
+    def run_combine_single_pointing(self, pointing, add_suffix="", sof_filename='pointing_combine',
                                     **kwargs):
         """Running the combine routine on just one single pointing
 
@@ -826,8 +904,7 @@ class MusePointings(SofPipe, PipeRecipes):
         """
 
         # getting the suffix with the additional PXX
-        ### ICI ICI ICI
-        suffix = "{0}_P{1:02d}".format(add_suffix, np.int(pointing))
+        suffix = f"{add_suffix}_{get_pointing_name(pointing)}"
 
         ref_wcs = kwargs.pop("ref_wcs", None)
         wcs_from_pointing = kwargs.pop("wcs_from_pointing", False)
@@ -843,18 +920,13 @@ class MusePointings(SofPipe, PipeRecipes):
                 prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
                 self.add_targetname = kwargs.pop("add_targetname", True)
                 prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
-                ref_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
-                                                        prefix_final_cube,
-                                                        np.int(pointing))
+                ref_wcs = f"{prefix_wcs}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
 
         # Running the combine for that single pointing
-        self.run_combine(list_pointings=[np.int(pointing)], suffix=suffix,
-                         sof_filename=sof_filename,
-                         ref_wcs=ref_wcs,
-                         **kwargs)
+        self.run_combine(list_pointings=[int(pointing)], suffix=suffix, sof_filename=sof_filename,
+                         ref_wcs=ref_wcs, **kwargs)
 
-    def create_all_pointings_wcs(self, filter_list="white",
-                                 list_pointings=None, **kwargs):
+    def create_all_pointings_wcs(self, filter_list="white", list_pointings=None, **kwargs):
         """Create all pointing masks one by one
         as well as the wcs for each individual pointings. Using the grid
         from the global WCS of the mosaic but restricting it to the 
@@ -867,19 +939,17 @@ class MusePointings(SofPipe, PipeRecipes):
             List of filter names to be used. 
         """
         # If list_pointings is None using the initially set up one
-        list_pointings = self._check_pointings_list(list_pointings,
-                                                    self.list_pointings)
+        list_pointings = self._check_list_pointings(list_pointings, self.list_pointings)
 
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Making WCS Mask for "
-                             "Pointing {0:02d}".format(np.int(pointing)))
+                             "Pointing {get_pointing_name(pointing)}")
             _ = self.create_pointing_wcs(pointing=pointing,
                                          filter_list=filter_list, **kwargs)
 
-    def create_pointing_wcs(self, pointing,
-            lambdaminmax_mosaic=lambdaminmax_for_mosaic,
-            filter_list="white", **kwargs):
+    def create_pointing_wcs(self, pointing, lambdaminmax_mosaic=lambdaminmax_for_mosaic,
+                            filter_list="white", **kwargs):
         """Create the mask of a given pointing
         And also a WCS file which can then be used to compute individual
         pointings with a fixed WCS.
@@ -923,19 +993,15 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
 
         # ICI ICI ICI
-        name_mask = "{0}{1}_P{2:02d}.fits".format(prefix_mask,
-                                                  prefix_final_cube,
-                                                  np.int(pointing))
-        finalname_wcs = "{0}{1}_P{2:02d}.fits".format(prefix_wcs,
-                                               prefix_final_cube,
-                                               np.int(pointing))
+        name_mask = f"{prefix_mask}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
+        finalname_wcs = f"{prefix_wcs}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
 
         # First create a subcube without all the Nan
         mask_cube = MuseCube(filename=joinpath(dir_mask, name_mask))
 
         # Creating the new cube
         upipe.print_info("Now creating the Reference WCS cube "
-                         "for pointing {0}".format(np.int(pointing)))
+                         "for pointing {0}".format(int(pointing)))
         cfolder, cname = mask_cube.create_reference_cube(
                 lambdamin=lambdaminmax_mosaic[0],
                 lambdamax=lambdaminmax_mosaic[1], 
@@ -952,23 +1018,21 @@ class MusePointings(SofPipe, PipeRecipes):
         return full_cname
 
     def extract_combined_narrow_wcs(self, name_cube=None, **kwargs):
-        """Create the reference WCS from the full mosaic with
-        only 2 lambdas
+        """Create the reference WCS from the full mosaic with only 2 lambdas
 
         Input
         -----
         name_cube: str
-            Name of the cube. Can be None, and then the final
-            datacube from the combine folder will be used.
+            Name of the cube. Can be None, and then the final datacube from the combine
+            folder will be used.
         wave1: float - optional
-            Wavelength taken for the extraction. Should only
-            be present in all spaxels you wish to get.
+            Wavelength taken for the extraction. Should only be present in all spaxels
+            you wish to get.
         prefix_wcs: str - optional
-            Prefix to be added to the name of the input cube.
-            By default, will use "refwcs".
-        add_targetname: bool [True]
-            Add the name of the target to the name of the output
-            WCS reference cube. Default is True.
+            Prefix to be added to the name of the input cube. By default, will use "refwcs".
+        add_targetname: bool default=True
+            Add the name of the target to the name of the output WCS reference cube.
+            Default is True.
 
         Creates:
             Combined narrow band WCS cube
@@ -1009,9 +1073,8 @@ class MusePointings(SofPipe, PipeRecipes):
         upipe.print_info("...Done")
         return full_cname
 
-    def create_combined_wcs(self, refcube_name=None,
-            lambdaminmax_wcs=lambdaminmax_for_wcs,
-            **kwargs):
+    def create_combined_wcs(self, refcube_name=None, lambdaminmax_wcs=lambdaminmax_for_wcs,
+                            **kwargs):
         """Create the reference WCS from the full mosaic
         with a given range of lambda.
 
@@ -1108,7 +1171,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.goto_folder(self.paths.data, addtolog=True)
 
         # If list_pointings is None using the initially set up one
-        list_pointings = self._check_pointings_list(list_pointings, self.list_pointings)
+        list_pointings = self._check_list_pointings(list_pointings, self.list_pointings)
 
         # If only 1 exposure, duplicate the pixtable
         # as exp_combine needs at least 2 pixtables
@@ -1152,15 +1215,14 @@ class MusePointings(SofPipe, PipeRecipes):
                 # getting the name of the final datacube (mosaic)
                 cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
                 cube_suffix = self._add_targetname(cube_suffix)
-                ref_wcs = "{0}{1}.fits".format(prefix_wcs, cube_suffix)
-            upipe.print_warning("ref_wcs used is {0}".format(ref_wcs))
+                ref_wcs = f"{prefix_wcs}{cube_suffix}.fits"
+            upipe.print_warning("ref_wcs used is {ref_wcs}")
 
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", upipe.normpath(self.paths.cubes))
         if ref_wcs is not None:
             full_ref_wcs = joinpath(folder_ref_wcs, ref_wcs)
             if not os.path.isfile(full_ref_wcs):
-                upipe.print_error("Reference WCS file {0} does not exist".format(
-                    full_ref_wcs))
+                upipe.print_error("Reference WCS file {full_ref_wcs} does not exist")
                 upipe.print_error("Consider using the create_combined_wcs recipe"
                                   " if you wish to create pointing masks. Else"
                                   " just check that the WCS reference file exists.")

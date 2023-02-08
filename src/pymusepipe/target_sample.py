@@ -31,7 +31,8 @@ from .align_pipe import rotate_pixtables
 from .mpdaf_pipe import MuseCubeMosaic, MuseCube
 from .prep_recipes_pipe import dict_products_scipost
 from .version import __version__ as version_pack
-from .util_pipe import add_string
+from .util_pipe import (add_string, get_pointing_name, get_dataset_name,
+                        check_filter_list)
 
 from astropy.table import Table
 
@@ -56,7 +57,9 @@ def insert_suffix(filename, suffix=""):
     """
     # Create new name
     sfilename, extension = os.path.splitext(filename)
-    return "{0}_{1}{2}".format(sfilename, suffix, extension)
+    if suffix != "":
+        suffix = f"_{suffix}"
+    return "{0}{1}{2}".format(sfilename, suffix, extension)
 
 
 def update_calib_file(filename, subfolder="", folder_config=""):
@@ -324,13 +327,13 @@ class MusePipeSample(object):
                                              rc_filename=rc_filename,
                                              cal_filename=cal_filename,
                                              folder_config=folder_config,
-                                             verbose=False)
+                                             verbose=False, check=False)
             self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
 
             if self.init_pipes:
                 self.set_pipe_target(targetname, **kwargs_init)
 
-    def _check_list_datasets(self, targetname, list_datasets):
+    def _check_list_datasets_for_target(self, targetname, list_datasets):
         """Check if dataset is in the list of datasets
         Returns the list of datasets if ok. If not, return an empty list
 
@@ -408,7 +411,7 @@ class MusePipeSample(object):
         upipe.print_info("=== Initialising MusePipe for Target {name} ===".format(name=targetname))
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
@@ -420,7 +423,7 @@ class MusePipeSample(object):
         if self.__phangs:
             config_args = PHANGS_reduc_config
             # Set overwrite to False to keep existing tables
-            config_args['overwrite_astropy_table'] = False
+            config_args['overwrite_astropy_tables'] = False
         else:
             config_args = kwargs.pop("config_args", None)
 
@@ -446,8 +449,7 @@ class MusePipeSample(object):
             upipe.print_info("Initialise Pipe for Target = {0:10s} / Dataset {1:03d} ".format(
                                  targetname, dataset))
             # New log file name with dataset included
-            log_filename_dataset = "{0}_P{1:03d}{2}".format(
-                                    log_filename, dataset, log_fileext)
+            log_filename_dataset = f"{log_filename}_{get_pointing_name(dataset)}{log_fileext}"
             # Setting up the names of the output files
             python_command = ("mypipe = musepipe.MusePipe(targetname='{0}', "
                               "dataset={1}, folder_config='{2}', " 
@@ -602,7 +604,7 @@ class MusePipeSample(object):
             upipe.print_info("=========== CREATION OF WCS MASKS ==============")
             mosaic_wcs = kwargs.pop("mosaic_wcs", True)
             reference_cube = kwargs.pop("reference_cube", True)
-            datasets_wcs = kwargs.pop("datasets_wcs", True)
+            pointings_wcs = kwargs.pop("pointings_wcs", True)
             refcube_name = kwargs.pop("refcube_name", None)
             full_ref_wcs = kwargs.pop("full_ref_wcs", None)
             default_comb_folder = self.targets[targetname].combcubes_path
@@ -615,7 +617,7 @@ class MusePipeSample(object):
                                       reference_cube=reference_cube,
                                       refcube_name=refcube_name,
                                       mosaic_wcs=mosaic_wcs,
-                                      datasets_wcs=datasets_wcs,
+                                      pointings_wcs=pointings_wcs,
                                       list_datasets=list_datasets,
                                       ref_wcs=full_ref_wcs,
                                       folder_ref_wcs=folder_full_ref_wcs,
@@ -646,7 +648,7 @@ class MusePipeSample(object):
 
     def run_target_scipost_perexpo(self, targetname=None, list_datasets=None,
                                    folder_offset_table=None, name_offset_table=None,
-                                   **kwargs):
+                                   dict_exposures=None, **kwargs):
         """Build the cube per exposure using a given WCS
 
         Args:
@@ -658,7 +660,7 @@ class MusePipeSample(object):
 
         """
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
         upipe.print_info(f"List of datasets to be reduced: {list_datasets}")
         if len(list_datasets) == 0:
             return
@@ -684,28 +686,41 @@ class MusePipeSample(object):
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
         filter_list = kwargs.pop("filter_list", self._short_filter_list)
 
+        # initialisation of the combination to make sure we get the pointings right
+        # We will thus make use of the dict_tplexpo_in_pointing
+        self.init_combine(targetname=targetname, list_datasets=list_datasets,
+                          dict_exposures=dict_exposures)
+
         # Running the scipost_perexpo for all datasets individually
+        dict_tplexpo_per_dataset = self.pipes_combine[targetname].dict_tplexpo_per_dataset
         for dataset in list_datasets:
-            obname = self.pipes[targetname][dataset]._get_dataset_name(dataset)
-            if wcs_auto:
-                ref_wcs = f"{wcs_suffix}_{obname}.fits"
-            if ref_wcs is not None:
-                suffix = f"_WCS_{obname}"
-            else:
-                suffix = f"_{obname}"
-            kwargs_dataset = {'ref_wcs': ref_wcs,
-                               'suffix': suffix,
-                               'folder_ref_wcs': folder_ref_wcs,
-                               'sof_filename': 'scipost_wcs',
-                               'dir_products': default_comb_folder,
-                               'name_offset_table': name_offset_table,
-                               'folder_offset_table': folder_offset_table,
-                               'offset_list': True,
-                               'filter_list': filter_list,
-                               'prefix_all': prefix_all,
-                               'save': save}
-            kwargs.update(kwargs_dataset)
-            self.pipes[targetname][dataset].run_scipost_perexpo(**kwargs)
+            obname = self.pipes[targetname][dataset]._get_dataset_name()
+            # We now need to identify which tpls are there and which ref_wcs (pointing)
+            # For each dataset, we go through all pointings one by one since each has a ref_wcs
+            # We then use the list tpl and iexpo to pass to run_scipost_perexpo as list_tplexpo
+            for pointing in dict_tplexpo_per_dataset[dataset]:
+                pointing_name = get_pointing_name(pointing)
+                list_tplexpo = dict_tplexpo_per_dataset[dataset][pointing]
+                if wcs_auto:
+                    ref_wcs = f"{wcs_suffix}_{pointing_name}.fits"
+                if ref_wcs is not None:
+                    suffix = f"_WCS_{obname}"
+                else:
+                    suffix = f"_{obname}"
+                kwargs_dataset = {'ref_wcs': ref_wcs,
+                                  'suffix': suffix,
+                                  'folder_ref_wcs': folder_ref_wcs,
+                                  'sof_filename': 'scipost_wcs',
+                                  'dir_products': default_comb_folder,
+                                  'name_offset_table': name_offset_table,
+                                  'folder_offset_table': folder_offset_table,
+                                  'offset_list': True,
+                                  'filter_list': filter_list,
+                                  'prefix_all': prefix_all,
+                                  'list_tplexpo': list_tplexpo,
+                                  'save': save}
+                kwargs.update(kwargs_dataset)
+                self.pipes[targetname][dataset].run_scipost_perexpo(**kwargs)
 
     def run_target_recipe(self, recipe_name, targetname=None,
                           list_datasets=None, **kwargs):
@@ -736,7 +751,7 @@ class MusePipeSample(object):
                 first_recipe=recipe_name, last_recipe=recipe_name, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
@@ -801,7 +816,7 @@ class MusePipeSample(object):
             self.set_pipe_target(targetname=targetname, list_datasets=list_datasets, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
@@ -835,7 +850,7 @@ class MusePipeSample(object):
                                  list_datasets=list_datasets, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
 
         if len(list_datasets) == 0:
             return
@@ -862,28 +877,28 @@ class MusePipeSample(object):
                              list_ifu=None, angle=angle, fakemode=fakemode,
                              prefix=prefix, **kwargs)
 
-    def init_mosaic(self, targetname=None, list_pointings=None,
-                    prefix_cubes="DATACUBE_FINAL_WCS", **kwargs):
+    def init_mosaic(self, targetname=None, list_datasets=None, prefix_cubes="DATACUBE_FINAL_WCS",
+                    **kwargs):
         """Prepare the combination of targets
 
         Input
         -----
         targetname: str [None]
             Name of target
-        list_pointings: list [or None=default meaning all pointings]
-            List of pointings (e.g., [1,2,3])
+        list_datasets: list [or None=default meaning all datasets]
+            List of datasets (e.g., [1,2,3])
+        prefix_cubes: str default="DATACUBE_FINAL_WCS", optional
+            Prefix to be used to list the cubes to consider
         """
         add_targetname = kwargs.pop("add_targetname", self.add_targetname)
-        # Check if pointings are valid
-        list_pointings = self._check_pointings_list(targetname, list_pointings)
-        # Using the obname of the first pointing to define the function
-        get_pointing_name = self.pipes[targetname][list_pointings[0]]._get_pointing_name
-        if len(list_pointings) == 0:
-            return
+        # Check if pointings are ok
+        if list_datasets is None:
+            list_datasets = copy.copy(self.targets[targetname].list_datasets)
 
         # Make a list for the masking of the cubes to take into account
-        list_pointing_names = [f"{get_pointing_name(pointing)}"
-                              for pointing in list_pointings]
+        list_datasets_names = [f"{get_dataset_name(dataset)}"
+                                for dataset in list_datasets]
+        upipe.print_info(f"List of datasets names: {list_datasets_names}")
 
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
@@ -895,12 +910,13 @@ class MusePipeSample(object):
             wcs_prefix = ""
         ref_wcs = kwargs.pop("ref_wcs", "{0}{1}DATACUBE_FINAL.fits".format(
                              default_prefix_wcs_mosaic, wcs_prefix))
+        upipe.print_info(f"Check file: ref_wcs is {ref_wcs}")
 
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
                                                        folder_ref_wcs=folder_ref_wcs,
                                                        folder_cubes=folder_cubes,
                                                        prefix_cubes=prefix_cubes,
-                                                       list_suffix=list_pointing_names,
+                                                       list_suffix=list_datasets_names,
                                                        **kwargs)
 
     def convolve_mosaic_per_pointing(self, targetname=None, list_pointings=None,
@@ -936,8 +952,8 @@ class MusePipeSample(object):
 
         """
         # Filter list for the convolved exposures
-        filter_list = (kwargs.pop("filter_list",
-                                  self._short_filter_list)).split(',')
+        filter_list = kwargs.pop("filter_list", self._short_filter_list)
+        filter_list = check_filter_list(filter_list)
 
         # Initialise and filter with list of datasets
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
@@ -1002,8 +1018,8 @@ class MusePipeSample(object):
 
         """
         # Constructing the images for that mosaic
-        filter_list = (kwargs.pop("filter_list",
-                                  self._filter_list)).split(',')
+        filter_list = kwargs.pop("filter_list", self._filter_list)
+        filter_list = check_filter_list(filter_list)
 
         # Doing the mosaic with mad
         default_comb_folder = self.targets[targetname].combcubes_path

@@ -150,7 +150,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         Other possible entries
         ----------------------
-        overwrite_astropy_table: bool [True]
+        overwrite_astropy_tables: bool [True]
             Overwrite the astropy table even when it exists.
         warnings: str ['ignore']
             If set to 'ignore', will ignore the Astropy Warnings.
@@ -173,7 +173,7 @@ class MusePipe(PipePrep, PipeRecipes):
             warnings.simplefilter('ignore', category=AstropyWarning)
 
         # Overwriting option for the astropy table
-        self._overwrite_astropy_table = kwargs.pop("overwrite_astropy_table", True)
+        self._overwrite_astropy_tables = kwargs.pop("overwrite_astropy_tables", True)
         # Updating the astropy table
         self._update_astropy_table = kwargs.pop("update_astropy_table", False)
 
@@ -188,7 +188,7 @@ class MusePipe(PipePrep, PipeRecipes):
 
         # Setting the default attibutes #####################
         self.targetname = targetname
-        self.vsystemic = np.float(kwargs.pop("vsystemic", 0.))
+        self.vsystemic = float(kwargs.pop("vsystemic", 0.))
 
         # Setting other default attributes
         if log_filename is None:
@@ -241,16 +241,18 @@ class MusePipe(PipePrep, PipeRecipes):
         # Create full path folder 
         self.set_fullpath_names()
         self.paths.log_filename = joinpath(self.paths.log, log_filename)
+        # Create Log folder if needed
+        upipe.safely_create_folder(self.paths.log, verbose=verbose)
 
         # Go to the data directory
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
 
-        # Making the output folders in a safe mode
-        upipe.print_info("Creating directory structure", pipe=self)
         self.goto_folder(self.paths.data)
 
         # ==============================================
+        # Making the output folders in a safe mode
+        upipe.print_info("Creating directory structure", pipe=self)
         # Creating the extra pipeline folder structure
         for folder in self.pipe_params._dict_input_folders:
             upipe.safely_create_folder(self.pipe_params._dict_input_folders[folder],
@@ -386,7 +388,7 @@ class MusePipe(PipePrep, PipeRecipes):
         """Set the options for overwriting or updating the astropy tables
         """
         if overwrite is not None:
-            self._overwrite_astropy_table = overwrite
+            self._overwrite_astropy_tables = overwrite
         if update is not None:
             self._update_astropy_table = update
 
@@ -533,7 +535,7 @@ class MusePipe(PipePrep, PipeRecipes):
         name_table = self._get_fitstablename_expo('RAWFILES', "raw")
 
         # ---- File exists - we READ it ------------------- #
-        overwrite = kwargs.pop("overwrite", self._overwrite_astropy_table)
+        overwrite = kwargs.pop("overwrite", self._overwrite_astropy_tables)
         scan_raw = True
         if os.path.isfile(name_table):
             if overwrite:
@@ -542,7 +544,7 @@ class MusePipe(PipePrep, PipeRecipes):
             else:
                 upipe.print_warning("The raw files table already exists.\n"
                                     "If you wish to overwrite it, please turn "
-                                    "on the 'overwrite_astropy_table' option to "
+                                    "on the 'overwrite_astropy_tables' option to "
                                     "'True'.\n In the meantime, the existing "
                                     "table will be read and used.",
                                     pipe=self)
@@ -660,7 +662,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # If the file already exists
         # If overwrite is True we just continue and overwrite the table
         if os.path.isfile(full_tablename):
-            if self._overwrite_astropy_table:
+            if self._overwrite_astropy_tables:
                 upipe.print_warning(f"Astropy Table {fits_tablename} "
                                     f"exists and will be overwritten")
             # Check if we update
@@ -684,7 +686,7 @@ class MusePipe(PipePrep, PipeRecipes):
             # Check if we want to overwrite or add the line in
             else:
                 upipe.print_warning("Astropy Table {0} already exists, "
-                                    " use overwrite_astropy_table to "
+                                    " use overwrite_astropy_tables to "
                                     "overwrite it".format(fits_tablename),
                                     pipe=self)
                 return

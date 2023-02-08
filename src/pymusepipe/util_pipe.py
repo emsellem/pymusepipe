@@ -3,33 +3,24 @@
 """MUSE-PHANGS utility functions for pymusepipe
 """
 
-__authors__   = "Eric Emsellem"
+__authors__ = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "MIT License"
-__contact__   = " <eric.emsellem@eso.org>"
+__license__ = "MIT License"
+__contact__ = " <eric.emsellem@eso.org>"
 
-# Importing modules
+# Importing generic modules
 import os
 import time
-from os.path import join as joinpath
 import copy
 from collections import OrderedDict
 import re
 
-# Numpy
-import numpy as np
-
-from astropy import constants as const
+# Astropy
 from astropy.io import fits as pyfits
 
 # Import package modules
-from .emission_lines import list_emission_lines, full_muse_wavelength_range
-from .config_pipe import (default_filter_list, dict_musemodes,
-                          default_ndigits, default_str_dataset)
-from . import util_pipe as upipe
-
-# MPDAF
-from mpdaf.obj import Image, Cube
+from .config_pipe import (default_filter_list, dict_musemodes, default_short_filter_list,
+                          default_ndigits, default_str_pointing, default_str_dataset)
 
 
 #  PRINTING FUNCTIONS #
@@ -43,23 +34,26 @@ ENDC = '\033[0m'
 BOLD = '\033[1m'
 DEBUG = '\033[1m'
 
+
 def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)
+
 
 def print_warning(text, **kwargs):
     toprint = "# MusePipeWarning " + text
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-    except:
+    except AttributeError:
         pass
     try:
         verbose = mypipe.verbose
-    except:
+    except AttributeError:
         verbose = kwargs.pop("verbose", True)
     
     if verbose:
         print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
+
 
 def print_info(text, **kwargs):
     """Print processing information
@@ -74,17 +68,18 @@ def print_info(text, **kwargs):
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-    except:
+    except AttributeError:
         pass
     try:
         verbose = mypipe.verbose
-    except:
+    except AttributeError:
         verbose = kwargs.pop("verbose", True)
     
     if verbose:
         print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
-def print_debug(text, **kwargs) :
+
+def print_debug(text, **kwargs):
     """Print debugging information
 
     Input
@@ -96,11 +91,12 @@ def print_debug(text, **kwargs) :
     mypipe = kwargs.pop("pipe", None)
     try:
         verbose = mypipe.verbose
-    except:
+    except AttributeError:
         verbose = kwargs.pop("verbose", True)
     
     if verbose:
         print(DEBUG + "# DebugInfo " + ENDC + text, **kwargs)
+
 
 def print_error(text, **kwargs):
     """Print error information
@@ -115,17 +111,46 @@ def print_error(text, **kwargs):
     mypipe = kwargs.pop("pipe", None)
     try:
         mypipe.write_logfile(toprint)
-    except:
+    except AttributeError:
         pass
     try:
         verbose = mypipe.verbose
-    except:
+    except AttributeError:
         verbose = kwargs.pop("verbose", True)
     
     if verbose:
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 
-#-----------  END PRINTING FUNCTIONS -----------------------
+
+# -----------  END PRINTING FUNCTIONS -----------------------
+def filter_list_to_str(filter_list):
+    if filter_list is None:
+        return default_short_filter_list
+
+    if type(filter_list) is list:
+        fl = str(filter_list[0])
+        for fi in filter_list[1:]:
+            fl += f",{fi}"
+        return fl
+    elif type(filter_list) is str:
+        return filter_list
+    else:
+        print_warning(f"Could not recognise type of filter_list {filter_list}")
+        return ""
+
+
+def check_filter_list(filter_list):
+    if filter_list is None:
+        return []
+
+    if type(filter_list) is list:
+        return filter_list
+    elif type(filter_list) is str:
+        return filter_list.split(',')
+    else:
+        print_warning(f"Could not recognise type of filter_list {filter_list}")
+        return []
+
 
 def analyse_musemode(musemode, field, delimiter='-'):
     """Extract the named field from the musemode
@@ -145,19 +170,20 @@ def analyse_musemode(musemode, field, delimiter='-'):
         Value of the field which was analysed (e.g., 'AO' or 'NOAO')
     """
     if field not in dict_musemodes:
-        upipe.error(f"Cannot find such a field ({field}) in the dict_musemodes")
+        print_error(f"Cannot find such a field ({field}) in the dict_musemodes")
         return ""
 
     index = dict_musemodes[field]
     sval = musemode.split(delimiter)
 
     if len(sval) < index+1:
-        upipe.print_error(f"Error in analyse_musemode. Cannot access field {index} "
-                          f"After splitting the musemode {musemode} = sval")
+        print_error(f"Error in analyse_musemode. Cannot access field {index} "
+                    f"After splitting the musemode {musemode} = sval")
         val = ""
     else:
         val = musemode.split(delimiter)[index]
     return val.lower()
+
 
 def add_string(text, word="_", loc=0):
     """Adding string at given location
@@ -182,10 +208,42 @@ def add_string(text, word="_", loc=0):
                 if text[loc] != "_":
                     text = f"{text[:loc]}{word}{text[loc:]}"
 
-            except:
+            except IndexError:
                 print(f"String index [{loc}] out of range [{len(text)}] in add_string")
 
     return text
+
+
+def get_dataset_tpl_nexpo(filename, str_dataset=default_str_dataset, ndigits=default_ndigits,
+                          filtername=None):
+    """Get the tpl and nexpo from a filename assuming it is at the end
+    of the filename
+
+    Input
+    -----
+    filename: str
+       Input filename
+
+    Returns
+    -------
+    tpl, nexpo: str, int
+    """
+    basestr, ext = os.path.splitext(filename)
+    if filtername is None:
+        filtername = ""
+    else:
+        filtername = f"_{filtername}"
+
+    try:
+        [(dataset, tpl, nexpo)] = re.findall("_" + str_dataset + r'(\d{' + str(ndigits) + r'})'
+                                             + str(filtername) + r'_(\S{19})_(\d{4})', basestr)
+        if len(nexpo) > 0:
+            return int(dataset), tpl, int(nexpo)
+        else:
+            return -1, "", -1
+    except ValueError:
+        return -1, "", -1
+
 
 def get_tpl_nexpo(filename):
     """Get the tpl and nexpo from a filename assuming it is at the end
@@ -210,6 +268,27 @@ def get_tpl_nexpo(filename):
     except ValueError:
         return "", -1
 
+
+def get_pointing_name(pointing=1, str_pointing=default_str_pointing, ndigits=default_ndigits):
+    """Formatting for the names using the number and
+    the number of digits and prefix string
+
+    Input
+    -----
+    pointing: int
+       Pointing number
+    str_pointing: str
+        Prefix representing the pointing
+    ndigits: int
+        Number of digits to be used for formatting
+
+    Returns
+    -------
+    string for the dataset/pointing name prefix
+    """
+    return f"{str_pointing}{int(pointing):0{int(ndigits)}}"
+
+
 def get_dataset_name(dataset=1, str_dataset=default_str_dataset, ndigits=default_ndigits):
     """Formatting for the dataset/pointing names using the number and
     the number of digits and prefix string
@@ -229,6 +308,7 @@ def get_dataset_name(dataset=1, str_dataset=default_str_dataset, ndigits=default
     """
     return f"{str_dataset}{int(dataset):0{int(ndigits)}}"
 
+
 def lower_rep(text):
     """Lower the text and return it after removing all underscores
 
@@ -241,10 +321,12 @@ def lower_rep(text):
     """
     return text.replace("_", "").lower()
 
+
 def lower_allbutfirst_letter(mystring):
     """Lowercase all letters except the first one
     """
     return mystring[0].upper() + mystring[1:].lower()
+
 
 class TimeStampDict(OrderedDict):
     """Class which builds a time stamp driven
@@ -273,6 +355,7 @@ class TimeStampDict(OrderedDict):
         """
         _ = self.pop(tstamp)
 
+
 def merge_dict(dict1, dict2):
     """Merging two dictionaries by appending
     keys which are duplicated
@@ -294,29 +377,39 @@ def merge_dict(dict1, dict2):
             dict1[key] = value
     return dict1
 
-def create_time_name() :
+
+def create_time_name():
     """Create a time-link name for file saving purposes
 
     Return: a string including the YearMonthDay_HourMinSec
     """
     return str(time.strftime("%Y%m%d_%H%M%S", time.localtime()))
 
-def formatted_time() :
+
+def formatted_time():
     """ Return: a string including the formatted time
     """
     return str(time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()))
 
+
 def safely_create_folder(path, verbose=True):
-    """Create a folder given by the input path
-    This small function tries to create it and if it fails
-    it checks whether the reason is because it is not a path
-    and then warn the user
-    and then warn the user
+    """Create a folder given by the input path This small function tries to create it
+    and if it fails it checks whether the reason is that it is not a path and then warn the user
+
+    Input
+    -----
+    path: str
+    verbose: bool
+
+    Creates
+    -------
+    A new folder if the folder does not yet exist
     """
-    if path is None :
-        if verbose : print_info("Input path is None, not doing anything")
+    if path is None:
+        if verbose:
+            print_info("Input path is None, not doing anything")
         return
-    if verbose : 
+    if verbose:
         print_info("Trying to create {folder} folder".format(folder=path), end='')
     try: 
         os.makedirs(path)
@@ -330,186 +423,28 @@ def safely_create_folder(path, verbose=True):
             if verbose:
                 print_endline("... Folder already exists, doing nothing.")
 
+
 def append_file(filename, content):
     """Append in ascii file
     """
     with open(filename, "a") as myfile:
         myfile.write(content)
-        
-def abspath(path) :
+
+
+def abspath(path):
     """Normalise the path to get it short but absolute
     """
     return os.path.abspath(os.path.realpath(path))
 
-def normpath(path) :
+
+def normpath(path):
     """Normalise the path to get it short
     """
     return os.path.normpath(os.path.realpath(path))
 
-def doppler_shift(wavelength, velocity=0.):
-    """Return the redshifted wavelength
-    """
-    doppler_factor = np.sqrt((1. + velocity / const.c.value) / (1. - velocity / const.c.value))
-    return wavelength * doppler_factor
-
-def get_emissionline_wavelength(line="Ha", velocity=0., redshift=None, medium='air'):
-    """Get the wavelength of an emission line, including a correction
-    for the redshift (or velocity)
-    """
-    index_line = {'vacuum': 0, 'air': 1}
-    # Get the velocity
-    if redshift is not None : velocity = redshift * const.c
-
-    if line is None:
-        return -1.
-    elif line not in list_emission_lines:
-        upipe.print_error("Could not guess the emission line you wish to use")
-        upipe.print_error("Please review the 'emission_line' dictionary")
-        return -1.
-
-    if medium not in index_line:
-        upipe.print_error("Please choose between one of these media: {0}".format(index_line.key()))
-        return -1.
-
-    wavel = list_emission_lines[line][index_line[medium]]
-    return doppler_shift(wavel, velocity)
-
-def get_emissionline_band(line="Ha", velocity=0., redshift=None, medium='air', lambda_window=10.0):
-    """Get the wavelengths of an emission line, including a correction
-    for the redshift (or velocity) and a lambda_window around that line (in Angstroems)
-
-    Parameters
-    ----------
-    line: name of the line (string). Default is 'Ha'
-    velocity: shift in velocity (km/s)
-    medium: 'air' or 'vacuum'
-    lambda_window: lambda_window in Angstroem
-    """
-    red_wavel = get_emissionline_wavelength(line=line, velocity=velocity, redshift=redshift, medium=medium)
-    # In case the line is not in the list, just return the full lambda Range
-    if red_wavel < 0 :
-        return full_muse_wavelength_range
-    else:
-        return [red_wavel - lambda_window/2., red_wavel + lambda_window/2.]
-
-    
-def select_spaxels(maskDic, maskName, X, Y) :
-    """Selecting spaxels defined by their coordinates
-    using the masks defined by Circle or Rectangle Zones
-    """
-    ## All spaxels are set to GOOD (True) first
-    selgood = (X**2 >= 0)
-
-    ## If no Mask is provided, we just return the full set of input X, Y
-    if maskDic == None :
-        return selgood
-
-    ## We first check if the maskName is in the list of the defined Masks
-    ## If the galaxy is not in the list, then the selection is all True
-    if maskName in maskDic:
-        ## The mask is defined, so Get the list of Regions
-        ## From the defined dictionary
-        listRegions = maskDic[maskName]
-        ## For each region, select the good spaxels
-        for region in  listRegions :
-            selgood = selgood & region.select(X, Y)
-
-    return selgood
-
-
-class Selection_Zone :
-    """
-    Parent class for Rectangle_Zone and Circle_Zone
-
-    Input
-    -----
-    params: list of floats
-        List of parameters for the selection zone
-    """
-    def __init__(self, params=None) :
-        self.params = params
-        if len(params) != self.nparams:
-            print_error("Error: {0} Zone needs {1} input parameters - {2} given".format(
-                            self.type, self.nparams, len(params)))
-
-
-class Rectangle_Zone(Selection_Zone) :
-    """Define a rectangular zone, given by 
-    a center, a length, a width and an angle
-    """
-    def __init__(self):
-        self.type = "Rectangle"
-        self.nparams = 5
-        Selection_Zone.__init__(self)
-
-    def select(self, xin, yin) :
-        """ Define a selection within a rectangle
-            It can be rotated by an angle theta (in degrees) 
-        Input
-        -----
-        xin, yin: 2d arrays
-            Input positions for the spaxels
-        """
-        if self.params == None :
-           return (xin**2 >=0)
-        [x0, y0, length, width, theta] = self.params
-        dx = xin - x0
-        dy = yin - y0
-        thetarad = np.deg2rad(theta)
-        nx =   dx * np.cos(thetarad) + dy * np.sin(thetarad)
-        ny = - dx * np.sin(thetarad) + dy * np.cos(thetarad)
-        selgood = (np.abs(ny) > width / 2.) | (np.abs(nx) > length / 2.)
-        return selgood
-
-class Circle_Zone(Selection_Zone) :
-    """Define a Circular zone, defined by 
-    a center and a radius
-    """
-    def __init__(self):
-        self.type = "Circle"
-        self.nparams = 5
-        Selection_Zone.__init__(self)
-
-    def select(self, xin, yin) :
-        """ Define a selection within a circle 
-
-        Input
-        -----
-        xin, yin: 2d arrays
-            Input positions for the spaxels
-        """
-        if self.params == None :
-           return (xin**2 >=0)
-        [x0, y0, radius] = self.params
-        selgood = (np.sqrt((xin - x0)**2 + (yin - y0)**2) > radius)
-        return selgood
-
-class Trail_Zone(Selection_Zone) :
-    """Define a Trail zone, defined by
-    two points and a width
-    """
-    def __init__(self):
-        self.type = "Trail"
-        self.nparams = 5
-        Selection_Zone.__init__(self)
-
-    def select(self, xin, yin) :
-        """ Define a selection within trail
-
-        Input
-        -----
-        xin, yin: 2d arrays
-            Input positions for the spaxels
-
-        """
-        if self.params == None :
-           return (xin**2 >=0)
-        [x0, y0, radius] = self.params
-        selgood = (np.sqrt((xin - x0)**2 + (yin - y0)**2) > radius)
-        return selgood
 
 def reconstruct_filter_images(cubename, filter_list=default_filter_list,
-        filter_fits_file="filter_list.fits"):
+                              filter_fits_file="filter_list.fits"):
     """ Reconstruct all images in a list of Filters
     cubename: str
         Name of the cube
@@ -522,9 +457,9 @@ def reconstruct_filter_images(cubename, filter_list=default_filter_list,
         Usually in filter_list.fits (MUSE default)
     """
     
-    command = "muse_cube_filter -f {0} {1} {2}".format(
-                  filter_list, cubename, filter_fits_file)
+    command = "muse_cube_filter -f {0} {1} {2}".format(filter_list, cubename, filter_fits_file)
     os.system(command)
+
 
 def add_key_dataset_expo(imaname, iexpo, dataset):
     """Add dataset and expo number to image
@@ -543,175 +478,9 @@ def add_key_dataset_expo(imaname, iexpo, dataset):
     print_info("Keywords MUSEPIPE_DATASET/EXPO updated for image {}".format(
         imaname))
 
-def rotate_image_wcs(ima_name, ima_folder="", outwcs_folder=None, rotangle=0.,
-                     **kwargs):
-    """Routine to remove potential Nan around an image and reconstruct
-    an optimal WCS reference image. The rotation angle is provided as a way
-    to optimise the extent of the output image, removing Nan along X and Y
-    at that angle.
-
-    Args:
-        ima_name (str): input image name. No default.
-        ima_folder (str): input image folder ['']
-        outwcs_folder (str): folder where to write the output frame. Default is
-            None which means that it will use the folder of the input image.
-        rotangle (float): rotation angle in degrees [0]
-        **kwargs:
-            in_suffix (str): in suffix to remove from name ['prealign']
-            out_suffix (str): out suffix to add to name ['rotwcs']
-            margin_factor (float): factor to extend the image [1.1]
-
-    Returns:
-
-    """
-
-    # Reading the input names and setting output folder
-    fullname = joinpath(ima_folder, ima_name)
-    ima_folder, ima_name = os.path.split(fullname)
-    if outwcs_folder is None:
-        outwcs_folder = ima_folder
-
-    # Suffix
-    in_suffix = kwargs.pop("in_suffix", "prealign")
-    out_suffix = kwargs.pop("out_suffix", "rotwcs")
-
-    # Get margin if needed
-    margin_factor = kwargs.pop("margin_factor", 1.1)
-    extend_fraction = np.maximum(0., (margin_factor - 1.))
-    upipe.print_info("Will use a {:5.2f}% extra margin".format(
-                     extend_fraction*100.))
-
-    # Opening the image via mpdaf
-    imawcs = Image(fullname)
-    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(np.int)
-
-    # New dimensions and extend current image
-    new_dim = tuple(np.array(imawcs.shape).astype(np.int) + extra_pixels)
-    ima_ext = imawcs.regrid(newdim=new_dim, refpos=imawcs.get_start(),
-                            refpix=tuple(extra_pixels / 2.),
-                            newinc=imawcs.get_step()[0]*3600.)
-
-    # Copy and rotate WCS
-    new_wcs = copy.deepcopy(ima_ext.wcs)
-    upipe.print_info("Rotating WCS by {} degrees".format(rotangle))
-    new_wcs.rotate(rotangle)
-
-    # New rotated image
-    ima_rot = Image(data=np.nan_to_num(ima_ext.data), wcs=new_wcs)
-
-    # Then resample the image using the initial one as your reference
-    ima_rot_resampled = ima_rot.align_with_image(ima_ext, flux=True)
-
-    # Crop NaN
-    ima_rot_resampled.crop()
-
-    # get the new header with wcs and rotate back
-    finalwcs = ima_rot_resampled.wcs
-    finalwcs.rotate(-rotangle)
-
-    # create the final image
-    final_rot_image = Image(data=ima_rot_resampled.data, wcs=finalwcs)
-
-    # Save image
-    if isinstance(in_suffix, str) and in_suffix != "" and in_suffix in ima_name:
-            out_name = ima_name.replace(in_suffix, out_suffix)
-    else:
-        name, extension = os.path.splitext(ima_name)
-        out_suffix = add_string(out_suffix)
-        out_name = "{0}{1}{2}".format(name, out_suffix, extension)
-
-    # write output
-    final_rot_image.write(joinpath(outwcs_folder, out_name))
-    return outwcs_folder, out_name
-
-def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
-                     **kwargs):
-    """Routine to remove potential Nan around an image and reconstruct
-    an optimal WCS reference image. The rotation angle is provided as a way
-    to optimise the extent of the output image, removing Nan along X and Y
-    at that angle.
-
-    Args:
-        cube_name (str): input image name. No default.
-        cube_folder (str): input image folder ['']
-        outwcs_folder (str): folder where to write the output frame. Default is
-            None which means that it will use the folder of the input image.
-        rotangle (float): rotation angle in degrees [0]
-        **kwargs:
-            in_suffix (str): in suffix to remove from name ['prealign']
-            out_suffix (str): out suffix to add to name ['rotwcs']
-            margin_factor (float): factor to extend the image [1.1]
-
-    Returns:
-
-    """
-
-    # Reading the input names and setting output folder
-    fullname = joinpath(cube_folder, cube_name)
-    cube_folder, cube_name = os.path.split(fullname)
-    if outwcs_folder is None:
-        outwcs_folder = cube_folder
-
-    # Suffix
-    in_suffix = kwargs.pop("in_suffix", "prealign")
-    out_suffix = kwargs.pop("out_suffix", "rotwcs")
-
-    # Get margin if needed
-    margin_factor = kwargs.pop("margin_factor", 1.1)
-    extend_fraction = np.maximum(0., (margin_factor - 1.))
-    upipe.print_info("Will use a {:5.2f}% extra margin".format(
-                     extend_fraction*100.))
-
-    # Opening the image via mpdaf
-    cubewcs = Cube(fullname)
-    imawcs = cubewcs.sum(axis=0)
-    extra_pixels = (np.array(imawcs.shape) * extend_fraction).astype(np.int)
-
-    # New dimensions and extend current image
-    new_dim = tuple(np.array(imawcs.shape).astype(np.int) + extra_pixels)
-    ima_ext = imawcs.regrid(newdim=new_dim, refpos=imawcs.get_start(),
-                            refpix=tuple(extra_pixels / 2.),
-                            newinc=imawcs.get_step()[0]*3600.)
-
-    # Copy and rotate WCS
-    new_wcs = copy.deepcopy(ima_ext.wcs)
-    upipe.print_info("Rotating spatial WCS of Cube by {} degrees".format(rotangle))
-    new_wcs.rotate(rotangle)
-
-    # New rotated image
-    ima_rot = Image(data=np.nan_to_num(ima_ext.data), wcs=new_wcs)
-
-    # Then resample the image using the initial one as your reference
-    ima_rot_resampled = ima_rot.align_with_image(ima_ext, flux=True)
-
-    # Crop NaN
-    ima_rot_resampled.crop()
-
-    # get the new header with wcs and rotate back
-    finalwcs = ima_rot_resampled.wcs
-    finalwcs.rotate(-rotangle)
-
-    # create the final image
-    data_cube_rot = np.repeat(ima_rot_resampled[np.newaxis,:,:].data,
-                              cubewcs.shape[0], axis=0)
-    final_rot_cube = Cube(data=data_cube_rot, wave=cubewcs.wave, wcs=finalwcs)
-
-    # Save image
-    if isinstance(in_suffix, str) and in_suffix != "" and in_suffix in cube_name:
-            out_name = cube_name.replace(in_suffix, out_suffix)
-    else:
-        name, extension = os.path.splitext(cube_name)
-        if out_suffix != "":
-            out_suffix = add_string(out_suffix)
-        out_name = "{0}{1}{2}".format(name, out_suffix, extension)
-
-    # write output
-    final_rot_cube.write(joinpath(outwcs_folder, out_name))
-    return outwcs_folder, out_name
-
 
 class ExposureInfo(object):
-    def __init__(self, targername, dataset, tpl, nexpo):
+    def __init__(self, targetname, dataset, tpl, nexpo):
         """A dummy class to just store temporarily
         the various basic info about a Muse exposure
         """
@@ -721,117 +490,184 @@ class ExposureInfo(object):
         self.nexpo = nexpo
 
 
-def filter_list_with_pdict(input_list, list_datasets=None,
-                           dict_files=None, verbose=True):
+def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verbose=True,
+                           str_dataset=default_str_dataset, ndigits=default_ndigits,
+                           filtername=None):
     """Filter out exposures (pixtab or cube namelist) using a dictionary which
     has a list of datasets and for each dataset a list of exposure number.
 
     Args:
         input_list (list of str):  input list to filter
         dict_files (dict):  dictionary used to filter
+        list_datasets: list of int
+        dict_files: dictionary
+        verbose: bool
+        str_dataset: str
+        ndigits: int
+        filtername: str
 
     Returns:
         selected_filename_list: selected list of files
         exposure_list_per_pointing: selected list of files for each pointing
 
     """
+    if list_datasets is None:
+        list_datasets = []
+    elif not isinstance(list_datasets, list):
+        print_error("Cannot recognise input dataset(s)")
+        list_datasets = []
+
     nfiles_input_list = len(input_list)
+
+    # If not dictionary is provided, we try to build it
     if dict_files is None:
-        # Returning the default input list
-        selected_filename_list = input_list
-        # Just one dummy pointing with all files
-        dict_exposures_per_pointing = {0: input_list}
         # Building the dummy list of tpl and nexpo for
         # this input list, decrypting with get_tpl_nexpo
-        list_tplexpo = []
+        dict_files = {}
+        dict_files_with_tpl = {}
         for filename in input_list:
-            ftpl, fnexpo = get_tpl_nexpo(filename)
-            list_tplexpo.append([ftpl, fnexpo])
-        dict_tplexpo_per_pointing = {0: list_tplexpo}
+            if verbose:
+                print_info(f"Adressing File name: {filename}")
+            fdataset, ftpl, fnexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
+                                                           ndigits=ndigits, filtername=filtername)
+            if verbose:
+                print_info(f"Adressing File name: {filename}")
+                print_info(f"    Detected = Dataset/TPLS/Nexpo: {fdataset} / {ftpl} / {fnexpo}")
+            # Did not find the string associated with dataset
+            if fdataset == -1:
+                continue
+            # or found it, then record it
+            else:
+                # Record only if the input list
+                if fdataset in list_datasets or len(list_datasets) == 0:
+                    if fdataset not in dict_files_with_tpl:
+                        dict_files_with_tpl[fdataset] = {ftpl: [fnexpo]}
+                    else:
+                        if ftpl not in dict_files_with_tpl[fdataset]:
+                            dict_files_with_tpl[fdataset][ftpl] = [fnexpo]
+                        else:
+                            dict_files_with_tpl[fdataset][ftpl].append(fnexpo)
 
-    # Otherwise use the ones which are given via their expo numbers
-    else:
-        selected_filename_list = []
-        dict_exposures_per_pointing = {}
-        dict_tplexpo_per_pointing = {}
-        # this is the list of exposures to consider
+                for dataset in dict_files_with_tpl:
+                    dict_files[dataset] = []
+                    for tpl in dict_files_with_tpl[dataset]:
+                        list_nexpo = []
+                        for nexpo in dict_files_with_tpl[dataset][tpl]:
+                            list_nexpo.append(nexpo)
+                        list_nexpo.sort()
+                        dict_files[dataset].append((tpl, list_nexpo))
 
-        if list_datasets is None:
-            list_datasets = dict_files.keys()
-        elif not isinstance(list_datasets, list):
-            upipe.print_error("Cannot recognise input dataset(s)")
-        else:
-            for dataset in list_datasets:
-                if dataset not in dict_files:
-                    upipe.print_warning("Dataset {} not in dictionary "
-                                        "- skipping".format(dataset))
-                else:
-                    list_tpltuple = dict_files[dataset]
-                    # We loop on that list which should contain 
-                    # the list of tpl associated
-                    # with a list of exposure numbers
-                    for expotuple in list_tpltuple:
-                        # We get the tpl, and then the list of expo numbers
-                        tpl, list_expo = expotuple[0], expotuple[1]
-                        # For each list of expo numbers, check 
-                        # if this is just a number
-                        # or also a pointing association
-                        for expo in list_expo:
-                            # By default we assign the dataset as 
-                            # pointing number
-                            if type(expo) in [str, int]:
-                                nexpo = int(expo)
-                                pointing = int(dataset)
-                            elif len(expo) == 2:
-                                nexpo = int(expo[0])
-                                pointing = int(expo[1])
-                            else:
-                                upipe.print_warning(f"Dictionary entry {expotuple} "
-                                                    f"ignored (type of expo - {expo} - "
-                                                    f"is {type(expo)}")
-                                break
-
-                            # Check whether this exists in the our cube list
-#                            suffix_expo = "_{0:04d}".format(nexpo)
-                            for filename in input_list:
-                                ftpl, fnexpo = get_tpl_nexpo(filename)
-#                                if (suffix_expo in filename) and (tpl in filename):
-                                if (nexpo == int(fnexpo)) & (ftpl == tpl):
-                                    # We select the file
-                                    selected_filename_list.append(filename)
-                                    if pointing not in dict_exposures_per_pointing:
-                                        dict_exposures_per_pointing[pointing] = []
-                                        dict_tplexpo_per_pointing[pointing] = []
-                                    dict_exposures_per_pointing[pointing].append(filename)
-                                    dict_tplexpo_per_pointing[pointing].append([tpl, nexpo])
-                                    # And remove it from the list
-                                    input_list.remove(filename)
-                                    # We break out of the cube for loop
-                                    break
+    if len(list_datasets) == 0:
+        list_datasets = list(dict_files.keys())
 
     if verbose:
-        upipe.print_info("Datasets {0} - Selected {1}/{2} exposures after "
-                         "dictionary filtering".format(list_datasets,
-                                                len(selected_filename_list),
-                                                nfiles_input_list))
+        print_info(f"Check file = dict_files is : {dict_files}")
+        print_info(f"Check file = list_datasets is : {list_datasets}")
+
+        # if len(dict_files) == 0:
+        #     list_tplexpo = []
+        #     for filename in input_list:
+        #         ftpl, fnexpo = get_tpl_nexpo(filename)
+        #         list_tplexpo.append([ftpl, fnexpo])
+        #     # Just one dummy pointing with all files
+        #     # Still use the dataset number if provided
+        #     dict_tplexpo_per_dataset = {}
+        #     if len(list_datasets) == 1:
+        #         dict_exposures_per_pointing = {list_datasets[0]: input_list}
+        #         dict_tplexpo_per_pointing = {list_datasets[0]: list_tplexpo}
+        #         dict_tplexpo_per_dataset[list_datasets[0]] = {1: list_tplexpo}
+        #     # if more than 1, then we need to pass them all
+        #     # to a dummy dataset number
+        #     else:
+        #         dict_exposures_per_pointing = {1: input_list}
+        #         dict_tplexpo_per_pointing = {1: list_tplexpo}
+        #         for dataset in list_datasets:
+        #             dict_tplexpo_per_dataset[dataset] = {1: list_tplexpo}
+
+    # Otherwise use the ones which are given via their expo numbers
+    selected_filename_list = []
+    dict_exposures_per_pointing = {}
+    dict_tplexpo_per_pointing = {}
+    dict_tplexpo_per_dataset = {}
+    # this is the list of exposures to consider
+
+    for dataset in list_datasets:
+        dict_tplexpo_per_dataset[dataset] = {}
+        if dataset not in dict_files:
+            print_warning(f"Dataset {dataset} not in dictionary - skipping")
+        else:
+            list_tpltuple = dict_files[dataset]
+            # We loop on that list which should contain
+            # the list of tpl associated
+            # with a list of exposure numbers
+            for expotuple in list_tpltuple:
+                # We get the tpl, and then the list of expo numbers
+                tpl, list_expo = expotuple[0], expotuple[1]
+                # For each list of expo numbers, check
+                # if this is just a number
+                # or also a pointing association
+                for expo in list_expo:
+                    # By default, we assign the dataset as
+                    # pointing number
+                    if type(expo) in [str, int]:
+                        nexpo = int(expo)
+                        pointing = int(dataset)
+                    elif len(expo) == 2:
+                        nexpo = int(expo[0])
+                        pointing = int(expo[1])
+                    else:
+                        print_warning(f"Dictionary entry {expotuple} "
+                                      f"ignored (type of expo - {expo} - "
+                                      f"is {type(expo)}")
+                        break
+
+                    # Check whether this exists in the cube list
+                    for filename in input_list:
+                        ftpl, fnexpo = get_tpl_nexpo(filename)
+                        if (nexpo == int(fnexpo)) & (ftpl == tpl):
+                            # We select the file
+                            selected_filename_list.append(filename)
+                            if pointing not in dict_exposures_per_pointing:
+                                dict_exposures_per_pointing[pointing] = []
+                                dict_tplexpo_per_pointing[pointing] = []
+                            dict_exposures_per_pointing[pointing].append(filename)
+                            dict_tplexpo_per_pointing[pointing].append([dataset, tpl,
+                                                                        nexpo])
+                            if pointing not in dict_tplexpo_per_dataset[dataset]:
+                                dict_tplexpo_per_dataset[dataset][pointing] = []
+                            dict_tplexpo_per_dataset[dataset][pointing].append([tpl, nexpo])
+                            # And remove it from the list
+                            input_list.remove(filename)
+                            # We break out of the cube for loop
+                            break
+
+    if verbose:
+        print_info(f"Datasets {list_datasets} - "
+                   f"Selected {len(selected_filename_list)}/{nfiles_input_list} "
+                   f"exposures after dictionary filtering")
 
         for pointing in dict_tplexpo_per_pointing:
-            upipe.print_info(f"Pointing {pointing} - Detected exposures [TPL / NEXPO]:")
+            print_info(f"Pointing {pointing} - Detected exposures [DATASET / TPL / NEXPO]:")
             for tplexpo in dict_tplexpo_per_pointing[pointing]:
-                upipe.print_info(f"     {tplexpo[0]} / {tplexpo[1]}")
+                print_info(f"     {tplexpo[0]} / {tplexpo[1]} / {tplexpo[2]}")
 
-    return selected_filename_list, dict_exposures_per_pointing
+    return selected_filename_list, dict_exposures_per_pointing, dict_tplexpo_per_pointing, \
+        dict_tplexpo_per_dataset
+
 
 def filter_list_with_suffix_list(list_names, included_suffix_list=[],
                                  excluded_suffix_list=[], name_list=""):
-    """
+    """Filter a list using suffixes (to exclude or include)
 
-    Args:
-        list_names (list of str):
-        included_suffix_list (list of str):
-        excluded_suffix_list (list of str):
+    Input
+    -----
+    list_names: list of str
+    included_suffix_list: list of str
+    excluded_suffix_list: list of str
+    name_list: str default=""
 
-    Returns:
+    Returns
+    -------
 
     """
     if name_list is not None:
@@ -841,22 +677,22 @@ def filter_list_with_suffix_list(list_names, included_suffix_list=[],
 
     # if the list of inclusion suffix is empty, just use all cubes
     if len(included_suffix_list) > 0:
-        upipe.print_info(f"Using suffixes {included_suffix_list} "
-                         f"as an inclusive condition {add_message}")
+        print_info(f"Using suffixes {included_suffix_list} "
+                   f"as an inclusive condition {add_message}")
         # Filtering out the ones that don't have any of the suffixes
         temp_list = copy.copy(list_names)
-        for l in temp_list:
-            if any([suff not in l for suff in included_suffix_list]):
-                _ = list_names.remove(l)
+        for litem in temp_list:
+            if any([suff not in litem for suff in included_suffix_list]):
+                _ = list_names.remove(litem)
 
     # if the list of exclusion suffix is empty, just use all cubes
     if len(excluded_suffix_list) > 0:
-        upipe.print_info(f"Using suffixes {excluded_suffix_list} "
-                         f"as an exclusive condition {add_message}")
+        print_info(f"Using suffixes {excluded_suffix_list} "
+                   f"as an exclusive condition {add_message}")
         # Filtering out the ones that have any of the suffixes
         temp_list = copy.copy(list_names)
-        for l in temp_list:
-            if any([suff in l for suff in excluded_suffix_list]):
-                _ = list_names.remove(l)
+        for litem in temp_list:
+            if any([suff in litem for suff in excluded_suffix_list]):
+                _ = list_names.remove(litem)
 
     return list_names

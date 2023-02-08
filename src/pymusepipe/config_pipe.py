@@ -16,12 +16,11 @@ __contact__ = " <eric.emsellem@eso.org>"
 #           FILTER LIST
 # ======================================================================#
 
-default_filter_list = ["white,Johnson_B,Johnson_V,Cousins_R,"
-                       "SDSS_g,SDSS_r,SDSS_i"]
-default_short_filter_list = ["white,Cousins_R"]
-default_PHANGS_filter_list = ["white,Johnson_B,Johnson_V,Cousins_R,"
-                              "SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB,DUPONT_R"]
-default_short_PHANGS_filter_list = ["white,WFI_BB,DUPONT_R"]
+default_filter_list = "white,Johnson_B,Johnson_V,Cousins_R,SDSS_g,SDSS_r,SDSS_i"
+default_short_filter_list = "white,Cousins_R"
+default_PHANGS_filter_list = "white,Johnson_B,Johnson_V,Cousins_R," \
+                             "SDSS_g,SDSS_r,SDSS_i,WFI_BB,WFI_NB,DUPONT_R"
+default_short_PHANGS_filter_list = "white,WFI_BB,DUPONT_R"
 
 # -- END ---------------------------------------------------------------#
 
@@ -65,12 +64,12 @@ dict_listMasterObject = {**dict_listMaster, **dict_listObject}
 listexpo_files = {
         "OBJECT": ['object', 'OBJECT', str, '20A'],
         "TYPE": ['type', 'ESO DPR TYPE', str, '20A'],
-        "DATE":  ['mjd', 'MJD-OBS', np.float, 'E'],
+        "DATE":  ['mjd', 'MJD-OBS', float, 'E'],
         "MODE":  ['mode', 'ESO INS MODE', str, '10A'],
         "EXPTIME":  ['exptime', 'EXPTIME', float, 'E'],
         "TPLS":  ['tpls', 'ESO TPL START', str, '30A'],
-        "TPLN":  ['tplnexp', 'ESO TPL NEXP', np.int, 'J'],
-        "TPLNO":  ['tplno', 'ESO TPL EXPNO', np.int, 'J']
+        "TPLN":  ['tplnexp', 'ESO TPL NEXP', int, 'J'],
+        "TPLNO":  ['tplno', 'ESO TPL EXPNO', int, 'J']
         }
 
 # Excluding files from the checking of their MUSE mode (AO, noAO, N/E etc)
@@ -163,7 +162,7 @@ default_rc_filename = "~/.musepiperc"
 PHANGS_reduc_config = {'fakemode': False,
                        'nocache': False,
                        'checkmode': False,
-                       'overwrite_astropy_table': True,
+                       'overwrite_astropy_tables': True,
                        'filter_list': "white,WFI_BB,DUPONT_R",
                        'filter_for_alignment': "WFI_BB"}
 
@@ -328,7 +327,7 @@ mjd_names = {'table': "MJD_OBS", 'image': "MJD-OBS"}
 date_names = {'table': "DATE_OBS", 'image': "DATE-OBS"}
 tpl_names = {'table': "TPL_START", 'image': "HIERARCH ESO TPL START"}
 iexpo_names = {'table': "IEXPO_OBS", 'image': "MUSEPIPE_IEXPO"}
-dataset_names = {'table': "DATASET_OBS", 'image': "MUSEPIPE_DATASET"}
+dataset_names = {'table': "DATASET_OBS", 'image': "MUSEPIPE_DATASET", 'oldimage': "MUSEPIPE_POINTING"}
 
 default_offset_table = {'date': [date_names['table'], 'S23', ""],
                         'mjd': [mjd_names['table'], 'f8', 0.0],
