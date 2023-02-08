@@ -529,7 +529,7 @@ class ExposureInfo(object):
 
 def filter_list_with_ptable(input_list, list_datasets=None, pointing_table=None, verbose=True,
                            str_dataset=default_str_dataset, ndigits=default_ndigits,
-                           filtername=None)
+                           filtername=None):
     """
     
     Input
@@ -596,7 +596,6 @@ def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verb
             fdataset, ftpl, fnexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
                                                            ndigits=ndigits, filtername=filtername)
             if verbose:
-                print_info(f"Adressing File name: {filename}")
                 print_info(f"    Detected = Dataset/TPLS/Nexpo: {fdataset} / {ftpl} / {fnexpo}")
             # Did not find the string associated with dataset
             if fdataset == -1:
@@ -945,7 +944,7 @@ def get_list_reduced_pixtables(target_path="", list_datasets=None,
         Additional suffix, if needed, for the names of the PixTables.
     """
     # Getting the pieces of the names to be used for pixtabs
-    pixtable_prefix = prep_recipes_pipe.dict_products_scipost['individual'][0]
+    pixtable_prefix = dict_products_scipost['individual'][0]
     print_info(f"Will be looking for PIXTABLES with suffix {pixtable_prefix}")
 
     # Object folder
