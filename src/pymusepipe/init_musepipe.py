@@ -36,9 +36,7 @@ def add_suffix_tokeys(dic, suffix="_folder") :
 ############################################################
 
 class InitMuseParameters(object) :
-    def __init__(self, folder_config="Config/", 
-                 rc_filename=None, cal_filename=None, 
-                 verbose=True, **kwargs) :
+    def __init__(self, folder_config="Config/", rc_filename=None, cal_filename=None, verbose=True):
         """Define the default parameters (folders/calibration files) 
         and name suffixes for the MUSE data reduction
 

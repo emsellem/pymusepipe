@@ -10,18 +10,26 @@ __contact__ = " <eric.emsellem@eso.org>"
 
 # Importing generic modules
 import os
+from os.path import join as joinpath
+import glob
 import time
 import copy
 from collections import OrderedDict
 import re
+
+# Numpy
+import numpy as np
 
 # Astropy
 from astropy.io import fits as pyfits
 
 # Import package modules
 from .config_pipe import (default_filter_list, dict_musemodes, default_short_filter_list,
-                          default_ndigits, default_str_pointing, default_str_dataset)
+                          default_ndigits, default_str_pointing, default_str_dataset,
+                          dict_folders, dict_products_scipost)
 
+prefix_final_cube = dict_products_scipost['cube'][0]
+default_object_folder = dict_folders['object']
 
 #  PRINTING FUNCTIONS #
 HEADER = '\033[95m'
@@ -120,9 +128,38 @@ def print_error(text, **kwargs):
     
     if verbose:
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
-
-
 # -----------  END PRINTING FUNCTIONS -----------------------
+
+
+def append_value_to_dict(mydict, key, value):
+    """Append a value to key within a given dictionary. If the key does not exist it creates
+    a list of 1 element for that key
+
+    Input
+    -----
+    mydict: dict
+    key:
+    value:
+
+    Returns
+    -------
+    Updated dictionary
+    """
+    if key in mydict:
+        if not isinstance(mydict[key], list):
+            # converting key to list type
+            mydict[key] = [mydict[key]]
+
+    # Otherwise create an empty list
+    else:
+        mydict[key] = []
+
+    # Append the key's value in list
+    mydict[key].append(value)
+
+    return mydict
+
+
 def filter_list_to_str(filter_list):
     if filter_list is None:
         return default_short_filter_list
@@ -490,6 +527,34 @@ class ExposureInfo(object):
         self.nexpo = nexpo
 
 
+def filter_list_with_ptable(input_list, list_datasets=None, pointing_table=None, verbose=True,
+                           str_dataset=default_str_dataset, ndigits=default_ndigits,
+                           filtername=None)
+    """
+    
+    Input
+    -----
+    input_list
+    list_datasets
+    pointing_table
+    verbose
+    str_dataset
+    ndigits
+    filtername
+
+    Returns
+    -------
+
+    """
+    if list_datasets is None:
+        list_datasets = []
+    elif not isinstance(list_datasets, list):
+        print_error("Cannot recognise input dataset(s)")
+        list_datasets = []
+
+    nfiles_input_list = len(input_list)
+
+
 def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verbose=True,
                            str_dataset=default_str_dataset, ndigits=default_ndigits,
                            filtername=None):
@@ -564,26 +629,6 @@ def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verb
         print_info(f"Check file = dict_files is : {dict_files}")
         print_info(f"Check file = list_datasets is : {list_datasets}")
 
-        # if len(dict_files) == 0:
-        #     list_tplexpo = []
-        #     for filename in input_list:
-        #         ftpl, fnexpo = get_tpl_nexpo(filename)
-        #         list_tplexpo.append([ftpl, fnexpo])
-        #     # Just one dummy pointing with all files
-        #     # Still use the dataset number if provided
-        #     dict_tplexpo_per_dataset = {}
-        #     if len(list_datasets) == 1:
-        #         dict_exposures_per_pointing = {list_datasets[0]: input_list}
-        #         dict_tplexpo_per_pointing = {list_datasets[0]: list_tplexpo}
-        #         dict_tplexpo_per_dataset[list_datasets[0]] = {1: list_tplexpo}
-        #     # if more than 1, then we need to pass them all
-        #     # to a dummy dataset number
-        #     else:
-        #         dict_exposures_per_pointing = {1: input_list}
-        #         dict_tplexpo_per_pointing = {1: list_tplexpo}
-        #         for dataset in list_datasets:
-        #             dict_tplexpo_per_dataset[dataset] = {1: list_tplexpo}
-
     # Otherwise use the ones which are given via their expo numbers
     selected_filename_list = []
     dict_exposures_per_pointing = {}
@@ -641,6 +686,7 @@ def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verb
                             # We break out of the cube for loop
                             break
 
+    selected_filename_list.sort()
     if verbose:
         print_info(f"Datasets {list_datasets} - "
                    f"Selected {len(selected_filename_list)}/{nfiles_input_list} "
@@ -696,3 +742,255 @@ def filter_list_with_suffix_list(list_names, included_suffix_list=[],
                 _ = list_names.remove(litem)
 
     return list_names
+
+
+def get_list_targets(folder=""):
+    """Getting a list of existing targets given path. This is done by simply listing the existing
+    folders. This may need to be filtered.
+
+    Input
+    -----
+    folder: str
+        Folder name where the targets are
+
+    Return
+    ------
+    list_targets: list of str
+    """
+    # Done by scanning the target path
+    list_targets = [name for name in os.listdir(folder)
+                    if os.path.isdir(os.path.join(folder, name))]
+
+    list_targets.sort()
+    print_info("Potential Targets -- list: {0}".format(str(list_targets)))
+    return list_targets
+
+
+def build_dict_datasets(data_path="", str_dataset=default_str_dataset, ndigits=default_ndigits):
+    """Build a dictionary of datasets for each target in the sample
+
+    Input
+    ------
+    data_path: str
+       Path of the target data
+    str_dataset: str default=default_str_dataset
+        Prefix string for datasets (see config_pipe.py)
+    ndigits: int default=default_ndigits
+       Number of digits to format the name of the dataset (see config_pipe.py)
+
+    Returns
+    -------
+    dict_dataset: dict
+
+    """
+    list_targets = get_list_targets(data_path)
+    dict_dataset = {}
+
+    npath = os.path.normpath(data_path)
+    s_npath = npath.split(os.sep)
+
+    for target in list_targets:
+        target_path = f"{data_path}/{target}/"
+        list_datasets = get_list_datasets(target_path, str_dataset, ndigits)
+        dict_t = {}
+        for ds in list_datasets:
+            dict_t[ds] = 1
+
+        dict_dataset[target] = [s_npath[-1], dict_t]
+
+    return dict_dataset
+
+
+def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
+                         ndigits=default_ndigits, show_pointings=False):
+    """Build a dictionary of exposures using the list of datasets found for the
+    given dataset path
+
+    Input
+    ------
+    target_path: str
+       Path of the target data
+    str_dataset: str
+        Prefix string for datasets
+    ndigits: int
+       Number of digits to format the name of the dataset
+
+    Returns
+    -------
+    dict_expo: dict
+        Dictionary of exposures in each dataset
+
+    """
+    list_datasets = get_list_datasets(target_path, str_dataset, ndigits)
+    dict_expos = {}
+    for dataset in list_datasets:
+        # Get the name of the dataset
+        name_dataset = get_dataset_name(dataset, str_dataset, ndigits)
+        print_info(f"For dataset {dataset}")
+        # Get the list of exposures for that dataset
+        dict_p = get_list_exposures(joinpath(target_path, name_dataset))
+
+        # If introducing the pointings, we set them by just showing the dataset
+        # numbers as a default, to be changed lated by the user
+        if show_pointings:
+            dict_p_wpointings = {}
+            for tpl in dict_p:
+                dict_p_wpointings[tpl] = [[nexpo, dataset] for nexpo in dict_p[tpl]]
+            # Now changing dict_p
+            dict_p = copy.copy(dict_p_wpointings)
+
+        # Now creating the dictionary entry for that dataset
+        dict_expos[dataset] = [(tpl, dict_p[tpl]) for tpl in dict_p]
+
+    return dict_expos
+
+def get_list_datasets(target_path="", str_dataset=default_str_dataset,
+                      ndigits=default_ndigits, verbose=False):
+    """Getting the list of existing datasets for a given target path
+
+    Input
+    -----
+    target_path: str
+       Path of the target data
+    str_dataset: str
+        Prefix string for datasets
+    ndigits: int
+       Number of digits to format the name of the dataset
+
+    Return
+    ------
+    list_datasets: list of int
+    """
+    # Done by scanning the target path
+    if verbose:
+        print_info(f"Searching datasets in {target_path} with {str_dataset} prefix")
+    all_folders = glob.glob(f"{target_path}/{str_dataset}*")
+    if verbose:
+        print_info(f"All folder names  = {all_folders}")
+    all_datasets = [os.path.split(s)[-1] for s in all_folders]
+    # Sorting names
+    all_datasets.sort()
+    if verbose:
+        print_info(f"All detected folder names  = {all_datasets}")
+
+    # Now filtering with the right rule
+    r = re.compile(f"{str_dataset}\d{{{ndigits}}}$")
+    good_datasets = [f for f in all_datasets if r.match(f)]
+    good_datasets.sort()
+    if verbose:
+        print_info(f"All good folder names  = {good_datasets}")
+
+    # Creating the list of datasets which is a list of numbers (int)
+    list_datasets = []
+    for folder in good_datasets:
+        list_datasets.append(int(folder[-int(ndigits):]))
+
+    list_datasets.sort()
+    print_info(f"Dataset list: {str(list_datasets)}")
+    return list_datasets
+
+def get_list_exposures(dataset_path="", object_folder=default_object_folder):
+    """Getting a list of exposures from a given path
+
+    Input
+    -----
+    dataset_path: str
+        Folder name where the dataset is
+
+    Return
+    ------
+    list_expos: list of int
+    """
+    # Done by scanning the target path
+    list_files = glob.glob(f"{dataset_path}/{object_folder}/{prefix_final_cube}*_????.fits")
+    list_expos = []
+    for name in list_files:
+        tpl, lint = get_tpl_nexpo(name)
+        if lint > 0:
+            list_expos.append((tpl, int(lint)))
+
+    # Making it unique and sort
+    list_expos = np.unique(list_expos, axis=0)
+    # Sorting by tpl and expo number
+    sorted_list = sorted(list_expos, key=lambda e: (e[0], e[1]))
+
+    # Building the final list
+    dict_expos = {}
+    for l in sorted_list:
+        tpl = l[0]
+        if tpl in dict_expos:
+            dict_expos[tpl].append(int(l[1]))
+        else:
+            dict_expos[tpl] = [int(l[1])]
+
+    # Finding the full list of tpl
+    print_info("Exposures list:")
+    for tpl in dict_expos:
+        print_info("TPL= {0} : Exposures= {1}".format(tpl, dict_expos[tpl]))
+
+    return dict_expos
+
+def get_list_reduced_pixtables(target_path="", list_datasets=None,
+                               suffix="", str_dataset=default_str_dataset,
+                               ndigits=default_ndigits, **kwargs):
+    """Provide a list of reduced pixtables
+
+    Input
+    -----
+    target_path: str
+        Path for the target folder
+    list_datasets: list of int
+        List of integers, providing the list of datasets to consider
+    suffix: str
+        Additional suffix, if needed, for the names of the PixTables.
+    """
+    # Getting the pieces of the names to be used for pixtabs
+    pixtable_prefix = prep_recipes_pipe.dict_products_scipost['individual'][0]
+    print_info(f"Will be looking for PIXTABLES with suffix {pixtable_prefix}")
+
+    # Object folder
+    object_folder = kwargs.pop("object_folder", default_object_folder)
+
+    # Initialise the dictionary of pixtabs to be found in each dataset
+    dict_pixtables = {}
+
+    # Defining the dataset list if not provided
+    # Done by scanning the target path
+    if list_datasets is None:
+        list_datasets = get_list_datasets(target_path, ndigits=ndigits, str_dataset=str_dataset)
+
+    # Looping over the datasets
+    for dataset in list_datasets:
+        # get the path of the dataset
+        path_dataset = joinpath(target_path, get_dataset_name(dataset, str_dataset, ndigits))
+        # List existing pixtabs, using the given suffix
+        list_pixtabs = glob.glob(path_dataset + f"/{object_folder}/{pixtable_prefix}{suffix}*fits")
+
+        # Reset the needed temporary dictionary
+        dict_tpl = {}
+        # Loop over the pixtables for that dataset
+        for pixtab in list_pixtabs:
+            # Split over the PIXTABLE_REDUCED string
+            sl = pixtab.split(pixtable_prefix + "_")
+            # Find the expo number
+            nf = len(".fits")
+            expo = sl[1][-int(nf+4):-int(nf)]
+            # Find the tpl
+            tpl = sl[1].split("_" + expo)[0]
+            # If not already there, add it
+            if tpl not in dict_tpl:
+                dict_tpl[tpl] = [int(expo)]
+            # if already accounted for, add the expo number
+            else:
+                dict_tpl[tpl].append(int(expo))
+
+        # Creating the full list for that dataset
+        full_list = []
+        for tpl in dict_tpl:
+            dict_tpl[tpl].sort()
+            full_list.append((tpl, dict_tpl[tpl]))
+
+        # And now filling in the dictionary for that dataset
+        dict_pixtables[dataset] = full_list
+
+    return dict_pixtables

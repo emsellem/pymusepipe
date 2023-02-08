@@ -19,7 +19,7 @@ from scipy import ndimage as nd
 from astropy.io import fits as pyfits
 from astropy import units as u
 from astropy.wcs import WCS
-from astropy.table import QTable, Column
+from astropy.table import Table, QTable, Column
 
 from astropy.stats import mad_std, sigma_clip, sigma_clipped_stats
 from astropy.convolution import Gaussian2DKernel, convolve
@@ -28,7 +28,7 @@ from astropy.coordinates import SkyCoord
 
 # Import package modules
 from . import util_pipe as upipe
-from .util_pipe import get_dataset_tpl_nexpo
+from .util_pipe import get_dataset_tpl_nexpo, append_value_to_dict
 from .config_pipe import (default_ndigits, default_str_dataset, default_offset_table)
 from .config_pipe import mjd_names, date_names, tpl_names, iexpo_names, dataset_names
 from .mpdaf_pipe import get_centre_from_pixtable
@@ -905,9 +905,30 @@ def get_centre_from_image_or_cube(filename, ext=1, dtype='image'):
     return coord
 
 
-def get_pointing_table_from_folder(folder="", prefix="", suffix="", ext="fits", **kwargs):
+min_column_set = ('filename', 'dataset', 'tpls', 'expo')
+min_column_set_format = ('S50', 'i4', 'S30', 'i4')
+def check_column_set(input_table):
+    """Check the minimum column set for the Pointing table
+
+    Input
+    -----
+    input_table: astropy Table
+
+    Returns
+    -------
+    bool: True if all names are in the table, False otherwise
+    """
+    missing_cols = [colname for colname in min_column_set if colname not in input_table.colnames]
+    if len(missing_cols) > 0:
+        upipe.print_error(f"Missing columns in input file: {missing_cols}")
+        return False
+    else:
+        return True
+
+
+def scan_filenames_from_folder(folder="", prefix="", suffix="", ext="fits", **kwargs):
     """Scan a given folder and look for a set of filenames that could enter a pointing
-    table. Those names are decrypted following a given scheme.
+    table. Those names are decrypted following a given scheme (extracting tpls, expo, dataset)
 
     Input
     ------
@@ -920,7 +941,9 @@ def get_pointing_table_from_folder(folder="", prefix="", suffix="", ext="fits", 
     ext: str default='fits'
         Extension
 
-    Create the self.pointing_table attribute
+    Returns
+    -------
+    filename_table: astropy QTable with columns 'filename' 'tpls' 'dataset' 'expo'
     """
     # First check that the folder exists
     realfolder = os.path.relpath(os.path.realpath(folder))
@@ -928,44 +951,76 @@ def get_pointing_table_from_folder(folder="", prefix="", suffix="", ext="fits", 
         upipe.print_error(f"Folder {folder} does not exist - Aborting folder scan [pointing_table]")
         return None
 
-    # initialise the table
-    column_formats = kwargs.pop("column_formats", ('S50', 'S30', 'i4', 'i4'))
-    pointing_table = QTable(names=('filename', 'tpls', 'dataset', 'expo'), dtype=column_formats)
+    # List the files in the folder, using the prefix and suffix
+    list_existing_files = glob.glob(f"{folder}{prefix}*{suffix}.{ext}")
+
+    # Use that list to scan and extract the dataset tpls and expo values
+    return scan_filenames_from_list(list_existing_files, **kwargs)
+
+
+def scan_filenames_from_list(list_files, **kwargs):
+    """Extract values of dataset, tpls, expo from a list of names
+
+    Input
+    -----
+    list_files: list of str
+    kwargs: additional keywords including
+        str_dataset: str
+        ndigits: int
+        filtername: str
+
+    Returns
+    -------
+    QTable including filenames, tpls, dataset, expo
+
+    """
+    upipe.print_info(f"Building the filename table from the list of {len(list_files)} files")
+
+    # initialise the astropy QTable table
+    column_formats = kwargs.pop("column_formats", min_column_set_format)
+    filename_table = QTable(names=min_column_set, dtype=column_formats)
+
     str_dataset = kwargs.pop("str_dataset", default_str_dataset)
     ndigits = kwargs.pop("ndigits", default_ndigits)
     filtername = kwargs.pop("filtername", None)
 
-    # List the files in the folder, using the prefix
-    this_folder = os.path
-    list_existing_files = glob.glob(f"{folder}{prefix}*{suffix}.{ext}")
-    upipe.print_info(f"Building the pointing table from the list of {len(list_existing_files)} "
-                     "files")
-
-    for filename in list_existing_files:
-        fdataset, ftpls, fexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
+    for filename in list_files:
+        shortname = os.split(filename)[1]
+        fdataset, ftpls, fexpo = get_dataset_tpl_nexpo(shortname, str_dataset=str_dataset,
                                                        ndigits=ndigits, filtername=filtername)
         # Exclude file which didn't have a proper dataset
         if int(fdataset) > 0:
-            pointing_table.add_row((filename, ftpls, fdataset, fexpo))
+            filename_table.add_row((filename, fdataset, ftpls, fexpo))
 
-    pointing_table.sort("filename")
-    return pointing_table
+    filename_table.sort("filename")
+    return filename_table
 
 
 class PointingTable(object):
     list_colnames_ptable = ['filename', 'dataset', 'tpls', 'expo']
 
-    def __init__(self, tablename=None, folder='', **kwargs):
+    def __init__(self, input_table=None, **kwargs):
         """Set up the Pointing Table which contains information about datasets and
         pointings. This is initialised by a given filename.
+        If the tablename is None, the class is initialised by scanning the provided folder name
+        trying to guess the pointings from there.
+        The tablename should be an astropy QTable (by default, a fits format).
 
         Input
         -----
-        tablename: str
-        folder: str
+        input_table: str, or Table, or QTable
+           If None, the folder given as 'folder' keyword will be scanned
+        kwargs: additional keywords that include
+            folder: str
+            folderout: str default=folder input
+                Output folder for the tablename when writing
+            format: str default=ascii
+            guess: bool default=False
+                Guess column formatting of the file.
+            verbose: bool default=False
 
         """
-        self.tablename = tablename
+        folder = kwargs.pop("folder", "")
         realfolder = os.path.relpath(os.path.realpath(folder))
         if not os.path.isdir(realfolder):
             upipe.print_error(f"Folder {folder} does not exist. Using local folder")
@@ -981,13 +1036,35 @@ class PointingTable(object):
         self.pointing_table = QTable()
 
         # if filename exists is not None we read
-        if tablename is not None:
-            # If path name does not exist abort
-            if not os.path.exists(self.fullname):
-                upipe.print_error(f"Filename {tablename} does not exist in folder {folder}")
-                return
+        self._initialise_centres = False
+        if input_table is not None:
 
-            self.read(filename=tablename, folder=folder, format=self.format_read, guess=self.guess)
+            # If QTable - all good but checking the columns
+            if isinstance(input_table, QTable):
+                if not check_column_set(input_table):
+                    upipe.print_error(f"Input astropy table does not have the minimum set of columns "
+                                      f"(should be {min_column_set})")
+                    return
+                self._init_qtable(input_table)
+
+            # If Table, convert to QTable by going through a file on disk
+            elif isinstance(input_table, Table):
+                self.tablename = "dummytable.tmp"
+                input_table.write(joinpath(self.folder, self.tablename),
+                                  format=self.format_read)
+                self.read()
+
+            # If we have a string, we read the file
+            elif isinstance(input_table, str):
+                self.tablename = input_table
+                # If path name does not exist abort
+                if not os.path.exists(self.fullname):
+                    upipe.print_error(f"Filename {self.tablename} does not exist in folder"
+                                      f" {self.folder}")
+                    return
+
+                self.read()
+
         # else we just scan the folder
         else:
             self.scan_folder(folder=folder, **kwargs)
@@ -1003,6 +1080,18 @@ class PointingTable(object):
         else:
             tablenameout = self.tablenameout
         return joinpath(self.folderout, tablenameout)
+
+    @property
+    def list_datasets(self):
+        """List of unique datasets in the pointing table
+        """
+        return np.unique(self.pointing_table['dataset'].data)
+
+    @property
+    def list_pointings(self):
+        """List of unique pointings in the pointing table
+        """
+        return np.unique(self.pointing_table['pointing'].data)
 
     def _exist(self):
         if not hasattr(self, 'pointing_table'):
@@ -1021,13 +1110,7 @@ class PointingTable(object):
         if not self._exist():
             return False
 
-        missing_cols = [colname for colname in self.list_colnames_ptable if colname not in
-                        self.pointing_table.colnames]
-        if len(missing_cols) > 0:
-            upipe.print_error(f"Missing columns in input file: {missing_cols}")
-            return False
-        else:
-            return True
+        return check_column_set(self.pointing_table)
 
     def scan_folder(self, folder=None, **kwargs):
         """Scan a folder to create a full pointing table
@@ -1047,9 +1130,12 @@ class PointingTable(object):
             self.folder = folder
         upipe.print_info(f"Scanning folder {self.folder}")
 
-        self.pointing_table = get_pointing_table_from_folder(folder=self.folder, **kwargs)
+        # First build the pointing table using the filenames found in folder
+        self.pointing_table = scan_filenames_from_folder(folder=self.folder, **kwargs)
+        # Reset the selection
         self._reset_select()
-        self._reset_pointing()
+        # Assign the pointings
+        self.assign_pointings()
 
     def write(self, overwrite=False, **kwargs):
         """Write out the pointing_table on disk, using the nameout and provided folder.
@@ -1066,7 +1152,7 @@ class PointingTable(object):
         Writes the pointing table on disk
         """
         # Reading the input
-        folder = kwargs.pop("folder", self.folder)
+        folder = kwargs.pop("folder", self.folderout)
         nameout = kwargs.pop("nameout", self.tablename)
         if nameout is None:
             upipe.print_error("No provided output filename")
@@ -1074,6 +1160,43 @@ class PointingTable(object):
         # Writing up using the astropy QTable write
         fullnameout = joinpath(folder, nameout)
         self.pointing_table.write(fullnameout, overwrite=overwrite, **kwargs)
+
+    def set_select_value(self, filename, value=1, verbose=False):
+        """Set the value of the select column to 1, according to a given filename
+
+        filename: str
+        value: int default 1
+        """
+        if filename in self.pointing_table['filename']:
+            selname = self.pointing_table['filename'] == filename
+            self.pointing_table['selec'][selname] = int(value)
+        else:
+            if verbose:
+                upipe.print_warning(f"Doing nothing as filename {filename} not found")
+
+    def unselect_filename(self, filename, verbose=False):
+        """Select the filename as provided, by putting the value of column 'select' to 1
+
+        Input
+        ------
+        filename: str
+            Name of the file (see column 'filename')
+
+        Put the right value of the 'select' column to 1
+        """
+        self.set_select_value(filename, value=0, verbose=verbose)
+
+    def select_filename(self, filename, verbose=False):
+        """Select the filename as provided, by putting the value of column 'select' to 1
+
+        Input
+        ------
+        filename: str
+            Name of the file (see column 'filename')
+
+        Put the right value of the 'select' column to 1
+        """
+        self.set_select_value(filename, value=1, verbose=verbose)
 
     def _reset_select(self, value=1):
         """Reset the select column with 1 by default
@@ -1095,6 +1218,44 @@ class PointingTable(object):
         else:
             self.pointing_table.add_column(int(0), name='pointing')
 
+    def _reset_centres(self):
+        """Reset the pointing column in the pointing table
+        """
+        # initialise the centre column with dummy coordinates
+        if 'centre' not in self.pointing_table.colnames:
+            dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.pointing_table)
+            self.pointing_table.add_column(dummycoord, name="centre")
+
+        if not isinstance(self.pointing_table['centre'], SkyCoord):
+            dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.pointing_table)
+            self.pointing_table.replace_column("centre", dummycoord)
+
+        self._initialise_centres = False
+
+    def _init_qtable(self, input_qtable):
+        """Initialise the select, pointing, centre columns and assign pointings from a minimum
+        QTable including filenames, dataset, tpls, expo
+
+        Input
+        -----
+        input_qtable: astropy QTable
+        """
+        self.pointing_table = input_qtable
+
+        if not self._check():
+            upipe.print_warning("Please consider updating the pointing table")
+
+        self._reset_select()
+        self._reset_pointing()
+
+        # After reading, save the selection to an original one to backup
+        self.pointing_table['select_orig'] = self.pointing_table('select')
+
+        # Get the centres as SkyCoord. Note that if the column is not in the right format
+        # it will be re-initialised
+        self._get_centres()
+        self.assign_pointings()
+
     def read(self, **kwargs):
         """Read the input filename in given folder assuming a given format.
 
@@ -1110,30 +1271,20 @@ class PointingTable(object):
         -------
         self.pointing_table with the content of the file
         """
-        self.filename = kwargs.pop("filename", self.filename)
+        self.tablename = kwargs.pop("filename", self.filename)
         self.folder = kwargs.pop("folder", self.folder)
-        fullname = joinpath(self.folder, self.filename)
-        self.format_read = kwargs.pop("format", 'ascii')
-        self.guess = kwargs.pop("guess", False)
-        if not os.path.exists(fullname):
-            upipe.print_error(f"Pointing Table {fullname} does not exist. Cannot open")
+        self.format_read = kwargs.pop("format", self.format_read)
+        self.guess = kwargs.pop("guess", self.guess)
+        if not os.path.exists(self.fullname):
+            upipe.print_error(f"Pointing Table {self.fullname} does not exist. Cannot open")
             return
 
-        self.pointing_table = QTable.read(fullname, format=self.format_read, guess=self.guess,
-                                         **kwargs)
-        if not self._check():
-            upipe.print_warning("Please consider updating the pointing table")
-
-        self._reset_select()
-        self._reset_pointing()
-
-        # After reading, save the selection to an original one to backup
-        self.pointing_table['select_orig'] = self.pointing_table('select')
-
-        self._get_centres()
+        pointing_table = QTable.read(self.fullname, format=self.format_read, guess=self.guess,
+                                          **kwargs)
+        self._init_qtable(pointing_table)
 
     def _get_centres(self, dtype="image", center_dict=None, **kwargs):
-        """Get the centre of each exposure, assuming a given type
+        """Get the centre of each exposure, assuming a given type for the input files.
 
         Input
         ------
@@ -1157,16 +1308,14 @@ class PointingTable(object):
 
         dict_dtype = {'IMAGE': 'image', 'CUBE': 'cube', 'PIXTABLE': 'pixtable'}
 
-        # initialise the centre column
-        if 'centre' not in self.pointing_table.colnames:
-            dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.pointing_table)
-            self.pointing_table.add_column(dummycoord, name="centre")
+        self._reset_centres()
 
         # Loop over the pointing table and find the centre
         for i in range(len(self.pointing_table)):
             filename = self.pointing_table['filename'][i]
 
             centre = None
+            # Only if the dictionary is not provided
             if center_dict is None:
                 fullname = joinpath(self.folder, filename)
                 if dtype == "guess":
@@ -1182,6 +1331,7 @@ class PointingTable(object):
                     centre = get_centre_from_image_or_cube(fullname, dtype=thistype, **kwargs)
                 else:
                     centre = get_centre_from_pixtable(fullname, **kwargs)
+            # Otherwise use the dictionary
             else:
                 if filename in center_dict:
                     centre = center_dict[filename]
@@ -1189,12 +1339,19 @@ class PointingTable(object):
             # Assigning the centre to the right row
             self.pointing_table['centre'][i] = centre
 
+        self._initialise_centres = True
+
     def assign_pointings(self, **kwargs):
         """Assign pointing according to distance rules. Will also update the centre values.
 
-        Returns
-        -------
+        **kwargs: additional keywords including
+            verbose: bool default=self.verbose
+            overwrite: bool default=False
+                overwrite the pointing
 
+        Updates
+        -------
+        The values of the 'pointing' column for the selected filenames ('select'==1)
         """
         verbose = kwargs.pop("verbose", self.verbose)
         overwrite = kwargs.pop("overwrite", False)
@@ -1203,7 +1360,7 @@ class PointingTable(object):
         self.center_dict, self.pointing_dict, self.file_pointing_dict = \
             group_exposures_per_pointing(self.selected_filenames, target_path=self.folder, **kwargs)
 
-        # Assign centres
+        # Assign centres to the table column 'center'
         self._get_centres(center_dict=self.center_dict)
 
         # Now writing the pointing in the pointing table
@@ -1214,29 +1371,81 @@ class PointingTable(object):
             if verbose:
                 upipe.print_info(f"File: {filename} = Pointing {pointing:02d}")
 
-    def select_from_list(self, **kwargs):
-        """Select all filenames with that pointing number.
+    def select_pointings_and_datasets(self):
+        """Select all filenames with that pointing or dataset number.
 
         Input
         -----
-        **kwargs: default lists are empty ones
-            Valid keywords are:
-                list_datasets: list of int
-                list_pointings: list of int
+        list_pointings: list of int, optional
+        list_datasets: list of int, optional
 
-        Returns
-        -------
-        An astropy table selected according to the list of datasets and pointings
+        Updates
+        ------
+        'select' values in the astropy pointing table according to the list of pointings and
+        datasets
         """
-        list_pointings = kwargs.pop("list_pointings", [])
-        list_datasets = kwargs.pop("list_datasets", [])
+        # Now getting the selections
+        list_datasets = kwargs.pop("list_datasets", self.list_datasets)
+        list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+
+        if list_datasets is None:
+            list_datasets = self.list_datasets
+        if list_pointings is None:
+            list_pointings = self.list_pointings
+
+        for i in range(len(self.pointing_table)):
+            p = self.pointing_table['pointing'][i]
+            d = self.pointing_table['dataset'][i]
+            if p not in list_pointings or d not in list_datasets:
+                self.pointing_table['select'] = int(0)
+            else:
+                self.pointing_table['select'] = int(1)
+
+    def select_pointings(self, **kwargs):
+        """Select all filenames with pointings in the pointing list
+
+        Input
+        -----
+        list_pointings: list of int, optional
+
+        Updates
+        ------
+        'select' values in the astropy pointing table according to the list of pointings
+        """
+        list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+        if list_pointings is None:
+            list_pointings = self.list_pointings
 
         # Now getting the selections
         for i in range(len(self.pointing_table)):
             p = self.pointing_table['pointing'][i]
+            if p not in list_pointings:
+                self.pointing_table['select'] = int(0)
+            else:
+                self.pointing_table['select'] = int(1)
+
+    def select_datasets(self):
+        """Select all filenames with a given list of datasets
+
+        Input
+        -----
+        list_datasets: list of int, optional
+
+        Updates
+        -------
+        'select' values in the astropy pointing table according to the list of datasets
+        """
+        list_datasets = kwargs.pop("list_datasets", self.list_datasets)
+        if list_datasets is None:
+            list_datasets = self.list_datasets
+
+        # Now getting the selections
+        for i in range(len(self.pointing_table)):
             d = self.pointing_table['dataset'][i]
-            if (p not in list_pointings) or (d not in list_datasets):
-                self.pointing_table['select'] = 0
+            if d not in list_datasets:
+                self.pointing_table['select'] = int(0)
+            else:
+                self.pointing_table['select'] = int(1)
 
     @property
     def selected_filenames(self):
@@ -1258,3 +1467,84 @@ class PointingTable(object):
         lfiles.sort()
 
         return lfiles
+
+    @property
+    def dict_names_in_datasets(self):
+        """Dictionary of the names per dataset
+        """
+        dict_names = {}
+        # Covering all rows of the table
+        for row in self.pointing_table:
+            # if the select value is True / 1, append filename to dictionary
+            if row['select']:
+                append_value_to_dict(dict_names, row['dataset'], row['filename'])
+
+        return dict_names
+
+    @property
+    def dict_names_in_pointings(self):
+        """Dictionary of the names per pointing
+        """
+        dict_names = {}
+        # Covering all rows of the table
+        for row in self.pointing_table:
+            # if the select value is True / 1, append filename to dictionary
+            if row['select']:
+                append_value_to_dict(dict_names, row['pointing'], row['filename'])
+
+        return dict_names
+
+    @property
+    def dict_allnames_in_datasets(self):
+        """Dictionary of the names per dataset
+        """
+        dict_names = {}
+        # Covering all rows of the table
+        for row in self.pointing_table:
+            # if the select value is True / 1, append filename to dictionary
+            append_value_to_dict(dict_names, row['dataset'], row['filename'])
+
+        return dict_names
+
+    @property
+    def dict_allnames_in_pointings(self):
+        """Dictionary of the names per pointing
+        """
+        dict_names = {}
+        # Covering all rows of the table
+        for row in self.pointing_table:
+            # if the select value is True / 1, append filename to dictionary
+            append_value_to_dict(dict_names, row['pointing'], row['filename'])
+
+        return dict_names
+
+    @property
+    def dict_tplexpo_per_dataset(self):
+        dict_tplexpo = {}
+        for row in self.pointing_table:
+            # Discard rows which are not selected
+            if not row['select']:
+                continue
+            # First create the dataset as key if not there yet
+            dataset = row['dataset']
+            if dataset not in dict_tplexpo:
+                dict_tplexpo[dataset] = {}
+            value = [row['tpls'], row['expo']]
+            # Then append the tpls and expo values to the pointing for that dataset
+            append_value_to_dict(dict_tplexpo[dataset], row['pointing'], value)
+
+        return dict_tplexpo
+
+    @property
+    def dict_tplexpo_per_pointing(self):
+        dict_tplexpo = {}
+        for row in self.pointing_table:
+            # Discard rows which are not selected
+            if not row['select']:
+                continue
+            # First create the dataset as key if not there yet
+            value = [row['dataset'], row['tpls'], row['expo']]
+            # Then append the tpls and expo values to the pointing for that dataset
+            append_value_to_dict(dict_tplexpo, row['pointing'], value)
+
+        return dict_tplexpo

@@ -25,7 +25,7 @@ except ImportError:
 from astropy.utils.exceptions import AstropyWarning
 
 try:
-    from astropy.table import Table
+    from astropy.table import QTable, Table
 except ImportError:
     raise Exception("astropy.table.Table is required for this module")
 
@@ -37,18 +37,17 @@ from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
 from .util_pipe import (filter_list_with_pdict, get_dataset_name, get_pointing_name, 
-                        get_tpl_nexpo, merge_dict, add_string)
+                        merge_dict, add_string, get_list_datasets)
+from .util_image import PointingTable, scan_filenames_from_list
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
                           dict_combined_folders, default_prefix_wcs,
                           default_prefix_mask, prefix_mosaic, dict_listObject,
-                          lambdaminmax_for_wcs, lambdaminmax_for_mosaic,
-                          default_str_dataset, default_ndigits)
+                          lambdaminmax_for_wcs, lambdaminmax_for_mosaic)
 from .mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
 from .align_pipe import mjd_names, date_names
-prefix_final_cube = prep_recipes_pipe.dict_products_scipost['cube'][0]
 
 __version__ = '0.1.0 (5 Aug 2022)'
 # 0.1.1 07 Nov, 2022: Change Field to Pointing (so now it is Dataset - for an OB, and Pointing)
@@ -56,317 +55,88 @@ __version__ = '0.1.0 (5 Aug 2022)'
 # 0.0.2 28 Feb, 2019: trying to make it work
 # 0.0.1 21 Nov, 2017 : just setting up the scene
 
-def get_list_periods(root_path=""):
-    """Getting a list of existing periods
-    for a given path
-
-    Input
-    -----
-    path: str
-
-    Return
-    ------
-    list_targets: list of str
-    """
-    # Done by scanning the target path
-    list_folders = glob.glob(root_path + "/P???")
-    list_periods = []
-    for folder in list_folders:
-        lint = re.findall(r'(\d{3})', folder)
-        if len(lint) > 0:
-            list_periods.append(int(lint[-1]))
-
-    list_periods.sort()
-    upipe.print_info("Periods list: {0}".format(str(list_periods)))
-    return list_periods
-
-def get_list_targets(folder=""):
-    """Getting a list of existing periods for a given path
-
-    Input
-    -----
-    folder: str
-        Folder name where the targets are
-
-    Return
-    ------
-    list_targets: list of str
-    """
-    # Done by scanning the target path
-    list_targets = [name for name in os.listdir(folder)
-                    if os.path.isdir(os.path.join(folder, name))]
-
-    list_targets.sort()
-    upipe.print_info("Potential Targets -- list: {0}".format(str(list_targets)))
-    return list_targets
+# # Outdated routine ====================================================
+# def get_list_periods(root_path=""):
+#     """Getting a list of existing periods
+#     for a given path
+#
+#     Input
+#     -----
+#     path: str
+#
+#     Return
+#     ------
+#     list_targets: list of str
+#     """
+#     # Done by scanning the target path
+#     list_folders = glob.glob(root_path + "/P???")
+#     list_periods = []
+#     for folder in list_folders:
+#         lint = re.findall(r'(\d{3})', folder)
+#         if len(lint) > 0:
+#             list_periods.append(int(lint[-1]))
+#
+#     list_periods.sort()
+#     upipe.print_info("Periods list: {0}".format(str(list_periods)))
+#     return list_periods
 
 
-def build_dict_datasets(data_path="", str_dataset=default_str_dataset, ndigits=default_ndigits):
-    """Build a dictionary of datasets for each target in the sample
+prefix_final_cube = prep_recipes_pipe.dict_products_scipost['cube'][0]
 
-    Input
-    ------
-    data_path: str
-       Path of the target data
-    str_dataset: str
-        Prefix string for datasets
-    ndigits: int
-       Number of digits to format the name of the dataset
-
-    Returns
-    -------
-    dict_dataset: dict
-
-    """
-    list_targets = get_list_targets(data_path)
-    dict_dataset = {}
-
-    npath = os.path.normpath(data_path)
-    s_npath = npath.split(os.sep)
-
-    for target in list_targets:
-        target_path = f"{data_path}/{target}/"
-        list_datasets = get_list_datasets(target_path, str_dataset, ndigits)
-        dict_t = {}
-        for ds in list_datasets:
-            dict_t[ds] = 1
-
-        dict_dataset[target] = [s_npath[-1], dict_t]
-
-    return dict_dataset
-        
-
-def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
-                         ndigits=default_ndigits, show_pointings=False):
-    """Build a dictionary of exposures using the list of datasets found for the
-    given dataset path
-
-    Input
-    ------
-    target_path: str
-       Path of the target data
-    str_dataset: str
-        Prefix string for datasets
-    ndigits: int
-       Number of digits to format the name of the dataset
-
-    Returns
-    -------
-    dict_expo: dict
-        Dictionary of exposures in each dataset
-
-    """
-    list_datasets = get_list_datasets(target_path, str_dataset, ndigits)
-    dict_expos = {}
-    for dataset in list_datasets:
-        # Get the name of the dataset
-        name_dataset = get_dataset_name(dataset, str_dataset, ndigits)
-        upipe.print_info(f"For dataset {dataset}")
-        # Get the list of exposures for that dataset
-        dict_p = get_list_exposures(joinpath(target_path, name_dataset))
-
-        # If introducing the pointings, we set them by just showing the dataset
-        # numbers as a default, to be changed lated by the user
-        if show_pointings:
-            dict_p_wpointings = {}
-            for tpl in dict_p:
-                dict_p_wpointings[tpl] = [[nexpo, dataset] for nexpo in dict_p[tpl]]
-            # Now changing dict_p
-            dict_p = copy.copy(dict_p_wpointings)
-
-        # Now creating the dictionary entry for that dataset
-        dict_expos[dataset] = [(tpl, dict_p[tpl]) for tpl in dict_p]
-
-    return dict_expos
-
-def get_list_datasets(target_path="", str_dataset=default_str_dataset,
-                      ndigits=default_ndigits, verbose=False):
-    """Getting the list of existing datasets for a given target path
-
-    Input
-    -----
-    target_path: str
-       Path of the target data
-    str_dataset: str
-        Prefix string for datasets
-    ndigits: int
-       Number of digits to format the name of the dataset
-
-    Return
-    ------
-    list_datasets: list of int
-    """
-    # Done by scanning the target path
-    if verbose:
-        upipe.print_info(f"Searching datasets in {target_path} with {str_dataset} prefix")
-    all_folders = glob.glob(f"{target_path}/{str_dataset}*")
-    if verbose:
-        upipe.print_info(f"All folder names  = {all_folders}")
-    all_datasets = [os.path.split(s)[-1] for s in all_folders]
-    all_datasets.sort()
-    if verbose:
-        upipe.print_info(f"All detected folder names  = {all_datasets}")
-    r = re.compile(f"{str_dataset}\d{{{ndigits}}}$")
-    good_datasets = [f for f in all_datasets if r.match(f)]
-    good_datasets.sort()
-    if verbose:
-        upipe.print_info(f"All good folder names  = {good_datasets}")
-    list_datasets = []
-    for folder in good_datasets:
-        list_datasets.append(int(folder[-int(ndigits):]))
-
-    list_datasets.sort()
-    upipe.print_info("Dataset list: {0}".format(str(list_datasets)))
-    return list_datasets
-
-def get_list_exposures(dataset_path=""):
-    """Getting a list of exposures from a given path
-
-    Input
-    -----
-    dataset_path: str
-        Folder name where the dataset is
-
-    Return
-    ------
-    list_expos: list of int
-    """
-    # Done by scanning the target path
-    list_files = glob.glob(f"{dataset_path}/Object/{prefix_final_cube}*_????.fits")
-    list_expos = []
-    for name in list_files:
-        tpl, lint = get_tpl_nexpo(name)
-        if lint > 0:
-            list_expos.append((tpl, int(lint)))
-
-    # Making it unique and sort
-    list_expos = np.unique(list_expos, axis=0)
-    # Sorting by tpl and expo number
-    sorted_list = sorted(list_expos, key=lambda e: (e[0], e[1]))
-
-    # Building the final list
-    dict_expos = {}
-    for l in sorted_list:
-        tpl = l[0]
-        if tpl in dict_expos:
-            dict_expos[tpl].append(int(l[1]))
-        else:
-            dict_expos[tpl] = [int(l[1])]
-
-    # Finding the full list of tpl
-    upipe.print_info("Exposures list:")
-    for tpl in dict_expos:
-        upipe.print_info("TPL= {0} : Exposures= {1}".format(tpl, dict_expos[tpl]))
-
-    return dict_expos
-
-def get_list_reduced_pixtables(target_path="", list_datasets=None, 
-                               suffix="", str_dataset=default_str_dataset, 
-                               ndigits=default_ndigits):
-    """Provide a list of reduced pixtables
-
-    Input
-    -----
-    target_path: str
-        Path for the target folder
-    list_datasets: list of int
-        List of integers, providing the list of datasets to consider
-    suffix: str
-        Additional suffix, if needed, for the names of the PixTables.
-    """
-    # Getting the pieces of the names to be used for pixtabs
-    pixtable_prefix = prep_recipes_pipe.dict_products_scipost['individual'][0]
-    upipe.print_info(f"Will be looking for PIXTABLES with suffix {pixtable_prefix}")
-
-    # Initialise the dictionary of pixtabs to be found in each dataset
-    dict_pixtables = {}
-
-    # Defining the dataset list if not provided
-    # Done by scanning the target path
-    if list_datasets is None:
-        list_datasets = get_list_datasets(target_path, ndigits=ndigits, str_dataset=str_dataset)
-
-    # Looping over the datasets
-    for dataset in list_datasets:
-        # get the path of the dataset
-        path_dataset = joinpath(target_path, get_dataset_name(dataset, str_dataset, ndigits))
-        # List existing pixtabs, using the given suffix
-        list_pixtabs = glob.glob(path_dataset +
-                                 f"/Object/{pixtable_prefix}{suffix}*fits")
-
-        # Reset the needed temporary dictionary
-        dict_tpl = {}
-        # Loop over the pixtables for that dataset
-        for pixtab in list_pixtabs:
-            # Split over the PIXTABLE_REDUCED string
-            sl = pixtab.split(pixtable_prefix + "_")
-            # Find the expo number
-            nf = len(".fits")
-            expo = sl[1][-int(nf+4):-int(nf)]
-            # Find the tpl
-            tpl = sl[1].split("_" + expo)[0]
-            # If not already there, add it
-            if tpl not in dict_tpl:
-                dict_tpl[tpl] = [int(expo)]
-            # if already accounted for, add the expo number
-            else:
-                dict_tpl[tpl].append(int(expo))
-
-        # Creating the full list for that dataset
-        full_list = []
-        for tpl in dict_tpl:
-            dict_tpl[tpl].sort()
-            full_list.append((tpl, dict_tpl[tpl]))
-
-        # And now filling in the dictionary for that dataset
-        dict_pixtables[dataset] = full_list
-
-    return dict_pixtables
 
 class MusePointings(SofPipe, PipeRecipes):
     """Class for a set of MUSE Pointings which can be covering several
     datasets. This provides a set of rules and methods to access the data and
     process them.
     """
-    def __init__(self, targetname=None, 
-                 list_datasets=None, list_pointings=None,
-                 dict_exposures=None,
-                 prefix_masked_pixtables="tmask",
-                 folder_config="",
-                 rc_filename=None, cal_filename=None,
-                 combined_folder_name="Combined", suffix="",
-                 name_offset_table=None,
-                 folder_offset_table=None,
-                 log_filename="MusePipeCombine.log",
-                 verbose=True, debug=False, **kwargs):
+    def __init__(self, targetname=None, list_datasets=None, list_pointings=None,
+                 pointing_table=None, pointing_table_format='ascii', pointing_table_folder='',
+                 folder_config="", rc_filename=None, cal_filename=None,
+                 suffix="", name_offset_table=None, folder_offset_table=None,
+                 log_filename="MusePipeCombine.log", verbose=True, debug=False, **kwargs):
         """Initialisation of class MusePointings
 
         Input
         -----
-        targetname: string (e.g., 'NGC1208'). default is None.
+        targetname: string default is None.
+            Name of the target (e.g., 'NGC0628')
         list_datasets: list of int
-            List of datasets numbers to consider
+            List of dataset numbers to consider
+        list_pointings: list of int
+            List of pointing numbers to consider
+        pointing_table: str or astropy table
+           Name of pointing table (ascii)
+        pointing_table_folder: str
+           Name of folder for the pointing table
+        pointing_table_format: str default='ascii'
+           Format to read the pointing table (if that is a name)
+        folder_config: str default ''
+            Name of folder where configuration files stand
         rc_filename: str
             filename to initialise folders
         cal_filename: str
             filename to initial FIXED calibration MUSE files
-        verbose: bool 
-            Give more information as output (default is True)
-        debug: bool
+        suffix: str default=''
+        name_offset_table: str default=None
+        folder_offset_table: str default=None
+        log_filename: str default='MusePipeCombine.log'
+        verbose: bool default=True
+            Give more information as output
+        debug: bool default=False
             Allows to get more messages when needed
-            Default is False
-        vsystemic: float 
-            Default is 0. Systemic velocity of the galaxy [in km/s]
-        prefix_masked_pixtables: str
-            Suffix for masked PixTables. Default is 'tmask'.
-        use_masked_pixtables: bool
-            Default is False. If True, will use prefix_masked_pixtables to filter out
-            Pixtables which have been masked.
 
         Other possible entries
         ----------------------
         warnings: str
           'ignore' by default. If set to ignore, will ignore the Astropy Warnings.
+        combined_folder_name: str default='Combined'
+        prefix_masked_pixtables: str default='tmask'
+            Suffix for masked PixTables.
+        use_masked_pixtables: bool
+            Default is False. If True, will use prefix_masked_pixtables to filter out
+            Pixtables which have been masked.
+        vsystemic: float
+            Default is 0. Systemic velocity of the galaxy [in km/s]
 
         """
         # Verbose option
@@ -381,7 +151,7 @@ class MusePointings(SofPipe, PipeRecipes):
         if self.warnings == 'ignore':
             warnings.simplefilter('ignore', category=AstropyWarning)
 
-        # Setting the default attibutes #####################
+        # Setting the default attibutes --------------------------------
         self.targetname = targetname
         self.__phangs = kwargs.pop("PHANGS", False)
         if self.__phangs:
@@ -391,14 +161,14 @@ class MusePointings(SofPipe, PipeRecipes):
             self.filter_list = kwargs.pop("filter_list",
                                           default_filter_list)
 
-        self.combined_folder_name = combined_folder_name
+        self.combined_folder_name = kwargs.pop("combined_folder_name", "Combined")
         self.vsystemic = float(kwargs.pop("vsystemic", 0.))
 
         # Including or not the masked Pixtables in place of the original ones
+        self.prefix_masked_pixtables = kwargs.pop("prefix_masked_pixtables", "tmask")
         self.use_masked_pixtables = kwargs.pop("use_masked_pixtables", False)
-        self.prefix_masked_pixtables = prefix_masked_pixtables
 
-        # Setting other default attributes
+        # Setting other default attributes -------------------------------
         if log_filename is None:
             log_filename = "log_{timestamp}.txt".format(timestamp=upipe.create_time_name())
             upipe.print_info("The Log file will be {0}".format(log_filename))
@@ -406,7 +176,8 @@ class MusePointings(SofPipe, PipeRecipes):
         self.suffix = suffix
         self.add_targetname = kwargs.pop("add_targetname", True)
 
-        # End of parameter settings #########################
+
+        # End of parameter settings =======================================
 
         # Init of the subclasses
         PipeRecipes.__init__(self, **kwargs)
@@ -415,7 +186,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # ---------------------------------------------------------
         # Setting up the folders and names for the data reduction
         # Can be initialised by either an rc_file, 
-        # or a default rc_file or harcoded defaults.
+        # or a default rc_file or hardcoded defaults.
         self.pipe_params = InitMuseParameters(folder_config=folder_config,
                                               rc_filename=rc_filename,
                                               cal_filename=cal_filename,
@@ -439,11 +210,9 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # and Recording the folder where we start
         self.paths.orig = os.getcwd()
-
         # END Set up params =======================================
 
         # =========================================================== 
-        # ---------------------------------------------------------
         # Create the Combined folder
         # Making the output folders in a safe mode
         if self.verbose:
@@ -460,18 +229,21 @@ class MusePointings(SofPipe, PipeRecipes):
         # Checking input datasets and pixtables
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
         if check:
-            self._get_list_reduced_pixtables(dict_exposures)
+            self._get_all_pixtables()
+        # Setting of pointing table ---------------------------------------
+            self.assign_pointing_table(input_table=pointing_table, format=pointing_table_format,
+                                       folder=pointing_table_folder)
+            self.filter_pixable_list()
 
         # Checking input offset table and corresponding pixtables
         if check:
             self._check_offset_table(name_offset_table, folder_offset_table)
-        # END CHECK UP ============================================
 
         # Going back to initial working directory
         self.goto_origfolder()
 
     def _check_list_pointings(self, list_pointings=None, default_list=None):
-        """Check which datasets exist
+        """Check which pointings exist
 
         Input
         -----
@@ -484,12 +256,10 @@ class MusePointings(SofPipe, PipeRecipes):
         --------
         list_datasets after checking they exist
         """
-        # Using the function check_list_datasets for this usage
         # But it will just check the list
         return self._check_list_datasets(list_datasets=list_pointings,
                                          default_list=default_list,
                                          listname="Pointings")
-
 
     @property
     def full_list_datasets(self):
@@ -552,92 +322,182 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             return name
 
-    def _get_list_reduced_pixtables(self, dict_exposures=None):
-        """Check if datasets and dictionary are compatible
+    def _replace_with_masked_pixtable(self, name_pixtable, **kwargs):
         """
-        upipe.print_info("Checking the list of reduced PixTables")
-        # Dictionary of exposures to select per dataset
-        self.dict_exposures = dict_exposures
 
+        Input
+        -----
+        name_pixtable: str
+        **kwargs: additional keywords including
+            prefix_masked_pixtables: str default=self.prefix_masked_pixtables
+
+        Returns
+        -------
+
+        """
+        prefix_masked_pixtables = kwargs.pop("prefix_masked_pixtables",
+                                             self.prefix_masked_pixtables)
+        path, filename = os.split(name_pixtable)
+        name_masked_pixtable = f"{path}{prefix_masked_pixtables}{filename}"
+        # If the file exists, replace the name
+        if os.path.isfile(name_masked_pixtable):
+            upipe.print_warning(f"Replacing file {filename} with masked pixtable "
+                                f"from folder {path}")
+            return name_masked_pixtable
+        else:
+            return name_pixtable
+
+    def _get_data_folder(self, dataset):
+        """Get the path to the data and the suffix to look for datasets (when relevant)
+
+        Input
+        -----
+        dataset: int
+
+        Returns
+        -------
+        path_pixtables: str
+            Path for the pixel tables
+        dataset_suffix: str
+            Suffix for the datasets. Return a non empty string if self.pixtab_in_comb_folder
+        """
+        if self._pixtab_in_comb_folder:
+            path_pixtables = self.paths.cubes
+            dataset_suffix = get_dataset_name(dataset,
+                                              self.pipe_params.str_dataset,
+                                              self.pipe_params.ndigits)
+        # Otherwise get it from the usual Object - individual dataset folder
+        else:
+            path_dataset = getattr(self.paths, self.dict_name_datasets[dataset])
+            path_pixtables = path_dataset + self.pipe_params.object
+            dataset_suffix = ""
+
+        return path_pixtables, dataset_suffix
+
+    @property
+    def _all_pixtables(self):
+        all_lists = [self.dict_allpixtabs_in_datasets[dataset] for dataset in self.dict_allpixtabs_in_datasets]
+        return [item for sublist in all_lists for item in sublist]
+
+    def create_pointing_table(self, **kwargs):
+        """Create the pointing table from the all pixtables list
+
+        Add the pointing_table attribute and do the selection according to list_datasets and
+        list_pointings
+        """
+        # get the list
+        list_pixtables = kwargs.pop("list_pixtables", self._all_pixtables)
+
+        # transform into QTable
+        input_qtable = scan_filenames_from_list(list_pixtables)
+
+        # add centres and pointings
+        self.pointing_table = PointingTable(input_table=input_qtable)
+
+
+    def get_all_pixtables(self):
+        """List all pixtables in the data folder
+        Fill in the dict_allpixtabs_in_datasets dictionary and creates the pointing table
+        """
         # Getting the pieces of the names to be used for pixtabs
-        pixtable_suffix = prep_recipes_pipe.dict_products_scipost['individual'][0]
+        pixtable_prefix = prep_recipes_pipe.dict_products_scipost['individual'][0]
         if self._pixtab_in_comb_folder and self.add_targetname:
-            pixtable_suffix = self._add_targetname(pixtable_suffix)
+            pixtable_prefix = self._add_targetname(pixtable_prefix)
 
         # Initialise the dictionary of pixtabs to be found in each dataset
-        self.dict_pixtabs_in_datasets = {}
         self.dict_allpixtabs_in_datasets = {}
-        self.dict_pixtabs_in_pointings = {}
-        self.dict_tplexpo_per_pointing = {}
-        self.dict_tplexpo_per_dataset = {}
-        # Loop on Datasets
+        # Loop on Datasets to get all the pixtables
         for dataset in self.list_datasets:
-            # get the path
-            if self._pixtab_in_comb_folder:
-                path_pixtables = self.paths.cubes
-                dataset_suffix = get_dataset_name(dataset,
-                                                  self.pipe_params.str_dataset,
-                                                  self.pipe_params.ndigits)
-            else:
-                path_dataset = getattr(self.paths, self.dict_name_datasets[dataset])
-                path_pixtables = path_dataset + self.pipe_params.object
-                dataset_suffix = ""
+            # get the path from the Combined folder
+            path_pixtables, dataset_suffix = self._get_data_folder(dataset)
 
             # Process the strings to add "_" if needed
             dataset_suffix = add_string(dataset_suffix)
             suffix = add_string(self.suffix)
             # List existing pixtabs, using the given suffix
             list_pixtabs = glob.glob(path_pixtables + "{0}{1}{2}*fits".format(
-                                     pixtable_suffix, suffix,
+                                     pixtable_prefix, suffix,
                                      dataset_suffix))
 
-            # Take (or not) the masked pixtables
+            # Take (or not) the masked pixtables -----------------------
             if self.use_masked_pixtables:
-                prefix_to_consider = "{0}{1}".format(self.prefix_masked_pixtables,
-                                                     pixtable_suffix)
-                list_masked_pixtabs = glob.glob(path_pixtables +
-                                               "{0}{1}{2}*fits".format(
-                                                   prefix_to_consider,
-                                                   suffix,
-                                                   dataset_suffix))
+                for name_pixtab in list_pixtabs:
+                    self._replace_with_masked_pixtable(name_pixtab)
 
-                # Looping over the existing masked pixtables
-                for masked_pixtab in list_masked_pixtabs:
-                    # Finding the name of the original one
-                    orig_pixtab = masked_pixtab.replace(prefix_to_consider,
-                                                        pixtable_suffix)
-                    if orig_pixtab in list_pixtabs:
-                        # If it exists, replace it
-                        list_pixtabs[list_pixtabs.index(orig_pixtab)] = masked_pixtab
-                        upipe.print_warning("Fixed PixTable {0} was included in "
-                                            "the list and Pixtable {1} was thus "
-                                            "removed from the list.".format(
-                                                masked_pixtab, orig_pixtab))
-                    else:
-                        upipe.print_warning("Original Pixtable {0} not found."
-                                            "Hence will not include masked "
-                                            "PixTable in the list {0}".format(
-                                                orig_pixtab, masked_pixtab))
+            # For this dataset, now sort things according to the dictionary
+            list_pixtabs.sort()
+            upipe.print_info(f"Found {len(list_pixtabs)} for Dataset {dataset:03d}")
+            self.dict_allpixtabs_in_datasets[dataset] = list_pixtabs
 
-            full_list = copy.copy(list_pixtabs)
-            full_list.sort()
-            self.dict_allpixtabs_in_datasets[dataset] = full_list
+    def assign_pointing_table(self, input_table=None, folder='', format='ascii'):
+        """Assign the pointing table as provided. If not provided it will create one from the
+        pixtable list
 
-            # Filter the list with the dataset dictionary if given
-            select_list_pixtabs, tempp_dict_pixtabs, tempp_dict_tplexpo_per_pointing, \
-                tempp_dict_tplexpo_per_dataset = filter_list_with_pdict(list_pixtabs,
-                                                                        list_datasets=[dataset],
-                                                                        dict_files=self.dict_exposures,
-                                                                        verbose=self.verbose)
+        Input
+        ----------
+        input_table: str, QTable, Table or PointingTable
 
-            self.dict_pixtabs_in_pointings = merge_dict(self.dict_pixtabs_in_pointings, 
-                                                        tempp_dict_pixtabs)
-            self.dict_tplexpo_per_pointing = merge_dict(self.dict_tplexpo_per_pointing,
-                                                        tempp_dict_tplexpo_per_pointing)
-            self.dict_tplexpo_per_dataset = merge_dict(self.dict_tplexpo_per_dataset,
-                                                        tempp_dict_tplexpo_per_dataset)
-            select_list_pixtabs.sort()
-            self.dict_pixtabs_in_datasets[dataset] = copy.copy(select_list_pixtabs)
+        Create pointing_table attribute.
+        """
+        if input_table is not None:
+            # Test type of pointing_table
+            if type(input_table) in [str, QTable, Table]:
+                self.pointing_table = PointingTable(input_table=input_table, folder=folder,
+                                                    format=format)
+            elif isinstance(input_table, PointingTable):
+                self.pointing_table = input_table
+            else:
+                upipe.print_error(f"Format of input table not recognised")
+
+        if not hasattr(self, 'pointing_table'):
+            self.create_pointing_table()
+
+    def filter_pixables_with_list(self, list_datasets=None, list_pointings=None):
+        """Filter a list of pixtables
+        
+        Parameters
+        ----------
+        list_datasets: list of int, optional
+        list_pointing: list of int, optional
+
+        Filter out the pointing table using those datasets and pointings
+        """
+        if list_datasets is None:
+            list_datasets = self.list_datasets
+        if list_pointings is None:
+            list_pointings = self.list_pointings
+        # select if pointing or dataset
+        self.pointing_table.select_pointings_and_datasets(list_datasets=list_datasets,
+                                                          list_pointings=list_pointings)
+
+    @property
+    def dict_pixtabs_in_datasets(self):
+        return self.pointing_table.dict_names_in_datasets
+
+    @property
+    def dict_pixtabs_in_pointings(self):
+        return self.pointing_table.dict_names_in_pointings
+
+    def dict_tplexpo_per_dataset(self):
+        return self.pointing_table.dict_tplexpo_per_dataset
+
+    def dict_tplexpo_per_pointing(self):
+        return self.pointing_table.dict_tplexpo_per_pointing
+
+        # # Filter the list with the dataset dictionary if given
+        #     select_list_pixtabs, tempp_dict_pixtabs, tempp_dict_tplexpo_per_pointing, \
+        #         tempp_dict_tplexpo_per_dataset = filter_list_with_pdict(list_pixtabs,
+        #                                                                 list_datasets=[dataset],
+        #                                                                 dict_files=self.dict_exposures,
+        #                                                                 verbose=self.verbose)
+
+        #     self.dict_pixtabs_in_datasets[dataset] = copy.copy(select_list_pixtabs)
+        #     self.dict_pixtabs_in_pointings = merge_dict(self.dict_pixtabs_in_pointings,
+        #                                                 tempp_dict_pixtabs)
+        #     self.dict_tplexpo_per_pointing = merge_dict(self.dict_tplexpo_per_pointing,
+        #                                                 tempp_dict_tplexpo_per_pointing)
+        #     self.dict_tplexpo_per_dataset = merge_dict(self.dict_tplexpo_per_dataset,
+        #                                                 tempp_dict_tplexpo_per_dataset)
 
     def _read_offset_table(self, name_offset_table=None, folder_offset_table=None):
         """Reading the Offset Table
@@ -791,9 +651,11 @@ class MusePointings(SofPipe, PipeRecipes):
             setattr(self.paths, name_dataset, joinpath(self.paths.root,
                                                        f"{self.targetname}/{name_dataset}/"))
 
-        # Creating the attributes for the folders needed in the TARGET root folder, e.g., for alignments
+        # Creating the attributes for the folders needed in the TARGET root folder,
+        # e.g., for alignments
         for name in self.pipe_params._dict_folders_target:
-            setattr(self.paths, name, joinpath(self.paths.target, self.pipe_params._dict_folders_target[name]))
+            setattr(self.paths, name, joinpath(self.paths.target,
+                                               self.pipe_params._dict_folders_target[name]))
 
     def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True, reference_cube=True,
                              refcube_name=None, **kwargs):
@@ -878,8 +740,8 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info("Combining single pointings - Pointing {0:02d}".format(
                              int(pointing)))
             self.run_combine_single_pointing(pointing, add_suffix=add_suffix,
-                                          sof_filename=sof_filename,
-                                          **kwargs)
+                                             sof_filename=sof_filename,
+                                             **kwargs)
 
     def run_combine_single_pointing(self, pointing, add_suffix="", sof_filename='pointing_combine',
                                     **kwargs):
@@ -977,13 +839,13 @@ class MusePointings(SofPipe, PipeRecipes):
         # Running combine with the ref WCS with only 2 spectral pixels
         # Limit the maximum lambda to the wcs ones
         self.run_combine_single_pointing(pointing=pointing,
-                                      filter_list=filter_list,
-                                      sof_filename="pointing_mask",
-                                      add_targetname=self.add_targetname,
-                                      prefix_all=prefix_mask,
-                                      lambdaminmax=lambdaminmax_for_wcs,
-                                      wcs_auto=wcs_auto,
-                                      **kwargs)
+                                         filter_list=filter_list,
+                                         sof_filename="pointing_mask",
+                                         add_targetname=self.add_targetname,
+                                         prefix_all=prefix_mask,
+                                         lambdaminmax=lambdaminmax_for_wcs,
+                                         wcs_auto=wcs_auto,
+                                         **kwargs)
 
         # Now creating the mask with 0's and 1's
         dir_mask = upipe.normpath(self.paths.cubes)
@@ -1183,18 +1045,6 @@ class MusePointings(SofPipe, PipeRecipes):
                                 "will not run. Please use the individual "
                                 "reconstructed cube.", pipe=self)
             return
-            # upipe.print_warning("All considered pointings have only one"
-            #                     " single exposure: it will be duplicated"
-            #                     " to make 'exp_combine' run", pipe=self)
-            # for pointing in list_pointings:
-            #     if len(self.dict_pixtabs_in_pointings[pointing]) < 1:
-            #         continue
-            #     pixtab_name = self.dict_pixtabs_in_pointings[pointing][0]
-            #     head, tail = os.path.split(pixtab_name)
-            #     newpixtab_name = joinpath(head, f"dummy_{tail}")
-            #     os.system(f"cp {pixtab_name} {newpixtab_name}")
-            #     self.dict_pixtabs_in_pointings[pointing].extend(
-            #         [newpixtab_name])
 
         # Now creating the SOF file, first reseting it
         self._sofdict.clear()

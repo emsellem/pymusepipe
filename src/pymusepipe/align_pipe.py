@@ -105,7 +105,7 @@ default_reference_unit = u.microJansky
 
 dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
                       "DUPONT_R": u.spectral_density(6483.58 * u.AA),
-                      "Legacy_r": u.spectral_density(6483.58 * u.AA)}
+                      "LEGACY_R": u.spectral_density(6483.58 * u.AA)}
 # ================== Useful function ====================== #
 
 
@@ -602,8 +602,7 @@ class AlignMuseDataset(object):
 
         # Get the MUSE images
         self._get_list_muse_images()
-        upipe.print_info("{0} MUSE images detected as input".format(
-            self.nimages))
+        upipe.print_info("{0} MUSE images detected as input".format(self.nimages))
         if self.nimages == 0:
             upipe.print_error("No MUSE images detected. Aborted")
             return
@@ -638,13 +637,13 @@ class AlignMuseDataset(object):
         upipe.print_info("Image # : InitFluxScale     SlopeFit       "
                          "NormFactor       Background")
         for nima in range(self.nimages):
-            upipe.print_info("Image {0:03d}:  {1:10.6e}   {2:10.6e}     "
-                             "{3:10.6e}     {4:10.6e}".format(
-                nima,
-                self.init_flux_scale[nima],
-                self.ima_polypar[nima].beta[1],
-                self.ima_norm_factors[nima],
-                self.ima_background[nima]))
+            upipe.print_info("Image #{0:03d}/i={1:03d}:  {2:10.6e}   {3:10.6e}     "
+                             "{4:10.6e}     {5:10.6e}".format(
+                             nima+1, nima,
+                             self.init_flux_scale[nima],
+                             self.ima_polypar[nima].beta[1],
+                             self.ima_norm_factors[nima],
+                             self.ima_background[nima]))
 
     def show_linearfit_values(self):
         """Print some information about the linearly fitted parameters
@@ -653,10 +652,10 @@ class AlignMuseDataset(object):
         upipe.print_info("Normalisation factors")
         upipe.print_info("Image # : BackGround        Slope")
         for nima in range(self.nimages):
-            upipe.print_info("Image {0:03d}:  {1:10.6e}   {2:10.6e}".format(
-                nima,
-                self.ima_polypar[nima].beta[0],
-                self.ima_polypar[nima].beta[1]))
+            upipe.print_info("Image #{0:03d}/i={1:03d}:  {2:10.6e}   {3:10.6e}".format(
+                             nima+1, nima,
+                             self.ima_polypar[nima].beta[0],
+                             self.ima_polypar[nima].beta[1]))
 
     def _init_alignment_arrays(self):
         """Initialise all list and image arrays which are needed
@@ -871,18 +870,19 @@ class AlignMuseDataset(object):
         upipe.print_info("Offset recorded in OFFSET_LIST Table")
         upipe.print_info("Total in ARCSEC")
         for nima in range(self.nimages):
-            upipe.print_info("Image {0:03d} - {1}".format(nima, self.list_name_museimages[nima]))
-            upipe.print_info("          - {0:8.4f} {1:8.4f}".format(
-                fits_table['RA_OFFSET'][nima] * 3600
-                * np.cos(np.deg2rad(self.list_dec_muse[nima])),
-                fits_table['DEC_OFFSET'][nima] * 3600.))
+            upipe.print_info(f"Image #{nima+1:03d}/i={nima:03d} - "
+                             f"{self.list_name_museimages[nima]}")
+            upipe.print_info("                - {0:8.4f} {1:8.4f}".format(
+                             fits_table['RA_OFFSET'][nima] * 3600
+                             * np.cos(np.deg2rad(self.list_dec_muse[nima])),
+                             fits_table['DEC_OFFSET'][nima] * 3600.))
 
     def print_images_names(self):
         """Print out the names of the images being considered for alignment
         """
         upipe.print_info("Image names")
         for nima in range(self.nimages):
-            upipe.print_info("{0:03d} - {1}".format(nima, self.list_name_museimages[nima]))
+            upipe.print_info(f"#{nima+1:03d}/i={nima:03d} - {self.list_name_museimages[nima]}")
 
     def print_offsets_and_norms(self, filename="_temp.txt",
                                 folder_output_file=None, overwrite=True):
@@ -946,9 +946,9 @@ class AlignMuseDataset(object):
         upipe.print_info("#    Name               OFFSETS  |ARCSEC|   "
                          "X        Y     |PIXEL|    X        Y      |ROT| (DEG)")
         for nima in range(self.nimages):
-            upipe.print_info("{0:03d} -{1:>26}  |ARCSEC|{2:8.4f} {3:8.4f} "
-                             " |PIXEL|{4:8.4f} {5:8.4f}  |ROT|{6:8.4f}".format(
-                             nima, self.list_name_museimages[nima][-29:-5],
+            upipe.print_info("#{0:03d}/i={1:03d} -{2:>26}  |ARCSEC|{3:8.4f} {4:8.4f} "
+                             " |PIXEL|{5:8.4f} {6:8.4f}  |ROT|{7:8.4f}".format(
+                             nima+1, nima, self.list_name_museimages[nima][-29:-5],
                              self._total_off_arcsec[nima][0],
                              self._total_off_arcsec[nima][1],
                              self._total_off_pixel[nima][0],
@@ -1394,7 +1394,7 @@ class AlignMuseDataset(object):
 
         # Use Translation and Rotation or only rotation?
         for nima in list_nima:
-            upipe.print_info(f"------- Optical Flow for Image {nima} -------")
+            upipe.print_info(f"---------- Optical Flow for Image #{nima+1}/i={nima} ----------")
             self.run_optical_flow_ima(nima=nima, save_plot=save_plot,
                                       use_rotation=use_rotation,
                                       verbose=verbose, **kwargs)
@@ -1476,7 +1476,7 @@ class AlignMuseDataset(object):
             Number of iterations
         """
         if self.verbose:
-            upipe.print_info(f"Optical flow with {niter} iterations for Image {nima}")
+            upipe.print_info(f"Optical flow with {niter} iterations for Image #{nima+1}/i={nima}")
 
         list_guess_key = ["guess_rotation", "guess_offset_pixel", "guess_offset_arcsec"]
         given_guess = any(guess_key in kwargs for guess_key in list_guess_key)
@@ -1897,7 +1897,7 @@ class AlignMuseDataset(object):
 
         """
         # Call the alignment given the input nima image
-        upipe.print_info(f"[#{nima:03d}] --- Regridding Image "
+        upipe.print_info(f"[#{nima+1:03d}/i={nima:03d}] --- Regridding Image "
                          f" {self.list_name_museimages[nima]} ---")
         hdu_offmuse, hdu_projref, diffra  = self._apply_alignment(self.list_muse_hdu[nima],
             total_off_pixel=self._total_off_pixel[nima], total_rotangle=self._total_rotangles[nima])
@@ -1971,9 +1971,9 @@ class AlignMuseDataset(object):
         verbose = kwargs.pop("verbose", self.verbose)
         if verbose:
             upipe.print_info(f"       Offset   [PIXELS]: {total_off_pixel[0]:8.4f}"
-                           f" {total_off_pixel[1]:8.4f}  /  "
-                           f"[ARCSEC]: {total_off_arcsec[0]:8.4f}"
-                           f"{total_off_arcsec[1]:8.4f}")
+                             f" {total_off_pixel[1]:8.4f}  /  "
+                             f"[ARCSEC]: {total_off_arcsec[0]:8.4f}"
+                             f"{total_off_arcsec[1]:8.4f}")
             upipe.print_info(f"       Rotation [DEGREE]: {total_rotangle:8.4f}")
 
         # Shifting the CRPIX values in the header

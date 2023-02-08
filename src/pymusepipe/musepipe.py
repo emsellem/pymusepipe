@@ -722,7 +722,7 @@ class MusePipe(PipePrep, PipeRecipes):
         # Sorting alphabetically (thus by date)
         if self.checkmode:
             upipe.print_warning(f"Checkmode is True: the MUSE Mode will be checked.")
-            upipe.print_warning(f"All Raw files which do have musemode = {self.musemode} "
+            upipe.print_warning(f"All Raw files which do NOT have musemode = {self.musemode} "
                                 f"and are mode specific (e.g., Flat field) will be masked.")
             upipe.print_warning(f"If you wish otherwise, set checkmode to False "
                                 f"[but this may impact the data reduction].")

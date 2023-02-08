@@ -127,8 +127,9 @@ class PipeRecipes(object) :
                 self.write_logfile(command)
                 self.write_outlogfile(command)
                 self.write_outlogfile(result.stdout.decode('utf-8'))
-                self.write_errlogfile(command)
-                self.write_errlogfile(result.stderr.decode('utf-8'))
+                if (result.stderr) > 0:
+                    self.write_errlogfile(command)
+                    self.write_errlogfile(result.stderr.decode('utf-8'))
 
     def joinprod(self, name):
         return joinpath(self.paths.pipe_products, name)

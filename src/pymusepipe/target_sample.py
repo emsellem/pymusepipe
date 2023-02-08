@@ -532,10 +532,10 @@ class MusePipeSample(object):
             Name of the target
         list_datasets: list
             Dataset numbers. Default is None (meaning all datasets
-            indicated in the dictonary will be reduced)
+            indicated in the dictionary will be reduced)
         """
         self.reduce_target(targetname=targetname, list_datasets=list_datasets,
-                last_recipe="prep_align", **kwargs)
+                           last_recipe="prep_align", **kwargs)
 
     def reduce_target_postalign(self, targetname=None, list_datasets=None, **kwargs):
         """Reduce target for all steps after pre-alignment
@@ -549,7 +549,7 @@ class MusePipeSample(object):
             indicated in the dictonary will be reduced)
         """
         self.reduce_target(targetname=targetname, list_datasets=list_datasets,
-                first_recipe="align_bydataset", **kwargs)
+                           first_recipe="align_bydataset", **kwargs)
 
     def finalise_reduction(self, targetname=None, rot_pixtab=False, create_wcs=True,
                            create_expocubes=True, create_pixtables=True,
@@ -648,7 +648,7 @@ class MusePipeSample(object):
 
     def run_target_scipost_perexpo(self, targetname=None, list_datasets=None,
                                    folder_offset_table=None, name_offset_table=None,
-                                   dict_exposures=None, **kwargs):
+                                   **kwargs):
         """Build the cube per exposure using a given WCS
 
         Args:
@@ -688,8 +688,7 @@ class MusePipeSample(object):
 
         # initialisation of the combination to make sure we get the pointings right
         # We will thus make use of the dict_tplexpo_in_pointing
-        self.init_combine(targetname=targetname, list_datasets=list_datasets,
-                          dict_exposures=dict_exposures)
+        self.init_combine(targetname=targetname, list_datasets=list_datasets)
 
         # Running the scipost_perexpo for all datasets individually
         dict_tplexpo_per_dataset = self.pipes_combine[targetname].dict_tplexpo_per_dataset
@@ -908,8 +907,8 @@ class MusePipeSample(object):
             prefix_cubes = "{0}_{1}".format(targetname, prefix_cubes)
         else:
             wcs_prefix = ""
-        ref_wcs = kwargs.pop("ref_wcs", "{0}{1}DATACUBE_FINAL.fits".format(
-                             default_prefix_wcs_mosaic, wcs_prefix))
+        ref_wcs = kwargs.pop("ref_wcs", f"{default_prefix_wcs_mosaic}{wcs_prefix}"
+                                        f"DATACUBE_FINAL.fits")
         upipe.print_info(f"Check file: ref_wcs is {ref_wcs}")
 
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
@@ -1067,7 +1066,8 @@ class MusePipeSample(object):
     def init_combine(self, targetname=None, list_pointings=None, list_datasets=None,
                      folder_offset_table=None, name_offset_table=None,
                      **kwargs):
-        """Prepare the combination of targets
+        """Prepare the combination of targets. The use can provide a pointing table providing a
+        given selection.
 
         Input
         -----
@@ -1077,17 +1077,20 @@ class MusePipeSample(object):
             List of pointings (e.g., [1,2,3])
         name_offset_table: str
             Name of Offset table
+
+        **kwargs: additional keywords including
+            pointing_table, pointing_table_folder, pointing_table_format
         """
         log_filename = kwargs.pop("log_filename", "{0}_combine_{1}.log".format(targetname, version_pack))
         self.pipes_combine[targetname] = MusePointings(targetname=targetname,
-                                                    list_pointings=list_pointings,
-                                                    list_datasets=list_datasets,
-                                                    rc_filename=self.targets[targetname].rc_filename,
-                                                    cal_filename=self.targets[targetname].cal_filename,
-                                                    folder_config=self.targets[targetname].folder_config,
-                                                    name_offset_table=name_offset_table,
-                                                    folder_offset_table=folder_offset_table,
-                                                    log_filename=log_filename, **kwargs)
+                                                       list_pointings=list_pointings,
+                                                       list_datasets=list_datasets,
+                                                       rc_filename=self.targets[targetname].rc_filename,
+                                                       cal_filename=self.targets[targetname].cal_filename,
+                                                       folder_config=self.targets[targetname].folder_config,
+                                                       name_offset_table=name_offset_table,
+                                                       folder_offset_table=folder_offset_table,
+                                                       log_filename=log_filename, **kwargs)
 
     def combine_target_per_pointing(self, targetname=None, wcs_from_pointing=True,
                                  **kwargs):
