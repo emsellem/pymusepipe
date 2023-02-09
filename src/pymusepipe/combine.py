@@ -200,9 +200,6 @@ class MusePointings(SofPipe, PipeRecipes):
         self._dict_combined_folders = dict_combined_folders
         # List of datasets to process
         self.list_datasets = self._check_list_datasets(list_datasets)
-        if check:
-            # List of pointings to process
-            self.list_pointings = self._check_list_pointings(list_pointings)
 
         # Setting all the useful paths
         self.set_fullpath_names()
@@ -233,6 +230,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Setting of pointing table ---------------------------------------
             self.assign_pointing_table(input_table=pointing_table, format=pointing_table_format,
                                        folder=pointing_table_folder)
+            self.list_pointings = self._check_list_pointings(list_pointings)
             self.filter_pixables_with_list()
 
         # Checking input offset table and corresponding pixtables
@@ -256,10 +254,27 @@ class MusePointings(SofPipe, PipeRecipes):
         --------
         list_datasets after checking they exist
         """
-        # But it will just check the list
-        return self._check_list_datasets(list_datasets=list_pointings,
-                                         default_list=default_list,
-                                         listname="Pointings")
+        verbose = kwargs.pop("verbose", False)
+
+        if default_list is None:
+            default_list = self.pointing_table.list_pointings
+
+        # Now the list of datasets
+        if list_pointings is None:
+            # This is using all the existing pointings
+            return default_list
+        else:
+            if verbose:
+                upipe.print_info(f"Wished pointing list = {list_pointings}")
+                upipe.print_warning(f"Target default pointing list = {default_list}")
+            # Checked ones
+            checked_list_pointings = list(set(list_pointings) & set(default_list))
+            # Not existing ones
+            notfound = list(set(list_pointings) - set(default_list))
+            for l in notfound:
+                upipe.print_warning(f"No pointing {l} for the given target")
+
+            return checked_list_pointings
 
     @property
     def full_list_datasets(self):
@@ -281,7 +296,6 @@ class MusePointings(SofPipe, PipeRecipes):
         -------
         list_datasets after checking they exist
         """
-        listname = kwargs.pop("listname", "Datasets")
         verbose = kwargs.pop("verbose", False)
 
         if default_list is None:
@@ -292,14 +306,14 @@ class MusePointings(SofPipe, PipeRecipes):
             return default_list
         else:
             if verbose:
-                upipe.print_info(f"Wished {listname} list = {list_datasets}")
-                upipe.print_warning(f"Target default {listname} list = {default_list}")
+                upipe.print_info(f"Wished dataset list = {list_datasets}")
+                upipe.print_warning(f"Target default dataset list = {default_list}")
             # Checked ones
             checked_list_datasets = list(set(list_datasets) & set(default_list))
             # Not existing ones
             notfound = list(set(list_datasets) - set(default_list))
             for l in notfound:
-                upipe.print_warning(f"No {listname} {l} for the given target")
+                upipe.print_warning(f"No dataset {l} for the given target")
 
             return checked_list_datasets
 
@@ -488,13 +502,8 @@ class MusePointings(SofPipe, PipeRecipes):
         if list_pointings is None:
             list_pointings = self.list_pointings
         # select if pointing or dataset
-        print(f"COUCOU = {self.pointing_table.qtable['select'][0]}")
-        print(list_datasets)
-        print("---")
-        print(list_pointings)
         self.pointing_table.select_pointings_and_datasets(list_datasets=list_datasets,
                                                           list_pointings=list_pointings)
-        print(f"COUCOU2 = {self.pointing_table.qtable['select'][0]}")
 
     @property
     def dict_pixtabs_in_datasets(self):

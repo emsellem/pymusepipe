@@ -1086,13 +1086,13 @@ class PointingTable(object):
     def list_datasets(self):
         """List of unique datasets in the pointing table
         """
-        return np.unique(self.qtable['dataset'].data)
+        return list(np.unique(self.qtable['dataset'].data))
 
     @property
     def list_pointings(self):
         """List of unique pointings in the pointing table
         """
-        return np.unique(self.qtable['pointing'].data)
+        return list(np.unique(self.qtable['pointing'].data))
 
     def _exist(self):
         if not hasattr(self, 'qtable'):
