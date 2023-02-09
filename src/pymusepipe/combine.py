@@ -36,14 +36,13 @@ from .recipes_pipe import PipeRecipes
 from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
-from .util_pipe import (filter_list_with_pdict, get_dataset_name, get_pointing_name, 
-                        merge_dict, add_string, get_list_datasets)
+from .util_pipe import (get_dataset_name, get_pointing_name, add_string, get_list_datasets)
 from .util_image import PointingTable, scan_filenames_from_list
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
                           dict_combined_folders, default_prefix_wcs,
                           default_prefix_mask, prefix_mosaic, dict_listObject,
-                          lambdaminmax_for_wcs, lambdaminmax_for_mosaic)
+                          lambdaminmax_for_wcs, lambdaminmax_for_mosaic, dict_products_scipost)
 from .mpdaf_pipe import MuseCube
 
 # Default keywords for MJD and DATE
@@ -81,7 +80,7 @@ __version__ = '0.1.0 (5 Aug 2022)'
 #     return list_periods
 
 
-prefix_final_cube = prep_recipes_pipe.dict_products_scipost['cube'][0]
+prefix_final_cube = dict_products_scipost['cube'][0]
 
 
 class MusePointings(SofPipe, PipeRecipes):
@@ -177,6 +176,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self.add_targetname = kwargs.pop("add_targetname", True)
         # Checking input datasets and pixtables
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
+        self._pixtable_type = kwargs.pop("pixtable_type", "REDUCED")
 
         # End of parameter settings =======================================
 
@@ -413,7 +413,11 @@ class MusePointings(SofPipe, PipeRecipes):
         Fill in the dict_allpixtabs_in_datasets dictionary and creates the pointing table
         """
         # Getting the pieces of the names to be used for pixtabs
-        pixtable_prefix = prep_recipes_pipe.dict_products_scipost['individual'][0]
+        if self._pixtab_in_comb_folder:
+            pixtable_prefix = dict_listObject[self._pixtable_type]
+        else:
+            pixtable_prefix = dict_listObject[self._pixtable_type]
+
         if self._pixtab_in_comb_folder and self.add_targetname:
             pixtable_prefix = self._add_targetname(pixtable_prefix)
 

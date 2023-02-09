@@ -596,6 +596,7 @@ class MusePipeSample(object):
                                             norm_skycontinuum=norm_skycontinuum,
                                             list_datasets=list_datasets,
                                             pixtab_in_comb_folder=False,
+                                            pixtable_type='OBJECT',
                                             skymethod=skymethod)
 
         if create_wcs:
@@ -689,11 +690,13 @@ class MusePipeSample(object):
         pointing_table_folder = kwargs.pop("pointing_table_folder", "")
         pointing_table_format = kwargs.pop("pointing_table_format", "ascii")
         pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", False)
+        pixtable_type = kwargs.pop("pixtable_type", 'REDUCED')
         self.init_combine(targetname=targetname, list_datasets=list_datasets,
                           list_pointings=list_pointings, pointing_table=pointing_table,
                           pointing_table_folder=pointing_table_folder,
                           pointing_table_format=pointing_table_format,
-                          pixtab_in_comb_folder=pixtab_in_comb_folder)
+                          pixtab_in_comb_folder=pixtab_in_comb_folder,
+                          pixtable_type=pixtable_type)
 
         # Running the scipost_perexpo for all datasets individually
         dict_tplexpo_per_dataset = self.pipes_combine[targetname].dict_tplexpo_per_dataset
