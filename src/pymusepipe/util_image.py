@@ -1283,12 +1283,12 @@ class PointingTable(object):
                                           **kwargs)
         self._init_qtable(pointing_table)
 
-    def _get_centres(self, dtype="image", center_dict=None, **kwargs):
+    def _get_centres(self, dtype="guess", center_dict=None, **kwargs):
         """Get the centre of each exposure, assuming a given type for the input files.
 
         Input
         ------
-        dtype: str
+        dtype: str default='guess'
             Must be 'image', 'cube' or 'pixeltable'
         center_dict: dictionary, optional
             Dictionary including the filenames and their centres
@@ -1311,15 +1311,15 @@ class PointingTable(object):
         self._reset_centres()
 
         # Loop over the pointing table and find the centre
-        for i in range(len(self.pointing_table)):
-            filename = self.pointing_table['filename'][i]
+        for row in self.pointing_table:
+            filename = row['filename']
 
             centre = None
             # Only if the dictionary is not provided
             if center_dict is None:
                 fullname = joinpath(self.folder, filename)
                 if dtype == "guess":
-                    ldtype = [dtype for dtype in dict_dtype if dtype in filename]
+                    ldtype = [dict_type[dtype] for dtype in dict_dtype if dtype in filename]
                     if len(ldtype) == 0:
                         upipe.print_warning(f"Could not guess type of file {filename} - Skipping")
                         continue
@@ -1337,7 +1337,8 @@ class PointingTable(object):
                     centre = center_dict[filename]
 
             # Assigning the centre to the right row
-            self.pointing_table['centre'][i] = centre
+            print(f"TEST - {centre}")
+            row['centre'] = centre
 
         self._initialise_centres = True
 
