@@ -688,9 +688,9 @@ class MusePipeSample(object):
 
         # initialisation of the combination to make sure we get the pointings right
         # We will thus make use of the dict_tplexpo_in_pointing
-        pointing_table = kwargs("pointing_table", None)
-        pointing_table_folder = kwargs("pointing_table_folder", "")
-        pointing_table_format = kwargs("pointing_table_format", "ascii")
+        pointing_table = kwargs.pop("pointing_table", None)
+        pointing_table_folder = kwargs.pop("pointing_table_folder", "")
+        pointing_table_format = kwargs.pop("pointing_table_format", "ascii")
         self.init_combine(targetname=targetname, list_datasets=list_datasets,
                           list_pointings=list_pointings, pointing_table=pointing_table,
                           pointing_table_folder=pointing_table_folder,
