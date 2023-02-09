@@ -594,8 +594,8 @@ class MusePipeSample(object):
                                             save="individual",
                                             wcs_auto=False,
                                             norm_skycontinuum=norm_skycontinuum,
-                                            dict_exposures=dict_exposures,
                                             list_datasets=list_datasets,
+                                            pixtab_in_comb_folder=False,
                                             skymethod=skymethod)
 
         if create_wcs:
@@ -613,7 +613,6 @@ class MusePipeSample(object):
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
                                       name_offset_table=name_offset_table,
-                                      dict_exposures=dict_exposures,
                                       reference_cube=reference_cube,
                                       refcube_name=refcube_name,
                                       mosaic_wcs=mosaic_wcs,
@@ -631,7 +630,6 @@ class MusePipeSample(object):
                                             name_offset_table=name_offset_table,
                                             save="cube",
                                             norm_skycontinuum=norm_skycontinuum,
-                                            dict_exposures=dict_exposures,
                                             list_datasets=list_datasets,
                                             skymethod=skymethod,
                                             **kwargs)
@@ -642,7 +640,6 @@ class MusePipeSample(object):
             self.combine_target_per_pointing(targetname=targetname,
                                              name_offset_table=name_offset_table,
                                              folder_offset_table=folder_offset_table,
-                                             dict_exposures=dict_exposures,
                                              list_datasets=list_datasets,
                                              filter_list=self._short_filter_list)
 
@@ -691,10 +688,12 @@ class MusePipeSample(object):
         pointing_table = kwargs.pop("pointing_table", None)
         pointing_table_folder = kwargs.pop("pointing_table_folder", "")
         pointing_table_format = kwargs.pop("pointing_table_format", "ascii")
+        pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", False)
         self.init_combine(targetname=targetname, list_datasets=list_datasets,
                           list_pointings=list_pointings, pointing_table=pointing_table,
                           pointing_table_folder=pointing_table_folder,
-                          pointing_table_format=pointing_table_format)
+                          pointing_table_format=pointing_table_format,
+                          pixtab_in_comb_folder=pixtab_in_comb_folder)
 
         # Running the scipost_perexpo for all datasets individually
         dict_tplexpo_per_dataset = self.pipes_combine[targetname].dict_tplexpo_per_dataset
