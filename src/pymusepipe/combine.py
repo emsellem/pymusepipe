@@ -517,9 +517,11 @@ class MusePointings(SofPipe, PipeRecipes):
     def dict_pixtabs_in_pointings(self):
         return self.pointing_table.dict_names_in_pointings
 
+    @property
     def dict_tplexpo_per_dataset(self):
         return self.pointing_table.dict_tplexpo_per_dataset
 
+    @property
     def dict_tplexpo_per_pointing(self):
         return self.pointing_table.dict_tplexpo_per_pointing
 
