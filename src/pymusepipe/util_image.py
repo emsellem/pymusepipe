@@ -1198,7 +1198,7 @@ class PointingTable(object):
         """
         self.set_select_value(filename, value=1, verbose=verbose)
 
-    def _reset_select(self, value=1):
+    def _reset_select(self, value=1, overwrite=True):
         """Reset the select column with 1 by default
 
         Input
@@ -1207,14 +1207,21 @@ class PointingTable(object):
         """
         # If no selection is done, just select all by default
         if "select" not in self.pointing_table.colnames:
-            self.pointing_table['select'] = int(value)
+            if overwrite:
+                self.pointing_table.replace_column(name='select',
+                                                   col=[int(value)] * len(self.pointing_table),
+                                                   copy=False))
+        else:
+            self.pointing_table.add_column(int(value), name='select')
 
     def _reset_pointing(self, overwrite=False):
         """Reset the pointing column in the pointing table
         """
         if 'pointing' in self.pointing_table.colnames:
-            if overwrite==True:
-                self.pointing_table.replace_column(int(0), name='pointing')
+            if overwrite:
+                self.pointing_table.replace_column(name='pointing',
+                                                   col=[int(0)] * len(self.pointing_table),
+                                                   copy=False)
         else:
             self.pointing_table.add_column(int(0), name='pointing')
 
@@ -1228,7 +1235,7 @@ class PointingTable(object):
 
         if not isinstance(self.pointing_table['centre'], SkyCoord):
             dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.pointing_table)
-            self.pointing_table.replace_column("centre", dummycoord)
+            self.pointing_table.replace_column(name="centre", col=dummycoord, copy=False)
 
         self._initialise_centres = False
 
@@ -1303,7 +1310,8 @@ class PointingTable(object):
 
         """
         if dtype not in ["image", "cube", "pixtable", "guess"]:
-            upipe.print_error(f"Dtype {dtype} not recognised ['image', 'cube', 'pixtable', 'guess']")
+            upipe.print_error(f"Dtype {dtype} not recognised "
+                              f"['image', 'cube', 'pixtable', 'guess']")
             return
 
         dict_dtype = {'IMAGE': 'image', 'CUBE': 'cube', 'PIXTABLE': 'pixtable'}
