@@ -470,8 +470,6 @@ class MusePointings(SofPipe, PipeRecipes):
                 if len(qtable_pixtables[mask]) == 0:
                     row['select'] = 0
                 else:
-                    print(f"_{qtable_pixtables[mask]['filename'].value[0]}_")
-                    print(f"_{row['filename']}_")
                     row['filename'] = qtable_pixtables[mask]['filename'].value[0]
                     row['select'] = 1
 
@@ -490,8 +488,10 @@ class MusePointings(SofPipe, PipeRecipes):
         if list_pointings is None:
             list_pointings = self.list_pointings
         # select if pointing or dataset
+        print(f"COUCOU = {self.pointing_table.qtable['select'][0]}")
         self.pointing_table.select_pointings_and_datasets(list_datasets=list_datasets,
                                                           list_pointings=list_pointings)
+        print(f"COUCOU2 = {self.pointing_table.qtable['select'][0]}")
 
     @property
     def dict_pixtabs_in_datasets(self):
