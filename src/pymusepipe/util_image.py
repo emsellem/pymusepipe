@@ -1470,8 +1470,7 @@ class PointingTable(object):
             upipe.print_warning("Missing a pointing table - returning an empty filename list")
             return []
 
-        self.pointing_table.add_index('select')
-        inds = self.pointing_table.loc_indices['select', 1]
+        inds = self.pointing_table['select'] == 1
 
         lfiles = list(self.pointing_table['filename'][inds])
         lfiles.sort()
