@@ -555,8 +555,7 @@ class MusePipeSample(object):
                            create_expocubes=True, create_pixtables=True,
                            create_pointingcubes=True,
                            name_offset_table=None, folder_offset_table=None,
-                           dict_exposures=None, list_datasets=None,
-                           **kwargs):
+                           list_datasets=None, **kwargs):
         """Finalise the reduction steps by using the offset table, rotating the
         pixeltables, then reconstructing the PIXTABLE_REDUCED, produce reference
         WCS for each pointing, and then run the reconstruction of the final
@@ -584,6 +583,7 @@ class MusePipeSample(object):
 
         norm_skycontinuum = kwargs.pop("norm_skycontinuum", True)
         skymethod = kwargs.pop("skymethod", 'model')
+        pointing_table = kwargs.pop("pointing_table", None)
         if create_pixtables:
             # We then reconstruct the pixtable reduced so we can
             # redo a muse_exp_combine if needed
@@ -597,8 +597,9 @@ class MusePipeSample(object):
                                             list_datasets=list_datasets,
                                             pixtab_in_comb_folder=False,
                                             pixtable_type='OBJECT',
-                                            check=False,
-                                            skymethod=skymethod)
+                                            pointing_table=pointing_table,
+                                            check=False, skymethod=skymethod,
+                                            **kwargs)
 
         if create_wcs:
             # Creating the WCS reference frames. Full mosaic and individual
@@ -634,6 +635,7 @@ class MusePipeSample(object):
                                             norm_skycontinuum=norm_skycontinuum,
                                             list_datasets=list_datasets,
                                             skymethod=skymethod,
+                                            pointing_table=pointing_table,
                                             **kwargs)
 
         if create_pointingcubes:
@@ -693,7 +695,8 @@ class MusePipeSample(object):
         pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", False)
         pixtable_type = kwargs.pop("pixtable_type", 'REDUCED')
         self.init_combine(targetname=targetname, list_datasets=list_datasets,
-                          list_pointings=list_pointings, pointing_table=pointing_table,
+                          list_pointings=list_pointings,
+                          pointing_table=pointing_table,
                           pointing_table_folder=pointing_table_folder,
                           pointing_table_format=pointing_table_format,
                           pixtab_in_comb_folder=pixtab_in_comb_folder,

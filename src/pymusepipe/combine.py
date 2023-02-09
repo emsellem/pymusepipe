@@ -472,8 +472,6 @@ class MusePointings(SofPipe, PipeRecipes):
                 upipe.print_error(f"Format of input table not recognised")
 
         if not hasattr(self, 'pointing_table'):
-            print("COUCOU")
-            print(input_table)
             self.pointing_table = self.get_pointing_table()
 
         # Now replace names with pixel tables names
