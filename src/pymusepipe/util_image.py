@@ -993,7 +993,7 @@ def scan_filenames_from_list(list_files, **kwargs):
             filename_table.add_row((filename, fdataset, ftpls, fexpo))
 
     filename_table.sort("filename")
-    upipe.print_info(f"Found {len(filename_table)} from input filename list")
+    upipe.print_info(f"Found {len(filename_table)} files from input filename list")
     return filename_table
 
 
@@ -1066,7 +1066,7 @@ class PointingTable(object):
 
                 self.read()
 
-        # else we just scan the folder
+        # else we just scan the folder but that means scanning over many pixtables
         else:
             self.scan_folder(folder=folder, **kwargs)
 
@@ -1253,16 +1253,18 @@ class PointingTable(object):
         if not self._check():
             upipe.print_warning("Please consider updating the pointing table")
 
-        self._reset_select()
-        self._reset_pointing()
+        if 'select' not in self.pointing_table.colnames:
+            self._reset_select()
+            # After reading, save the selection to an original one to backup
+            self.pointing_table['select_orig'] = self.pointing_table['select']
 
-        # After reading, save the selection to an original one to backup
-        self.pointing_table['select_orig'] = self.pointing_table['select']
+        if 'pointing' not in self.pointing_table.colnames:
+            self._reset_pointing()
+            # Get the centres as SkyCoord. Note that if the column is not in the right format
+            # it will be re-initialised
+            self._get_centres()
+            self.assign_pointings()
 
-        # Get the centres as SkyCoord. Note that if the column is not in the right format
-        # it will be re-initialised
-        self._get_centres()
-        self.assign_pointings()
 
     def read(self, **kwargs):
         """Read the input filename in given folder assuming a given format.
@@ -1319,34 +1321,46 @@ class PointingTable(object):
 
         self._reset_centres()
 
+        upipe.print_info(f"Getting centres for the set of {len(self.pointing_table)} files")
+        dict_found_centres = {}
         # Loop over the pointing table and find the centre
         for row in self.pointing_table:
             filename = row['filename']
+            # Extracting the information not to redo all centres if not needed
+            dataset = row['dataset']
+            tpls = row['tpls']
+            expo = row['expo']
 
-            centre = None
-            # Only if the dictionary is not provided
-            if center_dict is None:
-                fullname = joinpath(self.folder, filename)
-                if dtype == "guess":
-                    ldtype = [dict_dtype[dtype] for dtype in dict_dtype if dtype in filename]
-                    if len(ldtype) == 0:
-                        upipe.print_warning(f"Could not guess type of file {filename} - Skipping")
-                        continue
-                    thistype = ldtype[0]
-                else:
-                    thistype = dtype
+            set_ds_tplsexpo = [dataset, tpls, expo]
+            if set_ds_tplsexpo in dict_found_centres:
+                centre = dict_found_centres[set_ds_tplsexpo]
 
-                if thistype in ["image", "cube"]:
-                    centre = get_centre_from_image_or_cube(fullname, dtype=thistype, **kwargs)
-                else:
-                    centre = get_centre_from_pixtable(fullname, **kwargs)
-            # Otherwise use the dictionary
             else:
-                if filename in center_dict:
-                    centre = center_dict[filename]
+                centre = None
+                # Only if the dictionary is not provided
+                if center_dict is None:
+                    fullname = joinpath(self.folder, filename)
+                    if dtype == "guess":
+                        ldtype = [dict_dtype[dtype] for dtype in dict_dtype if dtype in filename]
+                        if len(ldtype) == 0:
+                            upipe.print_warning(f"Could not guess type of file {filename} - Skipping")
+                            continue
+                        thistype = ldtype[0]
+                    else:
+                        thistype = dtype
+
+                    if thistype in ["image", "cube"]:
+                        centre = get_centre_from_image_or_cube(fullname, dtype=thistype, **kwargs)
+                    else:
+                        centre = get_centre_from_pixtable(fullname, **kwargs)
+                    dict_found_centres[set_ds_tplsexpo] = centre
+                # Otherwise use the dictionary
+                else:
+                    if filename in center_dict:
+                        centre = center_dict[filename]
+                        dict_found_centres[set_ds_tplsexpo] = centre
 
             # Assigning the centre to the right row
-            print(f"TEST - {centre}")
             row['centre'] = centre
 
         self._initialise_centres = True
