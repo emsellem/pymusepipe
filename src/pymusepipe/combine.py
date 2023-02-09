@@ -478,7 +478,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Now replace names with pixel tables names
         else:
-            if self._pixtab_in_comb_folder
+            if self._pixtab_in_comb_folder:
                 qtable_pixtables = self.get_qtable()
                 for row in self.pointing_table.qtable:
                     dataset = row['dataset']
