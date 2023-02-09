@@ -646,7 +646,7 @@ class MusePipeSample(object):
                                              list_datasets=list_datasets,
                                              filter_list=self._short_filter_list)
 
-    def run_target_scipost_perexpo(self, targetname=None, list_datasets=None,
+    def run_target_scipost_perexpo(self, targetname=None, list_datasets=None, list_pointings=None,
                                    folder_offset_table=None, name_offset_table=None,
                                    **kwargs):
         """Build the cube per exposure using a given WCS
@@ -688,7 +688,13 @@ class MusePipeSample(object):
 
         # initialisation of the combination to make sure we get the pointings right
         # We will thus make use of the dict_tplexpo_in_pointing
-        self.init_combine(targetname=targetname, list_datasets=list_datasets)
+        pointing_table = kwargs("pointing_table", None)
+        pointing_table_folder = kwargs("pointing_table_folder", "")
+        pointing_table_format = kwargs("pointing_table_format", "ascii")
+        self.init_combine(targetname=targetname, list_datasets=list_datasets,
+                          list_pointings=list_pointings, pointing_table=pointing_table,
+                          pointing_table_folder=pointing_table_folder,
+                          pointing_table_format=pointing_table_format)
 
         # Running the scipost_perexpo for all datasets individually
         dict_tplexpo_per_dataset = self.pipes_combine[targetname].dict_tplexpo_per_dataset

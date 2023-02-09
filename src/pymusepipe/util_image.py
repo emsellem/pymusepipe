@@ -1034,7 +1034,7 @@ class PointingTable(object):
         self.guess = kwargs.pop("guess", False)
         self.verbose = kwargs.pop("verbose", False)
         # Init an empty table
-        self.pointing_table = QTable()
+        self.qtable = QTable()
 
         # if filename exists is not None we read
         self._initialise_centres = False
@@ -1043,8 +1043,8 @@ class PointingTable(object):
             # If QTable - all good but checking the columns
             if isinstance(input_table, QTable):
                 if not check_column_set(input_table):
-                    upipe.print_error(f"Input astropy table does not have the minimum set of columns "
-                                      f"(should be {min_column_set})")
+                    upipe.print_error(f"Input astropy QTable does not have the minimum set of "
+                                      f"columns (should be {min_column_set})")
                     return
                 self._init_qtable(input_table)
 
@@ -1086,17 +1086,17 @@ class PointingTable(object):
     def list_datasets(self):
         """List of unique datasets in the pointing table
         """
-        return np.unique(self.pointing_table['dataset'].data)
+        return np.unique(self.qtable['dataset'].data)
 
     @property
     def list_pointings(self):
         """List of unique pointings in the pointing table
         """
-        return np.unique(self.pointing_table['pointing'].data)
+        return np.unique(self.qtable['pointing'].data)
 
     def _exist(self):
-        if not hasattr(self, 'pointing_table'):
-            upipe.print_error("Object does not have pointing_table attribute")
+        if not hasattr(self, 'qtable'):
+            upipe.print_error("Object does not have qtable attribute")
             return False
 
         return True
@@ -1111,7 +1111,7 @@ class PointingTable(object):
         if not self._exist():
             return False
 
-        return check_column_set(self.pointing_table)
+        return check_column_set(self.qtable)
 
     def scan_folder(self, folder=None, **kwargs):
         """Scan a folder to create a full pointing table
@@ -1125,21 +1125,21 @@ class PointingTable(object):
 
         Creates
         -------
-        Attribute pointing_table
+        Attribute qtable
         """
         if folder is not None:
             self.folder = folder
         upipe.print_info(f"Scanning folder {self.folder}")
 
         # First build the pointing table using the filenames found in folder
-        self.pointing_table = scan_filenames_from_folder(folder=self.folder, **kwargs)
+        self.qtable = scan_filenames_from_folder(folder=self.folder, **kwargs)
         # Reset the selection
         self._reset_select()
         # Assign the pointings
         self.assign_pointings()
 
     def write(self, overwrite=False, **kwargs):
-        """Write out the pointing_table on disk, using the nameout and provided folder.
+        """Write out the table on disk, using the nameout and provided folder.
 
         Parameters
         ----------
@@ -1160,7 +1160,7 @@ class PointingTable(object):
 
         # Writing up using the astropy QTable write
         fullnameout = joinpath(folder, nameout)
-        self.pointing_table.write(fullnameout, overwrite=overwrite, **kwargs)
+        self.qtable.write(fullnameout, overwrite=overwrite, **kwargs)
 
     def set_select_value(self, filename, value=1, verbose=False):
         """Set the value of the select column to 1, according to a given filename
@@ -1168,9 +1168,9 @@ class PointingTable(object):
         filename: str
         value: int default 1
         """
-        if filename in self.pointing_table['filename']:
-            selname = self.pointing_table['filename'] == filename
-            self.pointing_table['selec'][selname] = int(value)
+        if filename in self.qtable['filename']:
+            selname = self.qtable['filename'] == filename
+            self.qtable['selec'][selname] = int(value)
         else:
             if verbose:
                 upipe.print_warning(f"Doing nothing as filename {filename} not found")
@@ -1207,36 +1207,36 @@ class PointingTable(object):
         value: int default=1
         """
         # If no selection is done, just select all by default
-        if "select" in self.pointing_table.colnames:
+        if "select" in self.qtable.colnames:
             if overwrite:
-                self.pointing_table.replace_column(name='select',
-                                                   col=[int(value)] * len(self.pointing_table),
+                self.qtable.replace_column(name='select',
+                                                   col=[int(value)] * len(self.qtable),
                                                    copy=False)
         else:
-            self.pointing_table.add_column([int(value)] * len(self.pointing_table), name='select')
+            self.qtable.add_column([int(value)] * len(self.qtable), name='select')
 
     def _reset_pointing(self, overwrite=False):
         """Reset the pointing column in the pointing table
         """
-        if 'pointing' in self.pointing_table.colnames:
+        if 'pointing' in self.qtable.colnames:
             if overwrite:
-                self.pointing_table.replace_column(name='pointing',
-                                                   col=[int(0)] * len(self.pointing_table),
+                self.qtable.replace_column(name='pointing',
+                                                   col=[int(0)] * len(self.qtable),
                                                    copy=False)
         else:
-            self.pointing_table.add_column([int(0)] * len(self.pointing_table), name='pointing')
+            self.qtable.add_column([int(0)] * len(self.qtable), name='pointing')
 
     def _reset_centres(self):
         """Reset the pointing column in the pointing table
         """
         # initialise the centre column with dummy coordinates
-        if 'centre' not in self.pointing_table.colnames:
-            dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.pointing_table)
-            self.pointing_table.add_column(dummycoord, name="centre")
+        if 'centre' not in self.qtable.colnames:
+            dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.qtable)
+            self.qtable.add_column(dummycoord, name="centre")
 
-        if not isinstance(self.pointing_table['centre'], SkyCoord):
-            dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.pointing_table)
-            self.pointing_table.replace_column(name="centre", col=dummycoord, copy=False)
+        if not isinstance(self.qtable['centre'], SkyCoord):
+            dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.qtable)
+            self.qtable.replace_column(name="centre", col=dummycoord, copy=False)
 
         self._initialise_centres = False
 
@@ -1248,17 +1248,17 @@ class PointingTable(object):
         -----
         input_qtable: astropy QTable
         """
-        self.pointing_table = input_qtable
+        self.qtable = input_qtable
 
         if not self._check():
             upipe.print_warning("Please consider updating the pointing table")
 
-        if 'select' not in self.pointing_table.colnames:
+        if 'select' not in self.qtable.colnames:
             self._reset_select()
             # After reading, save the selection to an original one to backup
-            self.pointing_table['select_orig'] = self.pointing_table['select']
+            self.qtable['select_orig'] = self.qtable['select']
 
-        if 'pointing' not in self.pointing_table.colnames:
+        if 'pointing' not in self.qtable.colnames:
             self._reset_pointing()
             # Get the centres as SkyCoord. Note that if the column is not in the right format
             # it will be re-initialised
@@ -1279,7 +1279,7 @@ class PointingTable(object):
 
         Returns
         -------
-        self.pointing_table with the content of the file
+        self.qtable with the content of the file
         """
         self.tablename = kwargs.pop("filename", self.filename)
         self.folder = kwargs.pop("folder", self.folder)
@@ -1289,9 +1289,9 @@ class PointingTable(object):
             upipe.print_error(f"Pointing Table {self.fullname} does not exist. Cannot open")
             return
 
-        pointing_table = QTable.read(self.fullname, format=self.format_read, guess=self.guess,
+        qtable = QTable.read(self.fullname, format=self.format_read, guess=self.guess,
                                           **kwargs)
-        self._init_qtable(pointing_table)
+        self._init_qtable(qtable)
 
     def _get_centres(self, dtype="guess", center_dict=None, **kwargs):
         """Get the centre of each exposure, assuming a given type for the input files.
@@ -1309,7 +1309,7 @@ class PointingTable(object):
                ext: int
                    Number of the extension to look at for thw WCS
 
-        Add column centre in the pointing_table
+        Add column centre in the qtable
 
         """
         if dtype not in ["image", "cube", "pixtable", "guess"]:
@@ -1321,10 +1321,10 @@ class PointingTable(object):
 
         self._reset_centres()
 
-        upipe.print_info(f"Getting centres for the set of {len(self.pointing_table)} files")
+        upipe.print_info(f"Getting centres for the set of {len(self.qtable)} files")
         dict_found_centres = {}
         # Loop over the pointing table and find the centre
-        for row in self.pointing_table:
+        for row in self.qtable:
             filename = row['filename']
             # Extracting the information not to redo all centres if not needed
             dataset = row['dataset']
@@ -1391,7 +1391,7 @@ class PointingTable(object):
         upipe.print_info(f"Assigning Pointings ---")
         for filename in self.file_pointing_dict:
             pointing = self.file_pointing_dict[filename]
-            self.pointing_table['pointing'][self.pointing_table['filename'] == filename] = pointing
+            self.qtable['pointing'][self.qtable['filename'] == filename] = pointing
             if verbose:
                 upipe.print_info(f"File: {filename} = Pointing {pointing:02d}")
 
@@ -1417,13 +1417,13 @@ class PointingTable(object):
         if list_pointings is None:
             list_pointings = self.list_pointings
 
-        for i in range(len(self.pointing_table)):
-            p = self.pointing_table['pointing'][i]
-            d = self.pointing_table['dataset'][i]
+        for i in range(len(self.qtable)):
+            p = self.qtable['pointing'][i]
+            d = self.qtable['dataset'][i]
             if p not in list_pointings or d not in list_datasets:
-                self.pointing_table['select'] = int(0)
+                self.qtable['select'] = int(0)
             else:
-                self.pointing_table['select'] = int(1)
+                self.qtable['select'] = int(1)
 
     def select_pointings(self, **kwargs):
         """Select all filenames with pointings in the pointing list
@@ -1441,12 +1441,12 @@ class PointingTable(object):
             list_pointings = self.list_pointings
 
         # Now getting the selections
-        for i in range(len(self.pointing_table)):
-            p = self.pointing_table['pointing'][i]
+        for i in range(len(self.qtable)):
+            p = self.qtable['pointing'][i]
             if p not in list_pointings:
-                self.pointing_table['select'] = int(0)
+                self.qtable['select'] = int(0)
             else:
-                self.pointing_table['select'] = int(1)
+                self.qtable['select'] = int(1)
 
     def select_datasets(self, **kwargs):
         """Select all filenames with a given list of datasets
@@ -1464,12 +1464,12 @@ class PointingTable(object):
             list_datasets = self.list_datasets
 
         # Now getting the selections
-        for i in range(len(self.pointing_table)):
-            d = self.pointing_table['dataset'][i]
+        for i in range(len(self.qtable)):
+            d = self.qtable['dataset'][i]
             if d not in list_datasets:
-                self.pointing_table['select'] = int(0)
+                self.qtable['select'] = int(0)
             else:
-                self.pointing_table['select'] = int(1)
+                self.qtable['select'] = int(1)
 
     @property
     def selected_filenames(self):
@@ -1480,13 +1480,13 @@ class PointingTable(object):
         list_filename
 
         """
-        if not hasattr(self, 'pointing_table'):
+        if not hasattr(self, 'qtable'):
             upipe.print_warning("Missing a pointing table - returning an empty filename list")
             return []
 
-        inds = self.pointing_table['select'] == 1
+        inds = self.qtable['select'] == 1
 
-        lfiles = list(self.pointing_table['filename'][inds])
+        lfiles = list(self.qtable['filename'][inds])
         lfiles.sort()
 
         return lfiles
@@ -1497,7 +1497,7 @@ class PointingTable(object):
         """
         dict_names = {}
         # Covering all rows of the table
-        for row in self.pointing_table:
+        for row in self.qtable:
             # if the select value is True / 1, append filename to dictionary
             if row['select']:
                 append_value_to_dict(dict_names, row['dataset'], row['filename'])
@@ -1510,7 +1510,7 @@ class PointingTable(object):
         """
         dict_names = {}
         # Covering all rows of the table
-        for row in self.pointing_table:
+        for row in self.qtable:
             # if the select value is True / 1, append filename to dictionary
             if row['select']:
                 append_value_to_dict(dict_names, row['pointing'], row['filename'])
@@ -1523,7 +1523,7 @@ class PointingTable(object):
         """
         dict_names = {}
         # Covering all rows of the table
-        for row in self.pointing_table:
+        for row in self.qtable:
             # if the select value is True / 1, append filename to dictionary
             append_value_to_dict(dict_names, row['dataset'], row['filename'])
 
@@ -1535,7 +1535,7 @@ class PointingTable(object):
         """
         dict_names = {}
         # Covering all rows of the table
-        for row in self.pointing_table:
+        for row in self.qtable:
             # if the select value is True / 1, append filename to dictionary
             append_value_to_dict(dict_names, row['pointing'], row['filename'])
 
@@ -1544,7 +1544,7 @@ class PointingTable(object):
     @property
     def dict_tplexpo_per_dataset(self):
         dict_tplexpo = {}
-        for row in self.pointing_table:
+        for row in self.qtable:
             # Discard rows which are not selected
             if not row['select']:
                 continue
@@ -1561,7 +1561,7 @@ class PointingTable(object):
     @property
     def dict_tplexpo_per_pointing(self):
         dict_tplexpo = {}
-        for row in self.pointing_table:
+        for row in self.qtable:
             # Discard rows which are not selected
             if not row['select']:
                 continue

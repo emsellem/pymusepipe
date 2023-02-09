@@ -233,7 +233,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Setting of pointing table ---------------------------------------
             self.assign_pointing_table(input_table=pointing_table, format=pointing_table_format,
                                        folder=pointing_table_folder)
-            self.filter_pixable_list()
+            self.filter_pixables_with_list()
 
         # Checking input offset table and corresponding pixtables
         if check:
@@ -379,21 +379,25 @@ class MusePointings(SofPipe, PipeRecipes):
         all_lists = [self.dict_allpixtabs_in_datasets[dataset] for dataset in self.dict_allpixtabs_in_datasets]
         return [item for sublist in all_lists for item in sublist]
 
-    def create_pointing_table(self, **kwargs):
-        """Create the pointing table from the all pixtables list
-
-        Add the pointing_table attribute and do the selection according to list_datasets and
-        list_pointings
+    def get_qtable(self, **kwargs):
+        """Create the qtable from the all pixtables list
         """
         # get the list
         list_pixtables = kwargs.pop("list_pixtables", self._all_pixtables)
 
         # transform into QTable
-        input_qtable = scan_filenames_from_list(list_pixtables)
+        return scan_filenames_from_list(list_pixtables)
+
+    def get_pointing_table(self, **kwargs):
+        """Create the pointing table from the all pixtables list
+
+        Add the pointing_table attribute and do the selection according to list_datasets and
+        list_pointings
+        """
+        input_qtable = self.get_qtable(**kwargs)
 
         # add centres and pointings
-        self.pointing_table = PointingTable(input_table=input_qtable)
-
+        return PointingTable(input_table=input_qtable)
 
     def get_all_pixtables(self):
         """List all pixtables in the data folder
@@ -439,18 +443,35 @@ class MusePointings(SofPipe, PipeRecipes):
 
         Create pointing_table attribute.
         """
+        # First read through the pointing_table
         if input_table is not None:
             # Test type of pointing_table
             if type(input_table) in [str, QTable, Table]:
                 self.pointing_table = PointingTable(input_table=input_table, folder=folder,
                                                     format=format)
             elif isinstance(input_table, PointingTable):
-                self.pointing_table = input_table
+                self.pointing_table = copy.copy(input_table)
             else:
                 upipe.print_error(f"Format of input table not recognised")
 
         if not hasattr(self, 'pointing_table'):
-            self.create_pointing_table()
+            self.pointing_table = self.get_pointing_table()
+
+        # Now replace names with pixel tables names
+        else:
+            qtable_pixtables = self.get_qtable()
+            for row in self.pointing_table.qtable:
+                dataset = row['dataset']
+                tpls = row['tpls']
+                expo = row['expo']
+                mask = (qtable_pixtables['dataset'] == dataset) \
+                       & (qtable_pixtables['tpls'] == tpls) \
+                       & (qtable_pixtables['expo'] == expo)
+                if len(qtable_pixtables[mask]) == 0:
+                    row['select'] = 0
+                else:
+                    row['filename'] = qtable_pixtables[mask]['filename']
+                    row['select'] = 1
 
     def filter_pixables_with_list(self, list_datasets=None, list_pointings=None):
         """Filter a list of pixtables
