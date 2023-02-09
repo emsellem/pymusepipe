@@ -1210,7 +1210,7 @@ class PointingTable(object):
             if overwrite:
                 self.pointing_table.replace_column(name='select',
                                                    col=[int(value)] * len(self.pointing_table),
-                                                   copy=False))
+                                                   copy=False)
         else:
             self.pointing_table.add_column(int(value), name='select')
 
