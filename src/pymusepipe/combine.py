@@ -240,7 +240,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Going back to initial working directory
         self.goto_origfolder()
 
-    def _check_list_pointings(self, list_pointings=None, default_list=None):
+    def _check_list_pointings(self, list_pointings=None, default_list=None, verbose=False):
         """Check which pointings exist
 
         Input
@@ -254,8 +254,6 @@ class MusePointings(SofPipe, PipeRecipes):
         --------
         list_datasets after checking they exist
         """
-        verbose = kwargs.pop("verbose", False)
-
         if default_list is None:
             default_list = self.pointing_table.list_pointings
 
@@ -282,7 +280,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                  ndigits=self.pipe_params.ndigits,
                                  str_dataset=self.pipe_params.str_dataset)
 
-    def _check_list_datasets(self, list_datasets=None, default_list=None, **kwargs):
+    def _check_list_datasets(self, list_datasets=None, default_list=None, verbose=False):
         """Check which datasets exist
 
         Input
@@ -296,8 +294,6 @@ class MusePointings(SofPipe, PipeRecipes):
         -------
         list_datasets after checking they exist
         """
-        verbose = kwargs.pop("verbose", False)
-
         if default_list is None:
             default_list = self.full_list_datasets
         # Now the list of datasets
