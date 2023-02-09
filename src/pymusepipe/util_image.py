@@ -1331,7 +1331,7 @@ class PointingTable(object):
             tpls = row['tpls']
             expo = row['expo']
 
-            set_ds_tplsexpo = [dataset, tpls, expo]
+            set_ds_tplsexpo = f"{dataset:03d}{tpls}{expo:03d}"
             if set_ds_tplsexpo in dict_found_centres:
                 centre = dict_found_centres[set_ds_tplsexpo]
 
