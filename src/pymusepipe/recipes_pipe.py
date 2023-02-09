@@ -1,4 +1,4 @@
-# Licensed under a MIT style license - see LICENSE.rst
+ Licensed under a MIT style license - see LICENSE.rst
 
 """MUSE-PHANGS recipe module
 """
@@ -127,7 +127,7 @@ class PipeRecipes(object) :
                 self.write_logfile(command)
                 self.write_outlogfile(command)
                 self.write_outlogfile(result.stdout.decode('utf-8'))
-                if (result.stderr) > 0:
+                if len(result.stderr) > 0:
                     self.write_errlogfile(command)
                     self.write_errlogfile(result.stderr.decode('utf-8'))
 
