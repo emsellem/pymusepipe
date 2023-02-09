@@ -1,4 +1,4 @@
- Licensed under a MIT style license - see LICENSE.rst
+# Licensed under a MIT style license - see LICENSE.rst
 
 """MUSE-PHANGS recipe module
 """
