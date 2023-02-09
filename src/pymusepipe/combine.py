@@ -175,7 +175,8 @@ class MusePointings(SofPipe, PipeRecipes):
         self.log_filename = log_filename
         self.suffix = suffix
         self.add_targetname = kwargs.pop("add_targetname", True)
-
+        # Checking input datasets and pixtables
+        self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
 
         # End of parameter settings =======================================
 
@@ -223,8 +224,6 @@ class MusePointings(SofPipe, PipeRecipes):
         for folder in self._dict_combined_folders:
             upipe.safely_create_folder(self._dict_combined_folders[folder], verbose=verbose)
 
-        # Checking input datasets and pixtables
-        self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
         if check:
             self.get_all_pixtables()
         # Setting of pointing table ---------------------------------------
