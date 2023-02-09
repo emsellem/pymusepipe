@@ -597,6 +597,7 @@ class MusePipeSample(object):
                                             list_datasets=list_datasets,
                                             pixtab_in_comb_folder=False,
                                             pixtable_type='OBJECT',
+                                            check=False,
                                             skymethod=skymethod)
 
         if create_wcs:
