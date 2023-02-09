@@ -993,6 +993,7 @@ def scan_filenames_from_list(list_files, **kwargs):
             filename_table.add_row((filename, fdataset, ftpls, fexpo))
 
     filename_table.sort("filename")
+    upipe.print_info(f"Found {len(filename_table)} from input filename list")
     return filename_table
 
 
@@ -1212,7 +1213,7 @@ class PointingTable(object):
                                                    col=[int(value)] * len(self.pointing_table),
                                                    copy=False)
         else:
-            self.pointing_table.add_column(int(value), name='select')
+            self.pointing_table.add_column(int(value) * len(self.pointing_table), name='select')
 
     def _reset_pointing(self, overwrite=False):
         """Reset the pointing column in the pointing table
@@ -1223,7 +1224,7 @@ class PointingTable(object):
                                                    col=[int(0)] * len(self.pointing_table),
                                                    copy=False)
         else:
-            self.pointing_table.add_column(int(0), name='pointing')
+            self.pointing_table.add_column(int(0) * len(self.pointing_table), name='pointing')
 
     def _reset_centres(self):
         """Reset the pointing column in the pointing table
