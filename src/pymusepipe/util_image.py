@@ -906,7 +906,7 @@ def get_centre_from_image_or_cube(filename, ext=1, dtype='image'):
 
 
 min_column_set = ('filename', 'dataset', 'tpls', 'expo')
-min_column_set_format = ('S50', 'i4', 'S30', 'i4')
+min_column_set_format = ('S200', 'i4', 'S20', 'i4')
 def check_column_set(input_table):
     """Check the minimum column set for the Pointing table
 

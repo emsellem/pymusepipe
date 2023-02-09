@@ -470,8 +470,8 @@ class MusePointings(SofPipe, PipeRecipes):
                 if len(qtable_pixtables[mask]) == 0:
                     row['select'] = 0
                 else:
-                    print(qtable_pixtables[mask]['filename'])
-                    print(row['filename'])
+                    print(f"_{qtable_pixtables[mask]['filename']}_")
+                    print(f"_{row['filename']}_")
                     row['filename'] = qtable_pixtables[mask]['filename']
                     row['select'] = 1
 
