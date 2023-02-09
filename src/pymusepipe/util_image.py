@@ -1213,7 +1213,7 @@ class PointingTable(object):
                                                    col=[int(value)] * len(self.pointing_table),
                                                    copy=False)
         else:
-            self.pointing_table.add_column(int(value) * len(self.pointing_table), name='select')
+            self.pointing_table.add_column([int(value)] * len(self.pointing_table), name='select')
 
     def _reset_pointing(self, overwrite=False):
         """Reset the pointing column in the pointing table
@@ -1224,7 +1224,7 @@ class PointingTable(object):
                                                    col=[int(0)] * len(self.pointing_table),
                                                    copy=False)
         else:
-            self.pointing_table.add_column(int(0) * len(self.pointing_table), name='pointing')
+            self.pointing_table.add_column([int(0)] * len(self.pointing_table), name='pointing')
 
     def _reset_centres(self):
         """Reset the pointing column in the pointing table
