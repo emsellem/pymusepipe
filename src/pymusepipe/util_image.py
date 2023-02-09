@@ -1249,7 +1249,7 @@ class PointingTable(object):
         self._reset_pointing()
 
         # After reading, save the selection to an original one to backup
-        self.pointing_table['select_orig'] = self.pointing_table('select')
+        self.pointing_table['select_orig'] = self.pointing_table['select']
 
         # Get the centres as SkyCoord. Note that if the column is not in the right format
         # it will be re-initialised
@@ -1371,7 +1371,7 @@ class PointingTable(object):
             if verbose:
                 upipe.print_info(f"File: {filename} = Pointing {pointing:02d}")
 
-    def select_pointings_and_datasets(self):
+    def select_pointings_and_datasets(self, **kwargs):
         """Select all filenames with that pointing or dataset number.
 
         Input
@@ -1424,7 +1424,7 @@ class PointingTable(object):
             else:
                 self.pointing_table['select'] = int(1)
 
-    def select_datasets(self):
+    def select_datasets(self, **kwargs):
         """Select all filenames with a given list of datasets
 
         Input

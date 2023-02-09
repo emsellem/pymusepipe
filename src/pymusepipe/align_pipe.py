@@ -1,4 +1,5 @@
-#Creating a plot showing the normalisation arising from a polypar object Licensed under a MIT license - see LICENSE
+# Creating a plot showing the normalisation arising from a polypar object Licensed under a MIT
+# license - see LICENSE
 
 """MUSE-PHANGS alignement module. This module can be used to align MUSE
 reconstructed images either with each others or using a reference background
@@ -78,6 +79,7 @@ try:
 except ImportError:
     upipe.print_warning("If you wish to use spacepylot please install it via"
                         "pip install or conda install or cloning the github version")
+
 
 def is_sequence(arg):
     """Test if sequence and return the boolean result
@@ -286,7 +288,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
     mypix = pyfits.open(fullname_pixtable, mode='update')
     hd = mypix[0].header
     if not fakemode and angle != 0.0:
-        if not angle_orig_keyword in hd:
+        if angle_orig_keyword not in hd:
             hd[angle_orig_keyword] = hd[angle_keyword]
         hd[angle_keyword] = hd[angle_orig_keyword] + angle
         upipe.print_info("Updating INS DROT POSANG for {0}".format(name_pixtable))
@@ -294,7 +296,7 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
 
     # Reading the result and printing
     print("=== {} === ".format(name_pixtable), end="")
-    if not angle_orig_keyword in hd:
+    if angle_orig_keyword not in hd:
         print("Present Angle [No Change] (deg): {}".format(hd[angle_keyword]))
     else:
         print("Orig / New / Rotation Angle (deg): {0:8.4f} / {1:8.4f} / {2:8.4f}".format(
@@ -379,8 +381,7 @@ def align_hdu(hdu_target=None, hdu_to_align=None, target_rotation=0.0, to_align_
             # Change of area
             newinc = ima_target.wcs.get_axis_increments(unit=u.deg)
             oldinc = ima_to_align.wcs.get_axis_increments(unit=u.deg)
-            change_area = np.abs(newinc[0] / oldinc[0]) \
-                          * np.abs(newinc[1] / oldinc[1])
+            change_area = np.abs(newinc[0] / oldinc[0]) * np.abs(newinc[1] / oldinc[1])
             daligned = repro_interp(ima_to_align.get_data_hdu(),
                                     ima_target.get_data_hdu().header,
                                     return_footprint=False)
@@ -683,7 +684,7 @@ class AlignMuseDataset(object):
         self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
 
-        self.extra_rotangles = np.zeros((self.nimages), dtype=np.float64)
+        self.extra_rotangles = np.zeros(self.nimages, dtype=np.float64)
         self._diffra_angle = np.zeros_like(self.extra_rotangles)
 
         # Cross normalisation for the images
@@ -794,7 +795,7 @@ class AlignMuseDataset(object):
                     # Find the index of the value array where mjd
                     ind = np.nonzero(mjd_values == mjd)[0][0]
                     self.init_off_arcsec[nima] = [
-                        self.offset_table['RA_OFFSET'][ind_table[ind]] * 3600. \
+                        self.offset_table['RA_OFFSET'][ind_table[ind]] * 3600.
                         * np.cos(np.deg2rad(self.list_dec_muse[nima])),
                         self.offset_table['DEC_OFFSET'][ind_table[ind]] * 3600.]
                     self.init_flux_scale[nima] = nonan_flux_scale_table[ind_table[ind]]
@@ -809,9 +810,8 @@ class AlignMuseDataset(object):
                     self.init_rotangles[nima] = 0.0
 
                 # Transform into pixel values
-                self.init_off_pixel[nima] = arcsec_to_pixel(
-                    self.list_muse_hdu[nima],
-                    self.init_off_arcsec[nima])
+                self.init_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima],
+                                                            self.init_off_arcsec[nima])
 
     def _reset_init_guess_values(self):
         """Reset the initial guess to 0. Hidden function as this is only
@@ -948,12 +948,12 @@ class AlignMuseDataset(object):
         for nima in range(self.nimages):
             upipe.print_info("#{0:03d}/i={1:03d} -{2:>26}  |ARCSEC|{3:8.4f} {4:8.4f} "
                              " |PIXEL|{5:8.4f} {6:8.4f}  |ROT|{7:8.4f}".format(
-                             nima+1, nima, self.list_name_museimages[nima][-29:-5],
-                             self._total_off_arcsec[nima][0],
-                             self._total_off_arcsec[nima][1],
-                             self._total_off_pixel[nima][0],
-                             self._total_off_pixel[nima][1],
-                             self._total_rotangles[nima]))
+                nima+1, nima, self.list_name_museimages[nima][-29:-5],
+                self._total_off_arcsec[nima][0],
+                self._total_off_arcsec[nima][1],
+                self._total_off_pixel[nima][0],
+                self._total_off_pixel[nima][1],
+                self._total_rotangles[nima]))
 
     def save_fits_offset_table(self, name_output_table=None,
                                folder_output_table=None,
@@ -1053,7 +1053,6 @@ class AlignMuseDataset(object):
                          overwrite=overwrite)
         self.name_output_table = name_output_table
 
-
     def _check_nima(self, nima):
         test_nima = nima in range(self.nimages)
         if self.verbose:
@@ -1061,7 +1060,6 @@ class AlignMuseDataset(object):
                 upipe.print_error(f"nima={nima} not within the range "
                                   f"allowed by self.nimages ({self.nimages})")
         return test_nima
-
 
     def offset_and_compare(self, nima=0, extra_pixel=None, extra_arcsec=None,
                            extra_rotation=None, **kwargs):
@@ -1290,7 +1288,6 @@ class AlignMuseDataset(object):
 
         return ima_ref, ima_muse
 
-
     def get_shift_from_pcc_listima(self, list_nima=None, threshold=None, verbose=False):
         """Run the PCC shift guess on a list of images given by a list
         of indices
@@ -1399,7 +1396,8 @@ class AlignMuseDataset(object):
                                       use_rotation=use_rotation,
                                       verbose=verbose, **kwargs)
 
-    def run_optical_flow_ima(self, nima=0, save_plot=True, use_rotation=True, verbose=False, **kwargs):
+    def run_optical_flow_ima(self, nima=0, save_plot=True, use_rotation=True,
+                             verbose=False, **kwargs):
         """Run Optical flow on image with index nima,
         first with a guess offset and then iterating. The solution
         is saved as extra offset in the class, and a op_plot instance is created.
@@ -1443,7 +1441,6 @@ class AlignMuseDataset(object):
         for nima in list_nima:
             self.apply_optical_flow_offset_ima(nima=nima)
 
-
     def apply_optical_flow_offset_ima(self, nima=0):
         """Transfer the value of the optical flow into the extra pixel
         """
@@ -1462,7 +1459,6 @@ class AlignMuseDataset(object):
                                     extra_rotation=-self.optical_flows[nima].rotation_deg)
         # Initialise the plot
         self.op_plots[nima] = init_plot_optical_flow(self.optical_flows[nima])
-
 
     def iterate_on_optical_flow_ima(self, nima=0, niter=5, verbose=False,
                                     use_rotation=True, **kwargs):
@@ -1495,7 +1491,6 @@ class AlignMuseDataset(object):
         self.optical_flows[nima].get_iterate_translation_rotation(niter,
                                                                   homography_method=homography_method)
 
-
     def iterate_on_optical_flow_listima(self, list_nima=None, use_rotation=True, **kwargs):
         """Run the iteration for the optical flow on a list of images
         given by a list of indices
@@ -1517,7 +1512,6 @@ class AlignMuseDataset(object):
         for nima in list_nima:
             self.iterate_on_optical_flow_ima(nima=nima, use_rotation=use_rotation, **kwargs)
 
-
     def init_optical_flow_listima(self, list_nima=None, **kwargs):
         """Initialise the optical flow on a list of images
         given by a list of indices
@@ -1535,7 +1529,6 @@ class AlignMuseDataset(object):
 
         for nima in list_nima:
             self.init_optical_flow_ima(nima=nima, **kwargs)
-
 
     def init_optical_flow_ima(self, nima=0, threshold=None, guess_offset_pixel=None,
                               guess_offset_arcsec=None, guess_rotation=None,
@@ -1595,8 +1588,8 @@ class AlignMuseDataset(object):
                                                               header=header, verbose=verbose,
                                                               **kwargs)
 
-    def init_optical_flow_hdu(self, muse_hdu, rotation=0., threshold=None, guess_translation=(0.,0.),
-                              header=None, verbose=False, **kwargs):
+    def init_optical_flow_hdu(self, muse_hdu, rotation=0., threshold=None,
+                              guess_translation=(0., 0.), header=None, verbose=False, **kwargs):
         """Get the optical flow for this hdu
 
         Input
@@ -1627,7 +1620,6 @@ class AlignMuseDataset(object):
                                          guess_translation=guess_translation[::-1],
                                          header=header,
                                          verbose=verbose)
-
 
     def find_cross_peak_ima(self, nima=0, threshold=None):
         """Find the cross correlation peak and get the x and y shifts
