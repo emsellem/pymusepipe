@@ -1206,7 +1206,7 @@ class PointingTable(object):
         value: int default=1
         """
         # If no selection is done, just select all by default
-        if "select" not in self.pointing_table.colnames:
+        if "select" in self.pointing_table.colnames:
             if overwrite:
                 self.pointing_table.replace_column(name='select',
                                                    col=[int(value)] * len(self.pointing_table),
