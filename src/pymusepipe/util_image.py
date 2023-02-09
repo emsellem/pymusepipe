@@ -1417,13 +1417,13 @@ class PointingTable(object):
         if list_pointings is None:
             list_pointings = self.list_pointings
 
-        for i in range(len(self.qtable)):
-            p = self.qtable['pointing'][i]
-            d = self.qtable['dataset'][i]
+        for row in self.qtable:
+            p = row['pointing']
+            d = row['dataset']
             if p not in list_pointings or d not in list_datasets:
-                self.qtable['select'] = int(0)
+                row['select'] = int(0)
             else:
-                self.qtable['select'] = int(1)
+                row['select'] = int(1)
 
     def select_pointings(self, **kwargs):
         """Select all filenames with pointings in the pointing list
@@ -1441,12 +1441,12 @@ class PointingTable(object):
             list_pointings = self.list_pointings
 
         # Now getting the selections
-        for i in range(len(self.qtable)):
-            p = self.qtable['pointing'][i]
+        for row in self.qtable:
+            p = row['pointing']
             if p not in list_pointings:
-                self.qtable['select'] = int(0)
+                row['select'] = int(0)
             else:
-                self.qtable['select'] = int(1)
+                row['select'] = int(1)
 
     def select_datasets(self, **kwargs):
         """Select all filenames with a given list of datasets
@@ -1464,12 +1464,12 @@ class PointingTable(object):
             list_datasets = self.list_datasets
 
         # Now getting the selections
-        for i in range(len(self.qtable)):
-            d = self.qtable['dataset'][i]
+        for row in self.qtable:
+            d = row['dataset']
             if d not in list_datasets:
-                self.qtable['select'] = int(0)
+                row['select'] = int(0)
             else:
-                self.qtable['select'] = int(1)
+                row['select'] = int(1)
 
     @property
     def selected_filenames(self):

@@ -489,6 +489,9 @@ class MusePointings(SofPipe, PipeRecipes):
             list_pointings = self.list_pointings
         # select if pointing or dataset
         print(f"COUCOU = {self.pointing_table.qtable['select'][0]}")
+        print(list_datasets)
+        print("---")
+        print(list_pointings)
         self.pointing_table.select_pointings_and_datasets(list_datasets=list_datasets,
                                                           list_pointings=list_pointings)
         print(f"COUCOU2 = {self.pointing_table.qtable['select'][0]}")

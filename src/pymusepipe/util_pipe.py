@@ -885,7 +885,8 @@ def get_list_datasets(target_path="", str_dataset=default_str_dataset,
         list_datasets.append(int(folder[-int(ndigits):]))
 
     list_datasets.sort()
-    print_info(f"Dataset list: {str(list_datasets)}")
+    if verbose:
+        print_info(f"Dataset list: {str(list_datasets)}")
     return list_datasets
 
 def get_list_exposures(dataset_path="", object_folder=default_object_folder):
