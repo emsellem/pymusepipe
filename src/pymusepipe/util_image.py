@@ -1319,7 +1319,7 @@ class PointingTable(object):
             if center_dict is None:
                 fullname = joinpath(self.folder, filename)
                 if dtype == "guess":
-                    ldtype = [dict_type[dtype] for dtype in dict_dtype if dtype in filename]
+                    ldtype = [dict_dtype[dtype] for dtype in dict_dtype if dtype in filename]
                     if len(ldtype) == 0:
                         upipe.print_warning(f"Could not guess type of file {filename} - Skipping")
                         continue
