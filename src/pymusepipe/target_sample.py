@@ -646,6 +646,7 @@ class MusePipeSample(object):
                                              name_offset_table=name_offset_table,
                                              folder_offset_table=folder_offset_table,
                                              list_datasets=list_datasets,
+                                             pointing_table=pointing_table,
                                              filter_list=self._short_filter_list)
 
     def run_target_scipost_perexpo(self, targetname=None, list_datasets=None, list_pointings=None,

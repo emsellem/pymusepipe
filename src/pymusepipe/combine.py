@@ -1107,7 +1107,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
                 cube_suffix = self._add_targetname(cube_suffix)
                 ref_wcs = f"{prefix_wcs}{cube_suffix}.fits"
-            upipe.print_warning("ref_wcs used is {ref_wcs}")
+            upipe.print_warning(f"ref_wcs used is {ref_wcs}")
 
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", upipe.normpath(self.paths.cubes))
         if ref_wcs is not None:
