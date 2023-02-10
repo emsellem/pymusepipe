@@ -3,10 +3,10 @@
 """MUSE-PHANGS check pipeline module
 """
 
-__authors__   = "Eric Emsellem"
+__authors__ = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "MIT License"
-__contact__   = " <eric.emsellem@eso.org>"
+__license__ = "MIT License"
+__contact__ = " <eric.emsellem@eso.org>"
 # This module will take a MusePipe object and do the plot check ups
 
 # Standard modules
@@ -28,21 +28,22 @@ name_final_datacube = "DATACUBE_FINAL.fits"
 PLOT = '\033[1;34;20m'
 ENDC = '\033[0m'
 
-def print_plot(text) :
+
+def print_plot(text):
     print(PLOT + "# CheckPipeInfo " + ENDC + text)
 
 
-class CheckPipe(MusePipe) :
+class CheckPipe(MusePipe):
     """Checking the outcome of the data reduction
     """
     def __init__(self, mycube=name_final_datacube, pdf_name="check_pipe.pdf",
-            pipe=None, standard_set=True, **kwargs) :
+                 pipe=None, standard_set=True, **kwargs):
         """Init of the CheckPipe class. Using a default datacube to run some checks
         and create some plots
         """
         if pipe is not None:
             self.__dict__.update(pipe.__dict__)
-        else :
+        else:
             MusePipe.__init__(self, **kwargs)
 
         self.cube = MuseCube(filename=joinpath(self.paths.object, mycube))
@@ -52,7 +53,7 @@ class CheckPipe(MusePipe) :
         suffix_skyspectra = kwargs.pop("suffix_skyspectra", "")
         suffix_images = kwargs.pop("suffix_images", None)
 
-        if standard_set :
+        if standard_set:
             # getting standard spectra
             self.cube.get_set_spectra()
 
@@ -73,13 +74,13 @@ class CheckPipe(MusePipe) :
             # closing the pdf
             self.pdf.close()
 
-    def check_quadrants(self) :
+    def check_quadrants(self):
         """Checking spectra from the 4 quadrants
         """
         print_plot("Plotting the 4 quadrants-spectra")
         self.pdf.plot_page(self.cube.spec_4quad)
 
-    def check_master_bias_flat(self) :
+    def check_master_bias_flat(self):
         """Checking the Master bias and Master flat
         """
         bias = self.get_master(mastertype="Bias", scale='arcsinh', title="Master Bias")
@@ -88,41 +89,43 @@ class CheckPipe(MusePipe) :
         print_plot("Plotting the Master Bias and Flat")
         self.pdf.plot_page(tocheck)
 
-    def check_white_line_images(self, line="Ha", velocity=0.) :
+    def check_white_line_images(self, line="Ha", velocity=0.):
         """Building the White and Ha images and 
         Adding them on the page
         """
         white = self.cube.get_whiteimage_from_cube()
         linemap = self.cube.get_emissionline_image(line=line, velocity=velocity)
-        tocheck = MuseSetImages(white, linemap, subtitle="White and emission line {0} images".format(line))
+        tocheck = MuseSetImages(white, linemap,
+                                subtitle="White and emission line {0} images".format(line))
         print_plot("Plotting the White and {0} images".format(line))
         self.pdf.plot_page(tocheck)
 
-    def check_sky_spectra(self, suffix) :
+    def check_sky_spectra(self, suffix):
         """Check all sky spectra from the exposures
         """
-        sky_spectra_names = glob.glob(self.paths.sky + "./SKY_SPECTRUM_*{suffix}.fits".format(suffix=suffix))
+        sky_spectra_names = glob.glob(self.paths.sky +
+                                      "./SKY_SPECTRUM_*{suffix}.fits".format(suffix=suffix))
         tocheck = MuseSetSpectra(subtitle="Sky Spectra")
         counter = 1
-        for specname in sky_spectra_names :
-            tocheck.append(MuseSpectrum(source=get_sky_spectrum(filename=specname), title="Sky {0:2d}".format(counter),
-                add_sky_lines=True))
+        for specname in sky_spectra_names:
+            tocheck.append(MuseSpectrum(source=get_sky_spectrum(specname),
+                                        title=f"Sky {counter:2d}", add_sky_lines=True))
             counter += 1
 
         print_plot("Plotting the sky spectra")
         self.pdf.plot_page(tocheck)
 
-    def check_given_images(self, suffix=None) :
+    def check_given_images(self, suffix=None):
         """Check all images with given suffix
         """
-        if suffix is None: suffix = ""
+        if suffix is None:
+            suffix = ""
         image_names = glob.glob(self.paths.maps + "./*{0}*.fits".format(suffix))
         tocheck = MuseSetImages(subtitle="Given Images - {0}".format(suffix))
         counter = 1
-        for imaname in image_names :
+        for imaname in image_names:
             tocheck.append(MuseImage(filename=imaname, title="Image {0:2d}".format(counter)))
             counter += 1
 
         print_plot("Plotting the set of given images")
         self.pdf.plot_page(tocheck)
-

@@ -10,6 +10,7 @@ __contact__ = " <eric.emsellem@eso.org>"
 import os
 from os.path import join as joinpath
 import glob
+import copy
 
 # Numpy
 import numpy as np
@@ -66,7 +67,7 @@ def select_spaxels(maskdict, maskname, x, y):
     return selgood
 
 
-class Selection_Zone(object):
+class SelectionZone(object):
     """
     Parent class for Rectangle_Zone and Circle_Zone
 
@@ -81,14 +82,14 @@ class Selection_Zone(object):
             upipe.print_error("Warning: no parameters given for Selection Zone")
 
 
-class Rectangle_Zone(Selection_Zone):
+class RectangleZone(SelectionZone):
     """Define a rectangular zone, given by
     a center, a length, a width and an angle
     """
     def __init__(self):
         self.geometry = "Rectangle"
         self.nparams = 5
-        Selection_Zone.__init__(self)
+        SelectionZone.__init__(self)
 
     def select(self, xin, yin):
         """ Define a selection within a rectangle
@@ -110,14 +111,14 @@ class Rectangle_Zone(Selection_Zone):
         return selgood
 
 
-class Circle_Zone(Selection_Zone):
+class CircleZone(SelectionZone):
     """Define a Circular zone, defined by
     a center and a radius
     """
     def __init__(self):
         self.geometry = "Circle"
         self.nparams = 5
-        Selection_Zone.__init__(self)
+        SelectionZone.__init__(self)
 
     def select(self, xin, yin):
         """ Define a selection within a circle
@@ -134,14 +135,14 @@ class Circle_Zone(Selection_Zone):
         return selgood
 
 
-class Trail_Zone(Selection_Zone):
+class TrailZone(SelectionZone):
     """Define a Trail zone, defined by
     two points and a width
     """
     def __init__(self):
         self.geometry = "Trail"
         self.nparams = 5
-        Selection_Zone.__init__(self)
+        SelectionZone.__init__(self)
 
     def select(self, xin, yin):
         """ Define a selection within trail
@@ -667,8 +668,7 @@ def create_offset_table(image_names, table_folder="", table_name="dummy_offset_t
     offset_table = QTable()
     for col in default_offset_table:
         [name, form, default] = default_offset_table[col]
-        offset_table[name] = Column([default for i in range(nlines)],
-                                    dtype=form)
+        offset_table[name] = Column([default] * nlines, dtype=form)
 
     offset_table[date_names['table']] = date
     offset_table[mjd_names['table']] = mjd
@@ -822,7 +822,7 @@ def group_exposures_per_pointing(list_files, target_path='', limit=10., unit=u.a
         print(f'{dtype} is not a supported data type.')
         return None, None
 
-    for name in list_files :
+    for name in list_files:
         # open file and recover the primary header
         fullname = joinpath(target_path, name)
         if dtype == "guess":
@@ -907,6 +907,8 @@ def get_centre_from_image_or_cube(filename, ext=1, dtype='image'):
 
 min_column_set = ('filename', 'dataset', 'tpls', 'expo')
 min_column_set_format = ('S200', 'i4', 'S20', 'i4')
+
+
 def check_column_set(input_table):
     """Check the minimum column set for the Pointing table
 
@@ -997,6 +999,55 @@ def scan_filenames_from_list(list_files, **kwargs):
     return filename_table
 
 
+def filter_list_with_pointingtable(input_list, pointing_table=None, verbose=True,
+                                   str_dataset=default_str_dataset, ndigits=default_ndigits,
+                                   list_pointings=None, filtername=None):
+    """
+
+    Input
+    -----
+    input_list: list of str
+        Input list of filenames to filter
+    pointing_table: PointingTable or QTable or Table
+    str_dataset: str default=default_str_dataset
+    ndigits: int default=default_ndigits
+    filtername: str default=None
+    verbose: bool default=True
+
+    Returns
+    -------
+
+    """
+    nfiles_input_list = len(input_list)
+
+    if isinstance(pointing_table, PointingTable):
+        qtable = pointing_table.qtable
+    elif type(pointing_table) in [Table, QTable]:
+        qtable = copy.copy(pointing_table)
+
+    output_list = copy.copy(input_list)
+    for filename in input_list:
+        dataset, tpls, expo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
+                                                    ndigits=ndigits, filtername=filtername)
+        # Make the pointing selection on top of the pointing_table selection
+        sel_pointing = True
+        if list_pointings is not None:
+            pointing = qtable['pointing']
+            if pointing not in list_pointings:
+                sel_pointing = False
+
+        mask = (qtable['dataset'] == dataset) & (qtable['tpls'] == tpls) \
+               & (qtable['expo'] == expo) & (qtable['select'] == 1)
+        if len(qtable[mask]) == 0 or not sel_pointing:
+            _ = output_list.remove(filename)
+
+    nfiles_output_list = len(output_list)
+    if verbose:
+        upipe.print_info(f"Input {nfiles_input_list} files filtered to {nfiles_output_list}")
+
+    return output_list
+
+
 class PointingTable(object):
     list_colnames_ptable = ['filename', 'dataset', 'tpls', 'expo']
 
@@ -1015,7 +1066,7 @@ class PointingTable(object):
             folder: str
             folderout: str default=folder input
                 Output folder for the tablename when writing
-            format: str default=ascii
+            table_format: str default=ascii
             guess: bool default=False
                 Guess column formatting of the file.
             verbose: bool default=False
@@ -1030,7 +1081,7 @@ class PointingTable(object):
         self.folder = folder
         self.folderout = kwargs.pop("folderout", self.folder)
 
-        self.format_read = kwargs.pop("format", "ascii")
+        self.table_format = kwargs.pop("table_format", "ascii")
         self.guess = kwargs.pop("guess", False)
         self.verbose = kwargs.pop("verbose", False)
         # Init an empty table
@@ -1052,7 +1103,7 @@ class PointingTable(object):
             elif isinstance(input_table, Table):
                 self.tablename = "dummytable.tmp"
                 input_table.write(joinpath(self.folder, self.tablename),
-                                  format=self.format_read)
+                                  format=self.table_format)
                 self.read()
 
             # If we have a string, we read the file
@@ -1265,7 +1316,6 @@ class PointingTable(object):
             self._get_centres()
             self.assign_pointings()
 
-
     def read(self, **kwargs):
         """Read the input filename in given folder assuming a given format.
 
@@ -1275,7 +1325,7 @@ class PointingTable(object):
             Name of the filename
         folder: str default='', optional
             Name of the folder where to find the filename
-        format: str default='ascii'
+        table_format: str default='ascii'
 
         Returns
         -------
@@ -1283,13 +1333,13 @@ class PointingTable(object):
         """
         self.tablename = kwargs.pop("filename", self.filename)
         self.folder = kwargs.pop("folder", self.folder)
-        self.format_read = kwargs.pop("format", self.format_read)
+        self.table_format = kwargs.pop("table_format", self.table_format)
         self.guess = kwargs.pop("guess", self.guess)
         if not os.path.exists(self.fullname):
             upipe.print_error(f"Pointing Table {self.fullname} does not exist. Cannot open")
             return
 
-        qtable = QTable.read(self.fullname, format=self.format_read, guess=self.guess,
+        qtable = QTable.read(self.fullname, format=self.table_format, guess=self.guess,
                                           **kwargs)
         self._init_qtable(qtable)
 
@@ -1343,7 +1393,8 @@ class PointingTable(object):
                     if dtype == "guess":
                         ldtype = [dict_dtype[dtype] for dtype in dict_dtype if dtype in filename]
                         if len(ldtype) == 0:
-                            upipe.print_warning(f"Could not guess type of file {filename} - Skipping")
+                            upipe.print_warning(f"Could not guess type of file {filename} "
+                                                f"- Skipping")
                             continue
                         thistype = ldtype[0]
                     else:

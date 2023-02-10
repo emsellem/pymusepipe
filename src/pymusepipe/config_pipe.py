@@ -56,7 +56,9 @@ dict_listMaster = {'DARK': 'MASTER_DARK',
 dict_listObject = {'OBJECT': 'PIXTABLE_OBJECT',
                    'SKY': 'PIXTABLE_SKY',
                    'STD': 'PIXTABLE_STD',
-                   'REDUCED': 'PIXTABLE_REDUCED'
+                   'REDUCED': 'PIXTABLE_REDUCED',
+                   'CUBEWCS': 'DATACUBE_FINAL_WCS',
+                   'CUBE': 'DATACUBE_FINAL'
                    }
 
 dict_listMasterObject = {**dict_listMaster, **dict_listObject}

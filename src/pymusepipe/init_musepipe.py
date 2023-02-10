@@ -4,10 +4,10 @@
    initialisation of folders
 """
 
-__authors__   = "Eric Emsellem"
+__authors__ = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "MIT"
-__contact__   = " <eric.emsellem@eso.org>"
+__license__ = "MIT"
+__contact__ = " <eric.emsellem@eso.org>"
 
 # Standard modules
 import os
@@ -21,21 +21,38 @@ from . import util_pipe as upipe
 from .util_pipe import get_dataset_name
 from .config_pipe import (dict_user_folders, default_rc_filename,
                           dict_extra_filters, dict_calib_tables, dict_input_folders,
-                          dict_folders, dict_folders_target)
+                          dict_folders, dict_folders_target, dict_combined_folders)
+
 
 ############################################################
 # Some fixed parameters for the structure
 ############################################################
-def add_suffix_tokeys(dic, suffix="_folder") :
+def add_suffix_tokeys(dic, suffix="_folder"):
     newdic = {}
     for key in dic:
         setattr(newdic, key + suffix, dic[key])
 
+
 ############################################################
 # Main class InitMuseParameters
 ############################################################
+class PipeObject(object):
+    """A very simple class used to store astropy tables.
+    """
 
-class InitMuseParameters(object) :
+    def __init__(self, info=None):
+        """Initialise the nearly empty class Add _info for a description
+        if needed
+
+        Args:
+            info (str): information on this object to be recorded. It will be
+                saved in _info.
+
+        """
+        self._info = info
+
+
+class InitMuseParameters(object):
     def __init__(self, folder_config="Config/", rc_filename=None, cal_filename=None, verbose=True):
         """Define the default parameters (folders/calibration files) 
         and name suffixes for the MUSE data reduction
@@ -53,7 +70,7 @@ class InitMuseParameters(object) :
         verbose: bool [True]
         """
         self.verbose = verbose
-        # Will first test if there is an rc_file provided
+        # Will first test if there is a rc_file provided
         # If not, it will look for a default rc_filename, the name of which is provided
         # above. If not, the hardcoded default will be used.
 
@@ -61,20 +78,21 @@ class InitMuseParameters(object) :
         # attributing the dictionaries
         self._dict_folders = dict_folders
         self._dict_input_folders = dict_input_folders
+        self._dict_combined_folders = dict_combined_folders
         self._dict_folders_target = dict_folders_target
         self._dict_extra_filters = dict_extra_filters
 
-        if rc_filename is None :
+        if rc_filename is None:
             if not os.path.isfile(default_rc_filename):
                 upipe.print_warning(f"No filename or {default_rc_filename} file "
-                     "to initialise from. We will use the default hardcoded " 
-                     "in the config_pipe.py module")
+                                    "to initialise from. We will use the default hardcoded " 
+                                    "in the config_pipe.py module")
                 self.init_default_param(dict_user_folders)
 
-            else :
+            else:
                 self.read_param_file(default_rc_filename, dict_user_folders)
             self.rcfile = "default_values"
-        else :
+        else:
             rcfile = joinpath(folder_config, rc_filename)
             self.read_param_file(rcfile, dict_user_folders)
             self.rcfile = rcfile
@@ -85,15 +103,15 @@ class InitMuseParameters(object) :
 
         # Same happens with the calibration files.
         # If filename is provided, will use that, otherwise use the hard coded values.
-        if cal_filename is None :
+        if cal_filename is None:
             self.init_default_param(dict_calib_tables)
             self.calfile = "default_values"
-        else :
+        else:
             calfile = joinpath(folder_config, cal_filename)
             self.read_param_file(calfile, dict_calib_tables)
             self.calfile = calfile
 
-    def init_default_param(self, dict_param) :
+    def init_default_param(self, dict_param, subattr=None):
         """Initialise the parameters as defined in the input dictionary
         Hardcoded in config_pipe.py
 
@@ -101,20 +119,34 @@ class InitMuseParameters(object) :
         -----
         dict_param: dict
             Input dictionary defining the attributes
+        subattr: str
+            Use subattr to add attributes under self.subattr
         """
-        for key in dict_param:
-            upipe.print_info(f"Default initialisation of attribute {key}", 
-                             pipe=self)
-            setattr(self, key, dict_param[key])
+        if subattr is None:
+            for key in dict_param:
+                upipe.print_info(f"Default initialisation of attribute {key}", pipe=self)
+                setattr(self, key, dict_param[key])
+        else:
+            if hasattr(self, subattr):
+                upipe.print_warning(f"Attribute {subattr} already exists. [from "
+                                    f"init_default_param in init_musepipe]")
+                return
+            # Allocating the attribute
+            setattr(self, subattr, PipeObject(info="Used to add attributes (e.g., paths)"))
+            # Addressing the keys and add them as attributes
+            for key in dict_param:
+                subself = getattr(self, subattr)
+                upipe.print_info(f"Default initialisation of attribute {key}", pipe=self)
+                setattr(subself, key, dict_param[key])
 
-    def read_param_file(self, filename, dict_param) :
+    def read_param_file(self, filename, dict_param):
         """Reading an input parameter initialisation file 
         """
         # Testing existence of filename
-        if not os.path.isfile(filename) :
+        if not os.path.isfile(filename):
             upipe.print_error((f"Input parameter {filename} cannot be found. "
-                    "We will use the default hardcoded in the "
-                    "config_pipe.py module"))
+                               "We will use the default hardcoded in the "
+                               "config_pipe.py module"))
             # Now relying on the default file but first checking it's there
             if not os.path.isfile(default_rc_filename):
                 upipe.print_error(f"Default rc file as defined in config_pipe.py "
@@ -130,7 +162,8 @@ class InitMuseParameters(object) :
         # Dummy dictionary to see which items are not initialised
         noninit_dict_param = copy.copy(dict_param)
         for line in lines:
-            if line[0] in ["#", "%"]: continue
+            if line[0] in ["#", "%"]:
+                continue
 
             sline = re.split(r'(\s+)', line)
             keyword_name = sline[0]
@@ -140,15 +173,15 @@ class InitMuseParameters(object) :
                                  pipe=self)
                 setattr(self, keyword_name, keyword) 
                 # Here we drop the item which was initialised
-                val = noninit_dict_param.pop(keyword_name)
+                _ = noninit_dict_param.pop(keyword_name)
             else:
                 continue
 
         # Listing them as warning and using the hardcoded default
         for key in noninit_dict_param:
-            upipe.print_warning(("Parameter {param} not initialised "
-                   "We will use the default hardcoded value from "
-                   "config_pipe.py").format(param=key))
+            upipe.print_warning(f"Parameter {key} not initialised "
+                                "We will use the default hardcoded value from "
+                                "config_pipe.py")
             setattr(self, key, dict_param[key])
 
     def _get_dataset_name(self, dataset=None):
@@ -165,5 +198,3 @@ class InitMuseParameters(object) :
                 upipe.print_error("No dataset number provided")
                 return "NONAME"
         return get_dataset_name(dataset, self.str_dataset, self.ndigits)
-
-

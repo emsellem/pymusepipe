@@ -527,177 +527,149 @@ class ExposureInfo(object):
         self.nexpo = nexpo
 
 
-def filter_list_with_ptable(input_list, list_datasets=None, pointing_table=None, verbose=True,
-                           str_dataset=default_str_dataset, ndigits=default_ndigits,
-                           filtername=None):
-    """
-    
-    Input
-    -----
-    input_list
-    list_datasets
-    pointing_table
-    verbose
-    str_dataset
-    ndigits
-    filtername
-
-    Returns
-    -------
-
-    """
-    if list_datasets is None:
-        list_datasets = []
-    elif not isinstance(list_datasets, list):
-        print_error("Cannot recognise input dataset(s)")
-        list_datasets = []
-
-    nfiles_input_list = len(input_list)
-
-
-def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verbose=True,
-                           str_dataset=default_str_dataset, ndigits=default_ndigits,
-                           filtername=None):
-    """Filter out exposures (pixtab or cube namelist) using a dictionary which
-    has a list of datasets and for each dataset a list of exposure number.
-
-    Args:
-        input_list (list of str):  input list to filter
-        dict_files (dict):  dictionary used to filter
-        list_datasets: list of int
-        dict_files: dictionary
-        verbose: bool
-        str_dataset: str
-        ndigits: int
-        filtername: str
-
-    Returns:
-        selected_filename_list: selected list of files
-        exposure_list_per_pointing: selected list of files for each pointing
-
-    """
-    if list_datasets is None:
-        list_datasets = []
-    elif not isinstance(list_datasets, list):
-        print_error("Cannot recognise input dataset(s)")
-        list_datasets = []
-
-    nfiles_input_list = len(input_list)
-
-    # If not dictionary is provided, we try to build it
-    if dict_files is None:
-        # Building the dummy list of tpl and nexpo for
-        # this input list, decrypting with get_tpl_nexpo
-        dict_files = {}
-        dict_files_with_tpl = {}
-        for filename in input_list:
-            if verbose:
-                print_info(f"Adressing File name: {filename}")
-            fdataset, ftpl, fnexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
-                                                           ndigits=ndigits, filtername=filtername)
-            if verbose:
-                print_info(f"    Detected = Dataset/TPLS/Nexpo: {fdataset} / {ftpl} / {fnexpo}")
-            # Did not find the string associated with dataset
-            if fdataset == -1:
-                continue
-            # or found it, then record it
-            else:
-                # Record only if the input list
-                if fdataset in list_datasets or len(list_datasets) == 0:
-                    if fdataset not in dict_files_with_tpl:
-                        dict_files_with_tpl[fdataset] = {ftpl: [fnexpo]}
-                    else:
-                        if ftpl not in dict_files_with_tpl[fdataset]:
-                            dict_files_with_tpl[fdataset][ftpl] = [fnexpo]
-                        else:
-                            dict_files_with_tpl[fdataset][ftpl].append(fnexpo)
-
-                for dataset in dict_files_with_tpl:
-                    dict_files[dataset] = []
-                    for tpl in dict_files_with_tpl[dataset]:
-                        list_nexpo = []
-                        for nexpo in dict_files_with_tpl[dataset][tpl]:
-                            list_nexpo.append(nexpo)
-                        list_nexpo.sort()
-                        dict_files[dataset].append((tpl, list_nexpo))
-
-    if len(list_datasets) == 0:
-        list_datasets = list(dict_files.keys())
-
-    if verbose:
-        print_info(f"Check file = dict_files is : {dict_files}")
-        print_info(f"Check file = list_datasets is : {list_datasets}")
-
-    # Otherwise use the ones which are given via their expo numbers
-    selected_filename_list = []
-    dict_exposures_per_pointing = {}
-    dict_tplexpo_per_pointing = {}
-    dict_tplexpo_per_dataset = {}
-    # this is the list of exposures to consider
-
-    for dataset in list_datasets:
-        dict_tplexpo_per_dataset[dataset] = {}
-        if dataset not in dict_files:
-            print_warning(f"Dataset {dataset} not in dictionary - skipping")
-        else:
-            list_tpltuple = dict_files[dataset]
-            # We loop on that list which should contain
-            # the list of tpl associated
-            # with a list of exposure numbers
-            for expotuple in list_tpltuple:
-                # We get the tpl, and then the list of expo numbers
-                tpl, list_expo = expotuple[0], expotuple[1]
-                # For each list of expo numbers, check
-                # if this is just a number
-                # or also a pointing association
-                for expo in list_expo:
-                    # By default, we assign the dataset as
-                    # pointing number
-                    if type(expo) in [str, int]:
-                        nexpo = int(expo)
-                        pointing = int(dataset)
-                    elif len(expo) == 2:
-                        nexpo = int(expo[0])
-                        pointing = int(expo[1])
-                    else:
-                        print_warning(f"Dictionary entry {expotuple} "
-                                      f"ignored (type of expo - {expo} - "
-                                      f"is {type(expo)}")
-                        break
-
-                    # Check whether this exists in the cube list
-                    for filename in input_list:
-                        ftpl, fnexpo = get_tpl_nexpo(filename)
-                        if (nexpo == int(fnexpo)) & (ftpl == tpl):
-                            # We select the file
-                            selected_filename_list.append(filename)
-                            if pointing not in dict_exposures_per_pointing:
-                                dict_exposures_per_pointing[pointing] = []
-                                dict_tplexpo_per_pointing[pointing] = []
-                            dict_exposures_per_pointing[pointing].append(filename)
-                            dict_tplexpo_per_pointing[pointing].append([dataset, tpl,
-                                                                        nexpo])
-                            if pointing not in dict_tplexpo_per_dataset[dataset]:
-                                dict_tplexpo_per_dataset[dataset][pointing] = []
-                            dict_tplexpo_per_dataset[dataset][pointing].append([tpl, nexpo])
-                            # And remove it from the list
-                            input_list.remove(filename)
-                            # We break out of the cube for loop
-                            break
-
-    selected_filename_list.sort()
-    if verbose:
-        print_info(f"Datasets {list_datasets} - "
-                   f"Selected {len(selected_filename_list)}/{nfiles_input_list} "
-                   f"exposures after dictionary filtering")
-
-        for pointing in dict_tplexpo_per_pointing:
-            print_info(f"Pointing {pointing} - Detected exposures [DATASET / TPL / NEXPO]:")
-            for tplexpo in dict_tplexpo_per_pointing[pointing]:
-                print_info(f"     {tplexpo[0]} / {tplexpo[1]} / {tplexpo[2]}")
-
-    return selected_filename_list, dict_exposures_per_pointing, dict_tplexpo_per_pointing, \
-        dict_tplexpo_per_dataset
+# def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verbose=True,
+#                            str_dataset=default_str_dataset, ndigits=default_ndigits,
+#                            filtername=None):
+#     """Filter out exposures (pixtab or cube namelist) using a dictionary which
+#     has a list of datasets and for each dataset a list of exposure number.
+#
+#     Args:
+#         input_list (list of str):  input list to filter
+#         dict_files (dict):  dictionary used to filter
+#         list_datasets: list of int
+#         dict_files: dictionary
+#         verbose: bool
+#         str_dataset: str
+#         ndigits: int
+#         filtername: str
+#
+#     Returns:
+#         selected_filename_list: selected list of files
+#         exposure_list_per_pointing: selected list of files for each pointing
+#
+#     """
+#     if list_datasets is None:
+#         list_datasets = []
+#     elif not isinstance(list_datasets, list):
+#         print_error("Cannot recognise input dataset(s)")
+#         list_datasets = []
+#
+#     nfiles_input_list = len(input_list)
+#
+#     # If not dictionary is provided, we try to build it
+#     if dict_files is None:
+#         # Building the dummy list of tpl and nexpo for
+#         # this input list, decrypting with get_tpl_nexpo
+#         dict_files = {}
+#         dict_files_with_tpl = {}
+#         for filename in input_list:
+#             if verbose:
+#                 print_info(f"Adressing File name: {filename}")
+#             fdataset, ftpl, fnexpo = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset,
+#                                                            ndigits=ndigits, filtername=filtername)
+#             if verbose:
+#                 print_info(f"    Detected = Dataset/TPLS/Nexpo: {fdataset} / {ftpl} / {fnexpo}")
+#             # Did not find the string associated with dataset
+#             if fdataset == -1:
+#                 continue
+#             # or found it, then record it
+#             else:
+#                 # Record only if the input list
+#                 if fdataset in list_datasets or len(list_datasets) == 0:
+#                     if fdataset not in dict_files_with_tpl:
+#                         dict_files_with_tpl[fdataset] = {ftpl: [fnexpo]}
+#                     else:
+#                         if ftpl not in dict_files_with_tpl[fdataset]:
+#                             dict_files_with_tpl[fdataset][ftpl] = [fnexpo]
+#                         else:
+#                             dict_files_with_tpl[fdataset][ftpl].append(fnexpo)
+#
+#                 for dataset in dict_files_with_tpl:
+#                     dict_files[dataset] = []
+#                     for tpl in dict_files_with_tpl[dataset]:
+#                         list_nexpo = []
+#                         for nexpo in dict_files_with_tpl[dataset][tpl]:
+#                             list_nexpo.append(nexpo)
+#                         list_nexpo.sort()
+#                         dict_files[dataset].append((tpl, list_nexpo))
+#
+#     if len(list_datasets) == 0:
+#         list_datasets = list(dict_files.keys())
+#
+#     if verbose:
+#         print_info(f"Check file = dict_files is : {dict_files}")
+#         print_info(f"Check file = list_datasets is : {list_datasets}")
+#
+#     # Otherwise use the ones which are given via their expo numbers
+#     selected_filename_list = []
+#     dict_exposures_per_pointing = {}
+#     dict_tplexpo_per_pointing = {}
+#     dict_tplexpo_per_dataset = {}
+#     # this is the list of exposures to consider
+#
+#     for dataset in list_datasets:
+#         dict_tplexpo_per_dataset[dataset] = {}
+#         if dataset not in dict_files:
+#             print_warning(f"Dataset {dataset} not in dictionary - skipping")
+#         else:
+#             list_tpltuple = dict_files[dataset]
+#             # We loop on that list which should contain
+#             # the list of tpl associated
+#             # with a list of exposure numbers
+#             for expotuple in list_tpltuple:
+#                 # We get the tpl, and then the list of expo numbers
+#                 tpl, list_expo = expotuple[0], expotuple[1]
+#                 # For each list of expo numbers, check
+#                 # if this is just a number
+#                 # or also a pointing association
+#                 for expo in list_expo:
+#                     # By default, we assign the dataset as
+#                     # pointing number
+#                     if type(expo) in [str, int]:
+#                         nexpo = int(expo)
+#                         pointing = int(dataset)
+#                     elif len(expo) == 2:
+#                         nexpo = int(expo[0])
+#                         pointing = int(expo[1])
+#                     else:
+#                         print_warning(f"Dictionary entry {expotuple} "
+#                                       f"ignored (type of expo - {expo} - "
+#                                       f"is {type(expo)}")
+#                         break
+#
+#                     # Check whether this exists in the cube list
+#                     for filename in input_list:
+#                         ftpl, fnexpo = get_tpl_nexpo(filename)
+#                         if (nexpo == int(fnexpo)) & (ftpl == tpl):
+#                             # We select the file
+#                             selected_filename_list.append(filename)
+#                             if pointing not in dict_exposures_per_pointing:
+#                                 dict_exposures_per_pointing[pointing] = []
+#                                 dict_tplexpo_per_pointing[pointing] = []
+#                             dict_exposures_per_pointing[pointing].append(filename)
+#                             dict_tplexpo_per_pointing[pointing].append([dataset, tpl,
+#                                                                         nexpo])
+#                             if pointing not in dict_tplexpo_per_dataset[dataset]:
+#                                 dict_tplexpo_per_dataset[dataset][pointing] = []
+#                             dict_tplexpo_per_dataset[dataset][pointing].append([tpl, nexpo])
+#                             # And remove it from the list
+#                             input_list.remove(filename)
+#                             # We break out of the cube for loop
+#                             break
+#
+#     selected_filename_list.sort()
+#     if verbose:
+#         print_info(f"Datasets {list_datasets} - "
+#                    f"Selected {len(selected_filename_list)}/{nfiles_input_list} "
+#                    f"exposures after dictionary filtering")
+#
+#         for pointing in dict_tplexpo_per_pointing:
+#             print_info(f"Pointing {pointing} - Detected exposures [DATASET / TPL / NEXPO]:")
+#             for tplexpo in dict_tplexpo_per_pointing[pointing]:
+#                 print_info(f"     {tplexpo[0]} / {tplexpo[1]} / {tplexpo[2]}")
+#
+#     return selected_filename_list, dict_exposures_per_pointing, dict_tplexpo_per_pointing, \
+#         dict_tplexpo_per_dataset
 
 
 def filter_list_with_suffix_list(list_names, included_suffix_list=[],

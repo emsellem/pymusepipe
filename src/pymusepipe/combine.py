@@ -14,7 +14,6 @@ import os
 from os.path import join as joinpath
 import glob
 import copy
-import re
 
 try:
     import astropy as apy
@@ -227,7 +226,8 @@ class MusePointings(SofPipe, PipeRecipes):
         # Setting of pointing table ---------------------------------------
         if check:
             self.get_all_pixtables()
-            self.assign_pointing_table(input_table=pointing_table, format=pointing_table_format,
+            self.assign_pointing_table(input_table=pointing_table,
+                                       table_format=pointing_table_format,
                                        folder=pointing_table_folder)
             self.list_pointings = self._check_list_pointings(list_pointings)
             self.filter_pixables_with_list()
@@ -267,8 +267,8 @@ class MusePointings(SofPipe, PipeRecipes):
             checked_list_pointings = list(set(list_pointings) & set(default_list))
             # Not existing ones
             notfound = list(set(list_pointings) - set(default_list))
-            for l in notfound:
-                upipe.print_warning(f"No pointing {l} for the given target")
+            for lpoint in notfound:
+                upipe.print_warning(f"No pointing {lpoint} for the given target")
 
             return checked_list_pointings
 
@@ -306,8 +306,8 @@ class MusePointings(SofPipe, PipeRecipes):
             checked_list_datasets = list(set(list_datasets) & set(default_list))
             # Not existing ones
             notfound = list(set(list_datasets) - set(default_list))
-            for l in notfound:
-                upipe.print_warning(f"No dataset {l} for the given target")
+            for lds in notfound:
+                upipe.print_warning(f"No dataset {lds} for the given target")
 
             return checked_list_datasets
 
@@ -345,7 +345,7 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         prefix_masked_pixtables = kwargs.pop("prefix_masked_pixtables",
                                              self.prefix_masked_pixtables)
-        path, filename = os.split(name_pixtable)
+        path, filename = os.path.split(name_pixtable)
         name_masked_pixtable = f"{path}{prefix_masked_pixtables}{filename}"
         # If the file exists, replace the name
         if os.path.isfile(name_masked_pixtable):
@@ -384,7 +384,9 @@ class MusePointings(SofPipe, PipeRecipes):
 
     @property
     def _all_pixtables(self):
-        all_lists = [self.dict_allpixtabs_in_datasets[dataset] for dataset in self.dict_allpixtabs_in_datasets]
+        all_lists = [self.dict_allpixtabs_in_datasets[dataset]
+                     for dataset in self.dict_allpixtabs_in_datasets]
+
         return [item for sublist in all_lists for item in sublist]
 
     def get_qtable(self, **kwargs):
@@ -448,7 +450,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                     f" {dataset_suffix}")
             self.dict_allpixtabs_in_datasets[dataset] = list_pixtabs
 
-    def assign_pointing_table(self, input_table=None, folder='', format='ascii'):
+    def assign_pointing_table(self, input_table=None, folder='', table_format='ascii'):
         """Assign the pointing table as provided. If not provided it will create one from the
         pixtable list
 
@@ -464,7 +466,7 @@ class MusePointings(SofPipe, PipeRecipes):
             if type(input_table) in [str, QTable, Table]:
                 upipe.print_info("Processing input pointing table")
                 self.pointing_table = PointingTable(input_table=input_table, folder=folder,
-                                                    format=format)
+                                                    table_format=table_format)
             elif isinstance(input_table, PointingTable):
                 upipe.print_info("Attaching the input pointing table to the MusePointings")
                 self.pointing_table = copy.copy(input_table)
@@ -489,7 +491,7 @@ class MusePointings(SofPipe, PipeRecipes):
                         row['select'] = 0
                     else:
                         row['filename'] = qtable_pixtables[mask]['filename'].value[0]
-                        row['select'] = 1
+                        row['select'] = qtable_pixtables[mask]['select'].value[0]
 
     def filter_pixables_with_list(self, list_datasets=None, list_pointings=None):
         """Filter a list of pixtables
@@ -497,7 +499,7 @@ class MusePointings(SofPipe, PipeRecipes):
         Parameters
         ----------
         list_datasets: list of int, optional
-        list_pointing: list of int, optional
+        list_pointings: list of int, optional
 
         Filter out the pointing table using those datasets and pointings
         """
@@ -617,7 +619,7 @@ class MusePointings(SofPipe, PipeRecipes):
                 index = np.argwhere(self.table_mjdobs == mjd_obs)
                 # Then check DATE
                 if (index.size == 0) or (self.table_dateobs[index] != date_obs):
-                    upipe.warning("PIXELTABLE {0} not found in OFFSET table: "
+                    upipe.print_warning("PIXELTABLE {0} not found in OFFSET table: "
                                   "please Check MJD-OBS and DATE-OBS".format(pixtab_name))
                     pixtab_to_exclude.append(pixtab_name)
                 nincluded_pixtab += 1
@@ -895,7 +897,7 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_mask = self._add_targetname(prefix_mask)
         prefix_wcs = self._add_targetname(prefix_wcs, asprefix=False)
 
-        # ICI ICI ICI
+        # Name of mask and final wcs
         name_mask = f"{prefix_mask}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
         finalname_wcs = f"{prefix_wcs}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
 
@@ -1031,7 +1033,7 @@ class MusePointings(SofPipe, PipeRecipes):
         return combined_wcs_name
 
     def run_combine(self, sof_filename='pointings_combine',
-                    lambdaminmax=[4000., 10000.],
+                    lambdaminmax=(4000., 10000.),
                     list_pointings=None,
                     suffix="", **kwargs):
         """MUSE Exp_combine treatment of the reduced pixtables

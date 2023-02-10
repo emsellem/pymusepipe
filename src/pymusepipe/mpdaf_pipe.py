@@ -42,15 +42,15 @@ from scipy import ndimage as ndi
 
 import pymusepipe
 from .config_pipe import default_wave_wcs, ao_mask_lambda, dict_extra_filters
-from .util_pipe import (filter_list_with_pdict, filter_list_with_suffix_list,\
-                        add_string, default_str_dataset, default_ndigits,
+from .util_pipe import (filter_list_with_suffix_list, add_string, default_str_dataset, default_ndigits,
                         get_dataset_name, check_filter_list)
 from .util_pipe import (print_error, print_info, print_warning, print_debug)
+from .util_image import filter_list_with_pointingtable
 from .cube_convolve import cube_kernel, cube_convolve
 from .emission_lines import get_emissionline_band
 
 
-def get_sky_spectrum(specname) :
+def get_sky_spectrum(specname):
     """Read sky spectrum from MUSE data reduction
     """
     if not os.path.isfile(specname):
@@ -362,8 +362,8 @@ class MuseCubeMosaic(CubeMosaic):
                  excluded_suffix=[],
                  included_suffix=[],
                  prefix_fixed_cubes="tmask", verbose=False,
-                 dict_exposures=None, dict_psf={},
-                 list_cubes=None):
+                 pointing_table=None, list_pointings=None,
+                 dict_psf={}, list_cubes=None, **kwargs):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
@@ -379,8 +379,12 @@ class MuseCubeMosaic(CubeMosaic):
         self.included_suffix = included_suffix
         self.prefix_fixed_cubes = prefix_fixed_cubes
         self.use_fixed_cubes = use_fixed_cubes
-        self.dict_exposures = dict_exposures
         self.dict_psf = dict_psf
+        self.pointing_table = pointing_table
+        self.list_pointings = list_pointings
+
+        self.str_dataset = kwargs.pop("str_dataset", default_str_dataset)
+        self.ndigits = kwargs.pop("ndigits", default_ndigits)
 
         # Building the list of cubes
         self.build_list(list_cubes=list_cubes)
@@ -472,8 +476,7 @@ class MuseCubeMosaic(CubeMosaic):
 
         if list_cubes is None:
             # get the list of cubes and return if 0 found
-            list_existing_cubes = glob.glob("{0}{1}*.fits".format(self.folder_cubes,
-                                                         self.prefix_cubes))
+            list_existing_cubes = glob.glob(f"{self.folder_cubes}{self.prefix_cubes}*.fits")
 
             print_info(f"Found {len(list_existing_cubes)} existing Cubes "
                              f"in this folder with prefix {self.prefix_cubes}")
@@ -486,32 +489,39 @@ class MuseCubeMosaic(CubeMosaic):
             print_info("Found {} Cubes after suffix filtering".format(
                 len(list_existing_cubes)))
 
-            # Filter the list with the pointing dictionary if given
-            if self.dict_exposures is not None:
-                print_info("Will be using a dictionary for "
-                                 "further selecting the appropriate cubes")
-            list_cubes, dict_exposures_per_pointing, dict_tplexpo_per_pointing,\
-                dict_tplexpo_per_dataset = filter_list_with_pdict(list_existing_cubes,
-                                                                  list_datasets=None,
-                                                                  dict_files=self.dict_exposures)
+            # Filtering the list using the input pointing table
+            if self.pointing_table is not None:
+                list_cubes = filter_list_with_pointingtable(list_existing_cubes,
+                                                            pointing_table=self.pointing_table,
+                                                            str_dataset=self.str_dataset,
+                                                            ndigits=self.ndigits)
+
+            # OLD WAY TO BE REMOVED
+            # # Filter the list with the pointing dictionary if given
+            # if self.dict_exposures is not None:
+            #     print_info("Will be using a dictionary for "
+            #                      "further selecting the appropriate cubes")
+            # list_cubes, dict_exposures_per_pointing, dict_tplexpo_per_pointing,\
+            #     dict_tplexpo_per_dataset = filter_list_with_pdict(list_existing_cubes,
+            #                                                       list_datasets=None,
+            #                                                       dict_files=self.dict_exposures)
 
             # Take (or not) the fixed Cubes
             if self.use_fixed_cubes:
                 print_warning("Using Corrected cubes with prefix {} "
-                                    "when relevant".format(self.prefix_fixed_cubes))
+                              "when relevant".format(self.prefix_fixed_cubes))
                 prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
                                                      self.prefix_cubes)
-                list_fixed_cubes = glob.glob("{0}{1}*fits".format(
-                                                   self.folder_cubes,
-                                                   prefix_to_consider))
+                list_fixed_cubes = glob.glob("{0}{1}*fits".format(self.folder_cubes,
+                                                                  prefix_to_consider))
                 print_info("Initial set of {:02d} Corrected "
-                                 "cubes found".format(len(list_fixed_cubes)))
+                           "cubes found".format(len(list_fixed_cubes)))
 
                 # if the list of exclusion suffix is empty, just use all cubes
                 list_fixed_cubes = filter_list_with_suffix_list(list_fixed_cubes,
-                                                          self.included_suffix,
-                                                          self.excluded_suffix,
-                                                          name_list="Fixed Cubes")
+                                                                 self.included_suffix,
+                                                                 self.excluded_suffix,
+                                                                 name_list="Fixed Cubes")
 
                 # Looping over the existing fixed pixtables
                 for fixed_cube in list_fixed_cubes:
@@ -562,8 +572,7 @@ class MuseCubeMosaic(CubeMosaic):
                         found = True
                 # If none correspond, set to the 0 FWHM Gaussian
                 if not found:
-                    print_warning(f"No PSF found for cube {name}. "
-                                        f"Using default")
+                    print_warning(f"No PSF found for cube {name}. Using default")
                     self.list_cubes[-1].psf = BasicPSF()
             else:
                 self.list_cubes[-1].psf = BasicPSF()
@@ -573,12 +582,10 @@ class MuseCubeMosaic(CubeMosaic):
                 print_info("Cube {0:03d}: {1}".format(i+1, c.filename))
 
         if self.ncubes == 0:
-            print_error("Found 0 cubes in this folder with suffix"
-                              " {}: please change suffix".format(
-                                  self.prefix_cubes))
+            print_error(f"Found 0 cubes in this folder with suffix {self.prefix_cubes}: "
+                        "please change suffix")
         else:
-            print_info("Found {} cubes to be processed".format(
-                                 self.ncubes))
+            print_info(f"Found {self.ncubes} cubes to be processed")
 
     def convolve_cubes(self, target_fwhm, target_nmoffat=None,
                         target_function="gaussian", suffix="conv", **kwargs):

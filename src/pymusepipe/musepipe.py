@@ -60,7 +60,7 @@ from astropy.utils.exceptions import AstropyWarning
 from datetime import datetime as dt
 
 # Importing pymusepipe modules
-from .init_musepipe import InitMuseParameters
+from .init_musepipe import InitMuseParameters, PipeObject
 from .recipes_pipe import PipeRecipes
 from .prep_recipes_pipe import PipePrep
 from . import util_pipe as upipe
@@ -81,20 +81,6 @@ __version__ = '2.0.2 (25/09/2019)'
 # _version__ = '0.0.1 (21 November 2017)'
 
 
-class PipeObject(object):
-    """A very simple class used to store astropy tables.
-    """
-
-    def __init__(self, info=None):
-        """Initialise the nearly empty class Add _info for a description
-        if needed
-
-        Args:
-            info (str): information on this object to be recorded. It will be
-                saved in _info.
-
-        """
-        self._info = info
 
 
 class MusePipe(PipePrep, PipeRecipes):
@@ -464,6 +450,13 @@ class MusePipe(PipePrep, PipeRecipes):
         for name in self.pipe_params._dict_folders_target:
             setattr(self.paths, name, joinpath(self.paths.target,
                                                self.pipe_params._dict_folders_target[name]))
+
+        # Setting the path for the Combined folders
+        self.paths.Comb = PipeObject("All Paths for Combined files")
+        for name in list(self.pipe_params._dict_combined_folders.keys()):
+            setattr(self.paths.Comb, name,
+                    joinpath(self.paths.target,
+                             self.pipe_params._dict_combined_folders_target[name]))
 
     def _get_dataset_name(self):
         """Reporting the _get_dataset_name from the InitMuseParam

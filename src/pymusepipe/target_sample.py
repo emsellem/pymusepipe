@@ -24,7 +24,8 @@ from .config_pipe import (PHANGS_reduc_config,
                           default_filter_list,
                           default_prefix_wcs,
                           default_prefix_wcs_mosaic,
-                          dict_default_for_recipes)
+                          dict_default_for_recipes,
+                          dict_listObject)
 from .init_musepipe import InitMuseParameters
 from .combine import MusePointings
 from .align_pipe import rotate_pixtables
@@ -322,13 +323,14 @@ class MusePipeSample(object):
             self.pipes[targetname].root_path = init_params_target.root
             self.pipes[targetname].data_path = joinpath(init_params_target.root, targetname)
 
-            init_comb_target = MusePointings(targetname=targetname,
-                                             list_datasets=list_datasets,
-                                             rc_filename=rc_filename,
-                                             cal_filename=cal_filename,
-                                             folder_config=folder_config,
-                                             verbose=False, check=False)
-            self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
+            #   init_comb_target = MusePointings(targetname=targetname,
+            #                                    list_datasets=list_datasets,
+            #                                    rc_filename=rc_filename,
+            #                                    cal_filename=cal_filename,
+            #                                    folder_config=folder_config,
+            #                                    verbose=False, check=False)
+            # self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
+            self.targets[targetname].combcubes_path = self.targets[targetname].paths.Comb.cubes
 
             if self.init_pipes:
                 self.set_pipe_target(targetname, **kwargs_init)
@@ -890,8 +892,8 @@ class MusePipeSample(object):
                              list_ifu=None, angle=angle, fakemode=fakemode,
                              prefix=prefix, **kwargs)
 
-    def init_mosaic(self, targetname=None, list_datasets=None, prefix_cubes="DATACUBE_FINAL_WCS",
-                    **kwargs):
+    def init_mosaic(self, targetname=None, list_datasets=None, list_pointings=None,
+                    pointing_table=None, **kwargs):
         """Prepare the combination of targets
 
         Input
@@ -900,10 +902,14 @@ class MusePipeSample(object):
             Name of target
         list_datasets: list [or None=default meaning all datasets]
             List of datasets (e.g., [1,2,3])
-        prefix_cubes: str default="DATACUBE_FINAL_WCS", optional
-            Prefix to be used to list the cubes to consider
+        pointing_table: PointingTable
+           Pointing Table to select a given set of exposures
         """
-        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        default_comb_folder = self.targets[targetname].combcubes_path
+        folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
+        folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
+        prefix_cubes = kwargs.pop("prefix_cubes", dict_listObject['CUBEWCS'])
+
         # Check if pointings are ok
         if list_datasets is None:
             list_datasets = copy.copy(self.targets[targetname].list_datasets)
@@ -913,16 +919,14 @@ class MusePipeSample(object):
                                 for dataset in list_datasets]
         upipe.print_info(f"List of datasets names: {list_datasets_names}")
 
-        default_comb_folder = self.targets[targetname].combcubes_path
-        folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
-        folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
+        add_targetname = kwargs.pop("add_targetname", self.add_targetname)
         if add_targetname:
-            wcs_prefix = "{}_".format(targetname)
-            prefix_cubes = "{0}_{1}".format(targetname, prefix_cubes)
+            wcs_prefix = f"{targetname}_"
+            prefix_cubes = f"{targetname}_{prefix_cubes}"
         else:
             wcs_prefix = ""
         ref_wcs = kwargs.pop("ref_wcs", f"{default_prefix_wcs_mosaic}{wcs_prefix}"
-                                        f"DATACUBE_FINAL.fits")
+                                        f"{dict_listObject['CUBE']}.fits")
         upipe.print_info(f"Check file: ref_wcs is {ref_wcs}")
 
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
@@ -930,6 +934,8 @@ class MusePipeSample(object):
                                                        folder_cubes=folder_cubes,
                                                        prefix_cubes=prefix_cubes,
                                                        list_suffix=list_datasets_names,
+                                                       pointing_table=pointing_table,
+                                                       list_pointings=list_pointings,
                                                        **kwargs)
 
     def convolve_mosaic_per_pointing(self, targetname=None, list_pointings=None,
