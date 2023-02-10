@@ -623,6 +623,7 @@ class MusePipeSample(object):
                                       list_datasets=list_datasets,
                                       ref_wcs=full_ref_wcs,
                                       folder_ref_wcs=folder_full_ref_wcs,
+                                      pointing_table=pointing_table,
                                       fakemode=False)
 
         if create_expocubes:
