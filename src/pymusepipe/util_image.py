@@ -27,12 +27,13 @@ from astropy.convolution import Gaussian2DKernel, convolve
 from astropy.coordinates import concatenate as concat_skycoords
 from astropy.coordinates import SkyCoord
 
+from mpdaf.drs import PixTable
+
 # Import package modules
 from . import util_pipe as upipe
 from .util_pipe import get_dataset_tpl_nexpo, append_value_to_dict
 from .config_pipe import (default_ndigits, default_str_dataset, default_offset_table)
 from .config_pipe import mjd_names, date_names, tpl_names, iexpo_names, dataset_names
-from .mpdaf_pipe import get_centre_from_pixtable
 
 try:
     from photutils.detection import IRAFStarFinder
@@ -366,7 +367,7 @@ def get_flux_range(data, border=15, low=2, high=98):
 
 def get_normfactor(array1, array2, median_filter=True, border=0,
                    convolve_data1=0., convolve_data2=0., chunk_size=10,
-                   threshold=0.):
+                   threshold=0., add_background1=0):
     """Get the normalisation factor for shifted and projected images. This function
     only consider the input images given by their data (numpy) arrays.
 
@@ -396,7 +397,8 @@ def get_normfactor(array1, array2, median_filter=True, border=0,
     polypar: the result of an ODR regression
     """
     # Retrieving the data and preparing it
-    d1 = prepare_image(array1, median_filter=median_filter, sigma=convolve_data1, border=border)
+    d1 = prepare_image(array1+add_background1, median_filter=median_filter, sigma=convolve_data1,
+                       border=border)
     d2 = prepare_image(array2, median_filter=median_filter, sigma=convolve_data2, border=border)
     polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold)
 
@@ -846,6 +848,47 @@ def group_exposures_per_pointing(list_files, target_path='', limit=10., unit=u.a
     pointing_dict, files_pointing_dict = group_xy_per_fieldofview(center_dict, limit=limit * unit)
 
     return center_dict, pointing_dict, files_pointing_dict
+
+
+def get_centre_from_pixtable(pixtable_name):
+    """Get the center of the FOV from pixtables
+
+    Input
+    -----
+    pixtable_name: str
+        name of the pixeltable
+
+    Returns
+    -------
+    SkyCoord: astropy.coordinates.Skycoord
+        Coordinates of the center of the field
+    """
+
+    table = PixTable(pixtable_name)
+
+    # get the x and y coordinates of each pixel
+    x = table.get_xpos()
+    y = table.get_ypos()
+
+    # it seems like the x and y are the position from the center of the field
+    # see: https://mpdaf.readthedocs.io/en/latest/pixtable.html#pixtable-format
+    # so the centre should just be the pixel close to 0 in both dimensions
+
+    xcen_id = np.argmin(np.abs(x))
+    ycen_id = np.argmin(np.abs(y))
+
+    xcen = x[xcen_id]
+    ycen = y[ycen_id]
+
+    # get the position on the sky of the barycenter
+    # and transform to SkyCoord for consistency
+    bary = table.get_pos_sky(xcen, ycen)
+    coord = SkyCoord(bary[0], bary[1], unit=(u.deg, u.deg))
+
+    # Printing the result
+    upipe.print_info(f"{pixtable_name} = {coord}")
+
+    return coord
 
 
 def get_centre_from_image_or_cube(filename, ext=1, dtype='image'):

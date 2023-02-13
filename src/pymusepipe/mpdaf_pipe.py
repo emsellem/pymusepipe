@@ -35,7 +35,6 @@ from mpdaf.drs import PixTable
 # Astropy
 from astropy.io import fits as pyfits
 from astropy import units as u
-from astropy.coordinates import SkyCoord
 
 # Scipy erosion
 from scipy import ndimage as ndi
@@ -278,47 +277,6 @@ def rotate_cube_wcs(cube_name, cube_folder="", outwcs_folder=None, rotangle=0.,
     # write output
     final_rot_cube.write(joinpath(outwcs_folder, out_name))
     return outwcs_folder, out_name
-
-
-def get_centre_from_pixtable(pixtable_name):
-    """Get the center of the FOV from pixtables
-
-    Input
-    -----
-    pixtable_name: str
-        name of the pixeltable
-
-    Returns
-    -------
-    SkyCoord: astropy.coordinates.Skycoord
-        Coordinates of the center of the field
-    """
-
-    table = PixTable(pixtable_name)
-
-    # get the x and y coordinates of each pixel
-    x = table.get_xpos()
-    y = table.get_ypos()
-
-    # it seems like the x and y are the position from the center of the field
-    # see: https://mpdaf.readthedocs.io/en/latest/pixtable.html#pixtable-format
-    # so the centre should just be the pixel close to 0 in both dimensions
-
-    xcen_id = np.argmin(np.abs(x))
-    ycen_id = np.argmin(np.abs(y))
-
-    xcen = x[xcen_id]
-    ycen = y[ycen_id]
-
-    # get the position on the sky of the barycenter
-    # and transform to SkyCoord for consistency
-    bary = table.get_pos_sky(xcen, ycen)
-    coord = SkyCoord(bary[0], bary[1], unit=(u.deg, u.deg))
-
-    # Printing the result
-    print_info(f"{pixtable_name} = {coord}")
-
-    return coord
 
 
 class BasicPSF(object):

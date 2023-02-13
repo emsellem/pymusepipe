@@ -414,6 +414,22 @@ def init_plot_optical_flow(opflow):
 #################################################################
 # ================== END Useful functions ===================== #
 #################################################################
+class OffsetState(object):
+    """A very simple class used to store the offsets
+    """
+
+    def __init__(self, nstate=1, info=None):
+        """Initialise the nearly empty class Add _info for a description
+        if needed
+
+        Args:
+            info (str): information on this object to be recorded. It will be
+                saved in _info.
+
+        """
+        self._info = info
+        self._nstate = nstate
+
 # Main alignment Class
 class AlignMuseDataset(object):
     """Class to align MUSE images onto a reference image.
@@ -570,6 +586,7 @@ class AlignMuseDataset(object):
         self.suffix_images = kwargs.pop("suffix_muse_images", "IMAGE_FOV")
         self.filter_name = kwargs.pop("filter_name", "Cousins_R")
         self.filter_suffix = kwargs.pop("filter_suffix", self.filter_name)
+        self._nstate = int(0)
 
         # Use polynorm or not
         self.use_polynorm = kwargs.pop("use_polynorm", True)
@@ -679,9 +696,8 @@ class AlignMuseDataset(object):
 
         # Initialise the needed arrays for the cross-correlation offsets
         self.cross_off_pixel = np.zeros((self.nimages, 2), dtype=np.float64)
-        self.extra_off_pixel = np.zeros_like(self.cross_off_pixel)
-
         self.cross_off_arcsec = np.zeros_like(self.cross_off_pixel)
+        self.extra_off_pixel = np.zeros_like(self.cross_off_pixel)
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
 
         self.extra_rotangles = np.zeros(self.nimages, dtype=np.float64)
@@ -704,6 +720,96 @@ class AlignMuseDataset(object):
         self.ima_tplstart = [None] * self.nimages
         self.ima_iexpo = [None] * self.nimages
         self.ima_dataset = [None] * self.nimages
+
+    def save_state(self, force_nstate=None):
+        """Save the offset and background and normalisation to a given attribute
+        defined by self._nstate
+
+        Input
+        -----
+        force_nstate: int default=None
+        """
+        if force_nstate is not None:
+            self._nstate = force_nstate
+
+        self._nstate += 1
+        newstate_name = f"state_{self._nstate:02d}"
+        # If state already exists, abort
+        if hasattr(self, newstate_name):
+            upipe.print_error(f"State number {self._nstate} exists - Have you modified "
+                              f"self._nstate? - Aborting save_state")
+            upipe.print_error(f"Check value of self._nstate and existing OffsetStates. "
+                              f"You can enforce it using save_state(force_nstate=XX)")
+            return
+
+        # if ok, initialise state using the OffsetState class
+        upipe.print_info(f"Creating new backup OffsetState {self._nstate:02d}")
+        newstate = OffsetState(nstate=self._nstate, info="Backuped offset state")
+        setattr(self, newstate_name, newstate)
+        my_newtstate = getattr(self, newstate_name)
+
+        # Save the data
+        for varname in ["ima_background", "ima_norm_factors",
+                        "init_off_pixel", "init_off_arcsec",
+                        "extra_off_pixel", "extra_off_arcsec",
+                        "init_rotangles", "extra_rotangles"]:
+            setattr(my_newtstate, varname, copy.copy(getattr(self, varname)))
+
+    def retrieve_state(self, nstate=1):
+        """Retrieve the state with offset and background and norm factors
+
+        Input
+        -----
+        nstate = int default=1
+        """
+        state_name = f"state_{nstate:02d}"
+        # Check if the state exists
+        if not hasattr(self, state_name):
+            upipe.print_error(f"No found state with number={nstate} - Cannot retrieve")
+            return
+
+        # Retrieve the data
+        for varname in ["ima_background", "ima_norm_factors",
+                        "init_off_pixel", "init_off_arcsec",
+                        "extra_off_pixel", "extra_off_arcsec",
+                        "init_rotangles", "extra_rotangles"]:
+            my_state = getattr(self, state_name)
+            setattr(self, varname, copy.copy(getattr(my_state, varname)))
+
+    def list_states(self, nstate_max=None):
+        """
+        Input
+        -----
+
+        """
+        if nstate_max is None:
+            nstate_max = self._nstate
+
+        for nstate in range(nstate_max+1):
+            state_name = "state_{nstate:02d}"
+            if hasattr(self, state_name):
+                print("State = {nstate_02d} exists")
+            else:
+                print("State = {nstate_02d} does *not* exist")
+
+    def transfer_extra_to_guess(self, transfer_rotation=False):
+        """Transfer the values of the extra offset as a guess
+        """
+        # First save the existing state
+        self.save_state()
+
+        # Copy the values
+        self.init_off_pixel = copy.copy(self.extra_off_pixel)
+        self.init_off_arcsec = copy.copy(self.extra_off_arcsec)
+
+        # Reset the extra offsets
+        self.extra_off_pixel = np.zeros_like(self.init_off_pixel)
+        self.extra_off_arcsec = np.zeros_like(self.init_off_arcsec)
+
+        # Deal with rotation too if needed
+        if transfer_rotation:
+            self.init_rotangles = copy.copy(self.extra_rotangles)
+            self.extra_rotangles = np.zeros_like(self.init_off_arcsec)
 
     def init_guess_offset(self, **kwargs):
         """Initialise first guess, either from cross-correlation (default)
@@ -1061,8 +1167,8 @@ class AlignMuseDataset(object):
                                   f"allowed by self.nimages ({self.nimages})")
         return test_nima
 
-    def offset_and_compare(self, nima=0, extra_pixel=None, extra_arcsec=None,
-                           extra_rotation=None, **kwargs):
+    def offset_and_compare_ima(self, nima=0, extra_pixel=None, extra_arcsec=None,
+                               extra_rotation=None, **kwargs):
         """Run the offset and comparison for a given image number
          
         Input
