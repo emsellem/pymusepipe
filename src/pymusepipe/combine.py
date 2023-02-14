@@ -480,6 +480,11 @@ class MusePointings(SofPipe, PipeRecipes):
         else:
             if self._pixtab_in_comb_folder:
                 qtable_pixtables = self.get_qtable()
+                # In case select is not in the table yet
+                self.pointing_table._reset_select(overwrite=False)
+                if 'select' not in qtable_pixtables.colnames:
+                    qtable_pixtables.add_column([int(1)] * len(qtable_pixtables), name='select')
+
                 for row in self.pointing_table.qtable:
                     dataset = row['dataset']
                     tpls = row['tpls']
