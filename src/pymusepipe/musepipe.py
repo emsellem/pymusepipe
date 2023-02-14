@@ -456,7 +456,7 @@ class MusePipe(PipePrep, PipeRecipes):
         for name in list(self.pipe_params._dict_combined_folders.keys()):
             setattr(self.paths.Comb, name,
                     joinpath(self.paths.target,
-                             self.pipe_params._dict_combined_folders_target[name]))
+                             self.pipe_params._dict_combined_folders[name]))
 
     def _get_dataset_name(self):
         """Reporting the _get_dataset_name from the InitMuseParam
