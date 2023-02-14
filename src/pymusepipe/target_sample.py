@@ -330,7 +330,7 @@ class MusePipeSample(object):
             #                                    folder_config=folder_config,
             #                                    verbose=False, check=False)
             # self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
-            self.targets[targetname].combcubes_path = self.targets[targetname].paths.Comb.cubes
+            self.targets[targetname].combcubes_path = init_params_target.paths.Comb.cubes
 
             if self.init_pipes:
                 self.set_pipe_target(targetname, **kwargs_init)
