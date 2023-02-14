@@ -323,14 +323,14 @@ class MusePipeSample(object):
             self.pipes[targetname].root_path = init_params_target.root
             self.pipes[targetname].data_path = joinpath(init_params_target.root, targetname)
 
-            #   init_comb_target = MusePointings(targetname=targetname,
-            #                                    list_datasets=list_datasets,
-            #                                    rc_filename=rc_filename,
-            #                                    cal_filename=cal_filename,
-            #                                    folder_config=folder_config,
-            #                                    verbose=False, check=False)
-            # self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
-            self.targets[targetname].combcubes_path = init_params_target.paths.Comb.cubes
+            init_comb_target = MusePointings(targetname=targetname,
+                                             list_datasets=list_datasets,
+                                             rc_filename=rc_filename,
+                                             cal_filename=cal_filename,
+                                             folder_config=folder_config,
+                                             verbose=False, check=False)
+            self.targets[targetname].combcubes_path = init_comb_target.paths.cubes
+            # self.targets[targetname].combcubes_path = init_params_target.paths.Comb.cubes
 
             if self.init_pipes:
                 self.set_pipe_target(targetname, **kwargs_init)
