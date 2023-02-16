@@ -394,9 +394,12 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         # get the list
         list_pixtables = kwargs.pop("list_pixtables", self._all_pixtables)
+        str_dataset = kwargs.pop("str_dataset", self.pipe_params.str_dataset)
+        ndigits = kwargs.pop("str_dataset", self.pipe_params.ndigits)
 
         # transform into QTable
-        return scan_filenames_from_list(list_pixtables)
+        return scan_filenames_from_list(list_pixtables, str_dataset=str_dataset,
+                                        ndigits=ndigits, **kwargs)
 
     def get_pointing_table(self, **kwargs):
         """Create the pointing table from the all pixtables list
