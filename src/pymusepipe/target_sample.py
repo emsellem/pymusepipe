@@ -574,7 +574,7 @@ class MusePipeSample(object):
         Returns:
 
         """
-        if not self._check_targetname(targetname)
+        if not self._check_targetname(targetname):
             return
 
         if rot_pixtab:
@@ -812,7 +812,7 @@ class MusePipeSample(object):
         last_recipe: str or int [max of all recipes]
             Name or number of the first and last recipes to process
         """
-        if not self._check_targetname(targetname)
+        if not self._check_targetname(targetname):
             return
 
         # General print out
