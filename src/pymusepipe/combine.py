@@ -854,7 +854,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Additional suffix if needed
         for pointing in list_pointings:
             upipe.print_info("Making WCS Mask for "
-                             "Pointing {get_pointing_name(pointing)}")
+                             f"Pointing {get_pointing_name(pointing)}")
             _ = self.create_pointing_wcs(pointing=pointing,
                                          filter_list=filter_list, **kwargs)
 
@@ -910,8 +910,7 @@ class MusePointings(SofPipe, PipeRecipes):
         mask_cube = MuseCube(filename=joinpath(dir_mask, name_mask))
 
         # Creating the new cube
-        upipe.print_info("Now creating the Reference WCS cube "
-                         "for pointing {0}".format(int(pointing)))
+        upipe.print_info(f"Now creating the Reference WCS cube for pointing {int(pointing)}")
         cfolder, cname = mask_cube.create_reference_cube(
                 lambdamin=lambdaminmax_mosaic[0],
                 lambdamax=lambdaminmax_mosaic[1], 
@@ -970,8 +969,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Creating the new cube
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
-        upipe.print_info("Now creating the Reference WCS cube using prefix '{0}'".format(
-            prefix_wcs))
+        upipe.print_info(f"Now creating the Reference WCS cube using prefix '{prefix_wcs}'")
         cfolder, cname = refcube.extract_onespectral_cube(prefix=prefix_wcs, **kwargs)
 
         # Now transforming this into a bona fide 1 extension WCS file
@@ -1014,8 +1012,8 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # test if cube exists
         if not os.path.isfile(refcube_name):
-            upipe.print_error("[combine/create_combined_wcs] File {0} does not exist "
-                              "- Aborting.".format(refcube_name))
+            upipe.print_error(f"[combine/create_combined_wcs] File {refcube_name} does not exist "
+                              "- Aborting.")
             return
 
         # Opening the cube via MuseCube
@@ -1023,8 +1021,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Creating the new cube
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
-        upipe.print_info("Now creating the Reference WCS cube using prefix '{0}'".format(
-            prefix_wcs))
+        upipe.print_info(f"Now creating the Reference WCS cube using prefix '{prefix_wcs}'")
         cfolder, cname = refcube.create_reference_cube(lambdamin=lambdaminmax_wcs[0],
                 lambdamax=lambdaminmax_wcs[1], prefix=prefix_wcs, **kwargs)
 
@@ -1120,7 +1117,7 @@ class MusePointings(SofPipe, PipeRecipes):
         if ref_wcs is not None:
             full_ref_wcs = joinpath(folder_ref_wcs, ref_wcs)
             if not os.path.isfile(full_ref_wcs):
-                upipe.print_error("Reference WCS file {full_ref_wcs} does not exist")
+                upipe.print_error(f"Reference WCS file {full_ref_wcs} does not exist")
                 upipe.print_error("Consider using the create_combined_wcs recipe"
                                   " if you wish to create pointing masks. Else"
                                   " just check that the WCS reference file exists.")
