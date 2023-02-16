@@ -382,8 +382,7 @@ class MusePipeSample(object):
             True if yes, False if no.
         """
         if targetname not in self.targetnames:
-            upipe.print_error("ERROR: no Target named {name} in the defined sample".format(
-                                name=targetname))
+            upipe.print_error(f"No '{targetname}' in the defined Target Name List -- Aborting")
             return False
         else:
             return True
@@ -575,6 +574,9 @@ class MusePipeSample(object):
         Returns:
 
         """
+        if not self._check_targetname(targetname)
+            return
+
         if rot_pixtab:
             # We first use the offset table to rotate the pixtables
             upipe.print_info("========== ROTATION OF PIXTABLES ===============")
@@ -810,6 +812,9 @@ class MusePipeSample(object):
         last_recipe: str or int [max of all recipes]
             Name or number of the first and last recipes to process
         """
+        if not self._check_targetname(targetname)
+            return
+
         # General print out
         upipe.print_info("---- Starting the Data Reduction for Target={0} ----".format(
                             targetname))

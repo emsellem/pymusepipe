@@ -1227,6 +1227,9 @@ class PointingTable(object):
 
         # First build the pointing table using the filenames found in folder
         self.qtable = scan_filenames_from_folder(folder=self.folder, **kwargs)
+        if len(self.qtable) == 0:
+            upipe.print_error("Empty table - found 0 files in the pointing QTable after scanning.")
+            return
         # Reset the selection
         self._reset_select()
         # Assign the pointings

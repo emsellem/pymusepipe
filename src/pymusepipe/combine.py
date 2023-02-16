@@ -706,7 +706,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                                self.pipe_params._dict_folders_target[name]))
 
     def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True, reference_cube=True,
-                             refcube_name=None, **kwargs):
+                             refcube_name=None, list_pointings=None, **kwargs):
         """Create the WCS reference files, for all individual pointings and for
         the mosaic.
 
@@ -727,7 +727,8 @@ class MusePointings(SofPipe, PipeRecipes):
                 self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
                                  filter_list="white",
                                  prefix_all=default_prefix_wcs,
-                                 targetname_asprefix=False)
+                                 targetname_asprefix=False,
+                                 list_pointings=list_pointings)
                 wcs_refcube_name = self._combined_cube_name
             else:
                 upipe.print_info("@@@@@@@@ Start creating the narrow-lambda "
@@ -1079,6 +1080,14 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # If list_pointings is None using the initially set up one
         list_pointings = self._check_list_pointings(list_pointings, self.list_pointings)
+
+        # Now cross-correlate with list of existing pointings
+        temp_list_pointings = copy.copy(list_pointings)
+        for pointing in temp_list_pointings:
+            if pointing not in self.dict_pixtabs_in_pointings:
+                upipe.print_info(f"Pointing {pointing} found in the list of pointings but not in "
+                                 f"the pointing table - We will not process that pointing")
+                list_pointings.remove(pointing)
 
         # If only 1 exposure, duplicate the pixtable
         # as exp_combine needs at least 2 pixtables
