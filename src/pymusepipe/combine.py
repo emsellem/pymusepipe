@@ -535,21 +535,6 @@ class MusePointings(SofPipe, PipeRecipes):
     def dict_tplexpo_per_pointing(self):
         return self.pointing_table.dict_tplexpo_per_pointing
 
-        # # Filter the list with the dataset dictionary if given
-        #     select_list_pixtabs, tempp_dict_pixtabs, tempp_dict_tplexpo_per_pointing, \
-        #         tempp_dict_tplexpo_per_dataset = filter_list_with_pdict(list_pixtabs,
-        #                                                                 list_datasets=[dataset],
-        #                                                                 dict_files=self.dict_exposures,
-        #                                                                 verbose=self.verbose)
-
-        #     self.dict_pixtabs_in_datasets[dataset] = copy.copy(select_list_pixtabs)
-        #     self.dict_pixtabs_in_pointings = merge_dict(self.dict_pixtabs_in_pointings,
-        #                                                 tempp_dict_pixtabs)
-        #     self.dict_tplexpo_per_pointing = merge_dict(self.dict_tplexpo_per_pointing,
-        #                                                 tempp_dict_tplexpo_per_pointing)
-        #     self.dict_tplexpo_per_dataset = merge_dict(self.dict_tplexpo_per_dataset,
-        #                                                 tempp_dict_tplexpo_per_dataset)
-
     def _read_offset_table(self, name_offset_table=None, folder_offset_table=None):
         """Reading the Offset Table
         If readable, the table is read and set in the offset_table attribute.
@@ -618,6 +603,8 @@ class MusePointings(SofPipe, PipeRecipes):
         nexcluded_pixtab = 0
         nincluded_pixtab = 0
         for dataset in self.list_datasets:
+            if dataset not in self.dict_pixtabs_in_datasets:
+                continue
             pixtab_to_exclude = []
             for pixtab_name in self.dict_pixtabs_in_datasets[dataset]:
                 pixtab_header = pyfits.getheader(pixtab_name)
@@ -640,13 +627,11 @@ class MusePointings(SofPipe, PipeRecipes):
                                         "{0}".format(pixtab))
 
         # printing result
-        upipe.print_info("Offset Table checked: #{0} PixTables included".format(
-            nincluded_pixtab))
+        upipe.print_info(f"Offset Table checked: #{nincluded_pixtab} PixTables included")
         if nexcluded_pixtab == 0:
             upipe.print_info("All PixTables were found in Offset Table")
         else:
-            upipe.print_warning("#{0} PixTables not found in Offset Table".format(
-                nexcluded_pixtab))
+            upipe.print_warning(f"#{nexcluded_pixtab} PixTables not found in Offset Table")
 
     def goto_origfolder(self, addtolog=False):
         """Go back to original folder
@@ -708,7 +693,7 @@ class MusePointings(SofPipe, PipeRecipes):
             setattr(self.paths, name, joinpath(self.paths.target,
                                                self.pipe_params._dict_folders_target[name]))
 
-    def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True, reference_cube=True,
+    def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True, wcs_refcube_name=None,
                              refcube_name=None, list_pointings=None, **kwargs):
         """Create the WCS reference files, for all individual pointings and for
         the mosaic.
@@ -717,33 +702,48 @@ class MusePointings(SofPipe, PipeRecipes):
             Will run the individual pointings WCS
         mosaic_wcs: bool [True]
             Will run the combined WCS
-        lambdaminmax: [float, float]
+        wcs_refcube_name: str default=None
+            Name of the input WCS to be used. If None, will be computed.
+            If "auto", we assume the WCS cube exists with the default naming convention
+            Otherwise, will use the name for further calculations
+        refcube_name: str default=None
+            Name of the input cube to guide the WCS building. If None and wcs_refcube_name is
+            also None, this reference cube will first be computed. If not None but no WCS is
+            provided, it will be used as a reference to create a new WCS.
+        list_pointings: list of int default=None
+            List of pointings to consider
+        **kwargs: additional keywords including
+            lambdaminmax: [float, float]
 
         """
         lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
 
-        # Creating the reference cube if not existing
-        if reference_cube:
+        # Creating the WCS Cube. First if None, we need to set this up
+        if wcs_refcube_name is None:
+            # If no reference input cube is provided, we also need to create that with a combine
             if refcube_name is None:
-                upipe.print_info("@@@@@@@ First creating a reference (mosaic) "
-                                 "cube with short spectral range @@@@@@@")
+                upipe.print_info("@@@@@@@ Creating a (WCS, narrow-lambda) reference mosaic "
+                                 "cube from existing individual exposures @@@@@@@")
                 self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
                                  filter_list="white",
                                  prefix_all=default_prefix_wcs,
                                  targetname_asprefix=False,
                                  list_pointings=list_pointings)
                 wcs_refcube_name = self._combined_cube_name
+            # If the input cube is provided, we just construct a WCS from that
             else:
-                upipe.print_info("@@@@@@@@ Start creating the narrow-lambda "
-                                 "WCS and Mask from reference Cube @@@@@@@@")
-                wcs_refcube_name = self.create_combined_wcs(
-                                       refcube_name=refcube_name)
+                upipe.print_info("@@@@@@@@ Creating a (WCS, narrow-lambda) reference mosaic "
+                                 "from provided input cube @@@@@@@@")
+                wcs_refcube_name = self.create_combined_wcs(refcube_name=refcube_name)
         else:
-            # getting the name of the final datacube (mosaic)
-            cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
-            cube_name = "{0}{1}.fits".format(default_prefix_wcs,
-                                          self._add_targetname(cube_suffix))
-            wcs_refcube_name = joinpath(self.paths.cubes, cube_name)
+            # If the wcs is not None, but auto, we used the default naming convention for that WCS
+            # Otherwise we will just use that name then
+            if wcs_refcube_name == "auto":
+                # getting the name of the final datacube (mosaic)
+                cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
+                cube_name = "{0}{1}.fits".format(default_prefix_wcs,
+                                              self._add_targetname(cube_suffix))
+                wcs_refcube_name = joinpath(self.paths.cubes, cube_name)
 
         if pointings_wcs:
             # Creating the full mosaic WCS first with a narrow lambda range
@@ -757,10 +757,9 @@ class MusePointings(SofPipe, PipeRecipes):
             # Creating a reference WCS for the Full Mosaic with the right
             # Spectral coverage for a full mosaic
             upipe.print_info("@@@@@@@ Start creating the full-lambda WCS @@@@@@@")
-            self._combined_wcs_name = self.create_combined_wcs(
-                                        prefix_wcs=prefix_mosaic,
-                                        lambdaminmax_wcs=lambdaminmax_for_mosaic,
-                                        refcube_name=wcs_refcube_name)
+            self._combined_wcs_name = self.create_combined_wcs(prefix_wcs=prefix_mosaic,
+                                                               lambdaminmax_wcs=lambdaminmax_for_mosaic,
+                                                               refcube_name=wcs_refcube_name)
 
     def run_combine_all_single_pointings(self, add_suffix="", sof_filename='pointings_combine',
                                          list_pointings=None, **kwargs):
@@ -915,12 +914,10 @@ class MusePointings(SofPipe, PipeRecipes):
 
         # Creating the new cube
         upipe.print_info(f"Now creating the Reference WCS cube for pointing {int(pointing)}")
-        cfolder, cname = mask_cube.create_reference_cube(
-                lambdamin=lambdaminmax_mosaic[0],
-                lambdamax=lambdaminmax_mosaic[1], 
-                filter_for_nan=True, prefix=prefix_wcs, 
-                outcube_name=finalname_wcs, **kwargs)
-
+        cfolder, cname = mask_cube.create_reference_cube(lambdamin=lambdaminmax_mosaic[0],
+                                                         lambdamax=lambdaminmax_mosaic[1],
+                                                         filter_for_nan=True, prefix=prefix_wcs,
+                                                         outcube_name=finalname_wcs, **kwargs)
         # Now transforming this into a bona fide 1 extension WCS file
         full_cname = joinpath(cfolder, cname)
         d = pyfits.getdata(full_cname, ext=1)
@@ -1027,7 +1024,8 @@ class MusePointings(SofPipe, PipeRecipes):
         prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
         upipe.print_info(f"Now creating the Reference WCS cube using prefix '{prefix_wcs}'")
         cfolder, cname = refcube.create_reference_cube(lambdamin=lambdaminmax_wcs[0],
-                lambdamax=lambdaminmax_wcs[1], prefix=prefix_wcs, **kwargs)
+                                                       lambdamax=lambdaminmax_wcs[1],
+                                                       prefix=prefix_wcs, **kwargs)
 
         # Now transforming this into a bona fide 1 extension WCS file
         combined_wcs_name = joinpath(cfolder, cname)
@@ -1088,8 +1086,8 @@ class MusePointings(SofPipe, PipeRecipes):
         temp_list_pointings = copy.copy(list_pointings)
         for pointing in temp_list_pointings:
             if pointing not in self.dict_pixtabs_in_pointings:
-                upipe.print_info(f"Pointing {pointing} found in the list of pointings but not in "
-                                 f"the pointing table - We will not process that pointing")
+                upipe.print_info(f"Pointing {pointing:02d} found in the list of pointings but not "
+                                 f"in the pointing table - We will not process that pointing")
                 list_pointings.remove(pointing)
 
         # If only 1 exposure, duplicate the pixtable
@@ -1145,6 +1143,8 @@ class MusePointings(SofPipe, PipeRecipes):
         pixtable_name = dict_listObject[expotype]
         self._sofdict[pixtable_name] = []
         for pointing in list_pointings:
+            if pointing not in self.dict_pixtabs_in_pointings:
+                continue
             self._sofdict[pixtable_name] += self.dict_pixtabs_in_pointings[pointing]
 
         self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename,

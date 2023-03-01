@@ -931,9 +931,9 @@ class MuseCube(Cube):
         # just provide the output name by folder+name
         return outcube_folder, outcube_name
 
-    def create_reference_cube(self, lambdamin=4700, lambdamax=9400,
-            step=1.25, outcube_name=None, filter_for_nan=False, **kwargs):
-        """Create a reference cube using an input one, and overiding
+    def create_reference_cube(self, lambdamin=4700, lambdamax=9400, step=1.25,
+                              outcube_name=None, filter_for_nan=False, **kwargs):
+        """Create a reference cube using an input one, and overriding
         the lambda part, to get a new WCS
 
         Args:
