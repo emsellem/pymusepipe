@@ -444,8 +444,7 @@ class MuseCubeMosaic(CubeMosaic):
                                                                self.included_suffix,
                                                                self.excluded_suffix,
                                                                name_list="Existing Cubes")
-            print_info("Found {} Cubes after suffix filtering".format(
-                len(list_existing_cubes)))
+            print_info(f"Found {len(list_existing_cubes)} Cubes after suffix filtering")
 
             # Filtering the list using the input pointing table
             if self.pointing_table is not None:
@@ -453,6 +452,7 @@ class MuseCubeMosaic(CubeMosaic):
                                                             pointing_table=self.pointing_table,
                                                             str_dataset=self.str_dataset,
                                                             ndigits=self.ndigits)
+            print_info(f"Found {len(list_cubes)} Cubes after pointing table filtering")
 
             # OLD WAY TO BE REMOVED
             # # Filter the list with the pointing dictionary if given
@@ -466,20 +466,20 @@ class MuseCubeMosaic(CubeMosaic):
 
             # Take (or not) the fixed Cubes
             if self.use_fixed_cubes:
-                print_warning("Using Corrected cubes with prefix {} "
-                              "when relevant".format(self.prefix_fixed_cubes))
+                print_warning(f"Using Corrected cubes with prefix '{self.prefix_fixed_cubes}' "
+                              "when relevant")
                 prefix_to_consider = "{0}{1}".format(self.prefix_fixed_cubes,
                                                      self.prefix_cubes)
                 list_fixed_cubes = glob.glob("{0}{1}*fits".format(self.folder_cubes,
                                                                   prefix_to_consider))
-                print_info("Initial set of {:02d} Corrected "
-                           "cubes found".format(len(list_fixed_cubes)))
+                print_info(f"Initial set of {len(list_fixed_cubes):02d} Corrected "
+                           "cubes found")
 
                 # if the list of exclusion suffix is empty, just use all cubes
                 list_fixed_cubes = filter_list_with_suffix_list(list_fixed_cubes,
-                                                                 self.included_suffix,
-                                                                 self.excluded_suffix,
-                                                                 name_list="Fixed Cubes")
+                                                                self.included_suffix,
+                                                                self.excluded_suffix,
+                                                                name_list="Fixed Cubes")
 
                 # Looping over the existing fixed pixtables
                 for fixed_cube in list_fixed_cubes:
