@@ -516,8 +516,6 @@ class MuseCubeMosaic(CubeMosaic):
         # Names for the OBs
         str_dataset = kwargs.pop("str_dataset", self.str_dataset)
         ndigits = kwargs.pop("ndigits", self.ndigits)
-        if self.verbose:
-            print_info(f"List of cubes so far = {list_cubes}")
 
         for name in list_cubes:
             self.list_cubes.append(BasicFile(name))
