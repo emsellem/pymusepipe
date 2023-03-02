@@ -503,6 +503,7 @@ class MuseCubeMosaic(CubeMosaic):
 
             # if the list of suffix is empty, just use all cubes
             if len(self.list_suffix) > 0:
+                print_info("Filtering with added suffixes")
                 # Filtering out the ones that don't have any of the suffixes
                 temp_list_cubes = []
                 for l in list_cubes:
@@ -515,6 +516,9 @@ class MuseCubeMosaic(CubeMosaic):
         # Names for the OBs
         str_dataset = kwargs.pop("str_dataset", self.str_dataset)
         ndigits = kwargs.pop("ndigits", self.ndigits)
+        if self.verbose:
+            print_info(f"List of cubes so far = {list_cubes}")
+
         for name in list_cubes:
             self.list_cubes.append(BasicFile(name))
             if len(self.dict_psf) > 0:
