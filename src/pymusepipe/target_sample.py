@@ -938,7 +938,7 @@ class MusePipeSample(object):
             list_datasets = copy.copy(self.targets[targetname].list_datasets)
 
         # Make a list for the masking of the cubes to take into account
-        list_datasets_names = [f"{get_dataset_name(dataset)}"
+        list_datasets_names = [f"{get_dataset_name(dataset, str_dataset, ndigits)}"
                                 for dataset in list_datasets]
         upipe.print_info(f"List of datasets names: {list_datasets_names}")
 
