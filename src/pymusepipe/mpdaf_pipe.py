@@ -513,8 +513,8 @@ class MuseCubeMosaic(CubeMosaic):
         # Attach the other properties to the list of cubes (e.g. PSF)
         self.list_cubes = []
         # Names for the OBs
-        str_dataset = kwargs.pop("str_dataset", default_str_dataset)
-        ndigits = kwargs.pop("ndigits", default_ndigits)
+        str_dataset = kwargs.pop("str_dataset", self.str_dataset)
+        ndigits = kwargs.pop("ndigits", self.ndigits)
         for name in list_cubes:
             self.list_cubes.append(BasicFile(name))
             if len(self.dict_psf) > 0:
