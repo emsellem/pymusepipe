@@ -25,7 +25,10 @@ from .config_pipe import (PHANGS_reduc_config,
                           default_prefix_wcs,
                           default_prefix_wcs_mosaic,
                           dict_default_for_recipes,
-                          dict_listObject)
+                          dict_listObject,
+                          default_str_dataset,
+                          default_ndigits,
+                          default_str_pointing)
 from .init_musepipe import InitMuseParameters
 from .combine import MusePointings
 from .align_pipe import rotate_pixtables
@@ -234,13 +237,19 @@ class MusePipeSample(object):
         # Getting the right input for rc and cal names
         folder_config, rc_filename, cal_filename = self._get_calib_filenames()
         # First read the root folder
-        init_cal_params = InitMuseParameters(folder_config=folder_config,
-                                             rc_filename=rc_filename,
-                                             cal_filename=cal_filename,
-                                             verbose=self.verbose)
-        self.root_path = init_cal_params.root
+        self._init_cal_params = InitMuseParameters(folder_config=folder_config,
+                                                   rc_filename=rc_filename,
+                                                   cal_filename=cal_filename,
+                                                   verbose=self.verbose)
+        # Transferring some of the keywords
+        self.root_path = self._init_cal_params.root
+        for keyword, default_keyword in zip(["str_dataset", "ndigits", "str_pointing"],
+                                            [default_str_dataset, default_ndigits,
+                                             default_str_pointing]):
+            if hasattr(self._init_cal_params, keyword):
+                set(self, keyword, getattr(self._init_cal_params, keyword))
         self._subfolders = np.unique([self.sample[targetname][0]
-                                for targetname in self.targetnames])
+                                     for targetname in self.targetnames])
 
         for subfolder in self._subfolders:
             update_calib_file(rc_filename, subfolder, folder_config=folder_config)
@@ -920,6 +929,9 @@ class MusePipeSample(object):
         folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
         prefix_cubes = kwargs.pop("prefix_cubes", dict_listObject['CUBEWCS'])
+        str_dataset = kwargs.pop("str_dataset", self.str_dataset)
+        str_pointing = kwargs.pop("str_pointing", self.str_pointing)
+        ndigits = kwargs.pop("ndigits", self.ndigits)
 
         # Check if pointings are ok
         if list_datasets is None:
@@ -947,6 +959,9 @@ class MusePipeSample(object):
                                                        list_suffix=list_datasets_names,
                                                        pointing_table=pointing_table,
                                                        list_pointings=list_pointings,
+                                                       str_dataset=str_dataset,
+                                                       str_pointing=str_pointing,
+                                                       ndigits=ndigits,
                                                        **kwargs)
 
     def convolve_mosaic_per_pointing(self, targetname=None, list_pointings=None,
