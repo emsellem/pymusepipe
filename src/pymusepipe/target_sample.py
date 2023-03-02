@@ -247,7 +247,7 @@ class MusePipeSample(object):
                                             [default_str_dataset, default_ndigits,
                                              default_str_pointing]):
             if hasattr(self._init_cal_params, keyword):
-                set(self, keyword, getattr(self._init_cal_params, keyword))
+                setattr(self, keyword, getattr(self._init_cal_params, keyword))
         self._subfolders = np.unique([self.sample[targetname][0]
                                      for targetname in self.targetnames])
 
