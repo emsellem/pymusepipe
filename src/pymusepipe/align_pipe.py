@@ -786,11 +786,11 @@ class AlignMuseDataset(object):
             nstate_max = self._nstate
 
         for nstate in range(nstate_max+1):
-            state_name = "state_{nstate:02d}"
+            state_name = f"state_{nstate:02d}"
             if hasattr(self, state_name):
-                print("State = {nstate_02d} exists")
+                print(f"State = {nstate_02d} exists")
             else:
-                print("State = {nstate_02d} does *not* exist")
+                print(f"State = {nstate_02d} does *not* exist")
 
     def transfer_extra_to_guess(self, transfer_rotation=False):
         """Transfer the values of the extra offset as a guess
@@ -798,9 +798,9 @@ class AlignMuseDataset(object):
         # First save the existing state
         self.save_state()
 
-        # Copy the values
-        self.init_off_pixel = copy.copy(self.extra_off_pixel)
-        self.init_off_arcsec = copy.copy(self.extra_off_arcsec)
+        # Copy the values from total to init
+        self.init_off_pixel = copy.copy(self._total_off_pixel)
+        self.init_off_arcsec = copy.copy(self._total_off_arcsec)
 
         # Reset the extra offsets
         self.extra_off_pixel = np.zeros_like(self.init_off_pixel)
@@ -808,7 +808,7 @@ class AlignMuseDataset(object):
 
         # Deal with rotation too if needed
         if transfer_rotation:
-            self.init_rotangles = copy.copy(self.extra_rotangles)
+            self.init_rotangles = copy.copy(self._total_rotangles)
             self.extra_rotangles = np.zeros_like(self.init_off_arcsec)
 
     def init_guess_offset(self, **kwargs):
@@ -1362,6 +1362,7 @@ class AlignMuseDataset(object):
         squeeze = kwargs.pop("squeeze", True)
         border = kwargs.pop("border", self.border)
         mask_stars = kwargs.pop("mask_stars", False)
+        mirror_nan = kwargs.pop("mirror_nan", True)
         threshold = kwargs.pop("threshold", self.default_threshold)
         if threshold is None:
             threshold = self.default_threshold
@@ -1383,6 +1384,9 @@ class AlignMuseDataset(object):
                                   remove_bkg=remove_bkg)
         ima_muse = flatclean_image(muse_hdu.data, border, self.dynamic_range, self.median_window,
                                    threshold=threshold, squeeze=squeeze, remove_bkg=remove_bkg)
+
+        if mirror_nan:
+            ima_ref[np.isnan(ima_muse)] = np.nan
 
         if mask_stars:
             ima_ref = mask_point_sources(ima_ref)
@@ -1516,7 +1520,9 @@ class AlignMuseDataset(object):
         save_plot : bool
             Whether to save the optical flow diagnostic plots or not.
         """
-        self.iterate_on_optical_flow_ima(nima, verbose=verbose, use_rotation=use_rotation, **kwargs)
+        reset_opf = kwargs.pop("reset_optical_flow", True)
+        self.iterate_on_optical_flow_ima(nima, verbose=verbose, use_rotation=use_rotation,
+                                         reset_optical_flow=reset_opf, **kwargs)
         self.apply_optical_flow_offset_ima(nima)
         if save_plot:
             plt.ioff()

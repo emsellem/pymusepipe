@@ -399,7 +399,15 @@ class MuseCubeMosaic(CubeMosaic):
             except:
                 pass
 
-        u_units = np.unique(list_units)
+        try:
+            u_units = np.unique(list_units)
+        except u.UnitConversionError:
+            print_error("Please check that all Cubes have the same unit "
+                        "[e.g., 'from mpdaf.obj import Cube' and then 'print(Cube(name).unit' "
+                        "for all involved cubes")
+            print_error("- Aborting -")
+            return
+
         if len(u_units) == 0:
             print("Warning: no unit found in input cubes, will set dimensionless one")
             self.unit = u.dimensionless_unscaled
