@@ -792,7 +792,7 @@ class AlignMuseDataset(object):
             else:
                 print(f"State = {nstate_02d} does *not* exist")
 
-    def transfer_extra_to_guess(self, transfer_rotation=False):
+    def transfer_extra_to_guess(self, transfer_rotation=True):
         """Transfer the values of the extra offset as a guess
         """
         # First save the existing state
@@ -809,7 +809,7 @@ class AlignMuseDataset(object):
         # Deal with rotation too if needed
         if transfer_rotation:
             self.init_rotangles = copy.copy(self._total_rotangles)
-            self.extra_rotangles = np.zeros_like(self.init_off_arcsec)
+            self.extra_rotangles = np.zeros_like(self.init_rotangles)
 
     def init_guess_offset(self, **kwargs):
         """Initialise first guess, either from cross-correlation (default)
