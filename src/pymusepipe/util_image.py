@@ -1132,6 +1132,7 @@ class PointingTable(object):
 
         # if filename exists is not None we read
         self._initialise_centres = False
+        self.tablename = "dummytable.tmp"
         if input_table is not None:
 
             # If QTable - all good but checking the columns
@@ -1144,7 +1145,6 @@ class PointingTable(object):
 
             # If Table, convert to QTable by going through a file on disk
             elif isinstance(input_table, Table):
-                self.tablename = "dummytable.tmp"
                 input_table.write(joinpath(self.folder, self.tablename),
                                   format=self.table_format)
                 self.read()
