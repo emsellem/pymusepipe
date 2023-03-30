@@ -111,7 +111,7 @@ dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
 # ================== Useful function ====================== #
 
 
-def get_conversion_factor(input_unit, output_unit, filter_name="WFI"):
+def get_conversion_factor(input_unit, output_unit, filter_name="WFI", dict_equiv=dict_equivalencies):
     """ Conversion of units from an input one
     to an output one
      
@@ -121,21 +121,24 @@ def get_conversion_factor(input_unit, output_unit, filter_name="WFI"):
         Input astropy unit to analyse
     output_unit: astropy unit
         Astropy unit to compare to input unit.
-    equivalencies: astropy equivalency
-        Used in case there is an existing equivalency
-        to help the conversion
+    filter_name: str, optional
+        Name of the filter
+    dict_equiv: dict, optional
+        Dictionary listing the equivalencies for various filters.
+        Will be using it if the filter name is the key list
+        to help with the conversion.
     
     Returns
     -------
     conversion: astropy unit conversion
     """
 
-    if filter_name not in dict_equivalencies:
+    if filter_name not in dict_equiv:
         upipe.print_warning("Didn't find conversion for this filter. "
                             "Using 1.0 as a conversion factor")
         return 1.0
 
-    equivalencies = dict_equivalencies[filter_name]
+    equivalencies = dict_equiv[filter_name]
     # First testing if the quantities are Quantity
     # If not, transform them 
     if not isinstance(input_unit, u.quantity.Quantity):
@@ -494,6 +497,18 @@ class AlignMuseDataset(object):
         chunk_size: int [15]
             Size in pixels of the chunk used to bin and compute the 
             normalisation factors
+        pivot_lambda: float, optional
+            Pivot wavelength (in Angstroems) for the reference filter
+        equivalency: astrooy unit equivalency, optional
+            Equivalency for unit conversion of the flux in the reference image.
+            The entry should be of the form: u.spectral_density(6483.58 * u.AA)
+            where u is units of astropy
+            Instead of an equivalency, the user can provide a pivot wavelength via
+            the pivot_lambda keyword.
+            If equivalency is provided, pivot_lambda is ignored.
+            If not provided, as set of predefined equivalencies will be used. When the filter
+            name is not part of the provided list of equivalencies, a conversion factor of 1
+            is used.
 
         Other keywords
         --------------
@@ -549,7 +564,7 @@ class AlignMuseDataset(object):
         self._debug = kwargs.pop("debug", False)
         if self._debug:
             upipe.print_warning("In DEBUG Mode [more printing]")
-        # Backward compatibility - TO BE REMOVED when fixed
+        # Backward compatibility - TO BE REMOVED/dict_equi when fixed
         self._backward_comp = kwargs.pop("backward_comp", True)
 
         # Check if folder reference exists
@@ -600,12 +615,17 @@ class AlignMuseDataset(object):
 
         # Getting the unit conversions
         self.convert_units = kwargs.pop("convert_units", True)
+        # Merging dictionaries if needed
+        pivot_lambda = kwargs.pop("pivot_lambda", 6483.58)
+        equivalency = kwargs.pop("equivalency", u.spectral_density(pivot_lambda * u.AA))
+        self.dict_equiv = dict_equivalencies.update({self.filter_name: equivalency})
         if self.convert_units:
             self.ref_unit = kwargs.pop("ref_unit", default_reference_unit)
             self.muse_unit = kwargs.pop("muse_unit", default_muse_unit)
             self.conversion_factor = get_conversion_factor(self.ref_unit,
                                                            self.muse_unit,
-                                                           self.filter_name)
+                                                           filter=self.filter_name,
+                                                           dict_equiv=self.dict_equiv)
         else:
             self.conversion_factor = 1.0
 
@@ -788,9 +808,9 @@ class AlignMuseDataset(object):
         for nstate in range(nstate_max+1):
             state_name = f"state_{nstate:02d}"
             if hasattr(self, state_name):
-                print(f"State = {nstate_02d} exists")
+                print(f"State = {state_name} exists")
             else:
-                print(f"State = {nstate_02d} does *not* exist")
+                print(f"State = {state_name} does *not* exist")
 
     def transfer_extra_to_guess(self, transfer_rotation=True):
         """Transfer the values of the extra offset as a guess
