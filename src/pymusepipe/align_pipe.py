@@ -618,13 +618,14 @@ class AlignMuseDataset(object):
         # Merging dictionaries if needed
         pivot_lambda = kwargs.pop("pivot_lambda", 6483.58)
         equivalency = kwargs.pop("equivalency", u.spectral_density(pivot_lambda * u.AA))
-        self.dict_equiv = dict_equivalencies.update({self.filter_name: equivalency})
+        self.dict_equiv = copy.copy(dict_equivalencies)
+        self.dict_equiv.update({self.filter_name: equivalency})
         if self.convert_units:
             self.ref_unit = kwargs.pop("ref_unit", default_reference_unit)
             self.muse_unit = kwargs.pop("muse_unit", default_muse_unit)
             self.conversion_factor = get_conversion_factor(self.ref_unit,
                                                            self.muse_unit,
-                                                           filter=self.filter_name,
+                                                           filter_name=self.filter_name,
                                                            dict_equiv=self.dict_equiv)
         else:
             self.conversion_factor = 1.0
