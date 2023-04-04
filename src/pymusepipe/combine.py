@@ -635,6 +635,11 @@ class MusePointings(SofPipe, PipeRecipes):
 
     def goto_origfolder(self, addtolog=False):
         """Go back to original folder
+
+        Input
+        -----
+        addtolog: bool, optional
+            Add this change of folder to the log file.
         """
         upipe.print_info("Going back to the original folder {0}".format(self.paths.orig),
                          pipe=self)
@@ -642,13 +647,25 @@ class MusePointings(SofPipe, PipeRecipes):
 
     def goto_prevfolder(self, addtolog=False):
         """Go back to previous folder
+
+        Input
+        -----
+        addtolog: bool, optional
+            Add this change of folder to the log file.
         """
         upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder),
                          pipe=self)
         self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
 
-    def goto_folder(self, newpath, addtolog=False, verbose=True):
+    def goto_folder(self, newpath, addtolog=False):
         """Changing directory and keeping memory of the old working one
+
+        Input
+        -----
+        newpath: str
+            Nanme of the folder where to go.
+        addtolog: bool, optional
+            Add this change of folder to the log file.
         """
         try:
             prev_folder = os.getcwd()
@@ -694,23 +711,27 @@ class MusePointings(SofPipe, PipeRecipes):
                                                self.pipe_params._dict_folders_target[name]))
 
     def create_reference_wcs(self, pointings_wcs=True, mosaic_wcs=True, wcs_refcube_name=None,
-                             refcube_name=None, list_pointings=None, **kwargs):
+                             refcube_name=None, folder_refcube="", list_pointings=None, **kwargs):
         """Create the WCS reference files, for all individual pointings and for
         the mosaic.
 
+        Input
+        -----
         pointings_wcs: bool [True]
             Will run the individual pointings WCS
         mosaic_wcs: bool [True]
             Will run the combined WCS
-        wcs_refcube_name: str default=None
-            Name of the input WCS to be used. If None, will be computed.
-            If "auto", we assume the WCS cube exists with the default naming convention
-            Otherwise, will use the name for further calculations
-        refcube_name: str default=None
-            Name of the input cube to guide the WCS building. If None and wcs_refcube_name is
-            also None, this reference cube will first be computed. If not None but no WCS is
-            provided, it will be used as a reference to create a new WCS.
-        list_pointings: list of int default=None
+        wcs_refcube_name: str default=None, optional
+            Name of the input WCS to be used. If None (default), we will look at the refcube_name keyword.
+            If set to 'auto', we will used the default naming conventions to find it on disk.
+            If set to a bona fide name, it will be used as reference WCS.
+        refcube_name: str default=None, optional
+            Name of the input cube to guide the WCS building (only used if wcs_refcube_name is None).
+            If None, a run_combine will ensure we have a good reference cube that can be used for the building of a
+            reference WCS. If provided, it will be used as the reference cube to then build the reference WCS.
+        folder_refcube: str, optional
+            Folder name for the reference cube or wcs.
+        list_pointings: list of int default=None, optional
             List of pointings to consider
         **kwargs: additional keywords including
             lambdaminmax: [float, float]
@@ -734,7 +755,7 @@ class MusePointings(SofPipe, PipeRecipes):
             else:
                 upipe.print_info("@@@@@@@@ Creating a (WCS, narrow-lambda) reference mosaic "
                                  "from provided input cube @@@@@@@@")
-                wcs_refcube_name = self.create_combined_wcs(refcube_name=refcube_name)
+                wcs_refcube_name = self.create_combined_wcs(refcube_name=refcube_name, folder_refcube=folder_refcube)
         else:
             # If the wcs is not None, but auto, we used the default naming convention for that WCS
             # Otherwise we will just use that name then
@@ -744,6 +765,8 @@ class MusePointings(SofPipe, PipeRecipes):
                 cube_name = "{0}{1}.fits".format(default_prefix_wcs,
                                               self._add_targetname(cube_suffix))
                 wcs_refcube_name = joinpath(self.paths.cubes, cube_name)
+            else:
+                wcs_refcube_name = joinpath(folder_refcube, wcs_refcube_name)
 
         if pointings_wcs:
             # Creating the full mosaic WCS first with a narrow lambda range
@@ -751,6 +774,8 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info("@@@@@@@@ Start creating the individual "
                              "Pointings Masks @@@@@@@@")
             self.create_all_pointings_wcs(lambdaminmax_mosaic=lambdaminmax,
+                                          ref_wcs=wcs_refcube_name,
+                                          folder_ref_wcs="",
                                           **kwargs)
 
         if mosaic_wcs:
@@ -759,7 +784,8 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info("@@@@@@@ Start creating the full-lambda WCS @@@@@@@")
             self._combined_wcs_name = self.create_combined_wcs(prefix_wcs=prefix_mosaic,
                                                                lambdaminmax_wcs=lambdaminmax_for_mosaic,
-                                                               refcube_name=wcs_refcube_name)
+                                                               refcube_name=wcs_refcube_name,
+                                                               folder_refcube="")
 
     def run_combine_all_single_pointings(self, add_suffix="", sof_filename='pointings_combine',
                                          list_pointings=None, **kwargs):
@@ -811,8 +837,8 @@ class MusePointings(SofPipe, PipeRecipes):
         lambdaminmax: list of 2 floats [in Angstroems]
             Minimum and maximum lambda values to consider for the combine.
             Default is 4000 and 10000 for the lower and upper limits, resp.
-        wcs_from_mosaic: bool
-            True by default, meaning that the WCS of the mosaic will be used.
+        wcs_from_pointing: bool
+            True by default, meaning that the WCS of the pointings will be used.
             If not there, will ignore it.
         """
 
@@ -871,6 +897,8 @@ class MusePointings(SofPipe, PipeRecipes):
         -----
         pointing: int
             Number of the pointing
+        lambdaminmax_mosaic: array of 2 floats
+            Default is lambdaminmax_for_mosaic, the starting end ending wavelengths needed for a mosaic.
         filter_list = list of str
             List of filter names to be used.
 
@@ -958,6 +986,9 @@ class MusePointings(SofPipe, PipeRecipes):
             cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
             cube_suffix = self._add_targetname(cube_suffix)
             name_cube = joinpath(self.paths.cubes, cube_suffix + ".fits")
+        else:
+            folder_cube = kwargs.pop("folder_cube", "")
+            name_cube = joinpath(folder_cube, name_cube)
 
         # test if cube exists
         if not os.path.isfile(name_cube):
@@ -1010,6 +1041,9 @@ class MusePointings(SofPipe, PipeRecipes):
             cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
             cube_suffix = self._add_targetname(cube_suffix)
             refcube_name = joinpath(self.paths.cubes, cube_suffix + ".fits")
+        else:
+            folder_refcube = kwargs.pop("folder_refcube", "")
+            refcube_name = joinpath(folder_refcube, refcube_name)
 
         # test if cube exists
         if not os.path.isfile(refcube_name):

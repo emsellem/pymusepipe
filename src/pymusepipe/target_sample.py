@@ -578,7 +578,13 @@ class MusePipeSample(object):
             create_expocubes (bool):
             name_offset_table (str):
             folder_offset_table (str):
-            **kwargs:
+            **kwargs: include
+                wcs_refcube_name: str
+                    Reference WCS (cube) to be used to project all cubes
+                refcube_name: str
+                    Reference cube which will be use to build a reference WCS
+                folder_refcube: str
+                    Name of the folder where to find the reference WCS or cube
 
         Returns:
 
@@ -628,9 +634,8 @@ class MusePipeSample(object):
             wcs_refcube_name = kwargs.pop("wcs_refcube_name", None)
             refcube_name = kwargs.pop("refcube_name", None)
 
-            full_ref_wcs = kwargs.pop("full_ref_wcs", None)
             default_comb_folder = self.targets[targetname].combcubes_path
-            folder_full_ref_wcs = kwargs.pop("folder_full_ref_wcs", default_comb_folder)
+            folder_refcube = kwargs.pop("folder_refcube", default_comb_folder)
 
             self.create_reference_wcs(targetname=targetname,
                                       folder_offset_table=folder_offset_table,
@@ -640,8 +645,7 @@ class MusePipeSample(object):
                                       mosaic_wcs=mosaic_wcs,
                                       pointings_wcs=pointings_wcs,
                                       list_datasets=list_datasets,
-                                      ref_wcs=full_ref_wcs,
-                                      folder_ref_wcs=folder_full_ref_wcs,
+                                      folder_ref_wcs=folder_refcube,
                                       pointing_table=pointing_table,
                                       fakemode=False)
 
@@ -1153,17 +1157,16 @@ class MusePipeSample(object):
         self.pipes_combine[targetname].run_combine(**kwargs)
 
     def create_reference_wcs(self, targetname=None, pointings_wcs=True, mosaic_wcs=True,
-                             wcs_refcube_name=None, refcube_name=None, ref_wcs=None, **kwargs):
+                             wcs_refcube_name=None, refcube_name=None, **kwargs):
         """Run the combine for individual exposures first building up
         a mask.
         """
         default_comb_folder = self.targets[targetname].combcubes_path
-        folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
+        folder_refcube = kwargs.pop("folder_refcube", default_comb_folder)
         self.init_combine(targetname=targetname, **kwargs)
         self.pipes_combine[targetname].create_reference_wcs(pointings_wcs=pointings_wcs,
                                                             mosaic_wcs=mosaic_wcs,
                                                             wcs_refcube_name=wcs_refcube_name,
                                                             refcube_name=refcube_name,
-                                                            ref_wcs=ref_wcs,
-                                                            folder_ref_wcs=folder_ref_wcs,
+                                                            folder_refcube=folder_refcube,
                                                             **kwargs)
