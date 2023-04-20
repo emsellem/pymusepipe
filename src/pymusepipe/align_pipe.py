@@ -2308,7 +2308,7 @@ class AlignMuseDataset(object):
             plot_compare_contours(data1, data2, plotwcs=plotwcs, fignum=current_fig,
                                   labels=['MUSE', 'REF'], nlevels=nlevels, levels=levels,
                                   figfolder=foldfig, namefig=f"align_contours{suffix_fig}.png",
-                                  title=f'Image {suffix_fig}')
+                                  title=f'Image {suffix_fig}', savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1
 
