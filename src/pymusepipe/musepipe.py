@@ -383,7 +383,7 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         upipe.print_info("Going back to the original folder {0}".format(
             self.paths.orig), pipe=self)
-        self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
+        self.goto_folder(self.paths.orig, addtolog=addtolog)
 
     def goto_prevfolder(self, addtolog=False):
         """Go back to previous folder
@@ -395,9 +395,9 @@ class MusePipe(PipePrep, PipeRecipes):
         """
         upipe.print_info("Going back to the previous folder {0}".format(
             self.paths._prev_folder), pipe=self)
-        self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
+        self.goto_folder(self.paths._prev_folder, addtolog=addtolog)
 
-    def goto_folder(self, newpath, addtolog=False, **kwargs):
+    def goto_folder(self, newpath, addtolog=False):
         """Changing directory and keeping memory of the old working one
 
         Parameters
@@ -407,14 +407,13 @@ class MusePipe(PipePrep, PipeRecipes):
         addtolog: bool [False]
             Adding the folder move to the log file
         """
-        verbose = kwargs.pop("verbose", self.verbose)
         try:
             prev_folder = os.getcwd()
             newpath = os.path.normpath(newpath)
             os.chdir(newpath)
-            upipe.print_info("Going to folder {0}".format(newpath), pipe=self)
+            upipe.print_info(f"Going to folder {newpath}", pipe=self)
             if addtolog:
-                upipe.append_file(self.paths.log_filename, "cd {0}\n".format(newpath))
+                upipe.append_file(self.paths.log_filename, f"cd {newpath}\n")
             self.paths._prev_folder = prev_folder
         except OSError:
             if not os.path.isdir(newpath):

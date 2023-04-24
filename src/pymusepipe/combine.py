@@ -643,7 +643,7 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         upipe.print_info("Going back to the original folder {0}".format(self.paths.orig),
                          pipe=self)
-        self.goto_folder(self.paths.orig, addtolog=addtolog, verbose=False)
+        self.goto_folder(self.paths.orig, addtolog=addtolog)
 
     def goto_prevfolder(self, addtolog=False):
         """Go back to previous folder
@@ -655,7 +655,7 @@ class MusePointings(SofPipe, PipeRecipes):
         """
         upipe.print_info("Going back to the previous folder {0}".format(self.paths._prev_folder),
                          pipe=self)
-        self.goto_folder(self.paths._prev_folder, addtolog=addtolog, verbose=False)
+        self.goto_folder(self.paths._prev_folder, addtolog=addtolog)
 
     def goto_folder(self, newpath, addtolog=False):
         """Changing directory and keeping memory of the old working one
@@ -775,7 +775,7 @@ class MusePointings(SofPipe, PipeRecipes):
                              "Pointings Masks @@@@@@@@")
             self.create_all_pointings_wcs(lambdaminmax_mosaic=lambdaminmax,
                                           ref_wcs=wcs_refcube_name,
-                                          folder_ref_wcs="",
+                                          folder_refcube="",
                                           **kwargs)
 
         if mosaic_wcs:
@@ -1157,9 +1157,9 @@ class MusePointings(SofPipe, PipeRecipes):
                 ref_wcs = f"{prefix_wcs}{cube_suffix}.fits"
             upipe.print_warning(f"ref_wcs used is {ref_wcs}")
 
-        folder_ref_wcs = kwargs.pop("folder_ref_wcs", upipe.normpath(self.paths.cubes))
+        folder_refcube = kwargs.pop("folder_refcube", upipe.normpath(self.paths.cubes))
         if ref_wcs is not None:
-            full_ref_wcs = joinpath(folder_ref_wcs, ref_wcs)
+            full_ref_wcs = joinpath(folder_refcube, ref_wcs)
             if not os.path.isfile(full_ref_wcs):
                 upipe.print_error(f"Reference WCS file {full_ref_wcs} does not exist")
                 upipe.print_error("Consider using the create_combined_wcs recipe"
@@ -1167,7 +1167,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                   " just check that the WCS reference file exists.")
                 return
 
-            self._sofdict['OUTPUT_WCS'] = [joinpath(folder_ref_wcs, ref_wcs)]
+            self._sofdict['OUTPUT_WCS'] = [joinpath(folder_refcube, ref_wcs)]
 
         # Setting the default option of offset_list
         if self.name_offset_table is not None:

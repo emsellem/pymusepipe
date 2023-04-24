@@ -1066,7 +1066,7 @@ class PipePrep(SofPipe) :
         # WCS
         ref_wcs = kwargs.pop("ref_wcs", None)
         if ref_wcs is not None:
-            folder_ref_wcs = kwargs.pop("folder_ref_wcs", "")
+            folder_refcube = kwargs.pop("folder_refcube", "")
         dir_products = kwargs.pop("dir_products",
                                   self._get_fullpath_expo(expotype, "processed"))
         prefix_all = kwargs.pop("prefix_all", "")
@@ -1106,7 +1106,7 @@ class PipePrep(SofPipe) :
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
             if ref_wcs is not None:
-                self._sofdict['OUTPUT_WCS'] = [joinpath(folder_ref_wcs, ref_wcs)]
+                self._sofdict['OUTPUT_WCS'] = [joinpath(folder_refcube, ref_wcs)]
 
             if name_offset_table is None:
                 folder_offset_table = self._get_fullpath_expo(expotype, "processed")

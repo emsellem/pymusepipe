@@ -314,7 +314,7 @@ class BasicFile(object):
 
 
 class MuseCubeMosaic(CubeMosaic):
-    def __init__(self, ref_wcs, folder_ref_wcs="", folder_cubes="",
+    def __init__(self, ref_wcs, folder_refcube="", folder_cubes="",
                  prefix_cubes="DATACUBE_FINAL_WCS",
                  list_suffix=[], use_fixed_cubes=True,
                  excluded_suffix=[],
@@ -325,11 +325,11 @@ class MuseCubeMosaic(CubeMosaic):
 
         self.verbose = verbose
         self.folder_cubes = folder_cubes
-        self.folder_ref_wcs = folder_ref_wcs
+        self.folder_refcube = folder_refcube
         self.ref_wcs = ref_wcs
         if not self._check_folder():
             return
-        self.full_wcs_name = joinpath(self.folder_ref_wcs, self.ref_wcs)
+        self.full_wcs_name = joinpath(self.folder_refcube, self.ref_wcs)
 
         self.prefix_cubes = prefix_cubes
         self.list_suffix = list_suffix
@@ -385,9 +385,9 @@ class MuseCubeMosaic(CubeMosaic):
             print_error("Cube Folder {} does not exists \n"
                               "- Aborting".format(self.folder_cubes))
             return False
-        if not os.path.isdir(self.folder_ref_wcs):
+        if not os.path.isdir(self.folder_refcube):
             print_error("WCS Folder {} does not exists \n"
-                              "- Aborting".format(self.folder_ref_wcs))
+                              "- Aborting".format(self.folder_refcube))
             return False
         return True
 

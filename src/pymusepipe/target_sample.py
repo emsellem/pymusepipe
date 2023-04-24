@@ -645,7 +645,7 @@ class MusePipeSample(object):
                                       mosaic_wcs=mosaic_wcs,
                                       pointings_wcs=pointings_wcs,
                                       list_datasets=list_datasets,
-                                      folder_ref_wcs=folder_refcube,
+                                      folder_refcube=folder_refcube,
                                       pointing_table=pointing_table,
                                       fakemode=False)
 
@@ -709,7 +709,7 @@ class MusePipeSample(object):
         # of the Combined cubes
         default_comb_folder = self.targets[targetname].combcubes_path
         # Now fetch the value set by the user
-        folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
+        folder_refcube = kwargs.pop("folder_refcube", default_comb_folder)
         filter_list = kwargs.pop("filter_list", self._short_filter_list)
 
         # initialisation of the combination to make sure we get the pointings right
@@ -745,7 +745,7 @@ class MusePipeSample(object):
                     suffix = f"_{obname}"
                 kwargs_dataset = {'ref_wcs': ref_wcs,
                                   'suffix': suffix,
-                                  'folder_ref_wcs': folder_ref_wcs,
+                                  'folder_refcube': folder_refcube,
                                   'sof_filename': 'scipost_wcs',
                                   'dir_products': default_comb_folder,
                                   'name_offset_table': name_offset_table,
@@ -930,7 +930,7 @@ class MusePipeSample(object):
            Pointing Table to select a given set of exposures
         """
         default_comb_folder = self.targets[targetname].combcubes_path
-        folder_ref_wcs = kwargs.pop("folder_ref_wcs", default_comb_folder)
+        folder_refcube = kwargs.pop("folder_refcube", default_comb_folder)
         folder_cubes = kwargs.pop("folder_cubes", default_comb_folder)
         prefix_cubes = kwargs.pop("prefix_cubes", dict_listObject['CUBEWCS'])
         str_dataset = kwargs.pop("str_dataset", self.str_dataset)
@@ -957,7 +957,7 @@ class MusePipeSample(object):
         upipe.print_info(f"Check file: ref_wcs is {ref_wcs}")
 
         self.pipes_mosaic[targetname] = MuseCubeMosaic(ref_wcs=ref_wcs,
-                                                       folder_ref_wcs=folder_ref_wcs,
+                                                       folder_refcube=folder_refcube,
                                                        folder_cubes=folder_cubes,
                                                        prefix_cubes=prefix_cubes,
                                                        list_suffix=list_datasets_names,
