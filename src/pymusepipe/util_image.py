@@ -304,30 +304,26 @@ def chunk_stats(list_arrays, chunk_size=15):
         for the given datasets analysed in chunks.
 
     """
+    # Check that all arrays have the same size
+    if not np.all([list_arrays[0].size == d.size for d in list_arrays[1:]]):
+        upipe.print_error("Input arrays are not of the same size in chunk_stats")
 
+    list_arrays = np.atleast_3d(list_arrays)
     narrays = len(list_arrays)
 
-    nchunk_x = int(list_arrays[0].shape[0] // chunk_size - 1)
-    nchunk_y = int(list_arrays[0].shape[1] // chunk_size - 1)
-    # Check that all arrays have the same size
-    med_array = np.zeros((narrays, nchunk_x * nchunk_y), dtype=np.float64)
-    std_array = np.zeros_like(med_array)
+    nchunk_x = int(list_arrays[0].shape[0] // chunk_size)
+    nchunk_y = int(list_arrays[0].shape[1] // chunk_size)
 
-    if not all([d.size for d in list_arrays]):
-        upipe.print_error("Datasets are not of the same "
-                          "size in median_compare")
-    else:
-        for i in range(0, nchunk_x):
-            for j in range(0, nchunk_y):
-                for k in range(narrays):
-                    # Taking the median of all arrays
-                    med_array[k, i * nchunk_y + j] = np.nanmedian(
-                        list_arrays[k][i * chunk_size:(i + 1) * chunk_size,
-                        j * chunk_size:(j + 1) * chunk_size])
-                    # Taking the std deviation of all arrays
-                    std_array[k, i * nchunk_y + j] = mad_std(
-                        list_arrays[k][i * chunk_size:(i + 1) * chunk_size,
-                        j * chunk_size:(j + 1) * chunk_size], ignore_nan=True)
+    grid_number = nchunk_x * nchunk_y
+
+    # Vectorised median and std dev
+    arrays3d_chunk_ready = list_arrays[:,:nchunk_x*chunk_size,:nchunk_y*chunk_size]
+
+    grids_nchunkx  = np.array(np.split(arrays3d_chunk_ready, nchunk_x, axis=1))
+    grids_xy = np.array(np.split(np.array(grids_nchunkx), nchunk_y, axis=-1))
+
+    med_array = np.nanmedian(grids_xy, axis=(-2,-1)).T.reshape(narrays, grid_number)
+    std_array = mad_std(grids_xy, axis=(-2,-1), ignore_nan=True).T.reshape(narrays, grid_number)
 
     # Cleaning in case of Nan
     med_array = np.nan_to_num(med_array)

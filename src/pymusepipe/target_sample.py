@@ -1085,6 +1085,7 @@ class MusePipeSample(object):
         if init_mosaic:
             self.init_mosaic(targetname=targetname,
                              list_pointings=list_pointings,
+                             folder_cubes=folder_cubes,
                              **kwargs)
         else:
             if targetname not in self.pipes_mosaic:
