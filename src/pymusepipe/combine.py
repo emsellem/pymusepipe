@@ -641,8 +641,7 @@ class MusePointings(SofPipe, PipeRecipes):
         addtolog: bool, optional
             Add this change of folder to the log file.
         """
-        upipe.print_info("Going back to the original folder {0}".format(self.paths.orig),
-                         pipe=self)
+        upipe.print_info("Going back to the original folder {0}".format(self.paths.orig), pipe=self)
         self.goto_folder(self.paths.orig, addtolog=addtolog)
 
     def goto_prevfolder(self, addtolog=False):

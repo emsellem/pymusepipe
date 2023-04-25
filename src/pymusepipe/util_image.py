@@ -1149,7 +1149,7 @@ class PointingTable(object):
             elif isinstance(input_table, str):
                 self.tablename = input_table
                 # If path name does not exist abort
-                if not os.path.exists(self.fullname):
+                if not os.path.exists(self.fulltablename):
                     upipe.print_error(f"Filename {self.tablename} does not exist in folder"
                                       f" {self.folder}")
                     return
