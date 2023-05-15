@@ -32,7 +32,7 @@ from mpdaf.drs import PixTable
 # Import package modules
 from . import util_pipe as upipe
 from .util_pipe import get_dataset_tpl_nexpo, append_value_to_dict
-from .config_pipe import (default_ndigits, default_str_dataset, default_offset_table)
+from .config_pipe import (default_ndigits, default_str_dataset, default_offset_table, default_filter_list)
 from .config_pipe import mjd_names, date_names, tpl_names, iexpo_names, dataset_names
 
 try:
