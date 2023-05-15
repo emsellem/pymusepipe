@@ -24,7 +24,7 @@ from .create_sof import SofPipe
 from .align_pipe import AlignMuseDataset
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
-from .util_pipe import check_filter_list, _get_combine_products, add_list_path
+from .util_pipe import check_filter_list, _get_combine_products, add_listpath
 from .util_image import create_offset_table
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
                           dict_recipes_per_num, dict_recipes_per_name,
