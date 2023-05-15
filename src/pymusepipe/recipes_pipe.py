@@ -247,7 +247,7 @@ class PipeRecipes(object) :
                 "--lambdamin={lmin} --lambdamax={lmax} --autocalib={autocalib} "
                 "--rvcorr={rvcorr} {sof}".format(esorex=self.esorex, astro=astrometry, 
                     save=save, pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
-                    darcheck=darcheck, model=skymodel_frac, lmin=lambdamin,
+                    darcheck=darcheck, model=skymodel_fraction, lmin=lambdamin,
                     lmax=lambdamax, autocalib=autocalib, sof=sof, expotype=expotype, 
                     tpl=tpl, rvcorr=rvcorr))
 
