@@ -232,7 +232,7 @@ class PipeRecipes(object) :
     def recipe_scipost(self, sof, tpl, expotype, dir_products="", name_products=[""],
             suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
             list_expo=[], save='cube,skymodel', filter_list='white', 
-            skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, 
+            skymethod='model', pixfrac=0.8, darcheck='none', skymodel_fraction=0.05, 
             astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="",
             autocalib='none', rvcorr='bary', **kwargs):
         """Running the esorex muse_scipost recipe
@@ -243,7 +243,7 @@ class PipeRecipes(object) :
         self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
                 "--astrometry={astro} --save={save} "
                 "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
-                "--darcheck={darcheck} --skymodel_frac={model:02f} "
+                "--darcheck={darcheck} --skymodel_fraction={model:02f} "
                 "--lambdamin={lmin} --lambdamax={lmax} --autocalib={autocalib} "
                 "--rvcorr={rvcorr} {sof}".format(esorex=self.esorex, astro=astrometry, 
                     save=save, pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
