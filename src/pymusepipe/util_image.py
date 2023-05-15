@@ -1664,3 +1664,21 @@ class PointingTable(object):
             append_value_to_dict(dict_tplexpo, row['pointing'], value)
 
         return dict_tplexpo
+
+
+def reconstruct_filter_images(cubename, filter_list=default_filter_list,
+                              filter_fits_file="filter_list.fits"):
+    """ Reconstruct all images in a list of Filters
+    cubename: str
+        Name of the cube
+    filter_list: str
+        List of filters, e.g., "Cousins_R,Johnson_I"
+        By default, the default_filter_list from pymusepipe.config_pipe
+
+    filter_fits_file: str
+        Name of the fits file containing all the filter characteristics
+        Usually in filter_list.fits (MUSE default)
+    """
+    
+    command = "muse_cube_filter -f {0} {1} {2}".format(filter_list, cubename, filter_fits_file)
+    os.system(command)

@@ -381,7 +381,8 @@ dict_default_for_recipes = {'fraction': 0.8,
                             'illum': True,
                             'filter_for_alignment': 'Cousins_R',
                             'line': None,
-                            'lambda_window': 10.0 
+                            'lambda_window': 10.0,
+                            'skymodel_fraction': 0.05
                             }
 
 # and creating the inverse dictionary

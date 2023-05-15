@@ -35,7 +35,8 @@ from .recipes_pipe import PipeRecipes
 from .create_sof import SofPipe
 from .init_musepipe import InitMuseParameters
 from . import util_pipe as upipe
-from .util_pipe import (get_dataset_name, get_pointing_name, add_string, get_list_datasets)
+from .util_pipe import (get_dataset_name, get_pointing_name, add_string, get_list_datasets,
+                        _get_combine_products)
 from .util_image import PointingTable, scan_filenames_from_list
 from . import musepipe, prep_recipes_pipe
 from .config_pipe import (default_filter_list, default_PHANGS_filter_list,
@@ -1145,10 +1146,9 @@ class MusePointings(SofPipe, PipeRecipes):
         ref_wcs = kwargs.pop("ref_wcs", None)
         if wcs_auto:
             if ref_wcs is not None:
-                 upipe.print_warning("wcs_auto is True, but ref_wcs was "
-                                     "specifically provided, and "
+                 upipe.print_warning("wcs_auto is True, but ref_wcs was specifically provided, and "
                                      "will not be overwritten.")
-                 upipe.print_warning("Provided ref_wcs is {}".format(ref_wcs))
+                 upipe.print_warning(f"Provided ref_wcs is {ref_wcs}")
             else:
                 # getting the name of the final datacube (mosaic)
                 cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
@@ -1187,7 +1187,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # Product names
         dir_products = upipe.normpath(self.paths.cubes)
         name_products, suffix_products, suffix_prefinalnames, prefix_products = \
-            prep_recipes_pipe._get_combine_products(filter_list,
+                              _get_combine_products(filter_list,
                                                     prefix_all=prefix_all)
 
         # Combine the exposures 

@@ -31,7 +31,7 @@ from .config_pipe import (default_filter_list, dict_musemodes, default_short_fil
 prefix_final_cube = dict_products_scipost['cube'][0]
 default_object_folder = dict_folders['object']
 
-#  PRINTING FUNCTIONS #
+# ------------- PRINTING FUNCTIONS ----------- #
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
 OKGREEN = '\033[92m'
@@ -41,7 +41,6 @@ ERROR = '\033[1;91m'
 ENDC = '\033[0m'
 BOLD = '\033[1m'
 DEBUG = '\033[1m'
-
 
 def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)
@@ -128,7 +127,140 @@ def print_error(text, **kwargs):
     
     if verbose:
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
-# -----------  END PRINTING FUNCTIONS -----------------------
+# -----------  END OF printing functions ----------------------- #
+
+
+# -----------  String and Path functions ----------------------- #
+def lower_rep(text):
+    """Lower the text and return it after removing all underscores
+
+    Args:
+        text (str): text to treat
+
+    Returns:
+        updated text (with removed underscores and lower-cased)
+
+    """
+    return text.replace("_", "").lower()
+
+
+def lower_allbutfirst_letter(mystring):
+    """Lowercase all letters except the first one
+    """
+    return mystring[0].upper() + mystring[1:].lower()
+
+
+def add_listpath(suffix, paths) :
+    """Add a suffix to a list of path
+    and normalise them
+    """
+    newlist = []
+    for mypath in paths:
+        newlist.append(upipe.normpath(joinpath(suffix, mypath)))
+    return newlist
+
+
+def add_string(text, word="_", loc=0):
+    """Adding string at given location
+    Default is underscore for string which are not empty.
+
+    Input
+    ----
+    text (str): input text
+    word (str): input word to be added
+    loc (int): location in 'text'. [Default is 0=start]
+               If None, will be added at the end.
+
+    Returns
+    ------
+    Updated text
+    """
+    if len(text) > 0:
+        if loc is None:
+            text = f"{text}{word}"
+        else:
+            try:
+                if text[loc] != "_":
+                    text = f"{text[:loc]}{word}{text[loc:]}"
+
+            except IndexError:
+                print(f"String index [{loc}] out of range [{len(text)}] in add_string")
+
+    return text
+
+
+def abspath(path):
+    """Normalise the path to get it short but absolute
+    """
+    return os.path.abspath(os.path.realpath(path))
+
+
+def normpath(path):
+    """Normalise the path to get it short
+    """
+    return os.path.normpath(os.path.realpath(path))
+
+
+def safely_create_folder(path, verbose=True):
+    """Create a folder given by the input path This small function tries to create it
+    and if it fails it checks whether the reason is that it is not a path and then warn the user
+
+    Input
+    -----
+    path: str
+    verbose: bool
+
+    Creates
+    -------
+    A new folder if the folder does not yet exist
+    """
+    if path is None:
+        if verbose:
+            print_info("Input path is None, not doing anything")
+        return
+    if verbose:
+        print_info("Trying to create {folder} folder".format(folder=path), end='')
+    try: 
+        os.makedirs(path)
+        if verbose:
+            print_endline("... Done", end='\n')
+    except OSError:
+        if not os.path.isdir(path):
+            print_error("Failed to create folder! Please check the path")
+            return
+        if os.path.isdir(path):
+            if verbose:
+                print_endline("... Folder already exists, doing nothing.")
+# -----------  END OF String and Path functions ----------------------- #
+
+
+# ----------- Dictionary CLASS and functions --------------------------- #
+class TimeStampDict(OrderedDict):
+    """Class which builds a time stamp driven
+    dictionary of objects
+    """
+    def __init__(self, description="", myobject=None):
+        """Initialise an empty dictionary
+        with a given name
+        """
+        OrderedDict.__init__(self)
+        self.description = description
+        self.create_new_timestamp(myobject)
+
+    def create_new_timestamp(self, myobject=None):
+        """Create a new item in dictionary
+        using a time stamp
+        """
+        if myobject is not None:
+            self.present_tstamp = create_time_name()
+            self[self.present_tstamp] = myobject
+        else:
+            self.present_stamp = None
+
+    def delete_timestamp(self, tstamp=None):
+        """Delete a key in the dictionary
+        """
+        _ = self.pop(tstamp)
 
 
 def append_value_to_dict(mydict, key, value):
@@ -160,7 +292,41 @@ def append_value_to_dict(mydict, key, value):
     return mydict
 
 
+def merge_dict(dict1, dict2):
+    """Merging two dictionaries by appending
+    keys which are duplicated
+
+    Input
+    -----
+    dict1: dict
+    dict2: dict
+
+    Returns
+    -------
+    dict1 : dict
+        merged dictionary
+    """
+    for key, value in dict2.items():
+        if key in dict1:
+            dict1[key].extend(value)
+        else:
+            dict1[key] = value
+    return dict1
+# ----------- END OF Dictionary CLASS and functions --------------------------- #
+
+
 def filter_list_to_str(filter_list):
+    """Convert a filter list to a list of strings
+
+    Input
+    -----
+    filter_list: list
+        List of filters, given as strings or else
+
+    Returns
+    -------
+    List of filters as list of strings
+    """
     if filter_list is None:
         return default_short_filter_list
 
@@ -177,6 +343,16 @@ def filter_list_to_str(filter_list):
 
 
 def check_filter_list(filter_list):
+    """Check the filter list to see if it is a list
+
+    Input
+    -----
+    filter_list: instance
+
+    Returns
+    -------
+    filter list as list
+    """
     if filter_list is None:
         return []
 
@@ -222,35 +398,7 @@ def analyse_musemode(musemode, field, delimiter='-'):
     return val.lower()
 
 
-def add_string(text, word="_", loc=0):
-    """Adding string at given location
-    Default is underscore for string which are not empty.
-
-    Input
-    ----
-    text (str): input text
-    word (str): input word to be added
-    loc (int): location in 'text'. [Default is 0=start]
-               If None, will be added at the end.
-
-    Returns
-    ------
-    Updated text
-    """
-    if len(text) > 0:
-        if loc is None:
-            text = f"{text}{word}"
-        else:
-            try:
-                if text[loc] != "_":
-                    text = f"{text[:loc]}{word}{text[loc:]}"
-
-            except IndexError:
-                print(f"String index [{loc}] out of range [{len(text)}] in add_string")
-
-    return text
-
-
+# --------------- Analysis of tpl, expo etc -------------------- #
 def get_dataset_tpl_nexpo(filename, str_dataset=default_str_dataset, ndigits=default_ndigits,
                           filtername=None):
     """Get the tpl and nexpo from a filename assuming it is at the end
@@ -344,75 +492,7 @@ def get_dataset_name(dataset=1, str_dataset=default_str_dataset, ndigits=default
     string for the dataset/pointing name prefix
     """
     return f"{str_dataset}{int(dataset):0{int(ndigits)}}"
-
-
-def lower_rep(text):
-    """Lower the text and return it after removing all underscores
-
-    Args:
-        text (str): text to treat
-
-    Returns:
-        updated text (with removed underscores and lower-cased)
-
-    """
-    return text.replace("_", "").lower()
-
-
-def lower_allbutfirst_letter(mystring):
-    """Lowercase all letters except the first one
-    """
-    return mystring[0].upper() + mystring[1:].lower()
-
-
-class TimeStampDict(OrderedDict):
-    """Class which builds a time stamp driven
-    dictionary of objects
-    """
-    def __init__(self, description="", myobject=None):
-        """Initialise an empty dictionary
-        with a given name
-        """
-        OrderedDict.__init__(self)
-        self.description = description
-        self.create_new_timestamp(myobject)
-
-    def create_new_timestamp(self, myobject=None):
-        """Create a new item in dictionary
-        using a time stamp
-        """
-        if myobject is not None:
-            self.present_tstamp = create_time_name()
-            self[self.present_tstamp] = myobject
-        else:
-            self.present_stamp = None
-
-    def delete_timestamp(self, tstamp=None):
-        """Delete a key in the dictionary
-        """
-        _ = self.pop(tstamp)
-
-
-def merge_dict(dict1, dict2):
-    """Merging two dictionaries by appending
-    keys which are duplicated
-
-    Input
-    -----
-    dict1: dict
-    dict2: dict
-
-    Returns
-    -------
-    dict1 : dict
-        merged dictionary
-    """
-    for key, value in dict2.items():
-        if key in dict1:
-            dict1[key].extend(value)
-        else:
-            dict1[key] = value
-    return dict1
+# --------------- END OF Analysis of tpl, expo etc -------------------- #
 
 
 def create_time_name():
@@ -429,73 +509,11 @@ def formatted_time():
     return str(time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()))
 
 
-def safely_create_folder(path, verbose=True):
-    """Create a folder given by the input path This small function tries to create it
-    and if it fails it checks whether the reason is that it is not a path and then warn the user
-
-    Input
-    -----
-    path: str
-    verbose: bool
-
-    Creates
-    -------
-    A new folder if the folder does not yet exist
-    """
-    if path is None:
-        if verbose:
-            print_info("Input path is None, not doing anything")
-        return
-    if verbose:
-        print_info("Trying to create {folder} folder".format(folder=path), end='')
-    try: 
-        os.makedirs(path)
-        if verbose:
-            print_endline("... Done", end='\n')
-    except OSError:
-        if not os.path.isdir(path):
-            print_error("Failed to create folder! Please check the path")
-            return
-        if os.path.isdir(path):
-            if verbose:
-                print_endline("... Folder already exists, doing nothing.")
-
-
 def append_file(filename, content):
     """Append in ascii file
     """
     with open(filename, "a") as myfile:
         myfile.write(content)
-
-
-def abspath(path):
-    """Normalise the path to get it short but absolute
-    """
-    return os.path.abspath(os.path.realpath(path))
-
-
-def normpath(path):
-    """Normalise the path to get it short
-    """
-    return os.path.normpath(os.path.realpath(path))
-
-
-def reconstruct_filter_images(cubename, filter_list=default_filter_list,
-                              filter_fits_file="filter_list.fits"):
-    """ Reconstruct all images in a list of Filters
-    cubename: str
-        Name of the cube
-    filter_list: str
-        List of filters, e.g., "Cousins_R,Johnson_I"
-        By default, the default_filter_list from pymusepipe.config_pipe
-
-    filter_fits_file: str
-        Name of the fits file containing all the filter characteristics
-        Usually in filter_list.fits (MUSE default)
-    """
-    
-    command = "muse_cube_filter -f {0} {1} {2}".format(filter_list, cubename, filter_fits_file)
-    os.system(command)
 
 
 def add_key_dataset_expo(imaname, iexpo, dataset):
@@ -516,17 +534,17 @@ def add_key_dataset_expo(imaname, iexpo, dataset):
         imaname))
 
 
-class ExposureInfo(object):
-    def __init__(self, targetname, dataset, tpl, nexpo):
-        """A dummy class to just store temporarily
-        the various basic info about a Muse exposure
-        """
-        self.targetname = targetname
-        self.dataset = dataset
-        self.tpl = tpl
-        self.nexpo = nexpo
-
-
+# class ExposureInfo(object):
+#     def __init__(self, targetname, dataset, tpl, nexpo):
+#         """A dummy class to just store temporarily
+#         the various basic info about a Muse exposure
+#         """
+#         self.targetname = targetname
+#         self.dataset = dataset
+#         self.tpl = tpl
+#         self.nexpo = nexpo
+# 
+# 
 # def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verbose=True,
 #                            str_dataset=default_str_dataset, ndigits=default_ndigits,
 #                            filtername=None):
@@ -671,7 +689,7 @@ class ExposureInfo(object):
 #     return selected_filename_list, dict_exposures_per_pointing, dict_tplexpo_per_pointing, \
 #         dict_tplexpo_per_dataset
 
-
+# --------------- Sorting list of datasets and cubes and files ----------------- #
 def filter_list_with_suffix_list(list_names, included_suffix_list=[],
                                  excluded_suffix_list=[], name_list=""):
     """Filter a list using suffixes (to exclude or include)
@@ -815,6 +833,7 @@ def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
 
     return dict_expos
 
+
 def get_list_datasets(target_path="", str_dataset=default_str_dataset,
                       ndigits=default_ndigits, verbose=False):
     """Getting the list of existing datasets for a given target path
@@ -860,6 +879,7 @@ def get_list_datasets(target_path="", str_dataset=default_str_dataset,
     if verbose:
         print_info(f"Dataset list: {str(list_datasets)}")
     return list_datasets
+
 
 def get_list_exposures(dataset_path="", object_folder=default_object_folder):
     """Getting a list of exposures from a given path
@@ -966,3 +986,30 @@ def get_list_reduced_pixtables(target_path="", list_datasets=None,
         dict_pixtables[dataset] = full_list
 
     return dict_pixtables
+
+
+def _get_combine_products(filter_list='white', prefix_all=""):
+    """Provide a set of key output products depending on the filters
+    for combine
+    """
+    name_products = []
+    suffix_products = []
+    suffix_prefinalnames = []
+    prefix_products = []
+    filter_list = check_filter_list(filter_list)
+    for prod in dict_products_scipost['cube']:
+        if prod == "IMAGE_FOV":
+            for i, value in enumerate(filter_list, start=1):
+                suffix_products.append(f"_{i:04d}")
+                suffix_prefinalnames.append(f"_{value}")
+                name_products.append(prod)
+                prefix_products.append(prefix_all)
+        else :
+            suffix_products.append("")
+            suffix_prefinalnames.append("")
+            name_products.append(prod)
+            prefix_products.append(prefix_all)
+
+    return name_products, suffix_products, suffix_prefinalnames, prefix_products
+# --------------- END OF Sorting list of datasets and cubes and files ----------------- #
+
