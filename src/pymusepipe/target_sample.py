@@ -589,6 +589,9 @@ class MusePipeSample(object):
         Returns:
 
         """
+        # Patched switch to test the combine via scipos
+        use_scipost = kwargs.pop("use_scipost", True)
+
         if not self._check_targetname(targetname):
             return
 
@@ -670,10 +673,11 @@ class MusePipeSample(object):
                                              folder_offset_table=folder_offset_table,
                                              list_datasets=list_datasets,
                                              pointing_table=pointing_table,
-                                             filter_list=self._short_filter_list)
+                                             filter_list=self._short_filter_list,
+                                             use_scipost=use_scipost)
 
     def run_target_scipost_perexpo(self, targetname=None, list_datasets=None, list_pointings=None,
-                                   folder_offset_table=None, name_offset_table=None,
+                                   folder_offset_table=None, name_offset_table=None, verbose=False,
                                    **kwargs):
         """Build the cube per exposure using a given WCS
 
@@ -756,6 +760,10 @@ class MusePipeSample(object):
                                   'list_tplexpo': list_tplexpo,
                                   'save': save}
                 kwargs.update(kwargs_dataset)
+                if verbose:
+                    upipe.print_info(f"Dataset/Pointing [{dataset}/{pointing}] "
+                                     f"- Will proceed with scipost per expo on "
+                                     f"exposures: {list_tplexpo}")
                 self.pipes[targetname][dataset].run_scipost_perexpo(**kwargs)
 
     def run_target_recipe(self, recipe_name, targetname=None,
@@ -1144,18 +1152,22 @@ class MusePipeSample(object):
                                                        log_filename=log_filename, **kwargs)
 
     def combine_target_per_pointing(self, targetname=None, wcs_from_pointing=True,
-                                 **kwargs):
-        """Run the combine recipe. Shortcut for combine[targetname].run_combine()
+                                    **kwargs):
+        """Run the combine recipe. Shortcut for combine[targetname].run_combine_scipost()
         """
         self.init_combine(targetname=targetname, **kwargs)
         self.pipes_combine[targetname].run_combine_all_single_pointings(
-                wcs_from_pointing=wcs_from_pointing, **kwargs)
+            wcs_from_pointing=wcs_from_pointing, **kwargs)
 
     def combine_target(self, targetname=None, **kwargs):
-        """Run the combine recipe. Shortcut for combine[targetname].run_combine()
+        """Run the combine recipe. Shortcut for combine[targetname].run_combine_scipost()
         """
+        use_scipost = kwargs("use_scipost", True)
         self.init_combine(targetname=targetname, **kwargs)
-        self.pipes_combine[targetname].run_combine(**kwargs)
+        if use_scipost:
+            self.pipes_combine[targetname].run_combine_scipost(**kwargs)
+        else:
+            self.pipes_combine[targetname].run_combine(**kwargs)
 
     def create_reference_wcs(self, targetname=None, pointings_wcs=True, mosaic_wcs=True,
                              wcs_refcube_name=None, refcube_name=None, **kwargs):

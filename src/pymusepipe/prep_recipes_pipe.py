@@ -1467,12 +1467,12 @@ class PipePrep(SofPipe) :
                 _get_combine_products(filter_list, prefix_all=prefix_all) 
 
         # Combine the exposures 
-        self.recipe_combine(self.current_sof, dir_products, name_products, 
-                tpl, expotype, suffix_products=suffix_products,
-                suffix_prefinalnames=suffix_prefinalnames,
-                prefix_products=prefix_products,
-                lambdamin=lambdamin, lambdamax=lambdamax,
-                save=save, suffix=suffix, filter_list=filter_list, **kwargs)
+        self.recipe_combine(self.current_sof, dir_products, name_products, tpl, expotype,
+                            suffix_products=suffix_products,
+                            suffix_prefinalnames=suffix_prefinalnames,
+                            prefix_products=prefix_products,
+                            lambdamin=lambdamin, lambdamax=lambdamax,
+                            save=save, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)

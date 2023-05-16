@@ -738,6 +738,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         """
         lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
+        use_scipost = kwargs("use_scipost", True)
 
         # Creating the WCS Cube. First if None, we need to set this up
         if wcs_refcube_name is None:
@@ -745,11 +746,18 @@ class MusePointings(SofPipe, PipeRecipes):
             if refcube_name is None:
                 upipe.print_info("@@@@@@@ Creating a (WCS, narrow-lambda) reference mosaic "
                                  "cube from existing individual exposures @@@@@@@")
-                self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
-                                 filter_list="white",
-                                 prefix_all=default_prefix_wcs,
-                                 targetname_asprefix=False,
-                                 list_pointings=list_pointings)
+                if use_scipost:
+                    self.run_combine_scipost(lambdaminmax=lambdaminmax_for_wcs,
+                                             filter_list="white",
+                                             prefix_all=default_prefix_wcs,
+                                             targetname_asprefix=False,
+                                             list_pointings=list_pointings)
+                else:
+                    self.run_combine(lambdaminmax=lambdaminmax_for_wcs,
+                                     filter_list="white",
+                                     prefix_all=default_prefix_wcs,
+                                     targetname_asprefix=False,
+                                     list_pointings=list_pointings)
                 wcs_refcube_name = self._combined_cube_name
             # If the input cube is provided, we just construct a WCS from that
             else:
@@ -847,6 +855,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         ref_wcs = kwargs.pop("ref_wcs", None)
         wcs_from_pointing = kwargs.pop("wcs_from_pointing", False)
+        use_scipost = kwargs.pop("use_scipost", True)
 
         # Wcs_from_pointing
         # If true, use the reference pointing wcs
@@ -862,8 +871,14 @@ class MusePointings(SofPipe, PipeRecipes):
                 ref_wcs = f"{prefix_wcs}{prefix_final_cube}_{get_pointing_name(pointing)}.fits"
 
         # Running the combine for that single pointing
-        self.run_combine(list_pointings=[int(pointing)], suffix=suffix, sof_filename=sof_filename,
-                         ref_wcs=ref_wcs, **kwargs)
+        if use_scipost:
+            self.run_combine_scipost(list_pointings=[int(pointing)], suffix=suffix,
+                                     sof_filename=sof_filename,
+                                     ref_wcs=ref_wcs, **kwargs)
+        else:
+            self.run_combine(list_pointings=[int(pointing)], suffix=suffix,
+                             sof_filename=sof_filename,
+                             ref_wcs=ref_wcs, **kwargs)
 
     def create_all_pointings_wcs(self, filter_list="white", list_pointings=None, **kwargs):
         """Create all pointing masks one by one
@@ -1197,6 +1212,134 @@ class MusePointings(SofPipe, PipeRecipes):
                                       prefix_products=prefix_products,
                                       save=save, suffix=suffix, filter_list=filter_list,
                                       lambdamin=lambdamin, lambdamax=lambdamax)
+
+        # Go back to original folder
+        self.goto_prevfolder(addtolog=True)
+
+    def run_combine_scipost(self, sof_filename='pointings_combine_scipost',
+                            lambdaminmax=(4000., 10000.), list_pointings=None, suffix="", **kwargs):
+        """MUSE combining reduced pixel tables running scipost
+
+        Parameters
+        ----------
+        sof_filename: string (without the file extension)
+            Name of the SOF file which will contain the Bias frames
+        lambdaminmax: list of 2 floats
+            Minimum and maximum lambda values to consider for the combine
+        suffix: str
+            Suffix to be used for the output name
+        """
+        # Lambda min and max?
+        [lambdamin, lambdamax] = lambdaminmax
+
+        # Save options
+        save = kwargs.pop("save", "cube,combined")
+
+        # Filters
+        filter_list = kwargs.pop("filter_list", self.filter_list)
+
+        # Expotype - We use here OBJECT as expotype even though the pixel tables are reduced
+        expotype = kwargs.pop("expotype", 'OBJECT')
+
+        # Adding target name as prefix or not
+        self.add_targetname = kwargs.pop("add_targetname", self.add_targetname)
+        asprefix = kwargs.pop("targetname_asprefix", True)
+        prefix_wcs = kwargs.pop("prefix_wcs", default_prefix_wcs)
+        prefix_all = kwargs.pop("prefix_all", "")
+        prefix_all = self._add_targetname(prefix_all, asprefix)
+
+        if "name_offset_table" in kwargs:
+            name_offset_table = kwargs.pop("name_offset_table")
+            folder_offset_table = kwargs.pop("folder_offset_table", self.folder_offset_table)
+            self._check_offset_table(name_offset_table, folder_offset_table)
+
+        # Go to the data folder
+        self.goto_folder(self.paths.data, addtolog=True)
+
+        # If list_pointings is None using the initially set up one
+        list_pointings = self._check_list_pointings(list_pointings, self.list_pointings)
+
+        # Now cross-correlate with list of existing pointings
+        temp_list_pointings = copy.copy(list_pointings)
+        for pointing in temp_list_pointings:
+            if pointing not in self.dict_pixtabs_in_pointings:
+                upipe.print_info(f"Pointing {pointing:02d} found in the list of pointings but not "
+                                 f"in the pointing table - We will not process that pointing")
+                list_pointings.remove(pointing)
+
+        # If only 1 exposure, duplicate the pixtable
+        # as exp_combine needs at least 2 pixtables
+        # nexpo_tocombine = sum(len(self.dict_pixtabs_in_pointings[pointing])
+        #                       for pointing in list_pointings)
+        # if nexpo_tocombine <= 1:
+        #     upipe.print_warning("All considered pointings have a total of "
+        #                         "only one single exposure: exp_combine "
+        #                         "will not run. Please use the individual "
+        #                         "reconstructed cube.", pipe=self)
+        #     return
+
+        # Now creating the SOF file, first reseting it
+        self._sofdict.clear()
+        # Adding the filter list to the sof
+        self._add_calib_to_sofdict("FILTER_LIST")
+
+        # Adding a WCS if needed
+        wcs_auto = kwargs.pop("wcs_auto", False)
+        ref_wcs = kwargs.pop("ref_wcs", None)
+        if wcs_auto:
+            if ref_wcs is not None:
+                 upipe.print_warning("wcs_auto is True, but ref_wcs was specifically provided, and "
+                                     "will not be overwritten.")
+                 upipe.print_warning(f"Provided ref_wcs is {ref_wcs}")
+            else:
+                # getting the name of the final datacube (mosaic)
+                cube_suffix = prep_recipes_pipe.dict_products_scipost['cube'][0]
+                cube_suffix = self._add_targetname(cube_suffix)
+                ref_wcs = f"{prefix_wcs}{cube_suffix}.fits"
+            upipe.print_warning(f"ref_wcs used is {ref_wcs}")
+
+        folder_refcube = kwargs.pop("folder_refcube", upipe.normpath(self.paths.cubes))
+        if ref_wcs is not None:
+            full_ref_wcs = joinpath(folder_refcube, ref_wcs)
+            if not os.path.isfile(full_ref_wcs):
+                upipe.print_error(f"Reference WCS file {full_ref_wcs} does not exist")
+                upipe.print_error("Consider using the create_combined_wcs recipe"
+                                  " if you wish to create pointing masks. Else"
+                                  " just check that the WCS reference file exists.")
+                return
+
+            self._sofdict['OUTPUT_WCS'] = [joinpath(folder_refcube, ref_wcs)]
+
+        # Setting the default option of offset_list
+        if self.name_offset_table is not None:
+            self._sofdict['OFFSET_LIST'] = [joinpath(self.folder_offset_table,
+                                                     self.name_offset_table)]
+
+        # Adding the list of PixTables - Those are reduced but will be passed as PIXTABLE_OBJECT
+        pixtable_name = dict_listObject[expotype]
+        self._sofdict[pixtable_name] = []
+        for pointing in list_pointings:
+            if pointing not in self.dict_pixtabs_in_pointings:
+                continue
+            self._sofdict[pixtable_name] += self.dict_pixtabs_in_pointings[pointing]
+
+        self.write_sof(sof_filename="{0}_{1}{2}".format(sof_filename,
+                                                        self.targetname,
+                                                        suffix), new=True)
+
+        # Product names
+        dir_products = upipe.normpath(self.paths.cubes)
+        name_products, suffix_products, suffix_prefinalnames, prefix_products = \
+                              _get_combine_products(filter_list,
+                                                    prefix_all=prefix_all)
+
+        # Combine the exposures 
+        self.recipe_combine_pointings_scipost(self.current_sof, dir_products, name_products,
+                                              suffix_products=suffix_products,
+                                              suffix_prefinalnames=suffix_prefinalnames,
+                                              prefix_products=prefix_products,
+                                              save=save, suffix=suffix, filter_list=filter_list,
+                                              lambdamin=lambdamin, lambdamax=lambdamax)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
