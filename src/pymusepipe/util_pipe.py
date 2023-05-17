@@ -156,7 +156,7 @@ def add_listpath(suffix, paths) :
     """
     newlist = []
     for mypath in paths:
-        newlist.append(upipe.normpath(joinpath(suffix, mypath)))
+        newlist.append(normpath(joinpath(suffix, mypath)))
     return newlist
 
 
