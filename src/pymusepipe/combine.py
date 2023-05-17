@@ -231,7 +231,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                        table_format=pointing_table_format,
                                        folder=pointing_table_folder)
             self.list_pointings = self._check_list_pointings(list_pointings)
-            self.filter_pixtables_with_list()
+            self.filter_pixtables_with_list(overwrite=False)
 
         # Checking input offset table and corresponding pixtables
             self._check_offset_table(name_offset_table, folder_offset_table)
@@ -509,7 +509,7 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info(f"Pointing table assigned included those exposures:")
             upipe.print_info(f"{self.pointing_table.dict_tplexpo_per_dataset}")
 
-    def filter_pixtables_with_list(self, list_datasets=None, list_pointings=None):
+    def filter_pixtables_with_list(self, list_datasets=None, list_pointings=None, overwrite=True):
         """Filter a list of pixtables
         
         Parameters
@@ -526,7 +526,7 @@ class MusePointings(SofPipe, PipeRecipes):
         # select if pointing or dataset but keep the unselected untouched (overwrite to False)
         self.pointing_table.select_pointings_and_datasets(list_datasets=list_datasets,
                                                           list_pointings=list_pointings,
-                                                          overwrite=False)
+                                                          overwrite=overwrite)
 
     @property
     def dict_pixtabs_in_datasets(self):
