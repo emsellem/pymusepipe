@@ -723,7 +723,6 @@ class MusePipeSample(object):
         pointing_table_format = kwargs.pop("pointing_table_format", "ascii")
         pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", False)
         pixtable_type = kwargs.pop("pixtable_type", 'REDUCED')
-        verbose = kwargs.get("verbose", False)
         self.init_combine(targetname=targetname, list_datasets=list_datasets,
                           list_pointings=list_pointings,
                           pointing_table=pointing_table,

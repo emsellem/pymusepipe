@@ -504,6 +504,7 @@ class MusePointings(SofPipe, PipeRecipes):
                     else:
                         row['filename'] = qtable_pixtables[mask]['filename'].value[0]
                         row['select'] = qtable_pixtables[mask]['select'].value[0]
+
         if self.verbose:
             upipe.print_info(f"Pointing table assigned included those exposures:")
             upipe.print_info(f"{self.pointing_table.dict_tplexpo_per_dataset}")
