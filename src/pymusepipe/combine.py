@@ -473,6 +473,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                                     table_format=table_format)
             elif isinstance(input_table, PointingTable):
                 upipe.print_info("Attaching the input pointing table to the MusePointings")
+                upipe.print_info(f"verbose is {self.verbose}")
                 self.pointing_table = copy.copy(input_table)
             else:
                 upipe.print_error(f"Format of input table not recognised")
