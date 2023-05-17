@@ -1302,10 +1302,13 @@ class PointingTable(object):
         # If no selection is done, just select all by default
         if "select" in self.qtable.colnames:
             if overwrite:
+                upipe.print_warning(f"Resetting all select values to {value}")
                 self.qtable.replace_column(name='select',
                                                    col=[int(value)] * len(self.qtable),
                                                    copy=False)
         else:
+            upipe.print_warning(f"Column 'select' is missing: adding it and reset values to"
+                                f" {value}")
             self.qtable.add_column([int(value)] * len(self.qtable), name='select')
 
     def _reset_pointing(self, overwrite=False):
