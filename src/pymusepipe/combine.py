@@ -177,6 +177,8 @@ class MusePointings(SofPipe, PipeRecipes):
         # Checking input datasets and pixtables
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
         self._pixtable_type = kwargs.pop("pixtable_type", "REDUCED")
+        # Using scipost or exp_combine
+        self.use_scipost = kwargs("use_scipost", True)
 
         # End of parameter settings =======================================
 
@@ -746,7 +748,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         """
         lambdaminmax = kwargs.pop("lambdaminmax", lambdaminmax_for_mosaic)
-        use_scipost = kwargs("use_scipost", True)
+        use_scipost = kwargs.pop("use_scipost", self.use_scipost)
 
         # Creating the WCS Cube. First if None, we need to set this up
         if wcs_refcube_name is None:
@@ -863,7 +865,7 @@ class MusePointings(SofPipe, PipeRecipes):
 
         ref_wcs = kwargs.pop("ref_wcs", None)
         wcs_from_pointing = kwargs.pop("wcs_from_pointing", False)
-        use_scipost = kwargs.pop("use_scipost", True)
+        use_scipost = kwargs.pop("use_scipost", self.use_scipost)
 
         # Wcs_from_pointing
         # If true, use the reference pointing wcs

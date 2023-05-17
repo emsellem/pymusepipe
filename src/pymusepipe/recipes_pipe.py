@@ -367,7 +367,7 @@ class PipeRecipes(object) :
         filter_list = filter_list_to_str(filter_list)
         self.run_oscommand(f"{self.esorex}  --log-file=combine_pointings_scipost.log "
                            f" muse_scipost --save={save} --pixfrac={pixfrac:0.2f} "
-                           f"--crsigma={crsigma} --rc={rc} --skymethod='none' --astrometry='FALSE'"
+                           f"--crsigma={crsigma} --rc={rc} --skymethod='none' --astrometry='FALSE' "
                            f"--format={format_out} --filter={filter_list} "
                            f"--lambdamin={lambdamin} --lambdamax={lambdamax} "
                            f"{sof}")
