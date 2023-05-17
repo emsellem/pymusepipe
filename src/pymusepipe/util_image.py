@@ -1507,6 +1507,7 @@ class PointingTable(object):
         # Now getting the selections
         list_datasets = kwargs.pop("list_datasets", self.list_datasets)
         list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+        overwrite = kwargs.pop("overwrite", True)
 
         if list_datasets is None:
             list_datasets = self.list_datasets
@@ -1519,7 +1520,8 @@ class PointingTable(object):
             if p not in list_pointings or d not in list_datasets:
                 row['select'] = int(0)
             else:
-                row['select'] = int(1)
+                if overwrite:
+                    row['select'] = int(1)
 
     def select_pointings(self, **kwargs):
         """Select all filenames with pointings in the pointing list
@@ -1533,6 +1535,7 @@ class PointingTable(object):
         'select' values in the astropy pointing table according to the list of pointings
         """
         list_pointings = kwargs.pop("list_pointings", self.list_pointings)
+        overwrite = kwargs.pop("overwrite", True)
         if list_pointings is None:
             list_pointings = self.list_pointings
 
@@ -1542,7 +1545,8 @@ class PointingTable(object):
             if p not in list_pointings:
                 row['select'] = int(0)
             else:
-                row['select'] = int(1)
+                if overwrite:
+                    row['select'] = int(1)
 
     def select_datasets(self, **kwargs):
         """Select all filenames with a given list of datasets
@@ -1556,6 +1560,7 @@ class PointingTable(object):
         'select' values in the astropy pointing table according to the list of datasets
         """
         list_datasets = kwargs.pop("list_datasets", self.list_datasets)
+        overwrite = kwargs.pop("overwrite", True)
         if list_datasets is None:
             list_datasets = self.list_datasets
 
@@ -1565,7 +1570,8 @@ class PointingTable(object):
             if d not in list_datasets:
                 row['select'] = int(0)
             else:
-                row['select'] = int(1)
+                if overwrite:
+                    row['select'] = int(1)
 
     @property
     def selected_filenames(self):

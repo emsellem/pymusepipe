@@ -231,7 +231,7 @@ class MusePointings(SofPipe, PipeRecipes):
                                        table_format=pointing_table_format,
                                        folder=pointing_table_folder)
             self.list_pointings = self._check_list_pointings(list_pointings)
-            self.filter_pixables_with_list()
+            self.filter_pixtables_with_list()
 
         # Checking input offset table and corresponding pixtables
             self._check_offset_table(name_offset_table, folder_offset_table)
@@ -473,7 +473,6 @@ class MusePointings(SofPipe, PipeRecipes):
                                                     table_format=table_format)
             elif isinstance(input_table, PointingTable):
                 upipe.print_info("Attaching the input pointing table to the MusePointings")
-                upipe.print_info(f"verbose is {self.verbose}")
                 self.pointing_table = copy.copy(input_table)
             else:
                 upipe.print_error(f"Format of input table not recognised")
@@ -510,7 +509,7 @@ class MusePointings(SofPipe, PipeRecipes):
             upipe.print_info(f"Pointing table assigned included those exposures:")
             upipe.print_info(f"{self.pointing_table.dict_tplexpo_per_dataset}")
 
-    def filter_pixables_with_list(self, list_datasets=None, list_pointings=None):
+    def filter_pixtables_with_list(self, list_datasets=None, list_pointings=None):
         """Filter a list of pixtables
         
         Parameters
@@ -524,9 +523,10 @@ class MusePointings(SofPipe, PipeRecipes):
             list_datasets = self.list_datasets
         if list_pointings is None:
             list_pointings = self.list_pointings
-        # select if pointing or dataset
+        # select if pointing or dataset but keep the unselected untouched (overwrite to False)
         self.pointing_table.select_pointings_and_datasets(list_datasets=list_datasets,
-                                                          list_pointings=list_pointings)
+                                                          list_pointings=list_pointings,
+                                                          overwrite=False)
 
     @property
     def dict_pixtabs_in_datasets(self):
