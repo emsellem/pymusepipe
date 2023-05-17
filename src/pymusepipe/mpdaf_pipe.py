@@ -1330,7 +1330,7 @@ class MuseSkyContinuum(object):
     
         # Writing to the new file
         skycont.writeto(norm_filename, overwrite=overwrite)
-        print_info('Normalised Factor used = {0:8.4f}'.format(norm_factor))
+        print_info('Normalised Sky Continuum Factor used = {0:8.4f}'.format(norm_factor))
         print_info('Normalised Sky Continuum {} has been created'.format(norm_filename))
 
 # Routine to read filters
