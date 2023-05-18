@@ -178,7 +178,7 @@ class MusePointings(SofPipe, PipeRecipes):
         self._pixtab_in_comb_folder = kwargs.pop("pixtab_in_comb_folder", True)
         self._pixtable_type = kwargs.pop("pixtable_type", "REDUCED")
         # Using scipost or exp_combine
-        self.use_scipost = kwargs("use_scipost", True)
+        self.use_scipost = kwargs.pop("use_scipost", True)
 
         # End of parameter settings =======================================
 

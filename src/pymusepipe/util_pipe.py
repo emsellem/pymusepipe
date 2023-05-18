@@ -24,7 +24,7 @@ import numpy as np
 from astropy.io import fits as pyfits
 
 # Import package modules
-from .config_pipe import (default_filter_list, dict_musemodes, default_short_filter_list,
+from .config_pipe import (dict_musemodes, default_short_filter_list,
                           default_ndigits, default_str_pointing, default_str_dataset,
                           dict_folders, dict_products_scipost)
 
@@ -41,6 +41,7 @@ ERROR = '\033[1;91m'
 ENDC = '\033[0m'
 BOLD = '\033[1m'
 DEBUG = '\033[1m'
+
 
 def print_endline(text, **kwargs):
     print(INFO + text + ENDC, **kwargs)
@@ -150,7 +151,7 @@ def lower_allbutfirst_letter(mystring):
     return mystring[0].upper() + mystring[1:].lower()
 
 
-def add_listpath(suffix, paths) :
+def add_listpath(suffix, paths):
     """Add a suffix to a list of path
     and normalise them
     """
@@ -908,12 +909,12 @@ def get_list_exposures(dataset_path="", object_folder=default_object_folder):
 
     # Building the final list
     dict_expos = {}
-    for l in sorted_list:
-        tpl = l[0]
+    for lexp in sorted_list:
+        tpl = lexp[0]
         if tpl in dict_expos:
-            dict_expos[tpl].append(int(l[1]))
+            dict_expos[tpl].append(int(lexp[1]))
         else:
-            dict_expos[tpl] = [int(l[1])]
+            dict_expos[tpl] = [int(lexp[1])]
 
     # Finding the full list of tpl
     print_info("Exposures list:")
@@ -921,6 +922,7 @@ def get_list_exposures(dataset_path="", object_folder=default_object_folder):
         print_info("TPL= {0} : Exposures= {1}".format(tpl, dict_expos[tpl]))
 
     return dict_expos
+
 
 def get_list_reduced_pixtables(target_path="", list_datasets=None,
                                suffix="", str_dataset=default_str_dataset,
@@ -1004,7 +1006,7 @@ def _get_combine_products(filter_list='white', prefix_all=""):
                 suffix_prefinalnames.append(f"_{value}")
                 name_products.append(prod)
                 prefix_products.append(prefix_all)
-        else :
+        else:
             suffix_products.append("")
             suffix_prefinalnames.append("")
             name_products.append(prod)
@@ -1012,4 +1014,3 @@ def _get_combine_products(filter_list='white', prefix_all=""):
 
     return name_products, suffix_products, suffix_prefinalnames, prefix_products
 # --------------- END OF Sorting list of datasets and cubes and files ----------------- #
-

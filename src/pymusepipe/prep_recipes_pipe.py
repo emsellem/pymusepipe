@@ -4,10 +4,10 @@
 """MUSE-PHANGS preparation recipe module
 """
 
-__authors__   = "Eric Emsellem"
+__authors__ = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__   = "MIT License"
-__contact__   = " <eric.emsellem@eso.org>"
+__license__ = "MIT License"
+__contact__ = " <eric.emsellem@eso.org>"
 
 # Importing modules
 import os
@@ -32,10 +32,10 @@ from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipe
                           dict_products_scipost)
 from .emission_lines import get_emissionline_band
 
-try :
+try:
     import astropy as apy
     from astropy.io import fits as pyfits
-except ImportError :
+except ImportError:
     raise Exception("astropy is required for this module")
 
 # =======================================================
@@ -43,6 +43,8 @@ except ImportError :
 # =======================================================
 # ----------- Define the print_my_method_name property -------- #
 import functools
+
+
 def print_my_method_name(f):
     """Function to provide a print of the name of the function
     Can be used as a decorator
@@ -57,10 +59,11 @@ def print_my_method_name(f):
         return f(*myargs, **mykwargs)
     return wrapped
 
-###################################################################
-# Class for preparing the launch of recipes
-###################################################################
-class PipePrep(SofPipe) :
+
+# ##################################################################
+#  Class for preparing the launch of recipes
+# ##################################################################
+class PipePrep(SofPipe):
     """PipePrep class prepare the SOF files and launch the recipes
     """
     def __init__(self, first_recipe=1, last_recipe=None):
@@ -87,23 +90,24 @@ class PipePrep(SofPipe) :
         """Selecting a subset of files from a certain type
         """
         if expotype not in musepipe.dict_expotypes:
-            upipe.print_info("ERROR: input {0} is not in the list of possible values".format(expotype),
-                    pipe=self)
-            return 
+            upipe.print_info(
+                "ERROR: input {0} is not in the list of possible values".format(expotype),
+                pipe=self)
+            return
 
-        MUSE_subtable = self._get_table_expo(expotype, stage)
-        if len(MUSE_subtable) == 0:
-            if self.verbose :
+        muse_subtable = self._get_table_expo(expotype, stage)
+        if len(muse_subtable) == 0:
+            if self.verbose:
                 upipe.print_warning("Empty file table of type {0}".format(expotype),
-                        pipe=self)
+                                    pipe=self)
                 upipe.print_warning("Returning an empty Table from the tpl -astropy- selection",
-                        pipe=self)
-            return MUSE_subtable
+                                    pipe=self)
+            return muse_subtable
 
-        group_table = MUSE_subtable.group_by('tpls')
+        group_table = muse_subtable.group_by('tpls')
         if tpl == "ALL":
             return group_table
-        else :
+        else:
             return group_table.groups[group_table.groups.keys['tpls'] == tpl]
         
     @staticmethod
@@ -149,19 +153,22 @@ class PipePrep(SofPipe) :
 
         # Dictionary of arguments for each recipe
         default_dict_kwargs_recipes = {'twilight': {'illum': defval.illum},
-                             'scibasic_all': {'illum': defval.illum},
-                             'sky': {'fraction': defval.fraction},
-                             'prep_align': {'skymethod': defval.skymethod, 
-                                            'skymodel_fraction': defval.skymodel_fraction,
-                                            'filter_for_alignment': defval.filter_for_alignment,
-                                            'line': defval.line,
-                                            'lambda_window': defval.lambda_window
-                                            },
-                             'scipost_per_expo': {'skymethod': defval.skymethod, 'skymodel_fraction':
-                                                  defval.skymodel_fraction},
-                             'scipost': {'skymethod': defval.skymethod, 'skymodel_fraction':
-                                                  defval.skymodel_fraction}
-                             }
+                                       'scibasic_all': {'illum': defval.illum},
+                                       'sky': {'fraction': defval.fraction},
+                                       'prep_align': {'skymethod': defval.skymethod,
+                                                      'skymodel_fraction': defval.skymodel_fraction,
+                                                      'filter_for_alignment':
+                                                          defval.filter_for_alignment,
+                                                      'line': defval.line,
+                                                      'lambda_window': defval.lambda_window
+                                                      },
+                                       'scipost_per_expo': {'skymethod': defval.skymethod,
+                                                            'skymodel_fraction':
+                                                                defval.skymodel_fraction},
+                                       'scipost': {'skymethod': defval.skymethod,
+                                                   'skymodel_fraction':
+                                                       defval.skymodel_fraction}
+                                       }
 
         dict_kwargs_recipes = kwargs.pop("param_recipes", {})
         for key in default_dict_kwargs_recipes:
@@ -173,7 +180,8 @@ class PipePrep(SofPipe) :
         # First and last recipe to be used
         first_recipe = kwargs.pop("first_recipe", self.first_recipe)
         last_recipe = kwargs.pop("last_recipe", self.last_recipe)
-        if last_recipe is None: last_recipe = np.max(list(dict_recipes_per_num.keys()))
+        if last_recipe is None:
+            last_recipe = np.max(list(dict_recipes_per_num.keys()))
 
         # Transforming first and last if they are strings and not numbers
         if isinstance(first_recipe, str):
@@ -207,7 +215,7 @@ class PipePrep(SofPipe) :
 
     @print_my_method_name
     def run_phangs_recipes(self, fraction=0.8, illum=True, skymethod="model",
-                                **kwargs):
+                           **kwargs):
         """Running all PHANGS recipes in one shot
         Using the basic set up for the general list of recipes
 
@@ -233,14 +241,15 @@ class PipePrep(SofPipe) :
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
+        update:
 
         """
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='BIAS', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose :
+            if self.verbose:
                 upipe.print_error("[run_bias] No BIAS recovered from the astropy Table - Aborting",
-                        pipe=self)
+                                  pipe=self)
             return
 
         # Go to the data folder
@@ -253,7 +262,7 @@ class PipePrep(SofPipe) :
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
             self._sofdict['BIAS'] = add_listpath(self.paths.rawfiles,
-                    list(gtable['filename']))
+                                                 list(gtable['filename']))
             # extract the tpl (string)
             tpl = gtable['tpls'][0]
             # Writing the sof file
@@ -280,14 +289,15 @@ class PipePrep(SofPipe) :
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
+        update:
 
         """
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='FLAT', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose :
+            if self.verbose:
                 upipe.print_error("[run_flat] No FLAT recovered from the astropy Table - Aborting",
-                        pipe=self)
+                                  pipe=self)
             return
 
         # Go to the data folder
@@ -300,7 +310,7 @@ class PipePrep(SofPipe) :
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
             self._sofdict['FLAT'] = add_listpath(self.paths.rawfiles,
-                    list(gtable['filename']))
+                                                 list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Adding the best tpc MASTER_BIAS
@@ -332,14 +342,15 @@ class PipePrep(SofPipe) :
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
+        update:
 
         """
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose :
-                upipe.print_error("[run_wave] No WAVE recovered from the astropy file Table - Aborting", 
-                        pipe=self)
+            if self.verbose:
+                upipe.print_error("[run_wave] No WAVE recovered from the astropy file Table "
+                                  "- Aborting", pipe=self)
             return
 
         # Go to the data folder
@@ -352,8 +363,7 @@ class PipePrep(SofPipe) :
         self._add_calib_to_sofdict("LINE_CATALOG")
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
-            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles,
-                    list(gtable['filename']))
+            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles, list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Finding the best tpl for BIAS + TRACE
@@ -382,14 +392,15 @@ class PipePrep(SofPipe) :
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
+        update:
 
         """
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose :
-                upipe.print_error("[run_lsf] No WAVE recovered from the astropy file Table - Aborting", 
-                        pipe=self)
+            if self.verbose:
+                upipe.print_error("[run_lsf] No WAVE recovered from the astropy file Table "
+                                  "- Aborting", pipe=self)
             return
 
         # Go to the data folder
@@ -402,8 +413,7 @@ class PipePrep(SofPipe) :
         self._add_calib_to_sofdict("LINE_CATALOG")
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
-            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles,
-                    list(gtable['filename']))
+            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles, list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Finding the best tpl for BIAS, TRACE, WAVE
@@ -432,6 +442,8 @@ class PipePrep(SofPipe) :
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
+        update:  bool
+        illum: bool
 
         """
         # First selecting the files via the grouped table
