@@ -759,6 +759,8 @@ class MusePipeSample(object):
             # We now need to identify which tpls are there and which ref_wcs (pointing)
             # For each dataset, we go through all pointings one by one since each has a ref_wcs
             # We then use the list tpl and iexpo to pass to run_scipost_perexpo as list_tplexpo
+            if dataset not in dict_tplexpo_per_dataset:
+                continue
             for pointing in dict_tplexpo_per_dataset[dataset]:
                 pointing_name = get_pointing_name(pointing)
                 list_tplexpo = dict_tplexpo_per_dataset[dataset][pointing]
