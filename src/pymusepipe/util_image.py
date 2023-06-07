@@ -1106,8 +1106,6 @@ class PointingTable(object):
             folderout: str default=folder input
                 Output folder for the tablename when writing
             table_format: str default=ascii
-            guess: bool default=False
-                Guess column formatting of the file.
             verbose: bool default=False
 
         """
@@ -1121,7 +1119,6 @@ class PointingTable(object):
         self.folderout = kwargs.pop("folderout", self.folder)
 
         self.table_format = kwargs.pop("table_format", "ascii")
-        self.guess = kwargs.pop("guess", False)
         self.verbose = kwargs.pop("verbose", False)
         # Init an empty table
         self.qtable = QTable()
@@ -1165,7 +1162,7 @@ class PointingTable(object):
         return joinpath(self.folder, self.tablename)
 
     @property
-    def fullnameout(self):
+    def fulltablenameout(self):
         if self.tablenameout is None:
             tablenameout = self.tablename
         else:
@@ -1239,21 +1236,20 @@ class PointingTable(object):
         overwrite: bool default=False
         **kwargs:
             Valid keywords are
-            folder: str
-            nameout: str
+            folderout: str
+            tablenameout: str
             Extra keywords are passed to the astropy QTable.write() function
 
         Writes the pointing table on disk
         """
         # Reading the input
-        folder = kwargs.pop("folder", self.folderout)
-        nameout = kwargs.pop("nameout", self.tablename)
-        if nameout is None:
+        self.folderout = kwargs.pop("folderout", self.folderout)
+        self.tablenameout = kwargs.pop("tablenameout", self.tablenameout)
+        if self.tablenameout is None:
             upipe.print_error("No provided output filename")
 
         # Writing up using the astropy QTable write
-        fullnameout = joinpath(folder, nameout)
-        self.qtable.write(fullnameout, overwrite=overwrite, **kwargs)
+        self.qtable.write(self.fulltablenameout, overwrite=overwrite, **kwargs)
 
     def set_select_value(self, filename, value=1, verbose=False):
         """Set the value of the select column to 1, according to a given filename
@@ -1362,12 +1358,12 @@ class PointingTable(object):
             self.assign_pointings()
 
     def read(self, **kwargs):
-        """Read the input filename in given folder assuming a given format.
+        """Read the input tablename in given folder assuming a given format.
 
         Input
         -----
         filename: str, optional
-            Name of the filename
+            Name of the tablename
         folder: str default='', optional
             Name of the folder where to find the filename
         table_format: str default='ascii'
@@ -1376,16 +1372,14 @@ class PointingTable(object):
         -------
         self.qtable with the content of the file
         """
-        self.tablename = kwargs.pop("filename", self.filename)
+        self.tablename = kwargs.pop("tablename", self.tablename)
         self.folder = kwargs.pop("folder", self.folder)
         self.table_format = kwargs.pop("table_format", self.table_format)
-        self.guess = kwargs.pop("guess", self.guess)
-        if not os.path.exists(self.fullname):
-            upipe.print_error(f"Pointing Table {self.fullname} does not exist. Cannot open")
+        if not os.path.exists(self.fulltablename):
+            upipe.print_error(f"Pointing Table {self.fulltablename} does not exist. Cannot open")
             return
 
-        qtable = QTable.read(self.fullname, format=self.table_format, guess=self.guess,
-                                          **kwargs)
+        qtable = QTable.read(self.fulltablename, format=self.table_format, **kwargs)
         self._init_qtable(qtable)
 
     def _get_centres(self, dtype="guess", center_dict=None, **kwargs):
