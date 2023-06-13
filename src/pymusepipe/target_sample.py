@@ -614,14 +614,15 @@ class MusePipeSample(object):
             self.rotate_pixtables_target(targetname=targetname,
                                          folder_offset_table=folder_offset_table,
                                          name_offset_table=name_offset_table,
-                                         fakemode=False)
+                                         fakemode=False,
+                                         list_datasets=list_datasets)
 
         norm_skycontinuum = kwargs.pop("norm_skycontinuum", True)
         skymethod = kwargs.pop("skymethod", 'model')
         pointing_table = kwargs.pop("pointing_table", None)
         if create_pixtables:
-            # We then reconstruct the pixtable reduced so we can
-            # redo a muse_exp_combine if needed
+            # We then reconstruct the pixtable reduced
+            # and redo a muse_exp_combine if needed
             upipe.print_info("==== REDUCED PIXTABLES for REFERENCE MOSAIC ====")
             self.run_target_scipost_perexpo(targetname=targetname,
                                             folder_offset_table=folder_offset_table,
@@ -933,8 +934,10 @@ class MusePipeSample(object):
         # Loop on the datasets
 
         for row in offset_table:
-            iexpo = row['IEXPO_OBS']
             dataset = row['DATASET_OBS']
+            if dataset not in list_datasets:
+                continue
+            iexpo = row['IEXPO_OBS']
             tpls = row['TPL_START']
             angle = row['ROTANGLE']
             ndigits = int(self.pipes[targetname][list_datasets[0]].pipe_params.ndigits)
@@ -1000,8 +1003,7 @@ class MusePipeSample(object):
                                                        **kwargs)
 
     def convolve_mosaic_per_pointing(self, targetname=None, list_pointings=None,
-                                     dict_psf={}, target_fwhm=0.,
-                                     target_nmoffat=None,
+                                     target_fwhm=0., target_nmoffat=None,
                                      target_function="gaussian", suffix=None,
                                      best_psf=True, min_dfwhm=0.2, fakemode=False,
                                      **kwargs):
@@ -1013,7 +1015,6 @@ class MusePipeSample(object):
             targetname (str): name of the target
             list_pointings (list): list of pointing numbers for the list of pointings
                 to consider
-            dict_psf (dict): dictionary providing individual PSFs per pointing
             target_fwhm (float): target FWHM for the convolution [arcsec]
             target_nmoffat (float): tail factor for the moffat function.
             target_function (str): 'moffat' or 'gaussian' ['gaussian']
@@ -1026,6 +1027,7 @@ class MusePipeSample(object):
                 proceed with the convolution.
             **kwargs:
                 filter_list (list): list of filters to be used for reconstructing images
+                dict_psf (dict): dictionary providing individual PSFs per pointing
 
         Returns:
 
@@ -1035,6 +1037,7 @@ class MusePipeSample(object):
         filter_list = check_filter_list(filter_list)
 
         # Initialise and filter with list of datasets
+        dict_psf = kwargs.pop("dict_psf", {})
         self.init_mosaic(targetname=targetname, list_pointings=list_pointings,
                          dict_psf=dict_psf, **kwargs)
 
@@ -1044,6 +1047,7 @@ class MusePipeSample(object):
         # Calculate the worst psf
         # Detect if there are larger values to account for
         # Using the wavelength dependent FWHM
+
         if len(dict_psf) > 0:
             best_fwhm = 0.
             for key in dict_psf:
