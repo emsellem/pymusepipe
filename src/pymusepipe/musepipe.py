@@ -410,6 +410,8 @@ class MusePipe(PipePrep, PipeRecipes):
         try:
             prev_folder = os.getcwd()
             newpath = os.path.normpath(newpath)
+            # Added by Amir
+            newpath = "/Users/abazkiaei/repos/muse_Jesse/Data/GECKOS/Muse/PGC044931/OB001"
             os.chdir(newpath)
             upipe.print_info(f"Going to folder {newpath}", pipe=self)
             if addtolog:
@@ -621,6 +623,9 @@ class MusePipe(PipePrep, PipeRecipes):
                 self.Tables.Rawfiles[namecol] = MUSE_infodic[k][idxsort]
 
             # Writing up the table
+            # added by Amir
+            # newpath = "/Users/abazkiaei/repos/muse_Jesse/Data/GECKOS/Muse/PGC044931/OB001"
+            name_table = "/Users/abazkiaei/repos/muse_Jesse/Data/GECKOS/Muse/PGC044931/OB001/Astro_tables/RAW_rawfiles_list_table.fits"
             self.Tables.Rawfiles.write(name_table, format="fits",
                                        overwrite=overwrite)
 

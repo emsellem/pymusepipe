@@ -4,10 +4,10 @@
 """MUSE-PHANGS preparation recipe module
 """
 
-__authors__ = "Eric Emsellem"
+__authors__   = "Eric Emsellem"
 __copyright__ = "(c) 2017, ESO + CRAL"
-__license__ = "MIT License"
-__contact__ = " <eric.emsellem@eso.org>"
+__license__   = "MIT License"
+__contact__   = " <eric.emsellem@eso.org>"
 
 # Importing modules
 import os
@@ -24,7 +24,7 @@ from .create_sof import SofPipe
 from .align_pipe import AlignMuseDataset
 from . import musepipe
 from .mpdaf_pipe import MuseSkyContinuum, MuseFilter
-from .util_pipe import check_filter_list, _get_combine_products, add_listpath
+from .util_pipe import check_filter_list
 from .util_image import create_offset_table
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
                           dict_recipes_per_num, dict_recipes_per_name,
@@ -32,26 +32,36 @@ from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipe
                           dict_products_scipost)
 from .emission_lines import get_emissionline_band
 
-try:
+try :
     import astropy as apy
     from astropy.io import fits as pyfits
-except ImportError:
+except ImportError :
     raise Exception("astropy is required for this module")
 
 # =======================================================
-#                Few useful functions
+# Few useful functions
 # =======================================================
-# ----------- Define the print_my_method_name property -------- #
+def add_listpath(suffix, paths) :
+    """Add a suffix to a list of path
+    and normalise them
+    """
+    newlist = []
+    for mypath in paths:
+        newlist.append(upipe.normpath(joinpath(suffix, mypath)))
+    return newlist
+
+def norm_listpath(paths) :
+    """Normalise the path for a list of paths
+    """
+    newlist = []
+    for mypath in paths:
+        newlist.append(upipe.normpath(mypath))
+    return newlist
+
 import functools
-
-
-def print_my_method_name(f):
+def print_my_function_name(f):
     """Function to provide a print of the name of the function
     Can be used as a decorator
-
-    Input
-    -----
-    f: method
     """
     @functools.wraps(f)
     def wrapped(*myargs, **mykwargs):
@@ -59,11 +69,34 @@ def print_my_method_name(f):
         return f(*myargs, **mykwargs)
     return wrapped
 
+def _get_combine_products(filter_list='white', prefix_all=""):
+    """Provide a set of key output products depending on the filters
+    for combine
+    """
+    name_products = []
+    suffix_products = []
+    suffix_prefinalnames = []
+    prefix_products = []
+    filter_list = check_filter_list(filter_list)
+    for prod in dict_products_scipost['cube']:
+        if prod == "IMAGE_FOV":
+            for i, value in enumerate(filter_list, start=1):
+                suffix_products.append(f"_{i:04d}")
+                suffix_prefinalnames.append(f"_{value}")
+                name_products.append(prod)
+                prefix_products.append(prefix_all)
+        else :
+            suffix_products.append("")
+            suffix_prefinalnames.append("")
+            name_products.append(prod)
+            prefix_products.append(prefix_all)
 
-# ##################################################################
-#  Class for preparing the launch of recipes
-# ##################################################################
-class PipePrep(SofPipe):
+    return name_products, suffix_products, suffix_prefinalnames, prefix_products
+
+###################################################################
+# Class for preparing the launch of recipes
+###################################################################
+class PipePrep(SofPipe) :
     """PipePrep class prepare the SOF files and launch the recipes
     """
     def __init__(self, first_recipe=1, last_recipe=None):
@@ -90,24 +123,23 @@ class PipePrep(SofPipe):
         """Selecting a subset of files from a certain type
         """
         if expotype not in musepipe.dict_expotypes:
-            upipe.print_info(
-                "ERROR: input {0} is not in the list of possible values".format(expotype),
-                pipe=self)
-            return
+            upipe.print_info("ERROR: input {0} is not in the list of possible values".format(expotype),
+                    pipe=self)
+            return 
 
-        muse_subtable = self._get_table_expo(expotype, stage)
-        if len(muse_subtable) == 0:
-            if self.verbose:
+        MUSE_subtable = self._get_table_expo(expotype, stage)
+        if len(MUSE_subtable) == 0:
+            if self.verbose :
                 upipe.print_warning("Empty file table of type {0}".format(expotype),
-                                    pipe=self)
+                        pipe=self)
                 upipe.print_warning("Returning an empty Table from the tpl -astropy- selection",
-                                    pipe=self)
-            return muse_subtable
+                        pipe=self)
+            return MUSE_subtable
 
-        group_table = muse_subtable.group_by('tpls')
+        group_table = MUSE_subtable.group_by('tpls')
         if tpl == "ALL":
             return group_table
-        else:
+        else :
             return group_table.groups[group_table.groups.keys['tpls'] == tpl]
         
     @staticmethod
@@ -120,7 +152,7 @@ class PipePrep(SofPipe):
             print("{0}: {1}".format(key, dict_recipes_per_num[key]))
         upipe.print_info("=============================================")
 
-    @print_my_method_name
+    @print_my_function_name
     def run_recipes(self, **kwargs):
         """Running all recipes in one shot
 
@@ -153,22 +185,16 @@ class PipePrep(SofPipe):
 
         # Dictionary of arguments for each recipe
         default_dict_kwargs_recipes = {'twilight': {'illum': defval.illum},
-                                       'scibasic_all': {'illum': defval.illum},
-                                       'sky': {'fraction': defval.fraction},
-                                       'prep_align': {'skymethod': defval.skymethod,
-                                                      'skymodel_fraction': defval.skymodel_fraction,
-                                                      'filter_for_alignment':
-                                                          defval.filter_for_alignment,
-                                                      'line': defval.line,
-                                                      'lambda_window': defval.lambda_window
-                                                      },
-                                       'scipost_per_expo': {'skymethod': defval.skymethod,
-                                                            'skymodel_fraction':
-                                                                defval.skymodel_fraction},
-                                       'scipost': {'skymethod': defval.skymethod,
-                                                   'skymodel_fraction':
-                                                       defval.skymodel_fraction}
-                                       }
+                             'scibasic_all': {'illum': defval.illum},
+                             'sky': {'fraction': defval.fraction},
+                             'prep_align': {'skymethod': defval.skymethod, 
+                                            'filter_for_alignment': defval.filter_for_alignment,
+                                            'line': defval.line,
+                                            'lambda_window': defval.lambda_window
+                                            },
+                             'scipost_per_expo': {'skymethod': defval.skymethod},
+                             'scipost': {'skymethod': defval.skymethod}
+                             }
 
         dict_kwargs_recipes = kwargs.pop("param_recipes", {})
         for key in default_dict_kwargs_recipes:
@@ -180,8 +206,7 @@ class PipePrep(SofPipe):
         # First and last recipe to be used
         first_recipe = kwargs.pop("first_recipe", self.first_recipe)
         last_recipe = kwargs.pop("last_recipe", self.last_recipe)
-        if last_recipe is None:
-            last_recipe = np.max(list(dict_recipes_per_num.keys()))
+        if last_recipe is None: last_recipe = np.max(list(dict_recipes_per_num.keys()))
 
         # Transforming first and last if they are strings and not numbers
         if isinstance(first_recipe, str):
@@ -213,9 +238,9 @@ class PipePrep(SofPipe):
                 kdic = {}
             getattr(self, name_recipe)(**kdic)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_phangs_recipes(self, fraction=0.8, illum=True, skymethod="model",
-                           **kwargs):
+                                **kwargs):
         """Running all PHANGS recipes in one shot
         Using the basic set up for the general list of recipes
 
@@ -231,7 +256,7 @@ class PipePrep(SofPipe):
         """
         self.run_recipes(fraction=fraction, skymethod=skymethod, illum=illum, **kwargs)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_bias(self, sof_filename='bias', tpl="ALL", update=None):
         """Reducing the Bias files and creating a Master Bias
         Will run the esorex muse_bias command on all Biases
@@ -241,15 +266,14 @@ class PipePrep(SofPipe):
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
-        update:
 
         """
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='BIAS', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose:
+            if self.verbose :
                 upipe.print_error("[run_bias] No BIAS recovered from the astropy Table - Aborting",
-                                  pipe=self)
+                        pipe=self)
             return
 
         # Go to the data folder
@@ -262,7 +286,7 @@ class PipePrep(SofPipe):
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
             self._sofdict['BIAS'] = add_listpath(self.paths.rawfiles,
-                                                 list(gtable['filename']))
+                    list(gtable['filename']))
             # extract the tpl (string)
             tpl = gtable['tpls'][0]
             # Writing the sof file
@@ -279,7 +303,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_flat(self, sof_filename='flat', tpl="ALL", update=None):
         """Reducing the Flat files and creating a Master Flat
         Will run the esorex muse_flat command on all Flats
@@ -289,15 +313,14 @@ class PipePrep(SofPipe):
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
-        update:
 
         """
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='FLAT', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose:
+            if self.verbose :
                 upipe.print_error("[run_flat] No FLAT recovered from the astropy Table - Aborting",
-                                  pipe=self)
+                        pipe=self)
             return
 
         # Go to the data folder
@@ -310,7 +333,7 @@ class PipePrep(SofPipe):
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
             self._sofdict['FLAT'] = add_listpath(self.paths.rawfiles,
-                                                 list(gtable['filename']))
+                    list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Adding the best tpc MASTER_BIAS
@@ -332,7 +355,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_wave(self, sof_filename='wave', tpl="ALL", update=None):
         """Reducing the WAVE-CAL files and creating the Master Wave
         Will run the esorex muse_wave command on all Flats
@@ -342,15 +365,14 @@ class PipePrep(SofPipe):
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
-        update:
 
         """
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose:
-                upipe.print_error("[run_wave] No WAVE recovered from the astropy file Table "
-                                  "- Aborting", pipe=self)
+            if self.verbose :
+                upipe.print_error("[run_wave] No WAVE recovered from the astropy file Table - Aborting", 
+                        pipe=self)
             return
 
         # Go to the data folder
@@ -363,7 +385,8 @@ class PipePrep(SofPipe):
         self._add_calib_to_sofdict("LINE_CATALOG")
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
-            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles, list(gtable['filename']))
+            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles,
+                    list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Finding the best tpl for BIAS + TRACE
@@ -382,7 +405,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_lsf(self, sof_filename='lsf', tpl="ALL", update=None):
         """Reducing the LSF files and creating the LSF PROFILE
         Will run the esorex muse_lsf command on all Flats
@@ -392,15 +415,14 @@ class PipePrep(SofPipe):
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
-        update:
 
         """
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='WAVE', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose:
-                upipe.print_error("[run_lsf] No WAVE recovered from the astropy file Table "
-                                  "- Aborting", pipe=self)
+            if self.verbose :
+                upipe.print_error("[run_lsf] No WAVE recovered from the astropy file Table - Aborting", 
+                        pipe=self)
             return
 
         # Go to the data folder
@@ -413,7 +435,8 @@ class PipePrep(SofPipe):
         self._add_calib_to_sofdict("LINE_CATALOG")
         for gtable in tpl_gtable.groups:
             # Provide the list of files to the dictionary
-            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles, list(gtable['filename']))
+            self._sofdict['ARC'] = add_listpath(self.paths.rawfiles,
+                    list(gtable['filename']))
             # extract the tpl (string) and mean mjd (float) 
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Finding the best tpl for BIAS, TRACE, WAVE
@@ -432,7 +455,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_twilight(self, sof_filename='twilight', tpl="ALL", update=None, illum=True):
         """Reducing the  files and creating the TWILIGHT CUBE.
         Will run the esorex muse_twilight command on all TWILIGHT
@@ -442,8 +465,6 @@ class PipePrep(SofPipe):
         sof_filename: string (without the file extension)
             Name of the SOF file which will contain the Bias frames
         tpl: ALL by default or a special tpl time
-        update:  bool
-        illum: bool
 
         """
         # First selecting the files via the grouped table
@@ -485,7 +506,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_scibasic_all(self, list_object=['OBJECT', 'SKY', 'STD'], tpl="ALL",
                          illum=True, **kwargs):
         """Running scibasic for all objects in list_object
@@ -496,7 +517,7 @@ class PipePrep(SofPipe):
             self.run_scibasic(sof_filename=sof_filename, expotype=expotype,
                               tpl=tpl, illum=illum, **kwargs)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_scibasic(self, sof_filename='scibasic', expotype="OBJECT", tpl="ALL", illum=True,
                      update=True, overwrite=True):
         """Reducing the files of a certain category and creating the PIXTABLES
@@ -568,7 +589,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_standard(self, sof_filename='standard', tpl="ALL", update=None,
                      overwrite=True):
         """Reducing the STD files after they have been obtained
@@ -615,7 +636,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_sky(self, sof_filename='sky', tpl="ALL", fraction=0.8,
                 update=None, overwrite=True):
         """Reducing the SKY after they have been scibasic reduced
@@ -667,7 +688,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_autocal_sky(self, sof_filename='scipost', expotype="SKY", 
             AC_suffix="_AC", tpl="ALL", **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
@@ -686,7 +707,7 @@ class PipePrep(SofPipe):
                     offset_list=False, suffix=AC_suffix, autocalib='deepfield', 
                     **extra_kwargs)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
             line=None, suffix="", **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
@@ -725,7 +746,7 @@ class PipePrep(SofPipe):
                     offset_list=False, filter_list=filter_for_alignment,
                     **extra_kwargs)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_check_align(self, name_offset_table, sof_filename='scipost', expotype="OBJECT", tpl="ALL",
             line=None, suffix="", folder_offset_table=None, **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
@@ -767,7 +788,7 @@ class PipePrep(SofPipe):
                     folder_offset_table=folder_offset_table,
                     **extra_kwargs)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT", 
                             list_tplexpo="ALL", stage="processed",
                             suffix="", offset_list=False, **kwargs):
@@ -953,13 +974,13 @@ class PipePrep(SofPipe):
 
         return prefix_skycont
 
-    @print_my_method_name
+    @print_my_function_name
     def run_scipost_sky(self):
         """Run scipost for the SKY with no offset list and no skymethod
         """
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
 
-    @print_my_method_name
+    @print_my_function_name
     def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
             stage="processed", list_expo=[], 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
@@ -1157,7 +1178,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_align_bygroup(self, sof_filename='exp_align_bygroup', expotype="OBJECT", 
             list_expo=[], stage="processed", line=None, suffix="",
             tpl="ALL", **kwargs):
@@ -1234,7 +1255,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
         
-    @print_my_method_name
+    @print_my_function_name
     def run_align_bydataset(self, sof_filename='exp_align_bydataset', expotype="OBJECT",
             list_expo=[], stage="processed", line=None, suffix="",
             tpl="ALL", **kwargs):
@@ -1316,7 +1337,7 @@ class PipePrep(SofPipe):
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
-    @print_my_method_name
+    @print_my_function_name
     def save_fine_alignment(self, name_offset_table=None):
         """ Save the fine dataset alignment
         """
@@ -1327,7 +1348,7 @@ class PipePrep(SofPipe):
         tstamp = self.dict_alignments.present_tstamp
         self.dict_alignments[tstamp].save(name_offset_table)
 
-    @print_my_method_name
+    @print_my_function_name
     def run_fine_alignment(self, name_ima_reference=None, nexpo=1, list_expo=[],
                            line=None, bygroup=False, reset=False, **kwargs):
         """Run the alignment on this dataset using or not a reference image
@@ -1356,7 +1377,7 @@ class PipePrep(SofPipe):
         tstamp = self.dict_alignments.present_tstamp
         self.dict_alignments[tstamp].run(nexpo)
         
-    @print_my_method_name
+    @print_my_function_name
     def get_align_group(self, name_ima_reference=None, list_expo=[], line=None, 
             suffix="", bygroup=False, **kwargs):
         """Extract the needed information for a set of exposures to be aligned
@@ -1403,7 +1424,7 @@ class PipePrep(SofPipe):
                 self.align_group.append(AlignMuseDataset(name_ima_reference,
                     list_names_muse, flag="mytpl"))
 
-    @print_my_method_name
+    @print_my_function_name
     def run_combine_dataset(self, sof_filename='exp_combine', expotype="OBJECT",
             list_expo=[], stage="processed", tpl="ALL", 
             lambdaminmax=[4000.,10000.], suffix="", **kwargs):
@@ -1479,12 +1500,12 @@ class PipePrep(SofPipe):
                 _get_combine_products(filter_list, prefix_all=prefix_all) 
 
         # Combine the exposures 
-        self.recipe_combine(self.current_sof, dir_products, name_products, tpl, expotype,
-                            suffix_products=suffix_products,
-                            suffix_prefinalnames=suffix_prefinalnames,
-                            prefix_products=prefix_products,
-                            lambdamin=lambdamin, lambdamax=lambdamax,
-                            save=save, suffix=suffix, filter_list=filter_list, **kwargs)
+        self.recipe_combine(self.current_sof, dir_products, name_products, 
+                tpl, expotype, suffix_products=suffix_products,
+                suffix_prefinalnames=suffix_prefinalnames,
+                prefix_products=prefix_products,
+                lambdamin=lambdamin, lambdamax=lambdamax,
+                save=save, suffix=suffix, filter_list=filter_list, **kwargs)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)

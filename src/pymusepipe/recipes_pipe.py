@@ -107,6 +107,8 @@ class PipeRecipes(object) :
                 upipe.formatted_time(),
                 " FAKEMODE" if self.fakemode else "",
                 pipeversion, text) 
+        # Added by Amir
+        self.paths.log_filename = '/Users/abazkiaei/repos/muse_Jesse/Data/GECKOS/Muse/PGC044931/Combined/Log/MusePipeCombine.log'
         upipe.append_file(self.paths.log_filename+addext, fulltext)
 
     def run_oscommand(self, command, log=True) :
@@ -230,29 +232,26 @@ class PipeRecipes(object) :
     #       tpl = tpls of the exposure
     #       suff_post = number of expo if relevant (2 integer)
     def recipe_scipost(self, sof, tpl, expotype, dir_products="", name_products=[""],
-                       suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""],
-                       list_expo=[], save='cube,skymodel', filter_list='white',
-                       skymethod='model', pixfrac=0.8, darcheck='none', skymodel_fraction=0.05,
-                       astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="",
-                       autocalib='none', rvcorr='bary', **kwargs):
+            suffix_products=[""], suffix_prefinalnames=[""], suffix_postfinalnames=[""], 
+            list_expo=[], save='cube,skymodel', filter_list='white', 
+            skymethod='model', pixfrac=0.8, darcheck='none', skymodel_frac=0.05, 
+            astrometry='TRUE', lambdamin=4000., lambdamax=10000., suffix="",
+            autocalib='none', rvcorr='bary', **kwargs):
         """Running the esorex muse_scipost recipe
         """
         filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
         prefix_all = kwargs.pop("prefix_all", "")
         filter_list = filter_list_to_str(filter_list)
         self.run_oscommand("{esorex} --log-file=scipost_{expotype}_{tpl}.log muse_scipost  "
-                           "--astrometry={astro} --save={save} "
-                           "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
-                           "--darcheck={darcheck} --skymodel_fraction={model:02f} "
-                           "--lambdamin={lmin} --lambdamax={lmax} --autocalib={autocalib} "
-                           "--rvcorr={rvcorr} {sof}".format(esorex=self.esorex, astro=astrometry,
-                                                            save=save, pixfrac=pixfrac,
-                                                            filt=filter_list, skym=skymethod,
-                                                            darcheck=darcheck,
-                                                            model=skymodel_fraction, lmin=lambdamin,
-                                                            lmax=lambdamax, autocalib=autocalib,
-                                                            sof=sof, expotype=expotype,
-                                                            tpl=tpl, rvcorr=rvcorr))
+                "--astrometry={astro} --save={save} "
+                "--pixfrac={pixfrac}  --filter={filt} --skymethod={skym} "
+                "--darcheck={darcheck} --skymodel_frac={model:02f} "
+                "--lambdamin={lmin} --lambdamax={lmax} --autocalib={autocalib} "
+                "--rvcorr={rvcorr} {sof}".format(esorex=self.esorex, astro=astrometry, 
+                    save=save, pixfrac=pixfrac, filt=filter_list, skym=skymethod, 
+                    darcheck=darcheck, model=skymodel_frac, lmin=lambdamin,
+                    lmax=lambdamax, autocalib=autocalib, sof=sof, expotype=expotype, 
+                    tpl=tpl, rvcorr=rvcorr))
 
         # Creating the images for the alignment, outside of scipost
         # The filter can be a private one
@@ -313,10 +312,10 @@ class PipeRecipes(object) :
                 name_imaout=joinpath(dir_products, nameout_prod)))
 
     def recipe_combine(self, sof, dir_products, name_products, tpl, expotype,
-                       suffix_products=(""), suffix_prefinalnames=(""),
-                       prefix_products=(""), save='cube', pixfrac=0.6, suffix="",
-                       format_out='Cube', filter_list='white',
-                       lambdamin=4000., lambdamax=10000.):
+            suffix_products=(""), suffix_prefinalnames=(""),
+            prefix_products=(""), save='cube', pixfrac=0.6, suffix="",
+            format_out='Cube', filter_list='white',
+            lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for one single dataset
         """
         filter_list = filter_list_to_str(filter_list)
@@ -330,15 +329,16 @@ class PipeRecipes(object) :
 
         for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products, 
                 suffix_prefinalnames, prefix_products):
-            self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod + suff_prod)}.fits "
-                               f"{joinpath(dir_products, pre_prod + name_prod)}"
+
+            self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod+suff_prod)}.fits "
+                               f"{joinpath(dir_products, pre_prod+name_prod)}"
                                f"{suffix}{suff_pre}_{self._get_dataset_name()}_{tpl}.fits")
 
     def recipe_combine_pointings(self, sof, dir_products, name_products,
-                                 suffix_products=(""), suffix_prefinalnames=(""),
-                                 prefix_products=(""), save='cube', pixfrac=0.6, suffix="",
-                                 format_out='Cube', filter_list='white',
-                                 lambdamin=4000., lambdamax=10000.):
+            suffix_products=(""), suffix_prefinalnames=(""),
+            prefix_products=(""), save='cube', pixfrac=0.6, suffix="",
+            format_out='Cube', filter_list='white', 
+            lambdamin=4000., lambdamax=10000.):
         """Running the muse_exp_combine recipe for pointings
         """
         filter_list = filter_list_to_str(filter_list)
@@ -348,35 +348,11 @@ class PipeRecipes(object) :
                            f"--lambdamin={lambdamin} --lambdamax={lambdamax} "
                            f"{sof}")
 
-        for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products,
-                                                            suffix_prefinalnames, prefix_products):
-            name_imaout = f"{joinpath(dir_products, pre_prod + name_prod)}{suffix}{suff_pre}.fits"
-            self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod + suff_prod)}.fits "
-                               f"{name_imaout}")
-            if "DATACUBE" in name_imaout:
-                self._combined_cube_name = name_imaout
+        for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products, 
+                suffix_prefinalnames, prefix_products):
 
-    def recipe_combine_pointings_scipost(self, sof, dir_products, name_products,
-                                         suffix_products=(""), suffix_prefinalnames=(""),
-                                         prefix_products=(""), save='cube', pixfrac=0.6, suffix="",
-                                         format_out='Cube', filter_list='white',
-                                         crsigma=10., rc=1.25,
-                                         lambdamin=4000., lambdamax=10000.):
-        """Running the muse_exp_combine recipe for pointings
-        """
-        filter_list = filter_list_to_str(filter_list)
-        self.run_oscommand(f"{self.esorex}  --log-file=combine_pointings_scipost.log "
-                           f" muse_scipost --save={save} --pixfrac={pixfrac:0.2f} "
-                           f"--crsigma={crsigma} --rc={rc} --skymethod='none' --astrometry='FALSE' "
-                           f"--format={format_out} --filter={filter_list} "
-                           f"--lambdamin={lambdamin} --lambdamax={lambdamax} "
-                           f"{sof}")
-
-        for name_prod, suff_prod, suff_pre, pre_prod in zip(name_products, suffix_products,
-                                                            suffix_prefinalnames, prefix_products):
-
-            name_imaout = f"{joinpath(dir_products, pre_prod + name_prod)}{suffix}{suff_pre}.fits"
-            self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod + suff_prod)}.fits "
+            name_imaout = f"{joinpath(dir_products, pre_prod+name_prod)}{suffix}{suff_pre}.fits"
+            self.run_oscommand(f"{self.nocache} mv {self.joinprod(name_prod+suff_prod)}.fits "
                                f"{name_imaout}")
             if "DATACUBE" in name_imaout:
                 self._combined_cube_name = name_imaout

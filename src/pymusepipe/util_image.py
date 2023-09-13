@@ -32,7 +32,7 @@ from mpdaf.drs import PixTable
 # Import package modules
 from . import util_pipe as upipe
 from .util_pipe import get_dataset_tpl_nexpo, append_value_to_dict
-from .config_pipe import (default_ndigits, default_str_dataset, default_offset_table, default_filter_list)
+from .config_pipe import (default_ndigits, default_str_dataset, default_offset_table)
 from .config_pipe import mjd_names, date_names, tpl_names, iexpo_names, dataset_names
 
 try:
@@ -1106,6 +1106,8 @@ class PointingTable(object):
             folderout: str default=folder input
                 Output folder for the tablename when writing
             table_format: str default=ascii
+            guess: bool default=False
+                Guess column formatting of the file.
             verbose: bool default=False
 
         """
@@ -1119,6 +1121,7 @@ class PointingTable(object):
         self.folderout = kwargs.pop("folderout", self.folder)
 
         self.table_format = kwargs.pop("table_format", "ascii")
+        self.guess = kwargs.pop("guess", False)
         self.verbose = kwargs.pop("verbose", False)
         # Init an empty table
         self.qtable = QTable()
@@ -1162,7 +1165,7 @@ class PointingTable(object):
         return joinpath(self.folder, self.tablename)
 
     @property
-    def fulltablenameout(self):
+    def fullnameout(self):
         if self.tablenameout is None:
             tablenameout = self.tablename
         else:
@@ -1236,20 +1239,21 @@ class PointingTable(object):
         overwrite: bool default=False
         **kwargs:
             Valid keywords are
-            folderout: str
-            tablenameout: str
+            folder: str
+            nameout: str
             Extra keywords are passed to the astropy QTable.write() function
 
         Writes the pointing table on disk
         """
         # Reading the input
-        self.folderout = kwargs.pop("folderout", self.folderout)
-        self.tablenameout = kwargs.pop("tablenameout", self.tablenameout)
-        if self.tablenameout is None:
+        folder = kwargs.pop("folder", self.folderout)
+        nameout = kwargs.pop("nameout", self.tablename)
+        if nameout is None:
             upipe.print_error("No provided output filename")
 
         # Writing up using the astropy QTable write
-        self.qtable.write(self.fulltablenameout, overwrite=overwrite, **kwargs)
+        fullnameout = joinpath(folder, nameout)
+        self.qtable.write(fullnameout, overwrite=overwrite, **kwargs)
 
     def set_select_value(self, filename, value=1, verbose=False):
         """Set the value of the select column to 1, according to a given filename
@@ -1298,13 +1302,10 @@ class PointingTable(object):
         # If no selection is done, just select all by default
         if "select" in self.qtable.colnames:
             if overwrite:
-                upipe.print_warning(f"Resetting all select values to {value}")
                 self.qtable.replace_column(name='select',
                                                    col=[int(value)] * len(self.qtable),
                                                    copy=False)
         else:
-            upipe.print_warning(f"Column 'select' is missing: adding it and reset values to"
-                                f" {value}")
             self.qtable.add_column([int(value)] * len(self.qtable), name='select')
 
     def _reset_pointing(self, overwrite=False):
@@ -1358,12 +1359,12 @@ class PointingTable(object):
             self.assign_pointings()
 
     def read(self, **kwargs):
-        """Read the input tablename in given folder assuming a given format.
+        """Read the input filename in given folder assuming a given format.
 
         Input
         -----
         filename: str, optional
-            Name of the tablename
+            Name of the filename
         folder: str default='', optional
             Name of the folder where to find the filename
         table_format: str default='ascii'
@@ -1372,14 +1373,16 @@ class PointingTable(object):
         -------
         self.qtable with the content of the file
         """
-        self.tablename = kwargs.pop("tablename", self.tablename)
+        self.tablename = kwargs.pop("filename", self.filename)
         self.folder = kwargs.pop("folder", self.folder)
         self.table_format = kwargs.pop("table_format", self.table_format)
-        if not os.path.exists(self.fulltablename):
-            upipe.print_error(f"Pointing Table {self.fulltablename} does not exist. Cannot open")
+        self.guess = kwargs.pop("guess", self.guess)
+        if not os.path.exists(self.fullname):
+            upipe.print_error(f"Pointing Table {self.fullname} does not exist. Cannot open")
             return
 
-        qtable = QTable.read(self.fulltablename, format=self.table_format, **kwargs)
+        qtable = QTable.read(self.fullname, format=self.table_format, guess=self.guess,
+                                          **kwargs)
         self._init_qtable(qtable)
 
     def _get_centres(self, dtype="guess", center_dict=None, **kwargs):
@@ -1501,7 +1504,6 @@ class PointingTable(object):
         # Now getting the selections
         list_datasets = kwargs.pop("list_datasets", self.list_datasets)
         list_pointings = kwargs.pop("list_pointings", self.list_pointings)
-        overwrite = kwargs.pop("overwrite", True)
 
         if list_datasets is None:
             list_datasets = self.list_datasets
@@ -1514,8 +1516,7 @@ class PointingTable(object):
             if p not in list_pointings or d not in list_datasets:
                 row['select'] = int(0)
             else:
-                if overwrite:
-                    row['select'] = int(1)
+                row['select'] = int(1)
 
     def select_pointings(self, **kwargs):
         """Select all filenames with pointings in the pointing list
@@ -1529,7 +1530,6 @@ class PointingTable(object):
         'select' values in the astropy pointing table according to the list of pointings
         """
         list_pointings = kwargs.pop("list_pointings", self.list_pointings)
-        overwrite = kwargs.pop("overwrite", True)
         if list_pointings is None:
             list_pointings = self.list_pointings
 
@@ -1539,8 +1539,7 @@ class PointingTable(object):
             if p not in list_pointings:
                 row['select'] = int(0)
             else:
-                if overwrite:
-                    row['select'] = int(1)
+                row['select'] = int(1)
 
     def select_datasets(self, **kwargs):
         """Select all filenames with a given list of datasets
@@ -1554,7 +1553,6 @@ class PointingTable(object):
         'select' values in the astropy pointing table according to the list of datasets
         """
         list_datasets = kwargs.pop("list_datasets", self.list_datasets)
-        overwrite = kwargs.pop("overwrite", True)
         if list_datasets is None:
             list_datasets = self.list_datasets
 
@@ -1564,8 +1562,7 @@ class PointingTable(object):
             if d not in list_datasets:
                 row['select'] = int(0)
             else:
-                if overwrite:
-                    row['select'] = int(1)
+                row['select'] = int(1)
 
     @property
     def selected_filenames(self):
@@ -1667,21 +1664,3 @@ class PointingTable(object):
             append_value_to_dict(dict_tplexpo, row['pointing'], value)
 
         return dict_tplexpo
-
-
-def reconstruct_filter_images(cubename, filter_list=default_filter_list,
-                              filter_fits_file="filter_list.fits"):
-    """ Reconstruct all images in a list of Filters
-    cubename: str
-        Name of the cube
-    filter_list: str
-        List of filters, e.g., "Cousins_R,Johnson_I"
-        By default, the default_filter_list from pymusepipe.config_pipe
-
-    filter_fits_file: str
-        Name of the fits file containing all the filter characteristics
-        Usually in filter_list.fits (MUSE default)
-    """
-    
-    command = "muse_cube_filter -f {0} {1} {2}".format(filter_list, cubename, filter_fits_file)
-    os.system(command)

@@ -641,7 +641,10 @@ class AlignMuseDataset(object):
 
         # Get the MUSE images
         self._get_list_muse_images()
+        import pdb; pdb.set_trace()
         upipe.print_info("{0} MUSE images detected as input".format(self.nimages))
+        # added by Amir
+        self.nimages = 2
         if self.nimages == 0:
             upipe.print_error("No MUSE images detected. Aborted")
             return

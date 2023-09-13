@@ -116,6 +116,14 @@ pymusepipe.target\_sample module
    :undoc-members:
    :show-inheritance:
 
+pymusepipe.util\_image module
+-----------------------------
+
+.. automodule:: pymusepipe.util_image
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pymusepipe.util\_pipe module
 ----------------------------
 

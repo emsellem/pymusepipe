@@ -1,0 +1,376 @@
+\indexentry{module@\spxentry{module}!pymusepipe.align\_pipe@\spxentry{pymusepipe.align\_pipe}|hyperpage}{10}
+\indexentry{pymusepipe.align\_pipe@\spxentry{pymusepipe.align\_pipe}!module@\spxentry{module}|hyperpage}{10}
+\indexentry{AlignMuseDataset (class in pymusepipe.align\_pipe)@\spxentry{AlignMuseDataset}\spxextra{class in pymusepipe.align\_pipe}|hyperpage}{10}
+\indexentry{apply\_extra\_offset\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{apply\_extra\_offset\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{10}
+\indexentry{apply\_optical\_flow\_offset\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{apply\_optical\_flow\_offset\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{11}
+\indexentry{apply\_optical\_flow\_offset\_listima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{apply\_optical\_flow\_offset\_listima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{11}
+\indexentry{compare() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{compare()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{11}
+\indexentry{compare\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{compare\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{12}
+\indexentry{find\_cross\_peak() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{find\_cross\_peak()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{12}
+\indexentry{find\_cross\_peak\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{find\_cross\_peak\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{12}
+\indexentry{find\_cross\_peak\_listima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{find\_cross\_peak\_listima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{13}
+\indexentry{get\_imaref\_muse() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{get\_imaref\_muse()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{13}
+\indexentry{get\_normfactor\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{get\_normfactor\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{13}
+\indexentry{get\_shift\_from\_pcc() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{get\_shift\_from\_pcc()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{14}
+\indexentry{get\_shift\_from\_pcc\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{get\_shift\_from\_pcc\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{14}
+\indexentry{get\_shift\_from\_pcc\_listima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{get\_shift\_from\_pcc\_listima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{15}
+\indexentry{init\_guess\_offset() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{init\_guess\_offset()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{15}
+\indexentry{init\_optical\_flow\_hdu() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{init\_optical\_flow\_hdu()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{15}
+\indexentry{init\_optical\_flow\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{init\_optical\_flow\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{15}
+\indexentry{init\_optical\_flow\_listima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{init\_optical\_flow\_listima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{16}
+\indexentry{iterate\_on\_optical\_flow\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{iterate\_on\_optical\_flow\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{16}
+\indexentry{iterate\_on\_optical\_flow\_listima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{iterate\_on\_optical\_flow\_listima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{16}
+\indexentry{list\_states() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{list\_states()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{16}
+\indexentry{offset\_and\_compare\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{offset\_and\_compare\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{17}
+\indexentry{open\_hdu() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{open\_hdu()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{17}
+\indexentry{open\_offset\_table() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{open\_offset\_table()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{17}
+\indexentry{print\_images\_names() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{print\_images\_names()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{18}
+\indexentry{print\_offsets\_and\_norms() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{print\_offsets\_and\_norms()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{18}
+\indexentry{retrieve\_state() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{retrieve\_state()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{18}
+\indexentry{run\_optical\_flow() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{run\_optical\_flow()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{18}
+\indexentry{run\_optical\_flow\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{run\_optical\_flow\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{19}
+\indexentry{save\_fits\_offset\_table() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{save\_fits\_offset\_table()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{19}
+\indexentry{save\_image() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{save\_image()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{20}
+\indexentry{save\_polypar\_ima() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{save\_polypar\_ima()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{20}
+\indexentry{save\_state() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{save\_state()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{20}
+\indexentry{show\_linearfit\_values() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{show\_linearfit\_values()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{20}
+\indexentry{show\_norm\_factors() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{show\_norm\_factors()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{20}
+\indexentry{show\_offset\_fromfits() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{show\_offset\_fromfits()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{20}
+\indexentry{show\_offsets() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{show\_offsets()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{21}
+\indexentry{transfer\_extra\_to\_guess() (pymusepipe.align\_pipe.AlignMuseDataset method)@\spxentry{transfer\_extra\_to\_guess()}\spxextra{pymusepipe.align\_pipe.AlignMuseDataset method}|hyperpage}{21}
+\indexentry{OffsetState (class in pymusepipe.align\_pipe)@\spxentry{OffsetState}\spxextra{class in pymusepipe.align\_pipe}|hyperpage}{21}
+\indexentry{align\_hdu() (in module pymusepipe.align\_pipe)@\spxentry{align\_hdu()}\spxextra{in module pymusepipe.align\_pipe}|hyperpage}{21}
+\indexentry{arcsec\_to\_pixel() (in module pymusepipe.align\_pipe)@\spxentry{arcsec\_to\_pixel()}\spxextra{in module pymusepipe.align\_pipe}|hyperpage}{21}
+\indexentry{get\_conversion\_factor() (in module pymusepipe.align\_pipe)@\spxentry{get\_conversion\_factor()}\spxextra{in module pymusepipe.align\_pipe}|hyperpage}{22}
+\indexentry{init\_plot\_optical\_flow() (in module pymusepipe.align\_pipe)@\spxentry{init\_plot\_optical\_flow()}\spxextra{in module pymusepipe.align\_pipe}|hyperpage}{24}
+\indexentry{is\_sequence() (in module pymusepipe.align\_pipe)@\spxentry{is\_sequence()}\spxextra{in module pymusepipe.align\_pipe}|hyperpage}{24}
+\indexentry{pixel\_to\_arcsec() (in module pymusepipe.align\_pipe)@\spxentry{pixel\_to\_arcsec()}\spxextra{in module pymusepipe.align\_pipe}|hyperpage}{24}
+\indexentry{rotate\_pixtable() (in module pymusepipe.align\_pipe)@\spxentry{rotate\_pixtable()}\spxextra{in module pymusepipe.align\_pipe}|hyperpage}{25}
+\indexentry{rotate\_pixtables() (in module pymusepipe.align\_pipe)@\spxentry{rotate\_pixtables()}\spxextra{in module pymusepipe.align\_pipe}|hyperpage}{25}
+\indexentry{module@\spxentry{module}!pymusepipe.check\_pipe@\spxentry{pymusepipe.check\_pipe}|hyperpage}{26}
+\indexentry{pymusepipe.check\_pipe@\spxentry{pymusepipe.check\_pipe}!module@\spxentry{module}|hyperpage}{26}
+\indexentry{CheckPipe (class in pymusepipe.check\_pipe)@\spxentry{CheckPipe}\spxextra{class in pymusepipe.check\_pipe}|hyperpage}{26}
+\indexentry{check\_given\_images() (pymusepipe.check\_pipe.CheckPipe method)@\spxentry{check\_given\_images()}\spxextra{pymusepipe.check\_pipe.CheckPipe method}|hyperpage}{26}
+\indexentry{check\_master\_bias\_flat() (pymusepipe.check\_pipe.CheckPipe method)@\spxentry{check\_master\_bias\_flat()}\spxextra{pymusepipe.check\_pipe.CheckPipe method}|hyperpage}{26}
+\indexentry{check\_quadrants() (pymusepipe.check\_pipe.CheckPipe method)@\spxentry{check\_quadrants()}\spxextra{pymusepipe.check\_pipe.CheckPipe method}|hyperpage}{26}
+\indexentry{check\_sky\_spectra() (pymusepipe.check\_pipe.CheckPipe method)@\spxentry{check\_sky\_spectra()}\spxextra{pymusepipe.check\_pipe.CheckPipe method}|hyperpage}{26}
+\indexentry{check\_white\_line\_images() (pymusepipe.check\_pipe.CheckPipe method)@\spxentry{check\_white\_line\_images()}\spxextra{pymusepipe.check\_pipe.CheckPipe method}|hyperpage}{26}
+\indexentry{print\_plot() (in module pymusepipe.check\_pipe)@\spxentry{print\_plot()}\spxextra{in module pymusepipe.check\_pipe}|hyperpage}{26}
+\indexentry{module@\spxentry{module}!pymusepipe.combine@\spxentry{pymusepipe.combine}|hyperpage}{26}
+\indexentry{pymusepipe.combine@\spxentry{pymusepipe.combine}!module@\spxentry{module}|hyperpage}{26}
+\indexentry{MusePointings (class in pymusepipe.combine)@\spxentry{MusePointings}\spxextra{class in pymusepipe.combine}|hyperpage}{26}
+\indexentry{assign\_pointing\_table() (pymusepipe.combine.MusePointings method)@\spxentry{assign\_pointing\_table()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{26}
+\indexentry{create\_all\_pointings\_wcs() (pymusepipe.combine.MusePointings method)@\spxentry{create\_all\_pointings\_wcs()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{26}
+\indexentry{create\_combined\_wcs() (pymusepipe.combine.MusePointings method)@\spxentry{create\_combined\_wcs()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{27}
+\indexentry{create\_pointing\_wcs() (pymusepipe.combine.MusePointings method)@\spxentry{create\_pointing\_wcs()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{27}
+\indexentry{create\_reference\_wcs() (pymusepipe.combine.MusePointings method)@\spxentry{create\_reference\_wcs()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{27}
+\indexentry{dict\_pixtabs\_in\_datasets (pymusepipe.combine.MusePointings property)@\spxentry{dict\_pixtabs\_in\_datasets}\spxextra{pymusepipe.combine.MusePointings property}|hyperpage}{28}
+\indexentry{dict\_pixtabs\_in\_pointings (pymusepipe.combine.MusePointings property)@\spxentry{dict\_pixtabs\_in\_pointings}\spxextra{pymusepipe.combine.MusePointings property}|hyperpage}{28}
+\indexentry{dict\_tplexpo\_per\_dataset (pymusepipe.combine.MusePointings property)@\spxentry{dict\_tplexpo\_per\_dataset}\spxextra{pymusepipe.combine.MusePointings property}|hyperpage}{28}
+\indexentry{dict\_tplexpo\_per\_pointing (pymusepipe.combine.MusePointings property)@\spxentry{dict\_tplexpo\_per\_pointing}\spxextra{pymusepipe.combine.MusePointings property}|hyperpage}{28}
+\indexentry{extract\_combined\_narrow\_wcs() (pymusepipe.combine.MusePointings method)@\spxentry{extract\_combined\_narrow\_wcs()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{28}
+\indexentry{filter\_pixables\_with\_list() (pymusepipe.combine.MusePointings method)@\spxentry{filter\_pixables\_with\_list()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{28}
+\indexentry{full\_list\_datasets (pymusepipe.combine.MusePointings property)@\spxentry{full\_list\_datasets}\spxextra{pymusepipe.combine.MusePointings property}|hyperpage}{29}
+\indexentry{get\_all\_pixtables() (pymusepipe.combine.MusePointings method)@\spxentry{get\_all\_pixtables()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{29}
+\indexentry{get\_pointing\_table() (pymusepipe.combine.MusePointings method)@\spxentry{get\_pointing\_table()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{29}
+\indexentry{get\_qtable() (pymusepipe.combine.MusePointings method)@\spxentry{get\_qtable()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{29}
+\indexentry{goto\_folder() (pymusepipe.combine.MusePointings method)@\spxentry{goto\_folder()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{29}
+\indexentry{goto\_origfolder() (pymusepipe.combine.MusePointings method)@\spxentry{goto\_origfolder()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{29}
+\indexentry{goto\_prevfolder() (pymusepipe.combine.MusePointings method)@\spxentry{goto\_prevfolder()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{29}
+\indexentry{run\_combine() (pymusepipe.combine.MusePointings method)@\spxentry{run\_combine()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{30}
+\indexentry{run\_combine\_all\_single\_pointings() (pymusepipe.combine.MusePointings method)@\spxentry{run\_combine\_all\_single\_pointings()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{30}
+\indexentry{run\_combine\_single\_pointing() (pymusepipe.combine.MusePointings method)@\spxentry{run\_combine\_single\_pointing()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{30}
+\indexentry{set\_fullpath\_names() (pymusepipe.combine.MusePointings method)@\spxentry{set\_fullpath\_names()}\spxextra{pymusepipe.combine.MusePointings method}|hyperpage}{31}
+\indexentry{module@\spxentry{module}!pymusepipe.config\_pipe@\spxentry{pymusepipe.config\_pipe}|hyperpage}{31}
+\indexentry{pymusepipe.config\_pipe@\spxentry{pymusepipe.config\_pipe}!module@\spxentry{module}|hyperpage}{31}
+\indexentry{get\_suffix\_product() (in module pymusepipe.config\_pipe)@\spxentry{get\_suffix\_product()}\spxextra{in module pymusepipe.config\_pipe}|hyperpage}{31}
+\indexentry{module@\spxentry{module}!pymusepipe.create\_sof@\spxentry{pymusepipe.create\_sof}|hyperpage}{31}
+\indexentry{pymusepipe.create\_sof@\spxentry{pymusepipe.create\_sof}!module@\spxentry{module}|hyperpage}{31}
+\indexentry{SofDict (class in pymusepipe.create\_sof)@\spxentry{SofDict}\spxextra{class in pymusepipe.create\_sof}|hyperpage}{31}
+\indexentry{SofPipe (class in pymusepipe.create\_sof)@\spxentry{SofPipe}\spxextra{class in pymusepipe.create\_sof}|hyperpage}{31}
+\indexentry{write\_sof() (pymusepipe.create\_sof.SofPipe method)@\spxentry{write\_sof()}\spxextra{pymusepipe.create\_sof.SofPipe method}|hyperpage}{31}
+\indexentry{module@\spxentry{module}!pymusepipe.cube\_convolve@\spxentry{pymusepipe.cube\_convolve}|hyperpage}{31}
+\indexentry{pymusepipe.cube\_convolve@\spxentry{pymusepipe.cube\_convolve}!module@\spxentry{module}|hyperpage}{31}
+\indexentry{convolution\_kernel() (in module pymusepipe.cube\_convolve)@\spxentry{convolution\_kernel()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{31}
+\indexentry{convolution\_kernel\_gaussian() (in module pymusepipe.cube\_convolve)@\spxentry{convolution\_kernel\_gaussian()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{31}
+\indexentry{cube\_convolve() (in module pymusepipe.cube\_convolve)@\spxentry{cube\_convolve()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{32}
+\indexentry{cube\_kernel() (in module pymusepipe.cube\_convolve)@\spxentry{cube\_kernel()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{32}
+\indexentry{gaussian\_kernel() (in module pymusepipe.cube\_convolve)@\spxentry{gaussian\_kernel()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{33}
+\indexentry{moffat\_kernel() (in module pymusepipe.cube\_convolve)@\spxentry{moffat\_kernel()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{33}
+\indexentry{psf2d() (in module pymusepipe.cube\_convolve)@\spxentry{psf2d()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{33}
+\indexentry{psf3d() (in module pymusepipe.cube\_convolve)@\spxentry{psf3d()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{34}
+\indexentry{pypher\_script() (in module pymusepipe.cube\_convolve)@\spxentry{pypher\_script()}\spxextra{in module pymusepipe.cube\_convolve}|hyperpage}{34}
+\indexentry{module@\spxentry{module}!pymusepipe.emission\_lines@\spxentry{pymusepipe.emission\_lines}|hyperpage}{35}
+\indexentry{pymusepipe.emission\_lines@\spxentry{pymusepipe.emission\_lines}!module@\spxentry{module}|hyperpage}{35}
+\indexentry{doppler\_shift() (in module pymusepipe.emission\_lines)@\spxentry{doppler\_shift()}\spxextra{in module pymusepipe.emission\_lines}|hyperpage}{35}
+\indexentry{get\_emissionline\_band() (in module pymusepipe.emission\_lines)@\spxentry{get\_emissionline\_band()}\spxextra{in module pymusepipe.emission\_lines}|hyperpage}{35}
+\indexentry{get\_emissionline\_wavelength() (in module pymusepipe.emission\_lines)@\spxentry{get\_emissionline\_wavelength()}\spxextra{in module pymusepipe.emission\_lines}|hyperpage}{35}
+\indexentry{print\_emission\_lines() (in module pymusepipe.emission\_lines)@\spxentry{print\_emission\_lines()}\spxextra{in module pymusepipe.emission\_lines}|hyperpage}{35}
+\indexentry{module@\spxentry{module}!pymusepipe.graph\_pipe@\spxentry{pymusepipe.graph\_pipe}|hyperpage}{35}
+\indexentry{pymusepipe.graph\_pipe@\spxentry{pymusepipe.graph\_pipe}!module@\spxentry{module}|hyperpage}{35}
+\indexentry{GraphMuse (class in pymusepipe.graph\_pipe)@\spxentry{GraphMuse}\spxextra{class in pymusepipe.graph\_pipe}|hyperpage}{35}
+\indexentry{close() (pymusepipe.graph\_pipe.GraphMuse method)@\spxentry{close()}\spxextra{pymusepipe.graph\_pipe.GraphMuse method}|hyperpage}{35}
+\indexentry{plot\_page() (pymusepipe.graph\_pipe.GraphMuse method)@\spxentry{plot\_page()}\spxextra{pymusepipe.graph\_pipe.GraphMuse method}|hyperpage}{35}
+\indexentry{plot\_set\_images() (pymusepipe.graph\_pipe.GraphMuse method)@\spxentry{plot\_set\_images()}\spxextra{pymusepipe.graph\_pipe.GraphMuse method}|hyperpage}{35}
+\indexentry{plot\_set\_spectra() (pymusepipe.graph\_pipe.GraphMuse method)@\spxentry{plot\_set\_spectra()}\spxextra{pymusepipe.graph\_pipe.GraphMuse method}|hyperpage}{35}
+\indexentry{savepage() (pymusepipe.graph\_pipe.GraphMuse method)@\spxentry{savepage()}\spxextra{pymusepipe.graph\_pipe.GraphMuse method}|hyperpage}{35}
+\indexentry{start\_page() (pymusepipe.graph\_pipe.GraphMuse method)@\spxentry{start\_page()}\spxextra{pymusepipe.graph\_pipe.GraphMuse method}|hyperpage}{36}
+\indexentry{open\_new\_wcs\_figure() (in module pymusepipe.graph\_pipe)@\spxentry{open\_new\_wcs\_figure()}\spxextra{in module pymusepipe.graph\_pipe}|hyperpage}{36}
+\indexentry{plot\_compare\_contours() (in module pymusepipe.graph\_pipe)@\spxentry{plot\_compare\_contours()}\spxextra{in module pymusepipe.graph\_pipe}|hyperpage}{36}
+\indexentry{plot\_compare\_cuts() (in module pymusepipe.graph\_pipe)@\spxentry{plot\_compare\_cuts()}\spxextra{in module pymusepipe.graph\_pipe}|hyperpage}{37}
+\indexentry{plot\_compare\_diff() (in module pymusepipe.graph\_pipe)@\spxentry{plot\_compare\_diff()}\spxextra{in module pymusepipe.graph\_pipe}|hyperpage}{37}
+\indexentry{plot\_polypar() (in module pymusepipe.graph\_pipe)@\spxentry{plot\_polypar()}\spxextra{in module pymusepipe.graph\_pipe}|hyperpage}{37}
+\indexentry{print\_fig() (in module pymusepipe.graph\_pipe)@\spxentry{print\_fig()}\spxextra{in module pymusepipe.graph\_pipe}|hyperpage}{37}
+\indexentry{module@\spxentry{module}!pymusepipe.init\_musepipe@\spxentry{pymusepipe.init\_musepipe}|hyperpage}{38}
+\indexentry{pymusepipe.init\_musepipe@\spxentry{pymusepipe.init\_musepipe}!module@\spxentry{module}|hyperpage}{38}
+\indexentry{InitMuseParameters (class in pymusepipe.init\_musepipe)@\spxentry{InitMuseParameters}\spxextra{class in pymusepipe.init\_musepipe}|hyperpage}{38}
+\indexentry{init\_default\_param() (pymusepipe.init\_musepipe.InitMuseParameters method)@\spxentry{init\_default\_param()}\spxextra{pymusepipe.init\_musepipe.InitMuseParameters method}|hyperpage}{38}
+\indexentry{read\_param\_file() (pymusepipe.init\_musepipe.InitMuseParameters method)@\spxentry{read\_param\_file()}\spxextra{pymusepipe.init\_musepipe.InitMuseParameters method}|hyperpage}{38}
+\indexentry{PipeObject (class in pymusepipe.init\_musepipe)@\spxentry{PipeObject}\spxextra{class in pymusepipe.init\_musepipe}|hyperpage}{38}
+\indexentry{add\_suffix\_tokeys() (in module pymusepipe.init\_musepipe)@\spxentry{add\_suffix\_tokeys()}\spxextra{in module pymusepipe.init\_musepipe}|hyperpage}{38}
+\indexentry{module@\spxentry{module}!pymusepipe.mpdaf\_pipe@\spxentry{pymusepipe.mpdaf\_pipe}|hyperpage}{38}
+\indexentry{pymusepipe.mpdaf\_pipe@\spxentry{pymusepipe.mpdaf\_pipe}!module@\spxentry{module}|hyperpage}{38}
+\indexentry{BasicFile (class in pymusepipe.mpdaf\_pipe)@\spxentry{BasicFile}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{38}
+\indexentry{BasicPSF (class in pymusepipe.mpdaf\_pipe)@\spxentry{BasicPSF}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{38}
+\indexentry{psf\_array (pymusepipe.mpdaf\_pipe.BasicPSF property)@\spxentry{psf\_array}\spxextra{pymusepipe.mpdaf\_pipe.BasicPSF property}|hyperpage}{38}
+\indexentry{MuseCube (class in pymusepipe.mpdaf\_pipe)@\spxentry{MuseCube}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{38}
+\indexentry{astropy\_convolve() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{astropy\_convolve()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{38}
+\indexentry{build\_filterlist\_images() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{build\_filterlist\_images()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{39}
+\indexentry{convolve\_cube\_to\_psf() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{convolve\_cube\_to\_psf()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{39}
+\indexentry{create\_reference\_cube() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{create\_reference\_cube()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{40}
+\indexentry{extract\_onespectral\_cube() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{extract\_onespectral\_cube()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{40}
+\indexentry{get\_emissionline\_image() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{get\_emissionline\_image()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{40}
+\indexentry{get\_filter\_image() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{get\_filter\_image()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{41}
+\indexentry{get\_image\_from\_cube() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{get\_image\_from\_cube()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{41}
+\indexentry{get\_quadrant\_spectra\_from\_cube() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{get\_quadrant\_spectra\_from\_cube()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{41}
+\indexentry{get\_set\_spectra() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{get\_set\_spectra()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{41}
+\indexentry{get\_spectrum\_from\_cube() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{get\_spectrum\_from\_cube()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{41}
+\indexentry{get\_whiteimage\_from\_cube() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{get\_whiteimage\_from\_cube()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{41}
+\indexentry{mask\_trail() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{mask\_trail()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{41}
+\indexentry{rebin\_spatial() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{rebin\_spatial()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{41}
+\indexentry{save\_mask() (pymusepipe.mpdaf\_pipe.MuseCube method)@\spxentry{save\_mask()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCube method}|hyperpage}{42}
+\indexentry{MuseCubeMosaic (class in pymusepipe.mpdaf\_pipe)@\spxentry{MuseCubeMosaic}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{42}
+\indexentry{build\_list() (pymusepipe.mpdaf\_pipe.MuseCubeMosaic method)@\spxentry{build\_list()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCubeMosaic method}|hyperpage}{42}
+\indexentry{convolve\_cubes() (pymusepipe.mpdaf\_pipe.MuseCubeMosaic method)@\spxentry{convolve\_cubes()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCubeMosaic method}|hyperpage}{42}
+\indexentry{cube\_names (pymusepipe.mpdaf\_pipe.MuseCubeMosaic property)@\spxentry{cube\_names}\spxextra{pymusepipe.mpdaf\_pipe.MuseCubeMosaic property}|hyperpage}{42}
+\indexentry{list\_cubes (pymusepipe.mpdaf\_pipe.MuseCubeMosaic property)@\spxentry{list\_cubes}\spxextra{pymusepipe.mpdaf\_pipe.MuseCubeMosaic property}|hyperpage}{42}
+\indexentry{madcombine() (pymusepipe.mpdaf\_pipe.MuseCubeMosaic method)@\spxentry{madcombine()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCubeMosaic method}|hyperpage}{43}
+\indexentry{ncubes (pymusepipe.mpdaf\_pipe.MuseCubeMosaic property)@\spxentry{ncubes}\spxextra{pymusepipe.mpdaf\_pipe.MuseCubeMosaic property}|hyperpage}{43}
+\indexentry{print\_cube\_names() (pymusepipe.mpdaf\_pipe.MuseCubeMosaic method)@\spxentry{print\_cube\_names()}\spxextra{pymusepipe.mpdaf\_pipe.MuseCubeMosaic method}|hyperpage}{43}
+\indexentry{MuseFilter (class in pymusepipe.mpdaf\_pipe)@\spxentry{MuseFilter}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{43}
+\indexentry{read() (pymusepipe.mpdaf\_pipe.MuseFilter method)@\spxentry{read()}\spxextra{pymusepipe.mpdaf\_pipe.MuseFilter method}|hyperpage}{43}
+\indexentry{MuseImage (class in pymusepipe.mpdaf\_pipe)@\spxentry{MuseImage}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{43}
+\indexentry{get\_fwhm\_startend() (pymusepipe.mpdaf\_pipe.MuseImage method)@\spxentry{get\_fwhm\_startend()}\spxextra{pymusepipe.mpdaf\_pipe.MuseImage method}|hyperpage}{43}
+\indexentry{mask\_trail() (pymusepipe.mpdaf\_pipe.MuseImage method)@\spxentry{mask\_trail()}\spxextra{pymusepipe.mpdaf\_pipe.MuseImage method}|hyperpage}{43}
+\indexentry{reset\_mask() (pymusepipe.mpdaf\_pipe.MuseImage method)@\spxentry{reset\_mask()}\spxextra{pymusepipe.mpdaf\_pipe.MuseImage method}|hyperpage}{43}
+\indexentry{save\_mask() (pymusepipe.mpdaf\_pipe.MuseImage method)@\spxentry{save\_mask()}\spxextra{pymusepipe.mpdaf\_pipe.MuseImage method}|hyperpage}{43}
+\indexentry{MuseSetImages (class in pymusepipe.mpdaf\_pipe)@\spxentry{MuseSetImages}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{43}
+\indexentry{update() (pymusepipe.mpdaf\_pipe.MuseSetImages method)@\spxentry{update()}\spxextra{pymusepipe.mpdaf\_pipe.MuseSetImages method}|hyperpage}{44}
+\indexentry{MuseSetSpectra (class in pymusepipe.mpdaf\_pipe)@\spxentry{MuseSetSpectra}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{44}
+\indexentry{update() (pymusepipe.mpdaf\_pipe.MuseSetSpectra method)@\spxentry{update()}\spxextra{pymusepipe.mpdaf\_pipe.MuseSetSpectra method}|hyperpage}{44}
+\indexentry{MuseSkyContinuum (class in pymusepipe.mpdaf\_pipe)@\spxentry{MuseSkyContinuum}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{44}
+\indexentry{integrate() (pymusepipe.mpdaf\_pipe.MuseSkyContinuum method)@\spxentry{integrate()}\spxextra{pymusepipe.mpdaf\_pipe.MuseSkyContinuum method}|hyperpage}{44}
+\indexentry{read() (pymusepipe.mpdaf\_pipe.MuseSkyContinuum method)@\spxentry{read()}\spxextra{pymusepipe.mpdaf\_pipe.MuseSkyContinuum method}|hyperpage}{44}
+\indexentry{save\_normalised() (pymusepipe.mpdaf\_pipe.MuseSkyContinuum method)@\spxentry{save\_normalised()}\spxextra{pymusepipe.mpdaf\_pipe.MuseSkyContinuum method}|hyperpage}{44}
+\indexentry{set\_normfactor() (pymusepipe.mpdaf\_pipe.MuseSkyContinuum method)@\spxentry{set\_normfactor()}\spxextra{pymusepipe.mpdaf\_pipe.MuseSkyContinuum method}|hyperpage}{44}
+\indexentry{MuseSpectrum (class in pymusepipe.mpdaf\_pipe)@\spxentry{MuseSpectrum}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{45}
+\indexentry{PixTableToMask (class in pymusepipe.mpdaf\_pipe)@\spxentry{PixTableToMask}\spxextra{class in pymusepipe.mpdaf\_pipe}|hyperpage}{45}
+\indexentry{create\_mask() (pymusepipe.mpdaf\_pipe.PixTableToMask method)@\spxentry{create\_mask()}\spxextra{pymusepipe.mpdaf\_pipe.PixTableToMask method}|hyperpage}{45}
+\indexentry{imshow() (pymusepipe.mpdaf\_pipe.PixTableToMask method)@\spxentry{imshow()}\spxextra{pymusepipe.mpdaf\_pipe.PixTableToMask method}|hyperpage}{45}
+\indexentry{mask\_pixtable() (pymusepipe.mpdaf\_pipe.PixTableToMask method)@\spxentry{mask\_pixtable()}\spxextra{pymusepipe.mpdaf\_pipe.PixTableToMask method}|hyperpage}{45}
+\indexentry{save\_mask() (pymusepipe.mpdaf\_pipe.PixTableToMask method)@\spxentry{save\_mask()}\spxextra{pymusepipe.mpdaf\_pipe.PixTableToMask method}|hyperpage}{46}
+\indexentry{get\_sky\_spectrum() (in module pymusepipe.mpdaf\_pipe)@\spxentry{get\_sky\_spectrum()}\spxextra{in module pymusepipe.mpdaf\_pipe}|hyperpage}{46}
+\indexentry{integrate\_spectrum() (in module pymusepipe.mpdaf\_pipe)@\spxentry{integrate\_spectrum()}\spxextra{in module pymusepipe.mpdaf\_pipe}|hyperpage}{46}
+\indexentry{rotate\_cube\_wcs() (in module pymusepipe.mpdaf\_pipe)@\spxentry{rotate\_cube\_wcs()}\spxextra{in module pymusepipe.mpdaf\_pipe}|hyperpage}{46}
+\indexentry{rotate\_image\_wcs() (in module pymusepipe.mpdaf\_pipe)@\spxentry{rotate\_image\_wcs()}\spxextra{in module pymusepipe.mpdaf\_pipe}|hyperpage}{47}
+\indexentry{module@\spxentry{module}!pymusepipe.musepipe@\spxentry{pymusepipe.musepipe}|hyperpage}{47}
+\indexentry{pymusepipe.musepipe@\spxentry{pymusepipe.musepipe}!module@\spxentry{module}|hyperpage}{47}
+\indexentry{MusePipe (class in pymusepipe.musepipe)@\spxentry{MusePipe}\spxextra{class in pymusepipe.musepipe}|hyperpage}{47}
+\indexentry{goto\_folder() (pymusepipe.musepipe.MusePipe method)@\spxentry{goto\_folder()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{goto\_origfolder() (pymusepipe.musepipe.MusePipe method)@\spxentry{goto\_origfolder()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{goto\_prevfolder() (pymusepipe.musepipe.MusePipe method)@\spxentry{goto\_prevfolder()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{init\_raw\_table() (pymusepipe.musepipe.MusePipe method)@\spxentry{init\_raw\_table()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{musemode (pymusepipe.musepipe.MusePipe property)@\spxentry{musemode}\spxextra{pymusepipe.musepipe.MusePipe property}|hyperpage}{48}
+\indexentry{print\_musemodes() (pymusepipe.musepipe.MusePipe method)@\spxentry{print\_musemodes()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{read\_all\_astro\_tables() (pymusepipe.musepipe.MusePipe method)@\spxentry{read\_all\_astro\_tables()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{read\_astropy\_table() (pymusepipe.musepipe.MusePipe method)@\spxentry{read\_astropy\_table()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{retrieve\_geoastro\_name() (pymusepipe.musepipe.MusePipe method)@\spxentry{retrieve\_geoastro\_name()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{save\_expo\_table() (pymusepipe.musepipe.MusePipe method)@\spxentry{save\_expo\_table()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{set\_fullpath\_names() (pymusepipe.musepipe.MusePipe method)@\spxentry{set\_fullpath\_names()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{48}
+\indexentry{sort\_raw\_tables() (pymusepipe.musepipe.MusePipe method)@\spxentry{sort\_raw\_tables()}\spxextra{pymusepipe.musepipe.MusePipe method}|hyperpage}{49}
+\indexentry{module@\spxentry{module}!pymusepipe.prep\_recipes\_pipe@\spxentry{pymusepipe.prep\_recipes\_pipe}|hyperpage}{49}
+\indexentry{pymusepipe.prep\_recipes\_pipe@\spxentry{pymusepipe.prep\_recipes\_pipe}!module@\spxentry{module}|hyperpage}{49}
+\indexentry{PipePrep (class in pymusepipe.prep\_recipes\_pipe)@\spxentry{PipePrep}\spxextra{class in pymusepipe.prep\_recipes\_pipe}|hyperpage}{49}
+\indexentry{get\_align\_group() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{get\_align\_group()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{49}
+\indexentry{print\_recipes() (pymusepipe.prep\_recipes\_pipe.PipePrep static method)@\spxentry{print\_recipes()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep static method}|hyperpage}{49}
+\indexentry{run\_align\_bydataset() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_align\_bydataset()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{49}
+\indexentry{run\_align\_bygroup() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_align\_bygroup()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{49}
+\indexentry{run\_autocal\_sky() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_autocal\_sky()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{49}
+\indexentry{run\_bias() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_bias()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{50}
+\indexentry{run\_check\_align() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_check\_align()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{50}
+\indexentry{run\_combine\_dataset() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_combine\_dataset()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{50}
+\indexentry{run\_fine\_alignment() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_fine\_alignment()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{50}
+\indexentry{run\_flat() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_flat()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{50}
+\indexentry{run\_lsf() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_lsf()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{50}
+\indexentry{run\_phangs\_recipes() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_phangs\_recipes()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{50}
+\indexentry{run\_prep\_align() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_prep\_align()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{51}
+\indexentry{run\_recipes() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_recipes()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{51}
+\indexentry{run\_scibasic() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_scibasic()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{51}
+\indexentry{run\_scibasic\_all() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_scibasic\_all()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{51}
+\indexentry{run\_scipost() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_scipost()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{51}
+\indexentry{run\_scipost\_perexpo() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_scipost\_perexpo()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{52}
+\indexentry{run\_scipost\_sky() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_scipost\_sky()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{52}
+\indexentry{run\_sky() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_sky()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{52}
+\indexentry{run\_standard() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_standard()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{52}
+\indexentry{run\_twilight() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_twilight()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{53}
+\indexentry{run\_wave() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{run\_wave()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{53}
+\indexentry{save\_fine\_alignment() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{save\_fine\_alignment()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{53}
+\indexentry{select\_tpl\_files() (pymusepipe.prep\_recipes\_pipe.PipePrep method)@\spxentry{select\_tpl\_files()}\spxextra{pymusepipe.prep\_recipes\_pipe.PipePrep method}|hyperpage}{53}
+\indexentry{add\_listpath() (in module pymusepipe.prep\_recipes\_pipe)@\spxentry{add\_listpath()}\spxextra{in module pymusepipe.prep\_recipes\_pipe}|hyperpage}{53}
+\indexentry{norm\_listpath() (in module pymusepipe.prep\_recipes\_pipe)@\spxentry{norm\_listpath()}\spxextra{in module pymusepipe.prep\_recipes\_pipe}|hyperpage}{53}
+\indexentry{print\_my\_function\_name() (in module pymusepipe.prep\_recipes\_pipe)@\spxentry{print\_my\_function\_name()}\spxextra{in module pymusepipe.prep\_recipes\_pipe}|hyperpage}{53}
+\indexentry{module@\spxentry{module}!pymusepipe.recipes\_pipe@\spxentry{pymusepipe.recipes\_pipe}|hyperpage}{53}
+\indexentry{pymusepipe.recipes\_pipe@\spxentry{pymusepipe.recipes\_pipe}!module@\spxentry{module}|hyperpage}{53}
+\indexentry{PipeRecipes (class in pymusepipe.recipes\_pipe)@\spxentry{PipeRecipes}\spxextra{class in pymusepipe.recipes\_pipe}|hyperpage}{53}
+\indexentry{checksum (pymusepipe.recipes\_pipe.PipeRecipes property)@\spxentry{checksum}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes property}|hyperpage}{53}
+\indexentry{esorex (pymusepipe.recipes\_pipe.PipeRecipes property)@\spxentry{esorex}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes property}|hyperpage}{53}
+\indexentry{joinprod() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{joinprod()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{merge (pymusepipe.recipes\_pipe.PipeRecipes property)@\spxentry{merge}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes property}|hyperpage}{54}
+\indexentry{recipe\_align() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_align()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_bias() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_bias()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_combine() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_combine()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_combine\_pointings() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_combine\_pointings()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_flat() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_flat()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_lsf() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_lsf()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_scibasic() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_scibasic()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_scipost() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_scipost()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_sky() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_sky()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_std() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_std()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_twilight() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_twilight()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{recipe\_wave() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{recipe\_wave()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{run\_oscommand() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{run\_oscommand()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{write\_errlogfile() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{write\_errlogfile()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{write\_logfile() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{write\_logfile()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{54}
+\indexentry{write\_outlogfile() (pymusepipe.recipes\_pipe.PipeRecipes method)@\spxentry{write\_outlogfile()}\spxextra{pymusepipe.recipes\_pipe.PipeRecipes method}|hyperpage}{55}
+\indexentry{module@\spxentry{module}!pymusepipe.target\_sample@\spxentry{pymusepipe.target\_sample}|hyperpage}{55}
+\indexentry{pymusepipe.target\_sample@\spxentry{pymusepipe.target\_sample}!module@\spxentry{module}|hyperpage}{55}
+\indexentry{MusePipeSample (class in pymusepipe.target\_sample)@\spxentry{MusePipeSample}\spxextra{class in pymusepipe.target\_sample}|hyperpage}{55}
+\indexentry{combine\_target() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{combine\_target()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{55}
+\indexentry{combine\_target\_per\_pointing() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{combine\_target\_per\_pointing()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{55}
+\indexentry{convolve\_mosaic\_per\_pointing() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{convolve\_mosaic\_per\_pointing()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{55}
+\indexentry{create\_reference\_wcs() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{create\_reference\_wcs()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{55}
+\indexentry{finalise\_reduction() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{finalise\_reduction()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{55}
+\indexentry{init\_combine() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{init\_combine()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{56}
+\indexentry{init\_mosaic() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{init\_mosaic()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{56}
+\indexentry{mosaic() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{mosaic()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{57}
+\indexentry{reduce\_all\_targets() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{reduce\_all\_targets()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{57}
+\indexentry{reduce\_target() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{reduce\_target()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{57}
+\indexentry{reduce\_target\_postalign() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{reduce\_target\_postalign()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{57}
+\indexentry{reduce\_target\_prealign() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{reduce\_target\_prealign()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{58}
+\indexentry{rotate\_pixtables\_target() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{rotate\_pixtables\_target()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{58}
+\indexentry{run\_target\_recipe() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{run\_target\_recipe()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{58}
+\indexentry{run\_target\_scipost\_perexpo() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{run\_target\_scipost\_perexpo()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{58}
+\indexentry{set\_pipe\_target() (pymusepipe.target\_sample.MusePipeSample method)@\spxentry{set\_pipe\_target()}\spxextra{pymusepipe.target\_sample.MusePipeSample method}|hyperpage}{58}
+\indexentry{MusePipeTarget (class in pymusepipe.target\_sample)@\spxentry{MusePipeTarget}\spxextra{class in pymusepipe.target\_sample}|hyperpage}{59}
+\indexentry{PipeDict (class in pymusepipe.target\_sample)@\spxentry{PipeDict}\spxextra{class in pymusepipe.target\_sample}|hyperpage}{59}
+\indexentry{run\_on\_all\_keys() (pymusepipe.target\_sample.PipeDict method)@\spxentry{run\_on\_all\_keys()}\spxextra{pymusepipe.target\_sample.PipeDict method}|hyperpage}{59}
+\indexentry{setdefault() (pymusepipe.target\_sample.PipeDict method)@\spxentry{setdefault()}\spxextra{pymusepipe.target\_sample.PipeDict method}|hyperpage}{59}
+\indexentry{update() (pymusepipe.target\_sample.PipeDict method)@\spxentry{update()}\spxextra{pymusepipe.target\_sample.PipeDict method}|hyperpage}{59}
+\indexentry{insert\_suffix() (in module pymusepipe.target\_sample)@\spxentry{insert\_suffix()}\spxextra{in module pymusepipe.target\_sample}|hyperpage}{59}
+\indexentry{update\_calib\_file() (in module pymusepipe.target\_sample)@\spxentry{update\_calib\_file()}\spxextra{in module pymusepipe.target\_sample}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!pymusepipe.util\_image@\spxentry{pymusepipe.util\_image}|hyperpage}{60}
+\indexentry{pymusepipe.util\_image@\spxentry{pymusepipe.util\_image}!module@\spxentry{module}|hyperpage}{60}
+\indexentry{CircleZone (class in pymusepipe.util\_image)@\spxentry{CircleZone}\spxextra{class in pymusepipe.util\_image}|hyperpage}{60}
+\indexentry{select() (pymusepipe.util\_image.CircleZone method)@\spxentry{select()}\spxextra{pymusepipe.util\_image.CircleZone method}|hyperpage}{60}
+\indexentry{PointingTable (class in pymusepipe.util\_image)@\spxentry{PointingTable}\spxextra{class in pymusepipe.util\_image}|hyperpage}{60}
+\indexentry{assign\_pointings() (pymusepipe.util\_image.PointingTable method)@\spxentry{assign\_pointings()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{60}
+\indexentry{dict\_allnames\_in\_datasets (pymusepipe.util\_image.PointingTable property)@\spxentry{dict\_allnames\_in\_datasets}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{dict\_allnames\_in\_pointings (pymusepipe.util\_image.PointingTable property)@\spxentry{dict\_allnames\_in\_pointings}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{dict\_names\_in\_datasets (pymusepipe.util\_image.PointingTable property)@\spxentry{dict\_names\_in\_datasets}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{dict\_names\_in\_pointings (pymusepipe.util\_image.PointingTable property)@\spxentry{dict\_names\_in\_pointings}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{dict\_tplexpo\_per\_dataset (pymusepipe.util\_image.PointingTable property)@\spxentry{dict\_tplexpo\_per\_dataset}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{dict\_tplexpo\_per\_pointing (pymusepipe.util\_image.PointingTable property)@\spxentry{dict\_tplexpo\_per\_pointing}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{fullnameout (pymusepipe.util\_image.PointingTable property)@\spxentry{fullnameout}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{fulltablename (pymusepipe.util\_image.PointingTable property)@\spxentry{fulltablename}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{list\_colnames\_ptable (pymusepipe.util\_image.PointingTable attribute)@\spxentry{list\_colnames\_ptable}\spxextra{pymusepipe.util\_image.PointingTable attribute}|hyperpage}{60}
+\indexentry{list\_datasets (pymusepipe.util\_image.PointingTable property)@\spxentry{list\_datasets}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{list\_pointings (pymusepipe.util\_image.PointingTable property)@\spxentry{list\_pointings}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{60}
+\indexentry{read() (pymusepipe.util\_image.PointingTable method)@\spxentry{read()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{61}
+\indexentry{scan\_folder() (pymusepipe.util\_image.PointingTable method)@\spxentry{scan\_folder()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{61}
+\indexentry{select\_datasets() (pymusepipe.util\_image.PointingTable method)@\spxentry{select\_datasets()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{61}
+\indexentry{select\_filename() (pymusepipe.util\_image.PointingTable method)@\spxentry{select\_filename()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{61}
+\indexentry{select\_pointings() (pymusepipe.util\_image.PointingTable method)@\spxentry{select\_pointings()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{62}
+\indexentry{select\_pointings\_and\_datasets() (pymusepipe.util\_image.PointingTable method)@\spxentry{select\_pointings\_and\_datasets()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{62}
+\indexentry{selected\_filenames (pymusepipe.util\_image.PointingTable property)@\spxentry{selected\_filenames}\spxextra{pymusepipe.util\_image.PointingTable property}|hyperpage}{62}
+\indexentry{set\_select\_value() (pymusepipe.util\_image.PointingTable method)@\spxentry{set\_select\_value()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{62}
+\indexentry{unselect\_filename() (pymusepipe.util\_image.PointingTable method)@\spxentry{unselect\_filename()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{62}
+\indexentry{write() (pymusepipe.util\_image.PointingTable method)@\spxentry{write()}\spxextra{pymusepipe.util\_image.PointingTable method}|hyperpage}{63}
+\indexentry{RectangleZone (class in pymusepipe.util\_image)@\spxentry{RectangleZone}\spxextra{class in pymusepipe.util\_image}|hyperpage}{63}
+\indexentry{select() (pymusepipe.util\_image.RectangleZone method)@\spxentry{select()}\spxextra{pymusepipe.util\_image.RectangleZone method}|hyperpage}{63}
+\indexentry{SelectionZone (class in pymusepipe.util\_image)@\spxentry{SelectionZone}\spxextra{class in pymusepipe.util\_image}|hyperpage}{63}
+\indexentry{TrailZone (class in pymusepipe.util\_image)@\spxentry{TrailZone}\spxextra{class in pymusepipe.util\_image}|hyperpage}{63}
+\indexentry{select() (pymusepipe.util\_image.TrailZone method)@\spxentry{select()}\spxextra{pymusepipe.util\_image.TrailZone method}|hyperpage}{63}
+\indexentry{check\_column\_set() (in module pymusepipe.util\_image)@\spxentry{check\_column\_set()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{64}
+\indexentry{chunk\_stats() (in module pymusepipe.util\_image)@\spxentry{chunk\_stats()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{64}
+\indexentry{compute\_diagnostics() (in module pymusepipe.util\_image)@\spxentry{compute\_diagnostics()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{64}
+\indexentry{create\_offset\_table() (in module pymusepipe.util\_image)@\spxentry{create\_offset\_table()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{64}
+\indexentry{crop\_data() (in module pymusepipe.util\_image)@\spxentry{crop\_data()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{65}
+\indexentry{filter\_list\_with\_pointingtable() (in module pymusepipe.util\_image)@\spxentry{filter\_list\_with\_pointingtable()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{65}
+\indexentry{filtermed\_image() (in module pymusepipe.util\_image)@\spxentry{filtermed\_image()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{65}
+\indexentry{flatclean\_image() (in module pymusepipe.util\_image)@\spxentry{flatclean\_image()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{66}
+\indexentry{get\_centre\_from\_image\_or\_cube() (in module pymusepipe.util\_image)@\spxentry{get\_centre\_from\_image\_or\_cube()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{66}
+\indexentry{get\_centre\_from\_pixtable() (in module pymusepipe.util\_image)@\spxentry{get\_centre\_from\_pixtable()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{67}
+\indexentry{get\_flux\_range() (in module pymusepipe.util\_image)@\spxentry{get\_flux\_range()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{67}
+\indexentry{get\_normfactor() (in module pymusepipe.util\_image)@\spxentry{get\_normfactor()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{67}
+\indexentry{get\_polynorm() (in module pymusepipe.util\_image)@\spxentry{get\_polynorm()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{68}
+\indexentry{group\_exposures\_per\_pointing() (in module pymusepipe.util\_image)@\spxentry{group\_exposures\_per\_pointing()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{68}
+\indexentry{group\_xy\_per\_fieldofview() (in module pymusepipe.util\_image)@\spxentry{group\_xy\_per\_fieldofview()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{69}
+\indexentry{mask\_point\_sources() (in module pymusepipe.util\_image)@\spxentry{mask\_point\_sources()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{69}
+\indexentry{my\_linear\_model() (in module pymusepipe.util\_image)@\spxentry{my\_linear\_model()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{70}
+\indexentry{prepare\_image() (in module pymusepipe.util\_image)@\spxentry{prepare\_image()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{70}
+\indexentry{regress\_odr() (in module pymusepipe.util\_image)@\spxentry{regress\_odr()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{71}
+\indexentry{scan\_filenames\_from\_folder() (in module pymusepipe.util\_image)@\spxentry{scan\_filenames\_from\_folder()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{71}
+\indexentry{scan\_filenames\_from\_list() (in module pymusepipe.util\_image)@\spxentry{scan\_filenames\_from\_list()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{71}
+\indexentry{select\_spaxels() (in module pymusepipe.util\_image)@\spxentry{select\_spaxels()}\spxextra{in module pymusepipe.util\_image}|hyperpage}{72}
+\indexentry{module@\spxentry{module}!pymusepipe.util\_pipe@\spxentry{pymusepipe.util\_pipe}|hyperpage}{72}
+\indexentry{pymusepipe.util\_pipe@\spxentry{pymusepipe.util\_pipe}!module@\spxentry{module}|hyperpage}{72}
+\indexentry{ExposureInfo (class in pymusepipe.util\_pipe)@\spxentry{ExposureInfo}\spxextra{class in pymusepipe.util\_pipe}|hyperpage}{72}
+\indexentry{TimeStampDict (class in pymusepipe.util\_pipe)@\spxentry{TimeStampDict}\spxextra{class in pymusepipe.util\_pipe}|hyperpage}{72}
+\indexentry{create\_new\_timestamp() (pymusepipe.util\_pipe.TimeStampDict method)@\spxentry{create\_new\_timestamp()}\spxextra{pymusepipe.util\_pipe.TimeStampDict method}|hyperpage}{72}
+\indexentry{delete\_timestamp() (pymusepipe.util\_pipe.TimeStampDict method)@\spxentry{delete\_timestamp()}\spxextra{pymusepipe.util\_pipe.TimeStampDict method}|hyperpage}{72}
+\indexentry{abspath() (in module pymusepipe.util\_pipe)@\spxentry{abspath()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{72}
+\indexentry{add\_key\_dataset\_expo() (in module pymusepipe.util\_pipe)@\spxentry{add\_key\_dataset\_expo()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{72}
+\indexentry{add\_string() (in module pymusepipe.util\_pipe)@\spxentry{add\_string()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{72}
+\indexentry{analyse\_musemode() (in module pymusepipe.util\_pipe)@\spxentry{analyse\_musemode()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{72}
+\indexentry{append\_file() (in module pymusepipe.util\_pipe)@\spxentry{append\_file()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{73}
+\indexentry{append\_value\_to\_dict() (in module pymusepipe.util\_pipe)@\spxentry{append\_value\_to\_dict()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{73}
+\indexentry{build\_dict\_datasets() (in module pymusepipe.util\_pipe)@\spxentry{build\_dict\_datasets()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{73}
+\indexentry{build\_dict\_exposures() (in module pymusepipe.util\_pipe)@\spxentry{build\_dict\_exposures()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{73}
+\indexentry{check\_filter\_list() (in module pymusepipe.util\_pipe)@\spxentry{check\_filter\_list()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{74}
+\indexentry{create\_time\_name() (in module pymusepipe.util\_pipe)@\spxentry{create\_time\_name()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{74}
+\indexentry{filter\_list\_to\_str() (in module pymusepipe.util\_pipe)@\spxentry{filter\_list\_to\_str()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{74}
+\indexentry{filter\_list\_with\_suffix\_list() (in module pymusepipe.util\_pipe)@\spxentry{filter\_list\_with\_suffix\_list()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{74}
+\indexentry{formatted\_time() (in module pymusepipe.util\_pipe)@\spxentry{formatted\_time()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{74}
+\indexentry{get\_dataset\_name() (in module pymusepipe.util\_pipe)@\spxentry{get\_dataset\_name()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{74}
+\indexentry{get\_dataset\_tpl\_nexpo() (in module pymusepipe.util\_pipe)@\spxentry{get\_dataset\_tpl\_nexpo()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{74}
+\indexentry{get\_list\_datasets() (in module pymusepipe.util\_pipe)@\spxentry{get\_list\_datasets()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{75}
+\indexentry{get\_list\_exposures() (in module pymusepipe.util\_pipe)@\spxentry{get\_list\_exposures()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{75}
+\indexentry{get\_list\_reduced\_pixtables() (in module pymusepipe.util\_pipe)@\spxentry{get\_list\_reduced\_pixtables()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{75}
+\indexentry{get\_list\_targets() (in module pymusepipe.util\_pipe)@\spxentry{get\_list\_targets()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{76}
+\indexentry{get\_pointing\_name() (in module pymusepipe.util\_pipe)@\spxentry{get\_pointing\_name()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{76}
+\indexentry{get\_tpl\_nexpo() (in module pymusepipe.util\_pipe)@\spxentry{get\_tpl\_nexpo()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{76}
+\indexentry{lower\_allbutfirst\_letter() (in module pymusepipe.util\_pipe)@\spxentry{lower\_allbutfirst\_letter()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{77}
+\indexentry{lower\_rep() (in module pymusepipe.util\_pipe)@\spxentry{lower\_rep()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{77}
+\indexentry{merge\_dict() (in module pymusepipe.util\_pipe)@\spxentry{merge\_dict()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{77}
+\indexentry{normpath() (in module pymusepipe.util\_pipe)@\spxentry{normpath()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{77}
+\indexentry{print\_debug() (in module pymusepipe.util\_pipe)@\spxentry{print\_debug()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{77}
+\indexentry{print\_endline() (in module pymusepipe.util\_pipe)@\spxentry{print\_endline()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{77}
+\indexentry{print\_error() (in module pymusepipe.util\_pipe)@\spxentry{print\_error()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{77}
+\indexentry{print\_info() (in module pymusepipe.util\_pipe)@\spxentry{print\_info()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{78}
+\indexentry{print\_warning() (in module pymusepipe.util\_pipe)@\spxentry{print\_warning()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{78}
+\indexentry{reconstruct\_filter\_images() (in module pymusepipe.util\_pipe)@\spxentry{reconstruct\_filter\_images()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{78}
+\indexentry{safely\_create\_folder() (in module pymusepipe.util\_pipe)@\spxentry{safely\_create\_folder()}\spxextra{in module pymusepipe.util\_pipe}|hyperpage}{78}
+\indexentry{module@\spxentry{module}!pymusepipe.version@\spxentry{pymusepipe.version}|hyperpage}{78}
+\indexentry{pymusepipe.version@\spxentry{pymusepipe.version}!module@\spxentry{module}|hyperpage}{78}
+\indexentry{module@\spxentry{module}!pymusepipe@\spxentry{pymusepipe}|hyperpage}{79}
+\indexentry{pymusepipe@\spxentry{pymusepipe}!module@\spxentry{module}|hyperpage}{79}

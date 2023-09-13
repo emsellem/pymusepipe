@@ -1,0 +1,193 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Contents}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}Welcome}{3}{section.1.1}
+\contentsline {subsection}{\numberline {1.1.1}GitHub Repository}{3}{subsection.1.1.1}
+\contentsline {section}{\numberline {1.2}Install}{4}{section.1.2}
+\contentsline {subsection}{\numberline {1.2.1}Prerequisites}{4}{subsection.1.2.1}
+\contentsline {subsection}{\numberline {1.2.2}Installation}{4}{subsection.1.2.2}
+\contentsline {section}{\numberline {1.3}Getting Started}{5}{section.1.3}
+\contentsline {subsection}{\numberline {1.3.1}Basic Usage \sphinxhyphen {} Dealing with OBs, individually}{5}{subsection.1.3.1}
+\contentsline {subsection}{\numberline {1.3.2}Step 1: Preparing your data}{5}{subsection.1.3.2}
+\contentsline {subsection}{\numberline {1.3.3}Step 2: Preparing your configuration files}{5}{subsection.1.3.3}
+\contentsline {subsection}{\numberline {1.3.4}Step 3: Running the pipeline}{6}{subsection.1.3.4}
+\contentsline {subsection}{\numberline {1.3.5}Under the hood of run\_recipes}{7}{subsection.1.3.5}
+\contentsline {subsection}{\numberline {1.3.6}Structure of the output}{8}{subsection.1.3.6}
+\contentsline {subsubsection}{Folders}{8}{subsubsection*.3}
+\contentsline {subsubsection}{Log files}{8}{subsubsection*.4}
+\contentsline {subsubsection}{Astropy Tables}{8}{subsubsection*.5}
+\contentsline {subsubsection}{Sof files}{8}{subsubsection*.6}
+\contentsline {subsubsection}{Python structure}{8}{subsubsection*.7}
+\contentsline {section}{\numberline {1.4}Alignment}{8}{section.1.4}
+\contentsline {subsection}{\numberline {1.4.1}Limitations of run\_align recipes}{8}{subsection.1.4.1}
+\contentsline {section}{\numberline {1.5}Targets and Mosaicking}{9}{section.1.5}
+\contentsline {section}{\numberline {1.6}Convolution}{9}{section.1.6}
+\contentsline {section}{\numberline {1.7}PHANGS pipeline example}{9}{section.1.7}
+\contentsline {section}{\numberline {1.8}License}{9}{section.1.8}
+\contentsline {section}{\numberline {1.9}Contributors}{10}{section.1.9}
+\contentsline {section}{\numberline {1.10}Changelog}{10}{section.1.10}
+\contentsline {subsection}{\numberline {1.10.1}Version 2.9.9}{10}{subsection.1.10.1}
+\contentsline {subsection}{\numberline {1.10.2}Version 1.0}{10}{subsection.1.10.2}
+\contentsline {section}{\numberline {1.11}pymusepipe}{10}{section.1.11}
+\contentsline {subsection}{\numberline {1.11.1}pymusepipe package}{10}{subsection.1.11.1}
+\contentsline {subsubsection}{Submodules}{10}{subsubsection*.8}
+\contentsline {subsubsection}{pymusepipe.align\_pipe module}{10}{subsubsection*.9}
+\contentsline {paragraph}{Input}{11}{paragraph*.12}
+\contentsline {paragraph}{Input}{11}{paragraph*.15}
+\contentsline {paragraph}{Input}{12}{paragraph*.18}
+\contentsline {paragraph}{Creates}{12}{paragraph*.19}
+\contentsline {paragraph}{Input}{12}{paragraph*.21}
+\contentsline {paragraph}{Input}{13}{paragraph*.23}
+\contentsline {paragraph}{Input}{13}{paragraph*.25}
+\contentsline {paragraph}{Input}{13}{paragraph*.27}
+\contentsline {paragraph}{Input}{14}{paragraph*.29}
+\contentsline {paragraph}{Input}{14}{paragraph*.31}
+\contentsline {paragraph}{Input}{15}{paragraph*.33}
+\contentsline {paragraph}{Input}{15}{paragraph*.35}
+\contentsline {paragraph}{Input}{15}{paragraph*.37}
+\contentsline {paragraph}{Input}{15}{paragraph*.39}
+\contentsline {paragraph}{Input}{16}{paragraph*.41}
+\contentsline {paragraph}{Input}{16}{paragraph*.43}
+\contentsline {paragraph}{Input}{16}{paragraph*.45}
+\contentsline {paragraph}{Input}{16}{paragraph*.47}
+\contentsline {paragraph}{Input}{17}{paragraph*.49}
+\contentsline {paragraph}{Input}{17}{paragraph*.51}
+\contentsline {paragraph}{Additional arguments}{17}{paragraph*.52}
+\contentsline {paragraph}{Input}{18}{paragraph*.55}
+\contentsline {paragraph}{Input}{18}{paragraph*.58}
+\contentsline {paragraph}{Creates}{18}{paragraph*.59}
+\contentsline {paragraph}{Input}{18}{paragraph*.61}
+\contentsline {paragraph}{Input}{19}{paragraph*.63}
+\contentsline {paragraph}{Input}{19}{paragraph*.65}
+\contentsline {paragraph}{Input}{19}{paragraph*.67}
+\contentsline {paragraph}{Creates}{20}{paragraph*.68}
+\contentsline {paragraph}{Input}{20}{paragraph*.70}
+\contentsline {paragraph}{Creates}{20}{paragraph*.71}
+\contentsline {paragraph}{Input}{20}{paragraph*.73}
+\contentsline {paragraph}{Input}{20}{paragraph*.75}
+\contentsline {paragraph}{Input}{21}{paragraph*.79}
+\contentsline {paragraph}{Input}{21}{paragraph*.84}
+\contentsline {paragraph}{Input}{22}{paragraph*.86}
+\contentsline {paragraph}{Input}{24}{paragraph*.88}
+\contentsline {paragraph}{Input}{24}{paragraph*.90}
+\contentsline {paragraph}{Input}{25}{paragraph*.93}
+\contentsline {paragraph}{Input}{25}{paragraph*.95}
+\contentsline {paragraph}{Input}{25}{paragraph*.97}
+\contentsline {subsubsection}{pymusepipe.check\_pipe module}{26}{subsubsection*.98}
+\contentsline {subsubsection}{pymusepipe.combine module}{26}{subsubsection*.106}
+\contentsline {paragraph}{Input}{26}{paragraph*.109}
+\contentsline {paragraph}{Input}{27}{paragraph*.111}
+\contentsline {paragraph}{Input}{27}{paragraph*.113}
+\contentsline {paragraph}{Input}{27}{paragraph*.115}
+\contentsline {paragraph}{Input}{28}{paragraph*.117}
+\contentsline {paragraph}{Input}{28}{paragraph*.123}
+\contentsline {paragraph}{Input}{29}{paragraph*.130}
+\contentsline {paragraph}{Input}{29}{paragraph*.132}
+\contentsline {paragraph}{Input}{30}{paragraph*.134}
+\contentsline {paragraph}{Input}{30}{paragraph*.137}
+\contentsline {paragraph}{Input}{30}{paragraph*.139}
+\contentsline {subsubsection}{pymusepipe.config\_pipe module}{31}{subsubsection*.141}
+\contentsline {subsubsection}{pymusepipe.create\_sof module}{31}{subsubsection*.143}
+\contentsline {subsubsection}{pymusepipe.cube\_convolve module}{31}{subsubsection*.147}
+\contentsline {subsubsection}{pymusepipe.emission\_lines module}{35}{subsubsection*.157}
+\contentsline {subsubsection}{pymusepipe.graph\_pipe module}{35}{subsubsection*.162}
+\contentsline {paragraph}{Input}{36}{paragraph*.171}
+\contentsline {paragraph}{Input}{36}{paragraph*.173}
+\contentsline {paragraph}{Creates}{37}{paragraph*.174}
+\contentsline {paragraph}{Input}{37}{paragraph*.176}
+\contentsline {paragraph}{Creates}{37}{paragraph*.177}
+\contentsline {subsubsection}{pymusepipe.init\_musepipe module}{38}{subsubsection*.181}
+\contentsline {paragraph}{Input}{38}{paragraph*.184}
+\contentsline {subsubsection}{pymusepipe.mpdaf\_pipe module}{38}{subsubsection*.188}
+\contentsline {paragraph}{Input}{41}{paragraph*.199}
+\contentsline {paragraph}{Input}{41}{paragraph*.203}
+\contentsline {paragraph}{Input}{41}{paragraph*.208}
+\contentsline {paragraph}{Input}{42}{paragraph*.210}
+\contentsline {paragraph}{Input}{43}{paragraph*.225}
+\contentsline {paragraph}{Input}{44}{paragraph*.234}
+\contentsline {paragraph}{Input}{44}{paragraph*.237}
+\contentsline {paragraph}{Input}{45}{paragraph*.239}
+\contentsline {paragraph}{Input}{45}{paragraph*.243}
+\contentsline {paragraph}{Input}{46}{paragraph*.246}
+\contentsline {paragraph}{Input}{46}{paragraph*.248}
+\contentsline {paragraph}{Creates}{46}{paragraph*.249}
+\contentsline {paragraph}{Input}{46}{paragraph*.252}
+\contentsline {paragraph}{Input}{47}{paragraph*.255}
+\contentsline {subsubsection}{pymusepipe.musepipe module}{47}{subsubsection*.256}
+\contentsline {paragraph}{Input}{49}{paragraph*.270}
+\contentsline {subsubsection}{pymusepipe.prep\_recipes\_pipe module}{49}{subsubsection*.271}
+\contentsline {paragraph}{Input}{51}{paragraph*.285}
+\contentsline {paragraph}{Input}{51}{paragraph*.288}
+\contentsline {paragraph}{Input}{52}{paragraph*.292}
+\contentsline {paragraph}{Input}{52}{paragraph*.294}
+\contentsline {subsubsection}{pymusepipe.recipes\_pipe module}{53}{subsubsection*.305}
+\contentsline {subsubsection}{pymusepipe.target\_sample module}{55}{subsubsection*.327}
+\contentsline {paragraph}{Input}{56}{paragraph*.335}
+\contentsline {paragraph}{Input}{57}{paragraph*.337}
+\contentsline {paragraph}{Input}{57}{paragraph*.340}
+\contentsline {paragraph}{Input}{57}{paragraph*.342}
+\contentsline {paragraph}{Input}{58}{paragraph*.344}
+\contentsline {paragraph}{Input}{58}{paragraph*.346}
+\contentsline {paragraph}{Input}{58}{paragraph*.349}
+\contentsline {paragraph}{Input}{59}{paragraph*.352}
+\contentsline {paragraph}{Input}{59}{paragraph*.359}
+\contentsline {paragraph}{Input}{59}{paragraph*.361}
+\contentsline {subsubsection}{pymusepipe.util\_image module}{60}{subsubsection*.362}
+\contentsline {paragraph}{Input}{60}{paragraph*.365}
+\contentsline {paragraph}{Updates}{60}{paragraph*.368}
+\contentsline {paragraph}{Input}{61}{paragraph*.381}
+\contentsline {paragraph}{Input}{61}{paragraph*.383}
+\contentsline {paragraph}{Creates}{61}{paragraph*.384}
+\contentsline {paragraph}{Input}{61}{paragraph*.386}
+\contentsline {paragraph}{Updates}{61}{paragraph*.387}
+\contentsline {paragraph}{Input}{62}{paragraph*.389}
+\contentsline {paragraph}{Input}{62}{paragraph*.391}
+\contentsline {paragraph}{Updates}{62}{paragraph*.392}
+\contentsline {paragraph}{Input}{62}{paragraph*.394}
+\contentsline {paragraph}{Updates}{62}{paragraph*.395}
+\contentsline {paragraph}{Input}{63}{paragraph*.399}
+\contentsline {paragraph}{Input}{63}{paragraph*.403}
+\contentsline {paragraph}{Input}{63}{paragraph*.405}
+\contentsline {paragraph}{Input}{64}{paragraph*.408}
+\contentsline {paragraph}{Input}{64}{paragraph*.410}
+\contentsline {paragraph}{Input}{64}{paragraph*.413}
+\contentsline {paragraph}{Input}{65}{paragraph*.416}
+\contentsline {paragraph}{Input}{65}{paragraph*.418}
+\contentsline {paragraph}{Input}{66}{paragraph*.420}
+\contentsline {paragraph}{Input}{66}{paragraph*.422}
+\contentsline {paragraph}{Input}{67}{paragraph*.424}
+\contentsline {paragraph}{Input}{67}{paragraph*.426}
+\contentsline {paragraph}{Input}{67}{paragraph*.428}
+\contentsline {paragraph}{Input}{68}{paragraph*.430}
+\contentsline {paragraph}{Input}{69}{paragraph*.433}
+\contentsline {paragraph}{Input}{69}{paragraph*.435}
+\contentsline {paragraph}{Input}{70}{paragraph*.437}
+\contentsline {paragraph}{Input}{70}{paragraph*.439}
+\contentsline {paragraph}{Input}{70}{paragraph*.441}
+\contentsline {paragraph}{Input}{71}{paragraph*.444}
+\contentsline {paragraph}{Input}{72}{paragraph*.446}
+\contentsline {subsubsection}{pymusepipe.util\_pipe module}{72}{subsubsection*.448}
+\contentsline {paragraph}{Input}{72}{paragraph*.455}
+\contentsline {paragraph}{Input}{72}{paragraph*.457}
+\contentsline {paragraph}{Input}{73}{paragraph*.459}
+\contentsline {paragraph}{Input}{73}{paragraph*.462}
+\contentsline {paragraph}{Input}{73}{paragraph*.464}
+\contentsline {paragraph}{Input}{74}{paragraph*.466}
+\contentsline {paragraph}{Input}{74}{paragraph*.471}
+\contentsline {paragraph}{Input}{74}{paragraph*.474}
+\contentsline {paragraph}{Input}{75}{paragraph*.476}
+\contentsline {paragraph}{Input}{75}{paragraph*.478}
+\contentsline {paragraph}{Input}{75}{paragraph*.480}
+\contentsline {paragraph}{Input}{76}{paragraph*.482}
+\contentsline {paragraph}{Input}{76}{paragraph*.484}
+\contentsline {paragraph}{Input}{76}{paragraph*.486}
+\contentsline {paragraph}{Input}{77}{paragraph*.488}
+\contentsline {paragraph}{Input}{77}{paragraph*.492}
+\contentsline {paragraph}{Input}{77}{paragraph*.495}
+\contentsline {paragraph}{Input}{78}{paragraph*.498}
+\contentsline {paragraph}{Input}{78}{paragraph*.500}
+\contentsline {paragraph}{Input}{78}{paragraph*.504}
+\contentsline {paragraph}{Creates}{78}{paragraph*.505}
+\contentsline {subsubsection}{pymusepipe.version module}{78}{subsubsection*.506}
+\contentsline {subsubsection}{Module contents}{79}{subsubsection*.507}
+\contentsline {chapter}{\numberline {2}Indices and tables}{81}{chapter.2}
+\contentsline {chapter}{Python Module Index}{83}{section*.508}
