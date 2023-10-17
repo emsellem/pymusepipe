@@ -1,6 +1,15 @@
 astropy>=4.0
-mpdaf==3.2
+mpdaf~=3.5
 numpy>=1.8
 scipy>=1.4.1
 matplotlib>=3.0.0
 sphinxcontrib.email
+reproject~=0.8
+scikit-image~=0.19.3
+spacepylot~=0.0.post1.dev20+g857829b.d20221118
+pymusepipe~=2.26.9
+photutils~=1.2.0
+pypher~=0.6.4
+sphinx~=5.3.0
+sphinx_rtd_theme~=1.2.0
+setuptools~=67.7.2

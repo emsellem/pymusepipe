@@ -791,6 +791,7 @@ class MusePointings(SofPipe, PipeRecipes):
             # Then creating the mask WCS for each pointing
             upipe.print_info("@@@@@@@@ Start creating the individual "
                              "Pointings Masks @@@@@@@@")
+            upipe.print_info("ref_wcs used will be {wcs_refcube_name}")
             self.create_all_pointings_wcs(lambdaminmax_mosaic=lambdaminmax,
                                           ref_wcs=wcs_refcube_name,
                                           folder_refcube="",

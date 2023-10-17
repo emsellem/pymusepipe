@@ -42,12 +42,14 @@ from mpdaf.obj import Image, WCS
 
 # Import needed modules from pymusepipe
 from . import util_pipe as upipe  # noqua: E402
-from .config_pipe import mjd_names, date_names, tpl_names
-from .config_pipe import dataset_names, iexpo_names, dict_listObject
+from .config_pipe import (mjd_names, date_names, tpl_names,
+                          dataset_names, iexpo_names, dict_listObject,
+                          dict_equivalencies, default_muse_unit, default_reference_unit,
+                          default_filter_name, default_pivot_lambda)
+
 from .graph_pipe import (plot_polypar, plot_compare_contours,
                          plot_compare_cuts, plot_compare_diff)
 from .util_image import my_linear_model, flatclean_image, get_normfactor, mask_point_sources
-
 
 try:
     import reproject
@@ -56,7 +58,6 @@ try:
 except ImportError:
     upipe.print_warning("If you wish to use reproject, please install "
                         "it via: pip install reproject.")
-
 
 # Skimage if you have it
 try:
@@ -68,7 +69,6 @@ except ImportError:
                         "please install it via "
                         "    pip install scikit-image "
                         "or  conda install scikit-image")
-
 
 # Spacepylot
 try:
@@ -100,18 +100,67 @@ def is_sequence(arg):
             hasattr(arg, "__iter__"))
 
 
-# ================== Default units ======================== #
-# Define useful units
-default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
-default_reference_unit = u.microJansky
-
-dict_equivalencies = {"WFI_BB": u.spectral_density(6483.58 * u.AA),
-                      "DUPONT_R": u.spectral_density(6483.58 * u.AA),
-                      "LEGACY_R": u.spectral_density(6483.58 * u.AA)}
 # ================== Useful function ====================== #
+def get_equivalency_from_pivot(pivot_lambda):
+    """Return the spectral density for equivalency using a unit and
+    pivot lambda
+    """
+    return u.spectral_density(pivot_lambda)
 
 
-def get_conversion_factor(input_unit, output_unit, filter_name="WFI", dict_equiv=dict_equivalencies):
+def get_reference_unit_from_filter(filter_name=default_filter_name, dict_equiv=dict_equivalencies):
+    """Extract the unit from the dictionary
+
+    Input
+    -----
+    dict_equiv: dict
+        Dictionary containing, for each filter name, the information as a list
+        [unit, equivalency]
+    filter_name: str
+
+    Returns
+    -------
+    unit: astropy unit
+    """
+    if filter_name not in dict_equiv:
+        upipe.print_warning(f"Didn't find unit for filter {filter_name}. "
+                            f"Using defaults filter {default_filter_name} for this conversion")
+        filter_name = default_filter_name
+
+    if filter_name not in dict_equiv:
+        upipe.print_error(f"Default filter {filter_name} not in equivalencies dictionary")
+        return None
+
+    return dict_equiv[filter_name][0]
+
+
+def get_pivot_lambda_from_filter(filter_name=default_filter_name, dict_equiv=dict_equivalencies):
+    """Extract the pivot lambda from the dictionary
+    
+    Input
+    -----
+    dict_equiv: dict
+        Dictionary containing, for each filter name, the information as a list 
+        [unit, equivalency]
+    filter_name: str
+
+    Returns
+    -------
+    pivot lambda: float
+    """
+    if filter_name not in dict_equiv:
+        upipe.print_warning(f"Didn't find pivot lambda for filter {filter_name}. "
+                            f"Using defaults filter {default_filter_name} for this conversion")
+        filter_name = default_filter_name
+
+    if filter_name not in dict_equiv:
+        upipe.print_error(f"Default filter {filter_name} not in equivalencies dictionary")
+        return None
+
+    return dict_equiv[filter_name][1]
+
+
+def get_conversion_factor(input_unit, output_unit, equivalency=None):
     """ Conversion of units from an input one
     to an output one
      
@@ -121,24 +170,12 @@ def get_conversion_factor(input_unit, output_unit, filter_name="WFI", dict_equiv
         Input astropy unit to analyse
     output_unit: astropy unit
         Astropy unit to compare to input unit.
-    filter_name: str, optional
-        Name of the filter
-    dict_equiv: dict, optional
-        Dictionary listing the equivalencies for various filters.
-        Will be using it if the filter name is the key list
-        to help with the conversion.
-    
+
     Returns
     -------
     conversion: astropy unit conversion
     """
 
-    if filter_name not in dict_equiv:
-        upipe.print_warning("Didn't find conversion for this filter. "
-                            "Using 1.0 as a conversion factor")
-        return 1.0
-
-    equivalencies = dict_equiv[filter_name]
     # First testing if the quantities are Quantity
     # If not, transform them 
     if not isinstance(input_unit, u.quantity.Quantity):
@@ -158,15 +195,19 @@ def get_conversion_factor(input_unit, output_unit, filter_name="WFI", dict_equiv
 
     if not input_unit.unit.is_equivalent(output_unit):
         # if not equivalent we try a spectral density equivalence
+        # We use the default filter name and dictionary of equivalencies
+        # if the pivot lambda is not provided
+        if equivalency is None:
+            equivalency = get_equivalency_from_pivot(get_pivot_lambda_from_filter())
         if not input_unit.unit.is_equivalent(output_unit,
-                                             equivalencies=equivalencies):
+                                             equivalencies=equivalency):
             upipe.print_warning("Provided units for reference "
                                 "and MUSE images are not equivalent")
             upipe.print_warning("A conversion factor of 1.0 will thus be used")
             return 1.0
         else:
-            return input_unit.unit.to(
-                output_unit, equivalencies=equivalencies) * input_unit.value
+            return input_unit.unit.to(output_unit,
+                                      equivalencies=equivalency) * input_unit.value
     else:
         return input_unit.unit.to(output_unit) * input_unit.value
 
@@ -433,6 +474,7 @@ class OffsetState(object):
         self._info = info
         self._nstate = nstate
 
+
 # Main alignment Class
 class AlignMuseDataset(object):
     """Class to align MUSE images onto a reference image.
@@ -614,20 +656,27 @@ class AlignMuseDataset(object):
                                 "not, all initial rotation angles will be set to 0.")
 
         # Getting the unit conversions
+        # Check if unit conversion is wished for
         self.convert_units = kwargs.pop("convert_units", True)
-        # Merging dictionaries if needed
-        pivot_lambda = kwargs.pop("pivot_lambda", 6483.58)
-        equivalency = kwargs.pop("equivalency", u.spectral_density(pivot_lambda * u.AA))
-        self.dict_equiv = copy.copy(dict_equivalencies)
-        self.dict_equiv.update({self.filter_name: equivalency})
+        self.muse_unit = kwargs.pop("muse_unit", default_muse_unit)
+        # If yes, get all relevant input
         if self.convert_units:
-            self.ref_unit = kwargs.pop("ref_unit", default_reference_unit)
-            self.muse_unit = kwargs.pop("muse_unit", default_muse_unit)
+            # Reads the input values if set
+            equivalency = kwargs.pop("equivalency", None)
+            pivot_lambda = kwargs.pop("pivot_lambda", None)
+            ref_unit = kwargs.pop("ref_unit", None)
+            # Set up the dictionary for equivalencies
+            self.dict_equiv = copy.copy(dict_equivalencies)
+            self._set_conversion(ref_unit=ref_unit, pivot_lambda=pivot_lambda,
+                                 equivalency=equivalency)
+
+            # Merging dictionaries if needed
+            self.dict_equiv.update({self.filter_name: [self.ref_unit, self.pivot_lambda]})
             self.conversion_factor = get_conversion_factor(self.ref_unit,
                                                            self.muse_unit,
-                                                           filter_name=self.filter_name,
-                                                           dict_equiv=self.dict_equiv)
+                                                           equivalency=self.equivalency)
         else:
+            self.ref_unit = None
             self.conversion_factor = 1.0
 
         # Initialise the parameters for the first guess
@@ -669,6 +718,39 @@ class AlignMuseDataset(object):
         for nima in range(self.nimages):
             self._apply_alignment_ima(nima)
 
+    def _set_conversion(self, ref_unit=None, pivot_lambda=None, equivalency=None):
+        """Set the conversion input parameters, including ref_unit, pivot_lambda, and equivalency.
+        ref_unit is in priority via the input parameter or via a the existing self.dict_equiv
+        dictionary (and filter name).
+        pivot_lambda is then the next priority, followed by equivalency
+
+        Input
+        -----
+        ref_unit: astropy unit
+        pivot_lambda: astropy unit
+
+        Sets
+        ----
+        self.ref_unit, self_pivot_lambda, and self.equivalency
+        """
+        # Set first the reference unit
+        if ref_unit is None:
+            self.ref_unit = get_reference_unit_from_filter(self.filter_name, self.dict_equiv)
+        else:
+            self.ref_unit = ref_unit
+
+        # Set the potential equivalency
+        if pivot_lambda is None:
+            if equivalency is None:
+                self.pivot_lambda = get_pivot_lambda_from_filter(self.filter_name, self.dict_equiv)
+        else:
+            self.pivot_lambda = pivot_lambda
+
+        if equivalency is None:
+            self.equivalency = get_equivalency_from_pivot(self.pivot_lambda)
+        else:
+            self.equivalency = equivalency
+
     def show_norm_factors(self):
         """Print some information about the normalisation factors.
         """
@@ -677,12 +759,11 @@ class AlignMuseDataset(object):
                          "NormFactor       Background")
         for nima in range(self.nimages):
             upipe.print_info("Image #{0:03d}/i={1:03d}:  {2:10.6e}   {3:10.6e}     "
-                             "{4:10.6e}     {5:10.6e}".format(
-                             nima+1, nima,
-                             self.init_flux_scale[nima],
-                             self.ima_polypar[nima].beta[1],
-                             self.ima_norm_factors[nima],
-                             self.ima_background[nima]))
+                             "{4:10.6e}     {5:10.6e}".format(nima + 1, nima,
+                                                              self.init_flux_scale[nima],
+                                                              self.ima_polypar[nima].beta[1],
+                                                              self.ima_norm_factors[nima],
+                                                              self.ima_background[nima]))
 
     def show_linearfit_values(self):
         """Print some information about the linearly fitted parameters
@@ -692,9 +773,7 @@ class AlignMuseDataset(object):
         upipe.print_info("Image # : BackGround        Slope")
         for nima in range(self.nimages):
             upipe.print_info("Image #{0:03d}/i={1:03d}:  {2:10.6e}   {3:10.6e}".format(
-                             nima+1, nima,
-                             self.ima_polypar[nima].beta[0],
-                             self.ima_polypar[nima].beta[1]))
+                nima + 1, nima, self.ima_polypar[nima].beta[0], self.ima_polypar[nima].beta[1]))
 
     def _init_alignment_arrays(self):
         """Initialise all list and image arrays which are needed
@@ -806,7 +885,7 @@ class AlignMuseDataset(object):
         if nstate_max is None:
             nstate_max = self._nstate
 
-        for nstate in range(nstate_max+1):
+        for nstate in range(nstate_max + 1):
             state_name = f"state_{nstate:02d}"
             if hasattr(self, state_name):
                 print(f"State = {state_name} exists")
@@ -997,19 +1076,19 @@ class AlignMuseDataset(object):
         upipe.print_info("Offset recorded in OFFSET_LIST Table")
         upipe.print_info("Total in ARCSEC")
         for nima in range(self.nimages):
-            upipe.print_info(f"Image #{nima+1:03d}/i={nima:03d} - "
+            upipe.print_info(f"Image #{nima + 1:03d}/i={nima:03d} - "
                              f"{self.list_name_museimages[nima]}")
             upipe.print_info("                - {0:8.4f} {1:8.4f}".format(
-                             fits_table['RA_OFFSET'][nima] * 3600
-                             * np.cos(np.deg2rad(self.list_dec_muse[nima])),
-                             fits_table['DEC_OFFSET'][nima] * 3600.))
+                fits_table['RA_OFFSET'][nima] * 3600
+                * np.cos(np.deg2rad(self.list_dec_muse[nima])),
+                fits_table['DEC_OFFSET'][nima] * 3600.))
 
     def print_images_names(self):
         """Print out the names of the images being considered for alignment
         """
         upipe.print_info("Image names")
         for nima in range(self.nimages):
-            upipe.print_info(f"#{nima+1:03d}/i={nima:03d} - {self.list_name_museimages[nima]}")
+            upipe.print_info(f"#{nima + 1:03d}/i={nima:03d} - {self.list_name_museimages[nima]}")
 
     def print_offsets_and_norms(self, filename="_temp.txt",
                                 folder_output_file=None, overwrite=True):
@@ -1075,7 +1154,7 @@ class AlignMuseDataset(object):
         for nima in range(self.nimages):
             upipe.print_info("#{0:03d}/i={1:03d} -{2:>26}  |ARCSEC|{3:8.4f} {4:8.4f} "
                              " |PIXEL|{5:8.4f} {6:8.4f}  |ROT|{7:8.4f}".format(
-                nima+1, nima, self.list_name_museimages[nima][-29:-5],
+                nima + 1, nima, self.list_name_museimages[nima][-29:-5],
                 self._total_off_arcsec[nima][0],
                 self._total_off_arcsec[nima][1],
                 self._total_off_pixel[nima][0],
@@ -1137,7 +1216,7 @@ class AlignMuseDataset(object):
                                 "but overwrite is set to False")
             upipe.print_warning("If you wish to overwrite the table {0}, "
                                 "please set overwrite to True".format(
-                                 name_output_table))
+                name_output_table))
             return
 
         # Check if RA_OFFSET is there
@@ -1522,7 +1601,7 @@ class AlignMuseDataset(object):
 
         # Use Translation and Rotation or only rotation?
         for nima in list_nima:
-            upipe.print_info(f"---------- Optical Flow for Image #{nima+1}/i={nima} ----------")
+            upipe.print_info(f"---------- Optical Flow for Image #{nima + 1}/i={nima} ----------")
             self.run_optical_flow_ima(nima=nima, save_plot=save_plot,
                                       use_rotation=use_rotation,
                                       verbose=verbose, **kwargs)
@@ -1579,7 +1658,7 @@ class AlignMuseDataset(object):
         """
         if self.optical_flows[nima] is None:
             upipe.print_warning(f"No optical flow class for image {nima} -"
-                                 "- run it before applying it")
+                                "- run it before applying it")
             return
 
         if self.verbose:
@@ -1605,7 +1684,7 @@ class AlignMuseDataset(object):
             Number of iterations
         """
         if self.verbose:
-            upipe.print_info(f"Optical flow with {niter} iterations for Image #{nima+1}/i={nima}")
+            upipe.print_info(f"Optical flow with {niter} iterations for Image #{nima + 1}/i={nima}")
 
         list_guess_key = ["guess_rotation", "guess_offset_pixel", "guess_offset_arcsec"]
         given_guess = any(guess_key in kwargs for guess_key in list_guess_key)
@@ -1699,11 +1778,9 @@ class AlignMuseDataset(object):
             guess_rotation = self.init_rotangles[nima]
 
         # Do the alignment and get the off_muse and proj_ref using those guess offset
-        hdu_off_muse, hdu_proj_ref, diffra = self._apply_alignment(self.list_muse_hdu[nima],
-                                                                   total_off_pixel=guess_offset_pixel,
-                                                                   total_off_arcsec=guess_offset_arcsec,
-                                                                   total_rotangle=guess_rotation,
-                                                                   verbose=False)
+        hdu_off_muse, hdu_proj_ref, diffra = self._apply_alignment(
+            self.list_muse_hdu[nima], total_off_pixel=guess_offset_pixel,
+            total_off_arcsec=guess_offset_arcsec, total_rotangle=guess_rotation, verbose=False)
         upipe.print_info(f"Used grid with initial Offset / Rotation = "
                          f"{guess_offset_pixel[0]:8.4f} {guess_offset_pixel[1]:8.4f} [PIX] "
                          f"/ {guess_rotation} [DEG]")
@@ -1818,8 +1895,8 @@ class AlignMuseDataset(object):
         ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, threshold=threshold, **kwargs)
 
         if self.phase_corr:
-            shifts, shift_errors, phasediff = phase_cross_correlation(ima_ref, ima_muse,
-                                                                      upsample_factor=self.phase_subsamp)
+            shifts, shift_errors, phasediff = phase_cross_correlation(
+                ima_ref, ima_muse, upsample_factor=self.phase_subsamp)
             xpix_cross = shifts[1]
             ypix_cross = shifts[0]
         else:
@@ -1885,10 +1962,9 @@ class AlignMuseDataset(object):
         else:
             upipe.print_error("There are not yet any new hdu to save")
 
-
     def _align_hdu(self, hdu_target=None, hdu_to_align=None,
-              target_rotation=0.0, to_align_rotation=0.0,
-              conversion_factor=None):
+                   target_rotation=0.0, to_align_rotation=0.0,
+                   conversion_factor=None):
         """Project an to be aligned hdu onto the input hdu
         Hidden function, as only used internally
 
@@ -1917,9 +1993,8 @@ class AlignMuseDataset(object):
                          target_rotation=target_rotation, to_align_rotation=to_align_rotation,
                          conversion_factor=conversion_factor, use_mpdaf=self.use_mpdaf)
 
-
     def _align_reference_hdu(self, hdu_target=None, target_rotation=0.0,
-                             ref_rotation=0.0, conversion_factor=None, **kwargs):
+                             ref_rotation=0.0, conversion_factor=None):
         """Project the reference image onto the target hdu
         Hidden function, as only used internally
          
@@ -1940,7 +2015,7 @@ class AlignMuseDataset(object):
 
         return self._align_hdu(hdu_target=hdu_target, hdu_to_align=self.reference_hdu,
                                target_rotation=target_rotation, to_align_rotation=ref_rotation,
-                               conversion_factor=conversion_factor, **kwargs)
+                               conversion_factor=conversion_factor)
 
     @property
     def _total_rotangles(self):
@@ -1984,7 +2059,6 @@ class AlignMuseDataset(object):
         if extra_rotation is not None:
             self.extra_rotangles[nima] = extra_rotation
 
-
     def apply_extra_offset_ima(self, nima=0, extra_pixel=None, extra_arcsec=None,
                                extra_rotation=None, **kwargs):
         """Shift image with index nima with the total offset
@@ -2006,11 +2080,10 @@ class AlignMuseDataset(object):
         """
         # Add this to the extra_off arrays
         self._set_extra_offset_ima(nima=nima, extra_arcsec=extra_arcsec, extra_pixel=extra_pixel,
-                                    extra_rotation=extra_rotation)
+                                   extra_rotation=extra_rotation)
 
         # Actually apply the alignment to the image
         self._apply_alignment_ima(nima, **kwargs)
-
 
     def _apply_alignment_ima(self, nima=0, **kwargs):
         """Apply alignment for image with index nima
@@ -2022,10 +2095,11 @@ class AlignMuseDataset(object):
 
         """
         # Call the alignment given the input nima image
-        upipe.print_info(f"[#{nima+1:03d}/i={nima:03d}] --- Regridding Image "
+        upipe.print_info(f"[#{nima + 1:03d}/i={nima:03d}] --- Regridding Image "
                          f" {self.list_name_museimages[nima]} ---")
-        hdu_offmuse, hdu_projref, diffra  = self._apply_alignment(self.list_muse_hdu[nima],
-            total_off_pixel=self._total_off_pixel[nima], total_rotangle=self._total_rotangles[nima])
+        hdu_offmuse, hdu_projref, diffra = self._apply_alignment(
+            self.list_muse_hdu[nima], total_off_pixel=self._total_off_pixel[nima],
+            total_rotangle=self._total_rotangles[nima])
 
         # Creating a new Primary HDU and its WCS with the input data, and the new Header
         # This HDU has now been offset using the total offsets
@@ -2037,9 +2111,10 @@ class AlignMuseDataset(object):
 
         # Writing this up in an ascii file for record purposes
         if self.save_hdr:
-             _ = self.list_offmuse_hdu[nima].header.totextfile(joinpath(self.header_folder_name,
-                                                                        self.list_name_offmusehdr[nima]),
-                                                               overwrite=True)
+            _ = self.list_offmuse_hdu[nima].header.totextfile(joinpath(self.header_folder_name,
+                                                                       self.list_name_offmusehdr[
+                                                                           nima]),
+                                                              overwrite=True)
         # Getting the normalisation factors using those last projections
         _, _, self.ima_polypar[nima] = self.get_normfactor_ima(nima=nima, **kwargs)
         # Saving the normalisation
@@ -2153,7 +2228,6 @@ class AlignMuseDataset(object):
                               median_filter=median_filter, border=border,
                               chunk_size=chunk_size, threshold=threshold)
 
-
     def save_polypar_ima(self, nima=0, beta=None):
         """Saving the input values into the fixed arrays for the polynomial
 
@@ -2164,7 +2238,6 @@ class AlignMuseDataset(object):
         if beta is not None:
             self.ima_background[nima] = beta[0]
             self.ima_norm_factors[nima] = beta[1]
-
 
     def compare_ima(self, nima=0, nima_museref=None,
                     convolve_muse=0, convolve_reference=0., **kwargs):

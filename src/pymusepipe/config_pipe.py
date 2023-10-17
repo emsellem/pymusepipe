@@ -2,20 +2,66 @@
 """MUSE-PHANGS configuration module
 """
 
-# import modules
-import numpy as np
-
 __authors__ = "Eric Emsellem"
-__copyright = "(c) 2017-2019, ESO + CRAL"
+__copyright__ = "(c) 2017-2019, ESO + CRAL"
 __license__ = "MIT License"
 __contact__ = " <eric.emsellem@eso.org>"
 
+# import modules
+from astropy import units as u
+
+# ======================================================================#
+# BEGIN
+#           UNITS and PIVOT LAMBDA
+# ======================================================================#
+# Define useful units for MUSE
+default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
+default_reference_unit = u.microJansky
+
+# Default equivalencies for other filters
+dict_equivalencies = {"WFI_BB":      [1.000 * u.microJansky, 6483.58   * u.AA],
+                      "DUPONT_R":    [1.000 * u.microJansky, 6483.58   * u.AA],
+                      "Johnson_B":   [1.000 * u.microJansky, 4402.1095 * u.AA],
+                      "Johnson_V":   [1.000 * u.microJansky, 5492.9237 * u.AA],
+                      "Cousins_R":   [1.000 * u.microJansky, 6449.8565 * u.AA],
+                      "Cousins_I":   [1.000 * u.microJansky, 8046.6135 * u.AA],
+                      "SDSS_u":      [3.631 * u.microJansky, 3556.5240 * u.AA],
+                      "SDSS_g":      [3.631 * u.microJansky, 4702.4953 * u.AA],
+                      "SDSS_r":      [3.631 * u.microJansky, 6175.5789 * u.AA],
+                      "SDSS_i":      [3.631 * u.microJansky, 7489.9768 * u.AA],
+                      "SDSS_z":      [3.631 * u.microJansky, 8946.7096 * u.AA],
+                      "ACS_F475W":   [3.631 * u.microJansky, 4715.0024 * u.AA],
+                      "ACS_F550M":   [3.631 * u.microJansky, 5578.5129 * u.AA],
+                      "ACS_F555W":   [3.631 * u.microJansky, 5344.3102 * u.AA],
+                      "ACS_F606W":   [3.631 * u.microJansky, 5849.2354 * u.AA],
+                      "ACS_F625W":   [3.631 * u.microJansky, 6279.7071 * u.AA],
+                      "ACS_F775W":   [3.631 * u.microJansky, 7679.5302 * u.AA],
+                      "ACS_F814W":   [3.631 * u.microJansky, 8036.7563 * u.AA],
+                      "WFPC2_F555W": [3.631 * u.microJansky, 5391.3705 * u.AA],
+                      "WFPC2_F675W": [3.631 * u.microJansky, 6697.8244 * u.AA],
+                      "WFPC2_F814W": [3.631 * u.microJansky, 7947.5087 * u.AA],
+                      "WFC3_F502N":  [3.631 * u.microJansky, 5009.0078 * u.AA],
+                      "WFC3_F555W":  [3.631 * u.microJansky, 5309.9095 * u.AA],
+                      "WFC3_F606W":  [3.631 * u.microJansky, 5907.0092 * u.AA],
+                      "WFC3_F625W":  [3.631 * u.microJansky, 6253.9998 * u.AA],
+                      "WFC3_F656N":  [3.631 * u.microJansky, 6561.1205 * u.AA],
+                      "WFC3_F775W":  [3.631 * u.microJansky, 7732.9840 * u.AA],
+                      "WFC3_F814W":  [3.631 * u.microJansky, 8304.6816 * u.AA],
+                      "Kron_V":      [3.631 * u.microJansky, 5416.2200 * u.AA],
+                      "LEGACY_G":    [3.631 * u.microJansky, 4808.5075 * u.AA],
+                      "LEGACY_R":    [3.631 * u.microJansky, 6417.6456 * u.AA],
+                      "LEGACY_I":    [3.631 * u.microJansky, 7814.5752 * u.AA],
+                      "LEGACY_Z":    [3.631 * u.microJansky, 9168.8545 * u.AA]
+                      }
+default_filter_name = "WFI_BB"
+default_pivot_lambda = dict_equivalencies[default_filter_name]
+
+# -- END ---------------------------------------------------------------#
 
 # ======================================================================#
 # BEGIN
 #           FILTER LIST
 # ======================================================================#
-
 default_filter_list = "white,Johnson_B,Johnson_V,Cousins_R,SDSS_g,SDSS_r,SDSS_i"
 default_short_filter_list = "white,Cousins_R"
 default_PHANGS_filter_list = "white,Johnson_B,Johnson_V,Cousins_R," \
@@ -389,4 +435,6 @@ dict_default_for_recipes = {'fraction': 0.8,
 dict_recipes_per_name = {}
 for key in dict_recipes_per_num:
     dict_recipes_per_name[dict_recipes_per_num[key]] = key
+
+# ========================================================
 

@@ -127,6 +127,7 @@ class PipeDict(dict):
         self.update(*args, **kwargs)
         self._initialised = False
 
+
     def __setitem__(self, key, value):
         """Setting the item by using the dictionary of the new values
         """
@@ -135,6 +136,7 @@ class PipeDict(dict):
                 setattr(self, funcname, self.run_on_all_keys(funcname))
 
         super(PipeDict, self).__setitem__(key, value)
+
 
     def update(self, *args, **kwargs):
         if args:
@@ -147,10 +149,12 @@ class PipeDict(dict):
         for key in kwargs:
             self[key] = kwargs[key]
 
+
     def setdefault(self, key, value=None):
         if key not in self:
             self[key] = value
         return self[key]
+
 
     def run_on_all_keys(self, funcname):
         """Runs the given function on all the keys
