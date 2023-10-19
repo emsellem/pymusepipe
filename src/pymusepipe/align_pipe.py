@@ -44,8 +44,8 @@ from mpdaf.obj import Image, WCS
 from . import util_pipe as upipe  # noqua: E402
 from .config_pipe import (mjd_names, date_names, tpl_names,
                           dataset_names, iexpo_names, dict_listObject,
-                          dict_equivalencies, default_muse_unit, default_reference_unit,
-                          default_filter_name, default_pivot_lambda)
+                          dict_equivalencies, default_muse_unit, default_filter_name,
+                          filter_warning_list)
 
 from .graph_pipe import (plot_polypar, plot_compare_contours,
                          plot_compare_cuts, plot_compare_diff)
@@ -750,6 +750,18 @@ class AlignMuseDataset(object):
             self.equivalency = get_equivalency_from_pivot(self.pivot_lambda)
         else:
             self.equivalency = equivalency
+
+        # Adding a warning in case e.g., PANSTARRS is the filter
+        for name in filter_warning_list:
+            if name in self.filter_name:
+                upipe.print_warning("# ------------------------------------------------------- #")
+                upipe.print_warning("#                       FILTER WARNING       ")
+                upipe.print_warning(f"For Filter {self.filter_name} beware of normalisation issues")
+                upipe.print_warning("Please make sure the input images are as expected, namely")
+                upipe.print_warning(f"Reference Unit = {self.ref_unit}, Pivot Lambda = "
+                                    f"{self.pivot_lambda}")
+                upipe.print_warning("# ------------------------------------------------------- #")
+
 
     def show_norm_factors(self):
         """Print some information about the normalisation factors.

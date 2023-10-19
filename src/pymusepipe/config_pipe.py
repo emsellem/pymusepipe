@@ -51,10 +51,20 @@ dict_equivalencies = {"WFI_BB":      [1.000 * u.microJansky, 6483.58   * u.AA],
                       "LEGACY_G":    [3.631 * u.microJansky, 4808.5075 * u.AA],
                       "LEGACY_R":    [3.631 * u.microJansky, 6417.6456 * u.AA],
                       "LEGACY_I":    [3.631 * u.microJansky, 7814.5752 * u.AA],
-                      "LEGACY_Z":    [3.631 * u.microJansky, 9168.8545 * u.AA]
+                      "LEGACY_Z":    [3.631 * u.microJansky, 9168.8545 * u.AA],
+                      "PANSTARRS_O": [3.631 * u.microJansky, 6550.0000 * u.AA],
+                      "PANSTARRS_G": [3.631 * u.microJansky, 4810.0000 * u.AA],
+                      "PANSTARRS_R": [3.631 * u.microJansky, 6170.0000 * u.AA],
+                      "PANSTARRS_I": [3.631 * u.microJansky, 7520.0000 * u.AA],
+                      "PANSTARRS_Z": [3.631 * u.microJansky, 8660.0000 * u.AA],
+                      "PANSTARRS_Y": [3.631 * u.microJansky, 9620.0000 * u.AA],
+                      "PANSTARRS_W": [3.631 * u.microJansky, 6080.0000 * u.AA]
                       }
 default_filter_name = "WFI_BB"
 default_pivot_lambda = dict_equivalencies[default_filter_name]
+# The following list of filters may need attention in terms of the normalisation etc
+# Used in the align_pipe module
+filter_warning_list = ["PANSTARRS"]
 
 # -- END ---------------------------------------------------------------#
 
