@@ -2385,7 +2385,7 @@ class AlignMuseDataset(object):
         if shownormalise:
             plot_polypar(polypar, labels=["MuseData", "RefData"], figfolder=foldfig,
                          fignum=current_fig, namefig=f"align_norm_scatter{suffix_fig}.png",
-                         savefig=savefig)
+                         savefig=savefig, title="Norm")
             self.list_figures.append(current_fig)
             current_fig += 1
 
@@ -2399,20 +2399,20 @@ class AlignMuseDataset(object):
 
         if showcuts:
             plot_compare_cuts(aligned, reference, ncuts=ncuts, fignum=current_fig, figfolder=foldfig,
-                              namefig=f"align_cuts{suffix_fig}.png", savefig=savefig)
+                              namefig=f"align_cuts{suffix_fig}.png", title=f'Cuts', savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1
 
         if showdiff:
             plot_compare_diff(aligned, reference, plotwcs=plotwcs, fignum=current_fig,
                               figfolder=foldfig, percentage=percentage,
-                              namefig=f"align_diff{suffix_fig}.png", savefig=savefig)
+                              namefig=f"align_diff{suffix_fig}.png", title=f'Difference', savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1
 
         if showfrac:
             plot_compare_frac(aligned, reference, plotwcs=plotwcs, fignum=current_fig,
                               figfolder=foldfig, percentage=percentage,
-                              namefig=f"align_frac{suffix_fig}.png", savefig=savefig)
+                              namefig=f"align_frac{suffix_fig}.png", title=f'Ratio [perc]', savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1
