@@ -25,7 +25,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.gridspec as gridspec
 
 from .mpdaf_pipe import MuseSetImages, MuseSetSpectra
-from .util_image import my_linear_model, get_flux_range
+from .util_image import my_linear_model, get_flux_range, filtermed_image
 
 __version__ = '0.0.1 (23 March 2018)'
 
@@ -139,8 +139,9 @@ def plot_compare_contours(data1, data2, plotwcs=None, labels=('Data1', 'Data2'),
         plt.savefig(joinpath(figfolder, namefig))
     np.seterr(divide='warn', invalid='warn')
 
-def plot_compare_diff(data1, data2, plotwcs=None, figfolder="", percentage=5, fignum=1,
-                      namefig="dummy_diff.ong", savefig=False, **kwargs):
+
+def plot_compare_frac(data1, data2, plotwcs=None, figfolder="", percentage=5, fignum=1,
+                      namefig="dummy_frac.png", savefig=False, filtermed=True, **kwargs):
     """
 
     Parameters
@@ -157,8 +158,53 @@ def plot_compare_diff(data1, data2, plotwcs=None, figfolder="", percentage=5, fi
     -------
     """
     fig, ax = open_new_wcs_figure(fignum, plotwcs)
+
+    if filtermed:
+         data1 = filtermed_image(data1)
+         data2 = filtermed_image(data2)    
     ratio = 100. * (data2 - data1) / (data1 + 1.e-12)
+
     im = ax.imshow(ratio, vmin=-percentage, vmax=percentage)
+    cbar = fig.colorbar(im, shrink=0.8)
+
+    if "title" in kwargs:
+        plt.title(kwargs.pop('title'))
+    plt.tight_layout()
+    if savefig:
+        plt.savefig(joinpath(figfolder, namefig))
+
+
+def plot_compare_diff(data1, data2, plotwcs=None, figfolder="", percentage=1, fignum=1,
+                      namefig="dummy_diff.png", savefig=False, filtermed=True, **kwargs):
+    """Compare the input 2 numpy array by looking at the difference
+
+    Parameters
+    ----------
+    data1: 2d numpy array
+    data2: 2d numpy array
+    plotwcs: bool
+    figfolder: str
+    fignum: int
+    namefig: str
+    savefig: bool
+    percentage: float
+        Will use [percentage, 100-percentage] as percentile colour cuts
+    **kwargs: dict
+        additional keywords
+
+    Creates
+    -------
+    A plot with the difference of the two images
+    """
+    fig, ax = open_new_wcs_figure(fignum, plotwcs)
+
+    if filtermed:
+         data1 = filtermed_image(data1)
+         data2 = filtermed_image(data2)
+    diff = data2 - data1
+
+    vmin, vmax = np.nanpercentile(diff, [percentage, 100 - percentage])
+    im = ax.imshow(diff, vmin=vmin, vmax=vmax)
     cbar = fig.colorbar(im, shrink=0.8)
 
     if "title" in kwargs:

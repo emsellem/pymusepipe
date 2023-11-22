@@ -1093,7 +1093,9 @@ class MusePipeSample(object):
                                              prefix=prefix, suffix=suffix)
 
     def mosaic(self, targetname=None, list_pointings=None, init_mosaic=True,
-               build_cube=True, build_images=True, **kwargs):
+               build_cube=True, build_images=True, 
+               nmax=2, nclip=5.0, var='propagate', nstop=2, mad=True,
+               **kwargs):
         """
 
         Input
@@ -1101,6 +1103,21 @@ class MusePipeSample(object):
         targetname: str
         list_pointings: list of int
         init_mosaic: bool
+        nmax: int
+           maximum number of clipping iterations
+        nclip: float or tuple of float (5.0)
+            number of sigma for the clipping or lower/upper sigma for the
+            clipping
+        nstop: int
+            If the number of not rejected pixels is less than this number, 
+            the clipping iterations stop. 
+        var: str ('propagate')
+            propagate: the variance is the sum of the variances of the N 
+                individual exposures divided by N**2.
+            stat_mean: the variance of each combined pixel is computed 
+                as the variance derived from the comparison of the N individual exposures divided N-1.
+            stat_one: the variance of each combined pixel is computed as 
+                the variance derived from the comparison of the N individual exposures.
         **kwargs:
 
         Returns
@@ -1140,7 +1157,9 @@ class MusePipeSample(object):
         # Doing the MAD combination using mpdaf. Note the build_cube fakemode
         self.pipes_mosaic[targetname].print_cube_names()
         self.pipes_mosaic[targetname].madcombine(outcube_name=outcube_name,
-                                                 fakemode=not build_cube)
+                                                 fakemode=not build_cube,
+                                                 var=var, nstop=nstop, nclip=nclip,
+                                                 nmax=nmax, mad=mad)
 
         if build_images:
             mosaic_name = self.pipes_mosaic[targetname].mosaic_cube_name

@@ -48,7 +48,7 @@ from .config_pipe import (mjd_names, date_names, tpl_names,
                           filter_warning_list)
 
 from .graph_pipe import (plot_polypar, plot_compare_contours,
-                         plot_compare_cuts, plot_compare_diff)
+                         plot_compare_cuts, plot_compare_diff, plot_compare_frac)
 from .util_image import my_linear_model, flatclean_image, get_normfactor, mask_point_sources
 
 try:
@@ -2292,21 +2292,21 @@ class AlignMuseDataset(object):
                                                     convolve_data1=convolve_muse,
                                                     convolve_data2=convolve_reference,
                                                     threshold=threshold_muse)
-        self.compare(data1=musedata, data2=refdata, header=musehdu.header,
+        self.compare(aligned=musedata, reference=refdata, header=musehdu.header,
                      suffix_fig=f"{nima:03d}", **kwargs)
 
-    def compare(self, data1, data2, header=None,
-                start_nfig=1, nlevels=10, levels=None, convolve_data1=0., convolve_data2=0.,
-                showcontours=True, showcuts=True, shownormalise=True, showdiff=True,
-                normalise=True, median_filter=True, ncuts=5, percentage=5.,
+    def compare(self, aligned=None, reference=None, header=None,
+                start_nfig=1, nlevels=10, levels=None, convolve_aligned=0., convolve_reference=0.,
+                showcontours=True, showcuts=False, shownormalise=True, showdiff=True,
+                showfrac=True, normalise=True, median_filter=True, ncuts=5, percentage=5.,
                 suffix_fig="", **kwargs):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
          
         Parameters
         ----------
-        data1:
-        data2: 2d np.arrays
+        aligned:
+        reference: 2d np.arrays
             Array to compare
         header: Header
             If provided, will be use to get the WCS in the plots. Default is None (ignored).
@@ -2329,7 +2329,7 @@ class AlignMuseDataset(object):
             Number of levels for the contour plots
         levels: list of float [None]
             Specific list of levels if any (default is None)
-        convolve_data1: float [0]
+        convolve_aligned: float [0]
             If not 0, will convolve with a gaussian of that sigma
         convolve_data2: float [0]
             If not 0, will convolve the reference image
@@ -2347,9 +2347,9 @@ class AlignMuseDataset(object):
         threshold = kwargs.pop("threshold", 0.)
 
         # Getting the data
-        _, _, polypar = get_normfactor(data1, data2,
-                                       convolve_data1=convolve_data1,
-                                       convolve_data2=convolve_data2,
+        _, _, polypar = get_normfactor(aligned, reference,
+                                       convolve_data1=convolve_aligned,
+                                       convolve_data2=convolve_reference,
                                        median_filter=median_filter, border=border,
                                        chunk_size=chunk_size,
                                        threshold=threshold)
@@ -2360,12 +2360,12 @@ class AlignMuseDataset(object):
                 upipe.print_info(f"Renormalising the data as: Normalised = "
                                  f"{polypar.beta[1]:8.4e} * ({polypar.beta[0]:8.4e} + MUSE)")
 
-            data1 = my_linear_model(polypar.beta, data1)
+            aligned = my_linear_model(polypar.beta, aligned)
 
         # Save the frames in case this is needed
         if self._debug:
-            self._temp_aligned = data1
-            self._temp_reference = data2
+            self._temp_aligned = aligned
+            self._temp_reference = reference
 
         # WCS for plotting using astropy
         if header is not None:
@@ -2390,7 +2390,7 @@ class AlignMuseDataset(object):
             current_fig += 1
 
         if showcontours:
-            plot_compare_contours(data1, data2, plotwcs=plotwcs, fignum=current_fig,
+            plot_compare_contours(aligned, reference, plotwcs=plotwcs, fignum=current_fig,
                                   labels=['MUSE', 'REF'], nlevels=nlevels, levels=levels,
                                   figfolder=foldfig, namefig=f"align_contours{suffix_fig}.png",
                                   title=f'Image {suffix_fig}', savefig=savefig)
@@ -2398,14 +2398,21 @@ class AlignMuseDataset(object):
             current_fig += 1
 
         if showcuts:
-            plot_compare_cuts(data1, data2, ncuts=ncuts, fignum=current_fig, figfolder=foldfig,
+            plot_compare_cuts(aligned, reference, ncuts=ncuts, fignum=current_fig, figfolder=foldfig,
                               namefig=f"align_cuts{suffix_fig}.png", savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1
 
         if showdiff:
-            plot_compare_diff(data1, data2, plotwcs=plotwcs, fignum=current_fig,
+            plot_compare_diff(aligned, reference, plotwcs=plotwcs, fignum=current_fig,
                               figfolder=foldfig, percentage=percentage,
                               namefig=f"align_diff{suffix_fig}.png", savefig=savefig)
+            self.list_figures.append(current_fig)
+            current_fig += 1
+
+        if showfrac:
+            plot_compare_frac(aligned, reference, plotwcs=plotwcs, fignum=current_fig,
+                              figfolder=foldfig, percentage=percentage,
+                              namefig=f"align_frac{suffix_fig}.png", savefig=savefig)
             self.list_figures.append(current_fig)
             current_fig += 1

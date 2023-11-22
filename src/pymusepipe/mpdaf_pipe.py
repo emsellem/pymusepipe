@@ -592,13 +592,14 @@ class MuseCubeMosaic(CubeMosaic):
                                            psf=psf)
 
     def madcombine(self, folder_cubes=None, outcube_name="dummy.fits",
-                   fakemode=False, mad=True):
+                   fakemode=False, mad=True, **kwargs):
         """Combine the CubeMosaic and write it out.
 
         Args:
             folder_cubes (str): name of the folder for the cube [None]
             outcube_name (str): name of the outcube
             mad (bool): using mad or not [True]
+            kwargs : include all other options for pycombine of Mosaic in mpdaf
 
         Creates:
             A new cube, combination of all input cubes listes in CubeMosaic
@@ -608,7 +609,7 @@ class MuseCubeMosaic(CubeMosaic):
         print_info("Starting the combine of "
                          "all {} input cubes".format(self.ncubes))
         if not fakemode:
-            cube, expmap, statpix, rejmap = self.pycombine(mad=mad)
+            cube, expmap, statpix, rejmap = self.pycombine(mad=mad, **kwargs)
 
         # Saving
         if folder_cubes is not None:
