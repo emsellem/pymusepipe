@@ -156,7 +156,8 @@ class PipePrep(SofPipe):
         defval.filter_for_alignment = kwargs.pop("filter_for_alignment", self.filter_for_alignment)
 
         # Dictionary of arguments for each recipe
-        default_dict_kwargs_recipes = {'twilight': {'illum': defval.illum},
+        default_dict_kwargs_recipes = {'twilight': {'illum': defval.illum,
+                                                    'use_vignetting_mask': defval.use_vignetting_mask},
                                        'scibasic_all': {'illum': defval.illum},
                                        'sky': {'fraction': defval.fraction},
                                        'prep_align': {'skymethod': defval.skymethod,
@@ -437,7 +438,7 @@ class PipePrep(SofPipe):
         self.goto_prevfolder(addtolog=True)
 
     @print_my_method_name
-    def run_twilight(self, sof_filename='twilight', tpl="ALL", update=None, illum=True):
+    def run_twilight(self, sof_filename='twilight', tpl="ALL", update=None, illum=True, use_vignetting_mask=None):
         """Reducing the  files and creating the TWILIGHT CUBE.
         Will run the esorex muse_twilight command on all TWILIGHT
 
@@ -469,8 +470,14 @@ class PipePrep(SofPipe):
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
             # Adding a test on whether we should use the Vignetting mask or not
             # Only use for tpl before 10th of March 2017
-            if datetime.fromisoformat(tpl).date() <= deadline_vignetting:
-                self._add_calib_to_sofdict("VIGNETTING_MASK")
+            # Can be forced if use_vignetting_mask is True
+            if use_vignetting_mask is None:
+                if datetime.fromisoformat(tpl).date() <= deadline_vignetting:
+                    self._add_calib_to_sofdict("VIGNETTING_MASK")
+            else:
+                if use_vignetting_mask:
+                    self._add_calib_to_sofdict("VIGNETTING_MASK")
+
             self._add_geometry_to_sofdict(tpl, mean_mjd)
             # Provide the list of files to the dictionary
             self._sofdict['SKYFLAT'] = add_listpath(self.paths.rawfiles,
