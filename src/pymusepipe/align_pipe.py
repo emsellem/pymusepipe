@@ -988,9 +988,8 @@ class AlignMuseDataset(object):
             self.table_mjdobs = self.offset_table[mjd_names['table']]
             # Now finding the right match with the Images
             # Warning, needs > numpy 1.15.0
-            mjd_values, ind_ima, ind_table = np.intersect1d(
-                self.ima_mjdobs, self.table_mjdobs,
-                return_indices=True, assume_unique=True)
+            mjd_values, ind_ima, ind_table = np.intersect1d(self.ima_mjdobs, self.table_mjdobs,
+                                                            return_indices=True, assume_unique=True)
             # Extracting the flux scale from table
             nonan_flux_scale_table = np.where(
                 np.isnan(self.offset_table['FLUX_SCALE']),
@@ -1167,11 +1166,8 @@ class AlignMuseDataset(object):
             upipe.print_info("#{0:03d}/i={1:03d} -{2:>26}  |ARCSEC|{3:8.4f} {4:8.4f} "
                              " |PIXEL|{5:8.4f} {6:8.4f}  |ROT|{7:8.4f}".format(
                 nima + 1, nima, self.list_name_museimages[nima][-29:-5],
-                self._total_off_arcsec[nima][0],
-                self._total_off_arcsec[nima][1],
-                self._total_off_pixel[nima][0],
-                self._total_off_pixel[nima][1],
-                self._total_rotangles[nima]))
+                self._total_off_arcsec[nima][0], self._total_off_arcsec[nima][1],
+                self._total_off_pixel[nima][0], self._total_off_pixel[nima][1], self._total_rotangles[nima]))
 
     def save_fits_offset_table(self, name_output_table=None,
                                folder_output_table=None,

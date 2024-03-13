@@ -1,4 +1,3 @@
-
 # Licensed under a MIT license - see LICENSE
 
 """MUSE-PHANGS preparation recipe module
@@ -14,6 +13,7 @@ import os
 from os.path import join as joinpath
 
 from copy import deepcopy
+from datetime import datetime
 
 # Numpy
 import numpy as np
@@ -29,7 +29,7 @@ from .util_image import create_offset_table
 from .config_pipe import (mjd_names, get_suffix_product, dict_default_for_recipes,
                           dict_recipes_per_num, dict_recipes_per_name,
                           dict_files_iexpo_products, dict_files_products,
-                          dict_products_scipost)
+                          dict_products_scipost, deadline_vignetting)
 from .emission_lines import get_emissionline_band
 
 try:
@@ -53,10 +53,12 @@ def print_my_method_name(f):
     -----
     f: method
     """
+
     @functools.wraps(f)
     def wrapped(*myargs, **mykwargs):
         upipe.print_info("################   " + f.__name__ + "   ################")
         return f(*myargs, **mykwargs)
+
     return wrapped
 
 
@@ -66,11 +68,12 @@ def print_my_method_name(f):
 class PipePrep(SofPipe):
     """PipePrep class prepare the SOF files and launch the recipes
     """
+
     def __init__(self, first_recipe=1, last_recipe=None):
         """Initialisation of PipePrep
         """
         SofPipe.__init__(self)
-#        super(PipePrep, self).__init__()
+        #        super(PipePrep, self).__init__()
         self.first_recipe = first_recipe
         if last_recipe is None:
             self.last_recipe = np.max(list(dict_recipes_per_num.keys()))
@@ -109,7 +112,7 @@ class PipePrep(SofPipe):
             return group_table
         else:
             return group_table.groups[group_table.groups.keys['tpls'] == tpl]
-        
+
     @staticmethod
     def print_recipes():
         """Printing the list of recipes
@@ -140,6 +143,7 @@ class PipePrep(SofPipe):
         lambda_window: float
             Default is 10.0 as defined in config_pipe
         """
+
         class DefVal(object):
             def __init__(self):
                 pass
@@ -197,10 +201,10 @@ class PipePrep(SofPipe):
 
         # Printing the info about which recipes will be used
         upipe.print_info("Data reduction from recipe {0} to {1}".format(
-                            dict_recipes_per_num[first_recipe],
-                            dict_recipes_per_num[last_recipe]))
+            dict_recipes_per_num[first_recipe],
+            dict_recipes_per_num[last_recipe]))
         upipe.print_info("               [steps {0} - {1}]".format(
-                            first_recipe, last_recipe))
+            first_recipe, last_recipe))
 
         # Now doing the recipes one by one in order
         for ind in range(first_recipe, last_recipe + 1):
@@ -449,9 +453,9 @@ class PipePrep(SofPipe):
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype='TWILIGHT', tpl=tpl)
         if len(tpl_gtable) == 0:
-            if self.verbose :
-                upipe.print_error("[run_twilight] No TWILIGHT recovered from the astropy file Table - Aborting", 
-                        pipe=self)
+            if self.verbose:
+                upipe.print_error("[run_twilight] No TWILIGHT recovered from the astropy file Table - Aborting",
+                                  pipe=self)
             return
 
         # Go to the data folder
@@ -459,15 +463,18 @@ class PipePrep(SofPipe):
 
         # Create the dictionary for the LSF including
         # the list of files to be processed for one MASTER Flat
-        self._add_calib_to_sofdict("BADPIX_TABLE", reset=True)
-        self._add_calib_to_sofdict("VIGNETTING_MASK")
         for gtable in tpl_gtable.groups:
-            # extract the tpl (string) and mean mjd (float) 
+            self._add_calib_to_sofdict("BADPIX_TABLE", reset=True)
+            # extract the tpl (string) and mean mjd (float)
             tpl, mean_mjd = self._get_tpl_meanmjd(gtable)
+            # Adding a test on whether we should use the Vignetting mask or not
+            # Only use for tpl before 10th of March 2017
+            if datetime.fromisoformat(tpl).date() <= deadline_vignetting:
+                self._add_calib_to_sofdict("VIGNETTING_MASK")
             self._add_geometry_to_sofdict(tpl, mean_mjd)
             # Provide the list of files to the dictionary
             self._sofdict['SKYFLAT'] = add_listpath(self.paths.rawfiles,
-                    list(gtable['filename']))
+                                                    list(gtable['filename']))
             # Finding the best tpl for BIAS, FLAT, ILLUM, TRACE, WAVE
             if illum:
                 self._add_tplraw_to_sofdict(mean_mjd, "ILLUM")
@@ -512,9 +519,10 @@ class PipePrep(SofPipe):
         # First selecting the files via the grouped table
         tpl_gtable = self.select_tpl_files(expotype=expotype, tpl=tpl, stage="raw")
         if len(tpl_gtable) == 0:
-            if self.verbose :
-                upipe.print_error("[run_scibasic] No {0} recovered from the astropy file Table - Aborting".format(expotype), 
-                        pipe=self)
+            if self.verbose:
+                upipe.print_error(
+                    "[run_scibasic] No {0} recovered from the astropy file Table - Aborting".format(expotype),
+                    pipe=self)
             return
 
         # Go to the data folder
@@ -531,18 +539,18 @@ class PipePrep(SofPipe):
             self._add_geometry_to_sofdict(tpl, mean_mjd)
             # Provide the list of files to the dictionary
             self._sofdict[expotype] = add_listpath(self.paths.rawfiles,
-                    list(gtable['filename']))
+                                                   list(gtable['filename']))
             # Number of objects
             Nexpo = len(self._sofdict[expotype])
             if self.verbose:
                 upipe.print_info("Number of expo is {Nexpo} for {expotype}".format(
-                                 Nexpo=Nexpo, expotype=expotype), pipe=self)
+                    Nexpo=Nexpo, expotype=expotype), pipe=self)
 
             # Finding the best tpl for BIAS
             if illum:
-                self._add_tplraw_to_sofdict(mean_mjd, "ILLUM") 
-            self._add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT', 
-                'TRACE', 'WAVE', 'TWILIGHT'])
+                self._add_tplraw_to_sofdict(mean_mjd, "ILLUM")
+            self._add_list_tplmaster_to_sofdict(mean_mjd, ['BIAS', 'FLAT',
+                                                           'TRACE', 'WAVE', 'TWILIGHT'])
 
             # Writing the sof file
             self.write_sof(sof_filename=sof_filename + "_" + tpl, new=True)
@@ -552,7 +560,7 @@ class PipePrep(SofPipe):
             name_products = []
             list_expo = np.arange(Nexpo).astype(int) + 1
             for iexpo in list_expo:
-                name_products += ['{0:04d}-{1:02d}.fits'.format(iexpo, j+1) for j in range(24)]
+                name_products += ['{0:04d}-{1:02d}.fits'.format(iexpo, j + 1) for j in range(24)]
             self.recipe_scibasic(self.current_sof, tpl, expotype, dir_products, name_products, suffix)
 
             # Write the Processed files Table and save it
@@ -584,9 +592,9 @@ class PipePrep(SofPipe):
         # First selecting the files via the grouped table
         std_table = self.select_tpl_files("STD", tpl=tpl, stage="processed")
         if len(std_table) == 0:
-            if self.verbose :
+            if self.verbose:
                 upipe.print_error("[run_standard] No processed STD recovered from the astropy file Table - Aborting",
-                        pipe=self)
+                                  pipe=self)
             return
 
         # Go to the data folder
@@ -596,13 +604,15 @@ class PipePrep(SofPipe):
         for i in range(len(std_table)):
             mytpl = std_table['tpls'][i]
             iexpo = int(std_table['iexpo'][i])
-            if tpl != "ALL" and tpl != mytpl :
+            if tpl != "ALL" and tpl != mytpl:
                 continue
             # Now starting with the standard recipe
             self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
             self._add_calib_to_sofdict("STD_FLUX_TABLE")
             self._sofdict['PIXTABLE_STD'] = [joinpath(self._get_fullpath_expo("STD", "processed"),
-                'PIXTABLE_STD_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo, j+1)) for j in range(24)]
+                                                      'PIXTABLE_STD_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo,
+                                                                                                     j + 1)) for j in
+                                             range(24)]
             self.write_sof(sof_filename=sof_filename + "_" + mytpl, new=True)
             name_std = deepcopy(dict_files_products['STD'])
             dir_std = self._get_fullpath_expo('STD', "master")
@@ -631,9 +641,9 @@ class PipePrep(SofPipe):
         # First selecting the files via the grouped table
         sky_table = self._get_table_expo("SKY", "processed")
         if len(sky_table) == 0:
-            if self.verbose :
+            if self.verbose:
                 upipe.print_warning("[run_sky] No SKY recovered from the astropy file Table - Aborting",
-                        pipe=self)
+                                    pipe=self)
             return
 
         # Go to the data folder
@@ -645,7 +655,7 @@ class PipePrep(SofPipe):
             mytpl = sky_table['tpls'][i]
             mymjd = sky_table['mjd'][i]
             iexpo = int(sky_table['iexpo'][i])
-            if tpl != "ALL" and tpl != mytpl :
+            if tpl != "ALL" and tpl != mytpl:
                 continue
             # Now starting with the standard recipe
             self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
@@ -654,7 +664,9 @@ class PipePrep(SofPipe):
             self._add_skycalib_to_sofdict("STD_TELLURIC", mymjd, 'STD')
             self._add_tplmaster_to_sofdict(mymjd, 'LSF')
             self._sofdict['PIXTABLE_SKY'] = [joinpath(self._get_fullpath_expo("SKY", "processed"),
-                'PIXTABLE_SKY_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo, j+1)) for j in range(24)]
+                                                      'PIXTABLE_SKY_{0}_{1:04d}-{2:02d}.fits'.format(mytpl, iexpo,
+                                                                                                     j + 1)) for j in
+                                             range(24)]
             self.write_sof(sof_filename="{0}_{1}_{2:02d}".format(sof_filename, mytpl, iexpo), new=True)
             dir_sky = self._get_fullpath_expo('SKY', "processed")
             name_sky = deepcopy(dict_files_products['SKY'])
@@ -668,8 +680,8 @@ class PipePrep(SofPipe):
         self.goto_prevfolder(addtolog=True)
 
     @print_my_method_name
-    def run_autocal_sky(self, sof_filename='scipost', expotype="SKY", 
-            AC_suffix="_AC", tpl="ALL", **extra_kwargs):
+    def run_autocal_sky(self, sof_filename='scipost', expotype="SKY",
+                        AC_suffix="_AC", tpl="ALL", **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter
         """
@@ -679,18 +691,18 @@ class PipePrep(SofPipe):
         for i in range(len(object_table)):
             iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
-            if tpl != "ALL" and tpl != mytpl :
+            if tpl != "ALL" and tpl != mytpl:
                 continue
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
-                    tpl=mytpl, list_expo=[iexpo], save='autocal', 
-                    offset_list=False, suffix=AC_suffix, autocalib='deepfield', 
-                    **extra_kwargs)
+                             tpl=mytpl, list_expo=[iexpo], save='autocal',
+                             offset_list=False, suffix=AC_suffix, autocalib='deepfield',
+                             **extra_kwargs)
 
     @print_my_method_name
-    def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            line=None, suffix="", **extra_kwargs):
-        """Launch the scipost command to get individual exposures in a narrow
-        band filter
+    def run_prep_align(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL",
+                       line=None, suffix="", **extra_kwargs):
+        """Launch the scipost command to get individual exposures in a narrowband
+        filter
         """
         # First selecting the files via the grouped table
         object_table = self._get_table_expo("OBJECT", "processed")
@@ -709,25 +721,25 @@ class PipePrep(SofPipe):
         # Tag the suffix with the prealign suffix
         suffix = "{0}{1}".format(suffix, self._suffix_prealign)
 
-        if line is not None: 
+        if line is not None:
             suffix = "{0}_{1}".format(suffix, line)
 
         # Processing individual exposures to get the full cube and image
         for i in range(len(object_table)):
             iexpo = int(object_table['iexpo'][i])
             mytpl = object_table['tpls'][i]
-            if tpl != "ALL" and tpl != mytpl :
+            if tpl != "ALL" and tpl != mytpl:
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
-                    tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
-                    lambdaminmax=[lmin, lmax], save='cube', 
-                    offset_list=False, filter_list=filter_for_alignment,
-                    **extra_kwargs)
+                             tpl=mytpl, list_expo=[iexpo], suffix=suffix,
+                             lambdaminmax=[lmin, lmax], save='cube',
+                             offset_list=False, filter_list=filter_for_alignment,
+                             **extra_kwargs)
 
     @print_my_method_name
     def run_check_align(self, name_offset_table, sof_filename='scipost', expotype="OBJECT", tpl="ALL",
-            line=None, suffix="", folder_offset_table=None, **extra_kwargs):
+                        line=None, suffix="", folder_offset_table=None, **extra_kwargs):
         """Launch the scipost command to get individual exposures in a narrow
         band filter to check if the alignments are ok (after rotation 
         and using a given offset_table)
@@ -749,7 +761,7 @@ class PipePrep(SofPipe):
         # Tag the suffix with the prealign suffix
         suffix = "{0}{1}".format(suffix, self._suffix_checkalign)
 
-        if line is not None: 
+        if line is not None:
             suffix = "{0}_{1}".format(suffix, line)
 
         # Processing individual exposures to get the full cube and image
@@ -760,15 +772,15 @@ class PipePrep(SofPipe):
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
-                    tpl=mytpl, list_expo=[iexpo], suffix=suffix, 
-                    lambdaminmax=[lmin, lmax], save='cube', 
-                    offset_list=True, filter_list=filter_for_alignment,
-                    name_offset_table=name_offset_table,
-                    folder_offset_table=folder_offset_table,
-                    **extra_kwargs)
+                             tpl=mytpl, list_expo=[iexpo], suffix=suffix,
+                             lambdaminmax=[lmin, lmax], save='cube',
+                             offset_list=True, filter_list=filter_for_alignment,
+                             name_offset_table=name_offset_table,
+                             folder_offset_table=folder_offset_table,
+                             **extra_kwargs)
 
     @print_my_method_name
-    def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT", 
+    def run_scipost_perexpo(self, sof_filename='scipost', expotype="OBJECT",
                             list_tplexpo="ALL", stage="processed",
                             suffix="", offset_list=False, **kwargs):
         """Launch the scipost command exposure per exposure
@@ -789,9 +801,9 @@ class PipePrep(SofPipe):
                 continue
             # Running scipost now on the individual exposure
             self.run_scipost(sof_filename=sof_filename, expotype=expotype,
-                    tpl=mytpl, list_expo=[iexpo], suffix=suffix,
-                    offset_list=offset_list,
-                    **kwargs)
+                             tpl=mytpl, list_expo=[iexpo], suffix=suffix,
+                             offset_list=offset_list,
+                             **kwargs)
 
     def _get_scipost_products(self, save='cube,skymodel', list_expo=[], filter_list=None):
         """Provide a set of key output products depending on the save mode
@@ -817,24 +829,24 @@ class PipePrep(SofPipe):
                         name_products.append(prod)
                         suffix_products.append("_{0:04d}".format(i))
                         suffix_prefinalnames.append("_{0}".format(value))
-                        if len(list_expo) == 1 :
+                        if len(list_expo) == 1:
                             suffix_postfinalnames.append("_{0:04d}".format(list_expo[0]))
-                        else :
+                        else:
                             suffix_postfinalnames.append("")
                         extlist_expo.append(list_expo[0])
 
                 elif any(x in prod for x in ['PIXTABLE', 'RAMAN', 'SKY', 'AUTOCAL']):
                     for i in range(len(list_expo)):
                         name_products.append(prod)
-                        suffix_products.append("_{0:04d}".format(i+1))
+                        suffix_products.append("_{0:04d}".format(i + 1))
                         suffix_prefinalnames.append("")
                         suffix_postfinalnames.append("_{0:04d}".format(list_expo[i]))
-                        extlist_expo.append(i+1)
-                else :
+                        extlist_expo.append(i + 1)
+                else:
                     if "DATACUBE" in prod:
-                        if len(list_expo) == 1 :
+                        if len(list_expo) == 1:
                             suffix_postfinalnames.append("_{0:04d}".format(list_expo[0]))
-                        else :
+                        else:
                             suffix_postfinalnames.append("")
                     extlist_expo.append(list_expo[0])
                     name_products.append(prod)
@@ -843,15 +855,15 @@ class PipePrep(SofPipe):
 
         if self._debug:
             upipe.print_info("Products for scipost: \n"
-                    "Name_products: [{0}] \n"
-                    "suffix_products: [{1}] \n"
-                    "suffix_pre: [{2}] \n"
-                    "suffix_post: [{3}] \n"
-                    "Expo number: [{4}]".format(
-                        name_products, suffix_products,
-                        suffix_prefinalnames, suffix_postfinalnames, extlist_expo))
+                             "Name_products: [{0}] \n"
+                             "suffix_products: [{1}] \n"
+                             "suffix_pre: [{2}] \n"
+                             "suffix_post: [{3}] \n"
+                             "Expo number: [{4}]".format(
+                name_products, suffix_products,
+                suffix_prefinalnames, suffix_postfinalnames, extlist_expo))
         return name_products, suffix_products, suffix_prefinalnames, \
-                   suffix_postfinalnames, extlist_expo
+            suffix_postfinalnames, extlist_expo
 
     def _select_list_expo(self, expotype, tpl, stage, list_expo=[]):
         """Select the expo numbers which exists for a certain expotype
@@ -860,7 +872,7 @@ class PipePrep(SofPipe):
         tpl_table = self.select_tpl_files(expotype=expotype, tpl=tpl, stage=stage)
 
         # Selecting the table with the right iexpo
-        if len(list_expo) == 0: 
+        if len(list_expo) == 0:
             list_expo = tpl_table['iexpo'].data
         # First we isolate the unique values of iexpo from the table
         list_expo = np.unique(list_expo)
@@ -874,21 +886,21 @@ class PipePrep(SofPipe):
         found_expo = True
         if len(group_table) == 0:
             found_expo = False
-            if self.verbose :
+            if self.verbose:
                 upipe.print_warning("[prep_recipes/_select_list_expo] No {0} recovered from the {1} astropy file "
-                    "Table - Aborting".format(expotype, stage), pipe=self)
+                                    "Table - Aborting".format(expotype, stage), pipe=self)
 
         return found_expo, list_expo, group_list_expo, group_table
 
-    def _normalise_skycontinuum(self, mjd_expo, tpl_expo, iexpo, 
-            suffix="", name_offset_table=None, **kwargs):
+    def _normalise_skycontinuum(self, mjd_expo, tpl_expo, iexpo,
+                                suffix="", name_offset_table=None, **kwargs):
         """Create a normalised continuum, to be included in the sof file
         """
         stage = "processed"
         expotype = "SKY"
         # Finding the best tpl for this sky calib file type
         expo_table = self._get_table_expo(expotype, stage)
-        index, this_tpl = self._select_closest_mjd(mjd_expo, expo_table) 
+        index, this_tpl = self._select_closest_mjd(mjd_expo, expo_table)
         if index < 0:
             upipe.print_info("[prep_recipes/_normalise_skycontinum/scipost] Failed to find an "
                              "exposure in the table - Aborting")
@@ -914,9 +926,9 @@ class PipePrep(SofPipe):
             # Get the background value
             if mjd_names['table'] not in self.offset_table.columns:
                 upipe.print_warning("No MJD column in offset table {0}".format(
-                                     name_offset_table))
+                    name_offset_table))
                 status = -1
-            else:    
+            else:
                 table_mjdobs = self.offset_table[mjd_names['table']]
                 if (mjd_expo in table_mjdobs) and ('BACKGROUND' in self.offset_table.columns):
                     ind_table = np.argwhere(table_mjdobs == mjd_expo)[0]
@@ -927,9 +939,9 @@ class PipePrep(SofPipe):
             if status < 0:
                 dict_err = {-1: "MJD", -2: "BACKGROUND"}
                 upipe.print_error("Table {0} - {1}".format(folder_offset_table,
-                                  name_offset_table))
+                                                           name_offset_table))
                 upipe.print_error("Could not find {0} value in offset table".format(
-                                    dict_err[status]))
+                    dict_err[status]))
                 upipe.print_warning("A background of 0 will be assumed, and")
                 upipe.print_warning("a normalisation of 1 will be used for the SKY_CONTINUUM")
                 return ""
@@ -960,9 +972,9 @@ class PipePrep(SofPipe):
         self.run_scipost(expotype="SKY", offset_list=False, skymethod='none')
 
     @print_my_method_name
-    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL", 
-            stage="processed", list_expo=[], 
-            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
+    def run_scipost(self, sof_filename='scipost', expotype="OBJECT", tpl="ALL",
+                    stage="processed", list_expo=[],
+                    lambdaminmax=[4000., 10000.], suffix="", **kwargs):
         """Scipost treatment of the objects
         Will run the esorex muse_scipost routine
 
@@ -989,7 +1001,7 @@ class PipePrep(SofPipe):
         offset_list: bool
             If True, using an OFFSET list. Default is True.
         name_offset_table: str
-            Name of the offset table table. If not provided, will use the 
+            Name of the offset table. If not provided, will use the
             default name produced during the pipeline run.
         filter_for_alignment: str
             Name of the filter used for alignment. 
@@ -999,7 +1011,7 @@ class PipePrep(SofPipe):
             By Default will use the list in self.filter_list.
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, group_list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        found_expo, list_expo, group_list_expo, scipost_table = self._select_list_expo(expotype, tpl, stage, list_expo)
         if not found_expo:
             return
 
@@ -1014,7 +1026,7 @@ class PipePrep(SofPipe):
         # Save options
         if skymethod != "none":
             save = kwargs.pop("save", "cube,skymodel,individual")
-        else :
+        else:
             # If skymethod is none, no need to save the skymodel...
             save = kwargs.pop("save", "cube,individual")
 
@@ -1056,8 +1068,8 @@ class PipePrep(SofPipe):
         if skymethod != "none":
             if suffix_skycontinuum != default_suffix_skycontinuum:
                 upipe.print_warning("Scipost will use '{0}' as suffix "
-                        "for the SKY_CONTINUUM files".format(suffix_skycontinuum),
-                        pipe=self)
+                                    "for the SKY_CONTINUUM files".format(suffix_skycontinuum),
+                                    pipe=self)
 
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
@@ -1070,7 +1082,7 @@ class PipePrep(SofPipe):
             # Adding the expo number if only 1 exposure is considered
             if len(list_group_expo) == 1:
                 suffix_iexpo = "_{0:04d}".format(list_group_expo[0])
-            else :
+            else:
                 suffix_iexpo = ""
 
             # extract the tpl (string) and mean mjd (float) 
@@ -1079,8 +1091,8 @@ class PipePrep(SofPipe):
             self._add_calib_to_sofdict("EXTINCT_TABLE", reset=True)
             self._add_calib_to_sofdict("FILTER_LIST")
             if autocalib == "user":
-                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY', 
-                        "processed", suffix=AC_suffix)
+                self._add_skycalib_to_sofdict("AUTOCAL_FACTORS", mean_mjd, 'SKY',
+                                              "processed", suffix=AC_suffix)
             self._add_astrometry_to_sofdict(tpl, mean_mjd)
             self._add_skycalib_to_sofdict("STD_RESPONSE", mean_mjd, 'STD')
             self._add_skycalib_to_sofdict("STD_TELLURIC", mean_mjd, 'STD')
@@ -1090,12 +1102,12 @@ class PipePrep(SofPipe):
             if name_offset_table is None:
                 folder_offset_table = self._get_fullpath_expo(expotype, "processed")
                 name_offset_table = '{0}{1}_{2}_{3}.fits'.format(
-                                       dict_files_products['ALIGN'][0],
-                                       suffix, filter_for_alignment, tpl)
+                    dict_files_products['ALIGN'][0],
+                    suffix, filter_for_alignment, tpl)
             else:
                 if folder_offset_table is None:
                     folder_offset_table = self.paths.alignment
-            if offset_list :
+            if offset_list:
                 self._sofdict['OFFSET_LIST'] = [joinpath(folder_offset_table, name_offset_table)]
 
             # The sky subtraction method on the sky continuum to normalise it
@@ -1105,18 +1117,18 @@ class PipePrep(SofPipe):
                     upipe.print_warning("More than 1 exposure in group table (scipost)")
                     upipe.print_warning("The sky continuum will be "
                                         "normalised according to the first exposure")
-                prefix_skycontinuum = self._normalise_skycontinuum(mjd_expo=mean_mjd, 
-                        tpl_expo=tpl, iexpo=list_group_expo[0], 
-                        suffix=suffix_skycontinuum, 
-                        folder_offset_table=folder_offset_table,
-                        name_offset_table=name_offset_table)
+                prefix_skycontinuum = self._normalise_skycontinuum(mjd_expo=mean_mjd,
+                                                                   tpl_expo=tpl, iexpo=list_group_expo[0],
+                                                                   suffix=suffix_skycontinuum,
+                                                                   folder_offset_table=folder_offset_table,
+                                                                   name_offset_table=name_offset_table)
             else:
                 prefix_skycontinuum = ""
             if skymethod != "none":
                 self._add_calib_to_sofdict("SKY_LINES")
-                self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY', 
-                        "processed", suffix=suffix_skycontinuum, 
-                        prefix=prefix_skycontinuum, perexpo=True)
+                self._add_skycalib_to_sofdict("SKY_CONTINUUM", mean_mjd, 'SKY',
+                                              "processed", suffix=suffix_skycontinuum,
+                                              prefix=prefix_skycontinuum, perexpo=True)
             self._add_tplmaster_to_sofdict(mean_mjd, 'LSF')
 
             # Selecting only exposures to be treated
@@ -1126,41 +1138,44 @@ class PipePrep(SofPipe):
             pixtable_name_thisone = get_suffix_product(expotype)
             self._sofdict[pixtable_name] = []
             for iexpo in list_group_expo:
-               self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
-                   '{0}_{1}_{2:04d}-{3:02d}.fits'.format(
-                       pixtable_name_thisone, tpl, iexpo, j+1)) for j in range(24)]
+                self._sofdict[pixtable_name] += [joinpath(self._get_fullpath_expo(expotype, "processed"),
+                                                          '{0}_{1}_{2:04d}-{3:02d}.fits'.format(
+                                                              pixtable_name_thisone, tpl, iexpo, j + 1)) for j in
+                                                 range(24)]
 
             # Adding the suffix_iexpo to the end of the name if needed
             # This is the expo number if only 1 exposure is present in the list
-            self.write_sof(sof_filename="{0}_{1}{2}_{3}{4}".format(sof_filename, expotype, 
-                suffix, tpl, suffix_iexpo), new=True)
+            self.write_sof(sof_filename="{0}_{1}{2}_{3}{4}".format(sof_filename, expotype,
+                                                                   suffix, tpl, suffix_iexpo), new=True)
             # products
             name_products, suffix_products, suffix_prefinalnames, suffix_postfinalnames, fl_expo = \
                 self._get_scipost_products(save, list_group_expo, filter_list)
-            self.recipe_scipost(self.current_sof, tpl, expotype, dir_products, 
-                    name_products, suffix_products, suffix_prefinalnames, 
-                    suffix_postfinalnames, suffix=suffix, 
-                    lambdamin=lambdamin, lambdamax=lambdamax, save=save, 
-                    filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr, 
-                    skymethod=skymethod, filter_for_alignment=filter_for_alignment,
-                    list_expo=fl_expo, prefix_all=prefix_all,
-                    **kwargs)
+            self.recipe_scipost(self.current_sof, tpl, expotype, dir_products,
+                                name_products, suffix_products, suffix_prefinalnames,
+                                suffix_postfinalnames, suffix=suffix,
+                                lambdamin=lambdamin, lambdamax=lambdamax, save=save,
+                                filter_list=filter_list, autocalib=autocalib, rvcorr=rvcorr,
+                                skymethod=skymethod, filter_for_alignment=filter_for_alignment,
+                                list_expo=fl_expo, prefix_all=prefix_all,
+                                **kwargs)
 
             # Write the MASTER files Table and save it
-            if len(list_expo) == 1: suffix_expo = "_{0:04d}".format(list_expo[0])
-            else: suffix_expo = ""
-            self.save_expo_table(expotype, scipost_table, "reduced", 
-                    "IMAGES_FOV{0}_{1}{2}_{3}_list_table.fits".format(
-                        suffix, expotype, suffix_expo, tpl), 
-                        aggregate=False, overwrite=True)
+            if len(list_expo) == 1:
+                suffix_expo = "_{0:04d}".format(list_expo[0])
+            else:
+                suffix_expo = ""
+            self.save_expo_table(expotype, scipost_table, "reduced",
+                                 "IMAGES_FOV{0}_{1}{2}_{3}_list_table.fits".format(
+                                     suffix, expotype, suffix_expo, tpl),
+                                 aggregate=False, overwrite=True)
 
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
     @print_my_method_name
-    def run_align_bygroup(self, sof_filename='exp_align_bygroup', expotype="OBJECT", 
-            list_expo=[], stage="processed", line=None, suffix="",
-            tpl="ALL", **kwargs):
+    def run_align_bygroup(self, sof_filename='exp_align_bygroup', expotype="OBJECT",
+                          list_expo=[], stage="processed", line=None, suffix="",
+                          tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -1174,10 +1189,10 @@ class PipePrep(SofPipe):
         """
         # Selecting the table with the right iexpo
         found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(
-                expotype, tpl, stage, list_expo) 
+            expotype, tpl, stage, list_expo)
         if not found_expo:
             return
-        
+
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
 
@@ -1200,22 +1215,22 @@ class PipePrep(SofPipe):
             if len(list_group_expo) <= 1:
                 if self.verbose:
                     upipe.print_warning("Group = {0}".format(mytpl),
-                            pipe=self)
+                                        pipe=self)
                     upipe.print_warning("No derived OFFSET LIST as only 1 exposure retrieved in this group",
-                            pipe=self)
+                                        pipe=self)
                 continue
             long_suffix = "{0}_{1}_{2}".format(suffix, filter_for_alignment, mytpl)
             long_suffix_align = "{0}{1}_{2}_{3}".format(suffix, self._suffix_prealign,
-                                 filter_for_alignment, mytpl)
+                                                        filter_for_alignment, mytpl)
             list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                                          'IMAGE_FOV{0}_{1:04d}.fits'.format(
-                                              long_suffix_align, iexpo)) 
-                                              for iexpo in list_group_expo]
+                                    'IMAGE_FOV{0}_{1:04d}.fits'.format(
+                                        long_suffix_align, iexpo))
+                           for iexpo in list_group_expo]
             self._sofdict['IMAGE_FOV'] = list_images
-            create_offset_table(list_images, table_folder=self.paths.pipe_products, 
+            create_offset_table(list_images, table_folder=self.paths.pipe_products,
                                 table_name="{0}.fits".format(dict_files_products['ALIGN'][0]))
-            upipe.print_info("Creating empty OFFSET_LIST.fits using images list", 
-                    pipe=self)
+            upipe.print_info("Creating empty OFFSET_LIST.fits using images list",
+                             pipe=self)
             self.write_sof(sof_filename=sof_filename + long_suffix, new=True)
             dir_align = self._get_fullpath_expo('OBJECT', "processed")
             namein_align = deepcopy(dict_files_products['ALIGN'])
@@ -1227,17 +1242,18 @@ class PipePrep(SofPipe):
             self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, mytpl, "group", **kwargs)
 
             # Write the MASTER files Table and save it
-            self.save_expo_table(expotype, align_table, "reduced", 
-                    "ALIGNED_IMAGES_BYGROUP_{0}{1}_list_table.fits".format(expotype, 
-                        long_suffix), aggregate=False, update=True)
-        
+            self.save_expo_table(expotype, align_table, "reduced",
+                                 "ALIGNED_IMAGES_BYGROUP_{0}{1}_list_table.fits".format(expotype,
+                                                                                        long_suffix), aggregate=False,
+                                 update=True)
+
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
-        
+
     @print_my_method_name
     def run_align_bydataset(self, sof_filename='exp_align_bydataset', expotype="OBJECT",
-            list_expo=[], stage="processed", line=None, suffix="",
-            tpl="ALL", **kwargs):
+                            list_expo=[], stage="processed", line=None, suffix="",
+                            tpl="ALL", **kwargs):
         """Aligning the individual exposures from a dataset
         using the emission line region 
         With the muse exp_align routine
@@ -1251,19 +1267,19 @@ class PipePrep(SofPipe):
         """
         # Selecting the table with the right iexpo
         found_expo, list_expo, group_list_expo, align_table = self._select_list_expo(
-                                      expotype, tpl, stage, list_expo) 
+            expotype, tpl, stage, list_expo)
         if not found_expo:
             return
         # Stop the process if only 1 or fewer exposures are retrieved
         if len(align_table) <= 1:
             if self.verbose:
                 upipe.print_warning("Dataset = {0}".format(self.dataset),
-                        pipe=self)
+                                    pipe=self)
                 upipe.print_warning("No derived OFFSET LIST as only "
                                     "1 exposure retrieved in this Dataset",
-                        pipe=self)
+                                    pipe=self)
             return
-        
+
         # Go to the data folder
         self.goto_folder(self.paths.data, addtolog=True)
 
@@ -1280,39 +1296,41 @@ class PipePrep(SofPipe):
         # Producing the list of IMAGES and add them to the SOF
         long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
         long_suffix_align = "{0}{1}_{2}".format(suffix, self._suffix_prealign,
-                             filter_for_alignment)
+                                                filter_for_alignment)
         list_images = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                       'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(
-                          long_suffix_align, row['tpls'], row['iexpo'])) 
-                          for row in align_table]
+                                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(
+                                    long_suffix_align, row['tpls'], row['iexpo']))
+                       for row in align_table]
         self._sofdict['IMAGE_FOV'] = list_images
         upipe.print_info("Creating empty OFFSET_LIST.fits using images list", pipe=self)
-        create_offset_table(list_images, table_folder=self.paths.pipe_products, 
+        create_offset_table(list_images, table_folder=self.paths.pipe_products,
                             table_name="{0}.fits".format(dict_files_products['ALIGN'][0]))
 
         # Write the SOF
         self.write_sof(sof_filename=sof_filename + "{0}_{1}_{2}_{3}".format(
-                       long_suffix, expotype, dataset, tpl), new=True)
+            long_suffix, expotype, dataset, tpl), new=True)
         dir_align = self._get_fullpath_expo('OBJECT', "processed")
         namein_align = deepcopy(dict_files_products['ALIGN'])
         nameout_align = [name + "{0}_{1}_{2}_{3}".format(
-                         long_suffix, expotype, dataset, tpl)
-                             for name in deepcopy(dict_files_products['ALIGN'])]
+            long_suffix, expotype, dataset, tpl)
+                         for name in deepcopy(dict_files_products['ALIGN'])]
         for iter_file in dict_files_iexpo_products['ALIGN']:
             for i, row in enumerate(align_table):
-                namein_align.append('{0}_{1:04d}'.format(iter_file, i+1))
+                namein_align.append('{0}_{1:04d}'.format(iter_file, i + 1))
                 nameout_align.append('{0}_bydataset{1}_{2}_{3:04d}'.format(
                     iter_file, long_suffix, row['tpls'], row['iexpo']))
 
         # Find the alignment - Note that Field is used and tpl reflects the given selection
-        self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align, 
-                tpl, dataset, **kwargs)
+        self.recipe_align(self.current_sof, dir_align, namein_align, nameout_align,
+                          tpl, dataset, **kwargs)
 
         # Write the MASTER files Table and save it
-        self.save_expo_table(expotype, align_table, "reduced", 
-                "ALIGNED_IMAGES_BYDATASET_{0}{1}_{2}_{3}_list_table.fits".format(expotype,
-                long_suffix, dataset, tpl), aggregate=False, update=True)
-        
+        self.save_expo_table(expotype, align_table, "reduced",
+                             "ALIGNED_IMAGES_BYDATASET_{0}{1}_{2}_{3}_list_table.fits".format(expotype,
+                                                                                              long_suffix, dataset,
+                                                                                              tpl), aggregate=False,
+                             update=True)
+
         # Go back to original folder
         self.goto_prevfolder(addtolog=True)
 
@@ -1346,30 +1364,30 @@ class PipePrep(SofPipe):
         # If not empty, create new time stamp and proceed with initialisation
         if reset:
             # Create a new set of alignments
-            self.get_align_group(name_ima_reference=name_ima_reference, 
-                    list_expo=list_expo, line=line, 
-                    filter_for_alignment=filter_for_alignment, bygroup=bygroup)
+            self.get_align_group(name_ima_reference=name_ima_reference,
+                                 list_expo=list_expo, line=line,
+                                 filter_for_alignment=filter_for_alignment, bygroup=bygroup)
             # if dictionary is empty, it creates the first timestamp
             self.dict_alignments.create_new_timestamp(self.align_group)
 
         # Run the alignment
         tstamp = self.dict_alignments.present_tstamp
         self.dict_alignments[tstamp].run(nexpo)
-        
+
     @print_my_method_name
-    def get_align_group(self, name_ima_reference=None, list_expo=[], line=None, 
-            suffix="", bygroup=False, **kwargs):
+    def get_align_group(self, name_ima_reference=None, list_expo=[], line=None,
+                        suffix="", bygroup=False, **kwargs):
         """Extract the needed information for a set of exposures to be aligned
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo("OBJECT", 
-                "ALL", "processed", list_expo) 
+        found_expo, list_expo, group_list_expo, align_table = self._select_list_expo("OBJECT",
+                                                                                     "ALL", "processed", list_expo)
         if not found_expo:
             if self.verbose:
                 upipe.print_warning("No exposure recovered for the fine alignment",
-                        pipe=self)
+                                    pipe=self)
             return
-            
+
         # Initialise the list of Groups to be aligned
         self.align_group = []
         # Setting the default alignment filter
@@ -1384,34 +1402,34 @@ class PipePrep(SofPipe):
                 list_group_expo = gtable['iexpo'].data
                 long_suffix = "{0}_{1}_{2}".format(suffix, filter_for_alignment, mytpl)
                 list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                    'IMAGE_FOV{0}_{1:04d}.fits'.format(long_suffix, iexpo)) 
-                    for iexpo in list_group_expo]
+                                            'IMAGE_FOV{0}_{1:04d}.fits'.format(long_suffix, iexpo))
+                                   for iexpo in list_group_expo]
                 self.align_group.append(AlignMuseDataset(name_ima_reference, list_names_muse,
-                                                   flag="mytpl"))
+                                                         flag="mytpl"))
         # If not by group
         else:
             long_suffix = "{0}_{1}".format(suffix, filter_for_alignment)
             list_names_muse = [joinpath(self._get_fullpath_expo("OBJECT", "processed"),
-                'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(long_suffix, row['tpls'], row['iexpo'])) 
-                for row in align_table]
+                                        'IMAGE_FOV{0}_{1}_{2:04d}.fits'.format(long_suffix, row['tpls'], row['iexpo']))
+                               for row in align_table]
             # Giving a reference image name, doing the alignment w.r.t. to that specific image
             if name_ima_reference is None:
                 upipe.print_warning("Using the first MUSE exposure as a reference")
                 self.align_group.append(AlignMuseDataset(list_names_muse[0],
-                    list_names_muse[1:], flag="mytpl"))
+                                                         list_names_muse[1:], flag="mytpl"))
             else:
                 self.align_group.append(AlignMuseDataset(name_ima_reference,
-                    list_names_muse, flag="mytpl"))
+                                                         list_names_muse, flag="mytpl"))
 
     @print_my_method_name
     def run_combine_dataset(self, sof_filename='exp_combine', expotype="OBJECT",
-            list_expo=[], stage="processed", tpl="ALL", 
-            lambdaminmax=[4000.,10000.], suffix="", **kwargs):
+                            list_expo=[], stage="processed", tpl="ALL",
+                            lambdaminmax=[4000., 10000.], suffix="", **kwargs):
         """Produce a cube from all frames in the dataset
         list_expo or tpl specific arguments can still reduce the selection if needed
         """
         # Selecting the table with the right iexpo
-        found_expo, list_expo, group_list_expo, combine_table = self._select_list_expo(expotype, tpl, stage, list_expo) 
+        found_expo, list_expo, group_list_expo, combine_table = self._select_list_expo(expotype, tpl, stage, list_expo)
         if not found_expo:
             return
 
@@ -1423,7 +1441,7 @@ class PipePrep(SofPipe):
         if len(list_expo) <= 1:
             if self.verbose:
                 upipe.print_warning("The combined dataset has only one exposure: process aborted",
-                        pipe=self)
+                                    pipe=self)
             return
 
         # Go to the data folder
@@ -1456,27 +1474,28 @@ class PipePrep(SofPipe):
             offset_list_tablename = kwargs.pop("offset_list_tablename", None)
             if offset_list_tablename is None:
                 offset_list_tablename = "{0}{1}_{2}_{3}_{4}.fits".format(
-                        dict_files_products['ALIGN'][0], long_suffix,
-                        expotype, dataset, tpl)
+                    dict_files_products['ALIGN'][0], long_suffix,
+                    expotype, dataset, tpl)
             if not os.path.isfile(joinpath(folder_expo, offset_list_tablename)):
                 upipe.print_error("OFFSET_LIST table {0} not found in folder {1}".format(
-                        offset_list_tablename, folder_expo), pipe=self)
+                    offset_list_tablename, folder_expo), pipe=self)
 
             self._sofdict['OFFSET_LIST'] = [joinpath(folder_expo, offset_list_tablename)]
 
         self._sofdict[pixtable_name] = []
         for prod in pixtable_name_thisone:
             self._sofdict[pixtable_name] += [joinpath(folder_expo,
-                '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo'])) for row in
-                combine_table]
-        self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype, 
-            long_suffix, tpl), new=True)
+                                                      '{0}_{1}_{2:04d}.fits'.format(prod, row['tpls'], row['iexpo']))
+                                             for row in
+                                             combine_table]
+        self.write_sof(sof_filename="{0}_{1}{2}_{3}".format(sof_filename, expotype,
+                                                            long_suffix, tpl), new=True)
 
         # Product names
         dir_products = kwargs.pop("dir_products",
                                   self._get_fullpath_expo(expotype, stage))
         name_products, suffix_products, suffix_prefinalnames, prefix_products = \
-                _get_combine_products(filter_list, prefix_all=prefix_all) 
+            _get_combine_products(filter_list, prefix_all=prefix_all)
 
         # Combine the exposures 
         self.recipe_combine(self.current_sof, dir_products, name_products, tpl, expotype,

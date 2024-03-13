@@ -9,6 +9,7 @@ __contact__ = " <eric.emsellem@eso.org>"
 
 # import modules
 from astropy import units as u
+from datetime import datetime
 
 # ======================================================================#
 # BEGIN
@@ -323,10 +324,15 @@ dict_combined_folders = {
 # ======================================================================#
 # BEGIN
 #           DEFAULT GEOMETRY AND ASTROWCS FILES
+#           Also DEADLINE for VIGNETTING_MASK
 # 
 # These are provided if you need time varying astrometry files
 # ======================================================================#
 # For musepipe module
+
+# Deadline for using VIGNETTING_MASK in Twilights
+# All after 10th of March 2017
+deadline_vignetting = datetime.fromisoformat("2017-03-10")
 
 dict_geo_astrowcs_table = {
     'comm1': ['2014-02-09', '2014-02-09'],
