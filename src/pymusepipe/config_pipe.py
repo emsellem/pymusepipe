@@ -332,7 +332,7 @@ dict_combined_folders = {
 
 # Deadline for using VIGNETTING_MASK in Twilights
 # All after 10th of March 2017
-deadline_vignetting = datetime.fromisoformat("2017-03-10")
+deadline_vignetting = datetime.fromisoformat("2017-03-10").date()
 
 dict_geo_astrowcs_table = {
     'comm1': ['2014-02-09', '2014-02-09'],
