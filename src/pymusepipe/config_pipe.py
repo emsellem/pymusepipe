@@ -17,7 +17,7 @@ from datetime import datetime
 # ======================================================================#
 # Define useful units for MUSE
 default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
-default_reference_unit = u.microJansky
+default_reference_unit = 1.000 * u.microJansky
 
 # Default equivalencies for other filters
 dict_equivalencies = {"WFI_BB":      [1.000 * u.microJansky, 6483.58   * u.AA],
