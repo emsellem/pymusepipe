@@ -668,7 +668,7 @@ class MusePipeSample(object):
                                       list_datasets=list_datasets,
                                       folder_refcube=folder_refcube,
                                       pointing_table=pointing_table,
-                                      fakemode=False)
+                                      fakemode=False, **kwargs)
 
         if create_expocubes:
             # Running the individual cubes now with the same WCS reference
@@ -1232,7 +1232,9 @@ class MusePipeSample(object):
         """
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_refcube = kwargs.pop("folder_refcube", default_comb_folder)
+        lambdaminmax = kwargs.pop("lambdaminmax", None)
         self.init_combine(targetname=targetname, **kwargs)
+        kwargs.update({'lambdaminmax': lambdaminmax})
         self.pipes_combine[targetname].create_reference_wcs(pointings_wcs=pointings_wcs,
                                                             mosaic_wcs=mosaic_wcs,
                                                             wcs_refcube_name=wcs_refcube_name,

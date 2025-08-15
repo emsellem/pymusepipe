@@ -271,11 +271,13 @@ def regress_odr(x, y, sx, sy, beta0=(0., 1.),
     result = ODR(mydata, linear, beta0=beta0)
 
     if sigclip > 0:
-        diff = ysel - my_linear_model([result.beta[0], result.beta[1]], xsel)
+        r = result.run()
+        r.beta[0] -= minx
+        diff = ysel - my_linear_model([r.beta[0], r.beta[1]], xsel)
         filtered = sigma_clip(diff, sigma=sigclip)
         xnsel, ynsel = xsel[~filtered.mask], ysel[~filtered.mask]
         sxnsel, synsel = sxsel[~filtered.mask], sysel[~filtered.mask]
-        clipdata = RealData(xnsel, ynsel, sx=sxnsel, sy=synsel)
+        clipdata = RealData(xnsel - minx, ynsel, sx=sxnsel, sy=synsel)
         result = ODR(clipdata, linear, beta0=beta0)
 
     # Running the ODR
@@ -396,7 +398,7 @@ def get_normfactor(array1, array2, median_filter=True, border=0,
     d1 = prepare_image(array1+add_background1, median_filter=median_filter, sigma=convolve_data1,
                        border=border)
     d2 = prepare_image(array2, median_filter=median_filter, sigma=convolve_data2, border=border)
-    polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold)
+    polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold, sigclip=1.5, percentiles=[30,99.7])
 
     # Returning the processed data
     return d1, d2, polypar

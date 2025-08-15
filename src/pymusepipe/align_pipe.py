@@ -1966,7 +1966,23 @@ class AlignMuseDataset(object):
             if newfits_name is None:
                 newfits_name = self.list_name_museimages[nima].replace(
                     ".fits", "_shift.fits")
-            self.list_offmuse_hdu[nima].writeto(newfits_name, overwrite=True)
+            #
+            newhdr = copy.copy(self.list_muse_hdu[nima].header)
+
+            # Using input offset or total
+            total_off_pixel, total_off_arcsec = self._sort_offset_pixel_arcsec(self.list_muse_hdu[nima], self._total_off_pixel[nima],
+                                                                               None)
+            # Shifting the CRPIX values in the header
+            newhdr['CRPIX1'] += total_off_pixel[0]
+            newhdr['CRPIX2'] += total_off_pixel[1]
+
+            hdu_offmuse = pyfits.PrimaryHDU(self.list_muse_hdu[nima].data, header=newhdr)
+
+            img_to_save, _, _ = self._align_hdu(hdu_target=hdu_offmuse, hdu_to_align=self.reference_hdu,
+                                   target_rotation=self._total_rotangles[nima], to_align_rotation=0,
+                                   conversion_factor=1.)
+            img_to_save.writeto(newfits_name, overwrite=True)
+            # self.list_offmuse_hdu[nima].writeto(newfits_name, overwrite=True)
         else:
             upipe.print_error("There are not yet any new hdu to save")
 
