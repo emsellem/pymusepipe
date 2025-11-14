@@ -276,10 +276,12 @@ def regress_odr(x, y, sx, sy, beta0=(0., 1.),
         # Offset from the min of x
         r.beta[0] -= minx
         if sigclip > 0:
+            # clean data with sigma clipping
             diff = y - my_linear_model([r.beta[0], r.beta[1]], x)
             filtered = sigma_clip(diff, sigma=sigclip)
             x, y = x[~filtered.mask], y[~filtered.mask]
             sx, sy = sx[~filtered.mask], sy[~filtered.mask]
+            # Run ODR again on the cleaned data
             r = local_run_odr(x, y, sx, sy, 0)
         return r
     return local_run_odr(xsel, ysel, sxsel, sysel, sigclip)

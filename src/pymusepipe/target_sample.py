@@ -578,7 +578,7 @@ class MusePipeSample(object):
                            create_expocubes=True, create_pixtables=True,
                            create_pointingcubes=True,
                            name_offset_table=None, folder_offset_table=None,
-                           list_datasets=None, **kwargs):
+                           list_datasets=None, lambdaminmax=None, **kwargs):
         """Finalise the reduction steps by using the offset table, rotating the
         pixeltables, then reconstructing the PIXTABLE_REDUCED, produce reference
         WCS for each pointing, and then run the reconstruction of the final
@@ -594,6 +594,8 @@ class MusePipeSample(object):
         create_pointingcubes: bool
         name_offset_table: str
         folder_offset_table: str
+        list_datasets: list
+        lambdaminmax: list
         **kwargs: include
             wcs_refcube_name: str
                 Reference WCS (cube) to be used to project all cubes
@@ -668,7 +670,7 @@ class MusePipeSample(object):
                                       list_datasets=list_datasets,
                                       folder_refcube=folder_refcube,
                                       pointing_table=pointing_table,
-                                      fakemode=False, **kwargs)
+                                      fakemode=False, lambdaminmax=lambdaminmax)
 
         if create_expocubes:
             # Running the individual cubes now with the same WCS reference
@@ -1226,15 +1228,16 @@ class MusePipeSample(object):
             self.pipes_combine[targetname].run_combine(**kwargs)
 
     def create_reference_wcs(self, targetname=None, pointings_wcs=True, mosaic_wcs=True,
-                             wcs_refcube_name=None, refcube_name=None, **kwargs):
+                             wcs_refcube_name=None, refcube_name=None, lambdaminmax=None,
+                             **kwargs):
         """Run the combine for individual exposures first building up
         a mask.
         """
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_refcube = kwargs.pop("folder_refcube", default_comb_folder)
-        lambdaminmax = kwargs.pop("lambdaminmax", None)
         self.init_combine(targetname=targetname, **kwargs)
-        kwargs.update({'lambdaminmax': lambdaminmax})
+        if lambdaminmax is not None:
+            kwargs.update({'lambdaminmax': lambdaminmax})
         self.pipes_combine[targetname].create_reference_wcs(pointings_wcs=pointings_wcs,
                                                             mosaic_wcs=mosaic_wcs,
                                                             wcs_refcube_name=wcs_refcube_name,
