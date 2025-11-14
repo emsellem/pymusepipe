@@ -39,7 +39,6 @@ from astropy import units as u
 
 # Import mpdaf
 from mpdaf.obj import Image, WCS
-from seaborn.utils import percentiles
 
 # Import needed modules from pymusepipe
 from . import util_pipe as upipe  # noqua: E402
@@ -2308,7 +2307,8 @@ class AlignMuseDataset(object):
         musedata, refdata, polypar = get_normfactor(musehdu.data, refhdu.data,
                                                     convolve_data1=convolve_muse,
                                                     convolve_data2=convolve_reference,
-                                                    threshold=threshold_muse, percentiles=percentiles, sigclip=sigclip)
+                                                    threshold=threshold_muse, percentiles=percentiles,
+                                                    sigclip=sigclip)
         self.compare(aligned=musedata, reference=refdata, header=musehdu.header,
                      suffix_fig=f"{nima:03d}", **kwargs)
 
@@ -2363,7 +2363,7 @@ class AlignMuseDataset(object):
         savefig = kwargs.pop("savefig", True)
         threshold = kwargs.pop("threshold", 0.)
         sigclip = kwargs.pop("sigclip", 0.)
-        percentiles = kwargs.pop("percentiles", 0.)
+        percentiles = kwargs.pop("percentiles", (0.,100.))
 
         # Getting the data
         _, _, polypar = get_normfactor(aligned, reference,
