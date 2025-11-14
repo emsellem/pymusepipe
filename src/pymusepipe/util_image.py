@@ -267,25 +267,22 @@ def regress_odr(x, y, sx, sy, beta0=(0., 1.),
 
     # We introduce the minimum of x to avoid negative values
     minx = np.min(xsel)
-    mydata = RealData(xsel - minx, ysel, sx=sxsel, sy=sysel)
-    result = ODR(mydata, linear, beta0=beta0)
 
-    if sigclip > 0:
+    def local_run_odr(x, y, sx, sy, sigclip):
+        mydata = RealData(x - minx, y, sx=sx, sy=sy)
+        result = ODR(mydata, linear, beta0=beta0)
+        # Running the ODR
         r = result.run()
+        # Offset from the min of x
         r.beta[0] -= minx
-        diff = ysel - my_linear_model([r.beta[0], r.beta[1]], xsel)
-        filtered = sigma_clip(diff, sigma=sigclip)
-        xnsel, ynsel = xsel[~filtered.mask], ysel[~filtered.mask]
-        sxnsel, synsel = sxsel[~filtered.mask], sysel[~filtered.mask]
-        clipdata = RealData(xnsel - minx, ynsel, sx=sxnsel, sy=synsel)
-        result = ODR(clipdata, linear, beta0=beta0)
-
-    # Running the ODR
-    r = result.run()
-    # Offset from the min of x
-    r.beta[0] -= minx
-
-    return r
+        if sigclip > 0:
+            diff = y - my_linear_model([r.beta[0], r.beta[1]], x)
+            filtered = sigma_clip(diff, sigma=sigclip)
+            x, y = x[~filtered.mask], y[~filtered.mask]
+            sx, sy = sx[~filtered.mask], sy[~filtered.mask]
+            r = local_run_odr(x, y, sx, sy, 0)
+        return r
+    return local_run_odr(xsel, ysel, sxsel, sysel, sigclip)
 
 
 def chunk_stats(list_arrays, chunk_size=15):
