@@ -1966,7 +1966,23 @@ class AlignMuseDataset(object):
             if newfits_name is None:
                 newfits_name = self.list_name_museimages[nima].replace(
                     ".fits", "_shift.fits")
-            self.list_offmuse_hdu[nima].writeto(newfits_name, overwrite=True)
+            # Copy header to keep astrometry from original fits
+            newhdr = copy.copy(self.list_muse_hdu[nima].header)
+
+            # Get total offset in pixels
+            total_off_pixel, total_off_arcsec = self._sort_offset_pixel_arcsec(self.list_muse_hdu[nima], self._total_off_pixel[nima],
+                                                                               None)
+            # Shifting the CRPIX values in the header
+            newhdr['CRPIX1'] += total_off_pixel[0]
+            newhdr['CRPIX2'] += total_off_pixel[1]
+
+            hdu_offmuse = pyfits.PrimaryHDU(self.list_muse_hdu[nima].data, header=newhdr)
+
+            # Get rotated image
+            img_to_save, _, _ = self._align_hdu(hdu_target=hdu_offmuse, hdu_to_align=self.reference_hdu,
+                                   target_rotation=self._total_rotangles[nima], to_align_rotation=0,
+                                   conversion_factor=1.)
+            img_to_save.writeto(newfits_name, overwrite=True)
         else:
             upipe.print_error("There are not yet any new hdu to save")
 
@@ -2230,11 +2246,13 @@ class AlignMuseDataset(object):
             The 2 arrays (input, reference) after processing
         """
         threshold = kwargs.pop("threshold", self.ima_threshold[nima])
+        percentiles = kwargs.pop("percentiles", (0,100))
+        sigclip = kwargs.pop("sigclip", 0)
 
         return get_normfactor(self.list_offmuse_hdu[nima].data, self.list_proj_refhdu[nima].data,
                               convolve_data1=convolve_muse, convolve_data2=convolve_reference,
                               median_filter=median_filter, border=border,
-                              chunk_size=chunk_size, threshold=threshold)
+                              chunk_size=chunk_size, threshold=threshold, percentiles=percentiles, sigclip=sigclip)
 
     def save_polypar_ima(self, nima=0, beta=None):
         """Saving the input values into the fixed arrays for the polynomial
@@ -2283,11 +2301,14 @@ class AlignMuseDataset(object):
             refhdu = self.list_proj_refhdu[nima]
 
         threshold_muse = kwargs.pop("threshold_muse", self.ima_threshold[nima])
+        percentiles = kwargs.pop("percentiles", (0, 100))
+        sigclip = kwargs.pop("sigclip", 0)
 
         musedata, refdata, polypar = get_normfactor(musehdu.data, refhdu.data,
                                                     convolve_data1=convolve_muse,
                                                     convolve_data2=convolve_reference,
-                                                    threshold=threshold_muse)
+                                                    threshold=threshold_muse, percentiles=percentiles,
+                                                    sigclip=sigclip)
         self.compare(aligned=musedata, reference=refdata, header=musehdu.header,
                      suffix_fig=f"{nima:03d}", **kwargs)
 
@@ -2341,6 +2362,8 @@ class AlignMuseDataset(object):
         chunk_size = kwargs.pop("chunk_size", self.chunk_size)
         savefig = kwargs.pop("savefig", True)
         threshold = kwargs.pop("threshold", 0.)
+        sigclip = kwargs.pop("sigclip", 0.)
+        percentiles = kwargs.pop("percentiles", (0.,100.))
 
         # Getting the data
         _, _, polypar = get_normfactor(aligned, reference,
@@ -2348,7 +2371,9 @@ class AlignMuseDataset(object):
                                        convolve_data2=convolve_reference,
                                        median_filter=median_filter, border=border,
                                        chunk_size=chunk_size,
-                                       threshold=threshold)
+                                       threshold=threshold,
+                                       percentiles=percentiles,
+                                       sigclip=sigclip)
 
         # If normalising, use the polypar slope and background
         if normalise:

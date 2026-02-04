@@ -267,23 +267,24 @@ def regress_odr(x, y, sx, sy, beta0=(0., 1.),
 
     # We introduce the minimum of x to avoid negative values
     minx = np.min(xsel)
-    mydata = RealData(xsel - minx, ysel, sx=sxsel, sy=sysel)
-    result = ODR(mydata, linear, beta0=beta0)
 
-    if sigclip > 0:
-        diff = ysel - my_linear_model([result.beta[0], result.beta[1]], xsel)
-        filtered = sigma_clip(diff, sigma=sigclip)
-        xnsel, ynsel = xsel[~filtered.mask], ysel[~filtered.mask]
-        sxnsel, synsel = sxsel[~filtered.mask], sysel[~filtered.mask]
-        clipdata = RealData(xnsel, ynsel, sx=sxnsel, sy=synsel)
-        result = ODR(clipdata, linear, beta0=beta0)
-
-    # Running the ODR
-    r = result.run()
-    # Offset from the min of x
-    r.beta[0] -= minx
-
-    return r
+    def local_run_odr(x, y, sx, sy, sigclip):
+        mydata = RealData(x - minx, y, sx=sx, sy=sy)
+        result = ODR(mydata, linear, beta0=beta0)
+        # Running the ODR
+        r = result.run()
+        # Offset from the min of x
+        r.beta[0] -= minx
+        if sigclip > 0:
+            # clean data with sigma clipping
+            diff = y - my_linear_model([r.beta[0], r.beta[1]], x)
+            filtered = sigma_clip(diff, sigma=sigclip)
+            x, y = x[~filtered.mask], y[~filtered.mask]
+            sx, sy = sx[~filtered.mask], sy[~filtered.mask]
+            # Run ODR again on the cleaned data
+            r = local_run_odr(x, y, sx, sy, 0)
+        return r
+    return local_run_odr(xsel, ysel, sxsel, sysel, sigclip)
 
 
 def chunk_stats(list_arrays, chunk_size=15):
@@ -363,7 +364,7 @@ def get_flux_range(data, border=15, low=2, high=98):
 
 def get_normfactor(array1, array2, median_filter=True, border=0,
                    convolve_data1=0., convolve_data2=0., chunk_size=10,
-                   threshold=0., add_background1=0):
+                   threshold=0., add_background1=0, percentiles=(0, 100.), sigclip=0):
     """Get the normalisation factor for shifted and projected images. This function
     only consider the input images given by their data (numpy) arrays.
 
@@ -384,6 +385,10 @@ def get_normfactor(array1, array2, median_filter=True, border=0,
         Number of pixels to crop
     threshold: float [None]
         Threshold for the input image flux to consider
+    percentiles : list or tuple of 2 floats
+        Percentiles for the values to consider for linear regression [(0., 100.)
+    sigclip : float
+        Sigma clipping factor for linear regression [0]
 
     Returns
     -------
@@ -396,7 +401,8 @@ def get_normfactor(array1, array2, median_filter=True, border=0,
     d1 = prepare_image(array1+add_background1, median_filter=median_filter, sigma=convolve_data1,
                        border=border)
     d2 = prepare_image(array2, median_filter=median_filter, sigma=convolve_data2, border=border)
-    polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold)
+    polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold, sigclip=sigclip,
+                           percentiles=percentiles)
 
     # Returning the processed data
     return d1, d2, polypar
