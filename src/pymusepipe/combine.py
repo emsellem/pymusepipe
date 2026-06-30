@@ -490,8 +490,6 @@ class MusePointings(SofPipe, PipeRecipes):
                 # Reset only do that if it does not exist yet as overwrite is set to False
                 self.pointing_table._reset_select(overwrite=False)
                 if 'select' not in qtable_pixtables.colnames:
-                    upipe.print_info("Select is not yet a column of the pointing table")
-                    upipe.print_info("Resetting it to values = 1")
                     qtable_pixtables.add_column([int(1)] * len(qtable_pixtables), name='select')
 
                 for row in self.pointing_table.qtable:
@@ -505,7 +503,6 @@ class MusePointings(SofPipe, PipeRecipes):
                         row['select'] = 0
                     else:
                         row['filename'] = qtable_pixtables[mask]['filename'].value[0]
-                        row['select'] = qtable_pixtables[mask]['select'].value[0]
 
         if self.verbose:
             upipe.print_info(f"Pointing table assigned included those exposures:")
