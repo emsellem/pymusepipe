@@ -4,8 +4,8 @@
 """MUSE-PHANGS alignement module. This module can be used to align MUSE
 reconstructed images either with each others or using a reference background
 image. It spits the results out in a Fits table which can then be used
-to process and mosaic Muse PIXTABLES via the MUSE ESO pipeline. 
-It includes a normalisation factor, an estimate of the background, 
+to process and mosaic Muse PIXTABLES via the MUSE ESO pipeline.
+It includes a normalisation factor, an estimate of the background,
 as well as any potential rotation. Fine tuning
 can be done by hand by the user, using a set of reference plots.
 """
@@ -128,7 +128,8 @@ def get_reference_unit_from_filter(filter_name=default_filter_name, dict_equiv=d
         filter_name = default_filter_name
 
     if filter_name not in dict_equiv:
-        upipe.print_error(f"Default filter {filter_name} not in equivalencies dictionary")
+        upipe.print_error(
+            f"Default filter {filter_name} not in equivalencies dictionary")
         return None
 
     return dict_equiv[filter_name][0]
@@ -136,11 +137,11 @@ def get_reference_unit_from_filter(filter_name=default_filter_name, dict_equiv=d
 
 def get_pivot_lambda_from_filter(filter_name=default_filter_name, dict_equiv=dict_equivalencies):
     """Extract the pivot lambda from the dictionary
-    
+
     Input
     -----
     dict_equiv: dict
-        Dictionary containing, for each filter name, the information as a list 
+        Dictionary containing, for each filter name, the information as a list
         [unit, equivalency]
     filter_name: str
 
@@ -154,7 +155,8 @@ def get_pivot_lambda_from_filter(filter_name=default_filter_name, dict_equiv=dic
         filter_name = default_filter_name
 
     if filter_name not in dict_equiv:
-        upipe.print_error(f"Default filter {filter_name} not in equivalencies dictionary")
+        upipe.print_error(
+            f"Default filter {filter_name} not in equivalencies dictionary")
         return None
 
     return dict_equiv[filter_name][1]
@@ -163,7 +165,7 @@ def get_pivot_lambda_from_filter(filter_name=default_filter_name, dict_equiv=dic
 def get_conversion_factor(input_unit, output_unit, equivalency=None):
     """ Conversion of units from an input one
     to an output one
-     
+
     Input
     -----
     input_unit: astropy unit
@@ -177,7 +179,7 @@ def get_conversion_factor(input_unit, output_unit, equivalency=None):
     """
 
     # First testing if the quantities are Quantity
-    # If not, transform them 
+    # If not, transform them
     if not isinstance(input_unit, u.quantity.Quantity):
         if not isinstance(input_unit, (u.core.Unit, u.core.CompositeUnit)):
             upipe.print_warning("Input provided unit could not be converted")
@@ -198,7 +200,8 @@ def get_conversion_factor(input_unit, output_unit, equivalency=None):
         # We use the default filter name and dictionary of equivalencies
         # if the pivot lambda is not provided
         if equivalency is None:
-            equivalency = get_equivalency_from_pivot(get_pivot_lambda_from_filter())
+            equivalency = get_equivalency_from_pivot(
+                get_pivot_lambda_from_filter())
         if not input_unit.unit.is_equivalent(output_unit,
                                              equivalencies=equivalency):
             upipe.print_warning("Provided units for reference "
@@ -215,14 +218,14 @@ def get_conversion_factor(input_unit, output_unit, equivalency=None):
 def arcsec_to_pixel(hdu, xy_arcsec=(0., 0.)):
     """Transform from arcsec to pixel for the muse image
     using the hdu to extract the WCS, hence the scaling.
-     
+
     Input
     -----
     hdu: astropy hdu (fits)
         Input hdu which includes a WCS
     xy_arcsec: list of 2 floats ([0,0])
         Coordinates to transform from arcsec to pixel.
-    
+
     Returns
     -------
     xpix, ypix: tuple or list of 2 floats
@@ -244,14 +247,14 @@ def arcsec_to_pixel(hdu, xy_arcsec=(0., 0.)):
 def pixel_to_arcsec(hdu, xy_pixel=(0., 0.)):
     """Transform from arcsec to pixel for the muse image
     using the hdu to extract the WCS, hence the scaling.
-     
+
     Input
     -----
     hdu: astropy hdu (fits)
         Input hdu which includes a WCS
     xy_pixel: tuple or list of 2 floats ((0,0))
         Coordinates to transform from pixel to arcsec
-    
+
     Returns
     -------
     xarc, yarc: 2 floats
@@ -335,7 +338,8 @@ def rotate_pixtable(folder="", name_suffix="", nifu=1, angle=0., **kwargs):
         if angle_orig_keyword not in hd:
             hd[angle_orig_keyword] = hd[angle_keyword]
         hd[angle_keyword] = hd[angle_orig_keyword] + angle
-        upipe.print_info("Updating INS DROT POSANG for {0}".format(name_pixtable))
+        upipe.print_info(
+            "Updating INS DROT POSANG for {0}".format(name_pixtable))
         mypix.flush()
 
     # Reading the result and printing
@@ -425,7 +429,8 @@ def align_hdu(hdu_target=None, hdu_to_align=None, target_rotation=0.0, to_align_
             # Change of area
             newinc = ima_target.wcs.get_axis_increments(unit=u.deg)
             oldinc = ima_to_align.wcs.get_axis_increments(unit=u.deg)
-            change_area = np.abs(newinc[0] / oldinc[0]) * np.abs(newinc[1] / oldinc[1])
+            change_area = np.abs(newinc[0] / oldinc[0]) * \
+                np.abs(newinc[1] / oldinc[1])
             daligned = repro_interp(ima_to_align.get_data_hdu(),
                                     ima_target.get_data_hdu().header,
                                     return_footprint=False)
@@ -493,7 +498,7 @@ class AlignMuseDataset(object):
                  firstguess="crosscorr",
                  **kwargs):
         """Initialise the AlignMuseImages class.
-        
+
         Input
         -----
         name_reference: str
@@ -533,11 +538,11 @@ class AlignMuseDataset(object):
         border: int [10]
             Ignore pixels this close to the border in the cross correlation
         hdu_ext: tuple or list of 2 floats (0,1)
-            Number of the extension for the input reference image 
+            Number of the extension for the input reference image
             and images to align, respectively. This is used to know
             where the data lies in the fits file.
         chunk_size: int [15]
-            Size in pixels of the chunk used to bin and compute the 
+            Size in pixels of the chunk used to bin and compute the
             normalisation factors
         pivot_lambda: float, optional
             Pivot wavelength (in Angstroems) for the reference filter
@@ -587,7 +592,8 @@ class AlignMuseDataset(object):
             upipe.print_info("WARNING: when using mpdaf, a potential extra rotation \n"
                              "has to be applied to redefine the reference grid.")
         else:
-            upipe.print_info("Will use image_registration for image regridding.")
+            upipe.print_info(
+                "Will use image_registration for image regridding.")
 
         # Set of input parameters for the image processing
         self.border = int(border)
@@ -628,13 +634,17 @@ class AlignMuseDataset(object):
 
         # Creating the Header-Align folder
         header_folder_name = kwargs.pop("header_folder_name", "AlignHeaders")
-        self.header_folder_name = joinpath(self.folder_muse_images, header_folder_name)
-        upipe.safely_create_folder(self.header_folder_name, verbose=self.verbose)
+        self.header_folder_name = joinpath(
+            self.folder_muse_images, header_folder_name)
+        upipe.safely_create_folder(
+            self.header_folder_name, verbose=self.verbose)
 
         # Creating the Figure folder if needed
         figures_folder_name = kwargs.pop("figures_folder_name", "AlignFigures")
-        self.figures_folder_name = joinpath(self.folder_muse_images, figures_folder_name)
-        upipe.safely_create_folder(self.figures_folder_name, verbose=self.verbose)
+        self.figures_folder_name = joinpath(
+            self.folder_muse_images, figures_folder_name)
+        upipe.safely_create_folder(
+            self.figures_folder_name, verbose=self.verbose)
 
         # Getting the names
         self.save_hdr = kwargs.pop("save_hdr", False)
@@ -671,7 +681,8 @@ class AlignMuseDataset(object):
                                  equivalency=equivalency)
 
             # Merging dictionaries if needed
-            self.dict_equiv.update({self.filter_name: [self.ref_unit, self.pivot_lambda]})
+            self.dict_equiv.update(
+                {self.filter_name: [self.ref_unit, self.pivot_lambda]})
             self.conversion_factor = get_conversion_factor(self.ref_unit,
                                                            self.muse_unit,
                                                            equivalency=self.equivalency)
@@ -690,7 +701,8 @@ class AlignMuseDataset(object):
 
         # Get the MUSE images
         self._get_list_muse_images()
-        upipe.print_info("{0} MUSE images detected as input".format(self.nimages))
+        upipe.print_info(
+            "{0} MUSE images detected as input".format(self.nimages))
         if self.nimages == 0:
             upipe.print_error("No MUSE images detected. Aborted")
             return
@@ -708,7 +720,8 @@ class AlignMuseDataset(object):
         # Open the Ref and MUSE image
         status_open = self.open_hdu()
         if not status_open:
-            upipe.print_error("Problem in opening frames, please check your input")
+            upipe.print_error(
+                "Problem in opening frames, please check your input")
             return
 
         # Initialise the offsets using the cross-correlation or FITS table
@@ -735,14 +748,16 @@ class AlignMuseDataset(object):
         """
         # Set first the reference unit
         if ref_unit is None:
-            self.ref_unit = get_reference_unit_from_filter(self.filter_name, self.dict_equiv)
+            self.ref_unit = get_reference_unit_from_filter(
+                self.filter_name, self.dict_equiv)
         else:
             self.ref_unit = ref_unit
 
         # Set the potential equivalency
         if pivot_lambda is None:
             if equivalency is None:
-                self.pivot_lambda = get_pivot_lambda_from_filter(self.filter_name, self.dict_equiv)
+                self.pivot_lambda = get_pivot_lambda_from_filter(
+                    self.filter_name, self.dict_equiv)
         else:
             self.pivot_lambda = pivot_lambda
 
@@ -754,14 +769,18 @@ class AlignMuseDataset(object):
         # Adding a warning in case e.g., PANSTARRS is the filter
         for name in filter_warning_list:
             if name in self.filter_name:
-                upipe.print_warning("# ------------------------------------------------------- #")
-                upipe.print_warning("#                       FILTER WARNING       ")
-                upipe.print_warning(f"For Filter {self.filter_name} beware of normalisation issues")
-                upipe.print_warning("Please make sure the input images are as expected, namely")
+                upipe.print_warning(
+                    "# ------------------------------------------------------- #")
+                upipe.print_warning(
+                    "#                       FILTER WARNING       ")
+                upipe.print_warning(
+                    f"For Filter {self.filter_name} beware of normalisation issues")
+                upipe.print_warning(
+                    "Please make sure the input images are as expected, namely")
                 upipe.print_warning(f"Reference Unit = {self.ref_unit}, Pivot Lambda = "
                                     f"{self.pivot_lambda}")
-                upipe.print_warning("# ------------------------------------------------------- #")
-
+                upipe.print_warning(
+                    "# ------------------------------------------------------- #")
 
     def show_norm_factors(self):
         """Print some information about the normalisation factors.
@@ -812,6 +831,11 @@ class AlignMuseDataset(object):
         self.extra_off_pixel = np.zeros_like(self.cross_off_pixel)
         self.extra_off_arcsec = np.zeros_like(self.cross_off_pixel)
 
+        # Temporary trial offsets, only used for diagnostics
+        self.trial_off_pixel = np.zeros_like(self.cross_off_pixel)
+        self.trial_off_arcsec = np.zeros_like(self.cross_off_pixel)
+        self.trial_rotangles = np.zeros(self.nimages, dtype=np.float64)
+
         self.extra_rotangles = np.zeros(self.nimages, dtype=np.float64)
         self._diffra_angle = np.zeros_like(self.extra_rotangles)
 
@@ -822,7 +846,8 @@ class AlignMuseDataset(object):
         # Normalisation factor to be saved or used
         self.ima_norm_factors = np.zeros(self.nimages, dtype=np.float64)
         self.ima_background = np.zeros_like(self.ima_norm_factors)
-        self.ima_threshold = np.full_like(self.ima_norm_factors, self.default_threshold)
+        self.ima_threshold = np.full_like(
+            self.ima_norm_factors, self.default_threshold)
         self._convolve_muse = np.zeros_like(self.ima_norm_factors)
         self._convolve_reference = np.zeros_like(self.ima_norm_factors)
 
@@ -856,7 +881,8 @@ class AlignMuseDataset(object):
 
         # if ok, initialise state using the OffsetState class
         upipe.print_info(f"Creating new backup OffsetState {self._nstate:02d}")
-        newstate = OffsetState(nstate=self._nstate, info="Backuped offset state")
+        newstate = OffsetState(nstate=self._nstate,
+                               info="Backuped offset state")
         setattr(self, newstate_name, newstate)
         my_newtstate = getattr(self, newstate_name)
 
@@ -864,7 +890,9 @@ class AlignMuseDataset(object):
         for varname in ["ima_background", "ima_norm_factors",
                         "init_off_pixel", "init_off_arcsec",
                         "extra_off_pixel", "extra_off_arcsec",
-                        "init_rotangles", "extra_rotangles"]:
+                        "init_rotangles", "extra_rotangles",
+                        "trial_off_pixel", "trial_off_arcsec",
+                        "trial_rotangles"]:
             setattr(my_newtstate, varname, copy.copy(getattr(self, varname)))
 
     def retrieve_state(self, nstate=1):
@@ -877,7 +905,8 @@ class AlignMuseDataset(object):
         state_name = f"state_{nstate:02d}"
         # Check if the state exists
         if not hasattr(self, state_name):
-            upipe.print_error(f"No found state with number={nstate} - Cannot retrieve")
+            upipe.print_error(
+                f"No found state with number={nstate} - Cannot retrieve")
             return
 
         # Retrieve the data
@@ -926,7 +955,7 @@ class AlignMuseDataset(object):
     def init_guess_offset(self, **kwargs):
         """Initialise first guess, either from cross-correlation (default)
         or from an Offset FITS Table
-         
+
         Input
         -----
         firstguess: str
@@ -946,7 +975,8 @@ class AlignMuseDataset(object):
             if self.firstguess not in ["pcc", "crosscorr", "fits"]:
                 self.firstguess = "crosscorr"
                 upipe.print_warning("Keyword 'firstguess' not recognised")
-                upipe.print_warning("Using Cross-Correlation as a first guess for the alignment")
+                upipe.print_warning(
+                    "Using Cross-Correlation as a first guess for the alignment")
 
         if self.firstguess == "crosscorr":
             upipe.print_info("Using cross-correlation as the initial guess")
@@ -981,7 +1011,8 @@ class AlignMuseDataset(object):
                 self.name_offset_table))
             # First get the right indices for the table by comparing MJD_OBS
             if mjd_names['table'] not in self.offset_table.columns:
-                upipe.print_warning("Input table does not contain MJD_OBS column")
+                upipe.print_warning(
+                    "Input table does not contain MJD_OBS column")
                 self._reset_init_guess_values()
                 return
 
@@ -1042,7 +1073,7 @@ class AlignMuseDataset(object):
 
     def open_offset_table(self, name_table=None):
         """Read offset table from fits file
-         
+
         Input
         -----
         name_table: str
@@ -1068,7 +1099,7 @@ class AlignMuseDataset(object):
 
     def show_offset_fromfits(self, name_table=None):
         """Print offset table from fits file
-         
+
         Input
         -----
         name_table: str
@@ -1099,7 +1130,8 @@ class AlignMuseDataset(object):
         """
         upipe.print_info("Image names")
         for nima in range(self.nimages):
-            upipe.print_info(f"#{nima + 1:03d}/i={nima:03d} - {self.list_name_museimages[nima]}")
+            upipe.print_info(
+                f"#{nima + 1:03d}/i={nima:03d} - {self.list_name_museimages[nima]}")
 
     def print_offsets_and_norms(self, filename="_temp.txt",
                                 folder_output_file=None, overwrite=True):
@@ -1156,25 +1188,53 @@ class AlignMuseDataset(object):
                              },
                     format='fixed_width', overwrite=True)
 
-    def show_offsets(self):
+    def show_offset(self, nima, banner=True, extra=False):
+        """Print out the offset from the Alignment class
+        """
+        if banner:
+            upipe.print_info("#---- Offset recorded so far ----#")
+            upipe.print_info("#    Name               OFFSETS  |ARCSEC|   "
+                             "X        Y     |PIXEL|    X        Y      |ROT| (DEG)")
+
+        upipe.print_info("#{0:03d}/i={1:03d} -{2:>26}  |ARCSEC|{3:8.4f} {4:8.4f} "
+                         " |PIXEL|{5:8.4f} {6:8.4f}  |ROT|{7:8.4f}".format(
+                             nima +
+                             1, nima, self.list_name_museimages[nima][-29:-5],
+                             self._total_off_arcsec[nima][0], self._total_off_arcsec[nima][1],
+                             self._total_off_pixel[nima][0], self._total_off_pixel[nima][1],
+                             self._total_rotangles[nima]))
+        if extra:
+            upipe.print_info("#---- Including Extra Offset ----#")
+            upipe.print_info("#{0:03d}/i={1:03d} -{2:>26}  |ARCSEC|{3:8.4f} {4:8.4f} "
+                             " |PIXEL|{5:8.4f} {6:8.4f}  |ROT|{7:8.4f}".format(
+                                 nima +
+                                 1, nima, self.list_name_museimages[nima][-29:-5],
+                                 self.extra_off_arcsec[nima][0], self.extra_off_arcsec[nima][1],
+                                 self.extra_off_pixel[nima][0], self.extra_off_pixel[nima][1],
+                                 self.extra_rotangles[nima]))
+
+    def show_offsets(self, extra=False):
         """Print out the offset from the Alignment class
         """
         upipe.print_info("#---- Offset recorded so far ----#")
         upipe.print_info("#    Name               OFFSETS  |ARCSEC|   "
                          "X        Y     |PIXEL|    X        Y      |ROT| (DEG)")
         for nima in range(self.nimages):
-            upipe.print_info("#{0:03d}/i={1:03d} -{2:>26}  |ARCSEC|{3:8.4f} {4:8.4f} "
-                             " |PIXEL|{5:8.4f} {6:8.4f}  |ROT|{7:8.4f}".format(
-                nima + 1, nima, self.list_name_museimages[nima][-29:-5],
-                self._total_off_arcsec[nima][0], self._total_off_arcsec[nima][1],
-                self._total_off_pixel[nima][0], self._total_off_pixel[nima][1], self._total_rotangles[nima]))
+            self.show_offset(nima, banner=False, extra=extra)
+
+    def show_trial_offset(self, nima=0):
+        upipe.print_info(
+            f"Trial PIX = {self.trial_off_pixel[nima]}   "
+            f"Trial ARCSEC = {self.trial_off_arcsec[nima]}   "
+            f"Trial ROT = {self.trial_rotangles:0.4f}"
+        )
 
     def save_fits_offset_table(self, name_output_table=None,
                                folder_output_table=None,
                                overwrite=False, suffix="", save_flux_scale=True,
                                save_other_params=True):
         """Save the Offsets into a fits Table
-         
+
         Input
         -----
         folder_output_table: str [None]
@@ -1188,7 +1248,7 @@ class AlignMuseDataset(object):
             If True, overwrite if the file exists
         suffix: str [""]
             Suffix to be used to add to the input name. This is handy
-            to just modify the given fits name with a suffix 
+            to just modify the given fits name with a suffix
             (e.g., version number).
         save_flux_scale: bool [True]
             If True, saving the flux in FLUX_SCALE
@@ -1196,7 +1256,7 @@ class AlignMuseDataset(object):
         save_other_params: bool [True]
             If True, saving the background + rotation
             If False, do not save these 2 parameters.
-        
+
         Creates
         -------
         A fits table with the given name (using the suffix if any)
@@ -1224,7 +1284,7 @@ class AlignMuseDataset(object):
                                 "but overwrite is set to False")
             upipe.print_warning("If you wish to overwrite the table {0}, "
                                 "please set overwrite to True".format(
-                name_output_table))
+                                    name_output_table))
             return
 
         # Check if RA_OFFSET is there
@@ -1239,7 +1299,7 @@ class AlignMuseDataset(object):
 
         # Saving the final values
         fits_table['RA_OFFSET'] = self._total_off_arcsec[:, 0] / 3600. \
-                                  / np.cos(np.deg2rad(self.list_dec_muse))
+            / np.cos(np.deg2rad(self.list_dec_muse))
         fits_table['DEC_OFFSET'] = self._total_off_arcsec[:, 1] / 3600.
         if save_flux_scale:
             fits_table['FLUX_SCALE'] = self.ima_norm_factors
@@ -1259,7 +1319,7 @@ class AlignMuseDataset(object):
 
         # Finally add the cross-correlation offsets
         fits_table['RA_CROSS_OFFSET'] = self.cross_off_arcsec[:, 0] / 3600. \
-                                        / np.cos(np.deg2rad(self.list_dec_muse))
+            / np.cos(np.deg2rad(self.list_dec_muse))
         fits_table['DEC_CROSS_OFFSET'] = self.cross_off_arcsec[:, 1] / 3600.
 
         # Writing up
@@ -1274,52 +1334,6 @@ class AlignMuseDataset(object):
                 upipe.print_error(f"nima={nima} not within the range "
                                   f"allowed by self.nimages ({self.nimages})")
         return test_nima
-
-    def offset_and_compare_ima(self, nima=0, extra_pixel=None, extra_arcsec=None,
-                               extra_rotation=None, **kwargs):
-        """Run the offset and comparison for a given image number
-         
-        Input
-        -----
-        nima: int
-            Index of the image to consider
-        extra_pixel: list of 2 floats
-            Offsets in X and Y in pixels to add to the existing
-            guessed offsets
-            IMPORTANT NOTE: extra_pixel will be considered first
-            (before extra_arcsec).
-        extra_arcsec: list of 2 floats
-            Offsets in X and Y in arcsec to add to the existing
-            guessed offsets. Ignored if extra_pixel is given or None
-        extra_rotation: rotation in degrees
-            Angle to rotate the image (in degrees). Ignore if None
-
-        Additional arguments
-        --------------------
-        threshold: float [0]
-            Threshold to consider when plotting the comparison
-        plot (bool): if True, will plot the comparison
-            If not used, will use the default self.plot
-               * flux comparison (1 to 1)
-               * Map of the flux ratio
-               * Contours of the two scaled maps
-               * Cuts of the division between the 2 maps
-
-        See also all arguments from self.compare
-        """
-        if not self._check_nima(nima):
-            return
-
-        # Add the offset from user
-        border = kwargs.get("border", self.border)
-        chunk_size = kwargs.get("chunk_size", self.chunk_size)
-        self.apply_extra_offset_ima(nima=nima, extra_arcsec=extra_arcsec,
-                                    extra_pixel=extra_pixel,
-                                    extra_rotation=extra_rotation,
-                                    border=border, chunk_size=chunk_size)
-
-        # Compare contours if plot is set to True
-        self.compare_ima(nima=nima, **kwargs)
 
     def _get_list_muse_images(self):
         """Extract the name of the muse images
@@ -1341,7 +1355,8 @@ class AlignMuseDataset(object):
                             for i in self.sel_indices_images]):
                     upipe.print_warning("Selection list - sel_indices_images "
                                         "- does not match image list")
-                    upipe.print_warning("Ignoring that input sel_indices_images")
+                    upipe.print_warning(
+                        "Ignoring that input sel_indices_images")
                 else:
                     newlist = [self.list_name_museimages[nima]
                                for nima in self.sel_indices_images]
@@ -1365,12 +1380,14 @@ class AlignMuseDataset(object):
         """
         status_ref = self._open_ref_hdu()
         if not status_ref:
-            upipe.print_error("Problem in opening Reference frame, please check input")
+            upipe.print_error(
+                "Problem in opening Reference frame, please check input")
             return 0
 
         status_muse = self._open_muse_nhdu()
         if not status_muse:
-            upipe.print_error("Problem in opening MUSE frame, please check input")
+            upipe.print_error(
+                "Problem in opening MUSE frame, please check input")
             return 0
 
         return 1
@@ -1525,7 +1542,8 @@ class AlignMuseDataset(object):
             list_nima = range(self.nimages)
 
         for nima in list_nima:
-            self.get_shift_from_pcc_ima(nima=nima, threshold=threshold, verbose=verbose)
+            self.get_shift_from_pcc_ima(
+                nima=nima, threshold=threshold, verbose=verbose)
 
     def get_shift_from_pcc_ima(self, nima=None, threshold=None, rotation=None, verbose=False):
         """Run the PCC shift guess for image nima
@@ -1603,13 +1621,15 @@ class AlignMuseDataset(object):
             True if you wish to have rotation. False otherwise
         verbose: bool
         """
-        upipe.print_info("Run the optical flow for all images in list (indices)")
+        upipe.print_info(
+            "Run the optical flow for all images in list (indices)")
         if list_nima is None:
             list_nima = range(self.nimages)
 
         # Use Translation and Rotation or only rotation?
         for nima in list_nima:
-            upipe.print_info(f"---------- Optical Flow for Image #{nima + 1}/i={nima} ----------")
+            upipe.print_info(
+                f"---------- Optical Flow for Image #{nima + 1}/i={nima} ----------")
             self.run_optical_flow_ima(nima=nima, save_plot=save_plot,
                                       use_rotation=use_rotation,
                                       verbose=verbose, **kwargs)
@@ -1635,11 +1655,14 @@ class AlignMuseDataset(object):
         if save_plot:
             plt.ioff()
             self.op_plots[nima].red_blue_before_after()
-            plt.savefig(joinpath(self.figures_folder_name, f"opflow_redblue_{nima:03d}.png"))
+            plt.savefig(joinpath(self.figures_folder_name,
+                        f"opflow_redblue_{nima:03d}.png"))
             self.op_plots[nima].before_after()
-            plt.savefig(joinpath(self.figures_folder_name, f"opflow_beforeafter_{nima:03d}.png"))
+            plt.savefig(joinpath(self.figures_folder_name,
+                        f"opflow_beforeafter_{nima:03d}.png"))
             self.op_plots[nima].illustrate_vector_fields()
-            plt.savefig(joinpath(self.figures_folder_name, f"opflow_vectorfield_{nima:03d}.png"))
+            plt.savefig(joinpath(self.figures_folder_name,
+                        f"opflow_vectorfield_{nima:03d}.png"))
             self.op_plots[nima].before_after_diff_frac()
             plt.savefig(joinpath(self.figures_folder_name, f"opflow_beforeafter_frac_"
                                                            f"{nima:03d}.png"))
@@ -1654,7 +1677,8 @@ class AlignMuseDataset(object):
         list_nima: list
             If None, will be initiliased to the default list of indices
         """
-        upipe.print_info("Apply the optical flow offset as extra user offset - and rotation")
+        upipe.print_info(
+            "Apply the optical flow offset as extra user offset - and rotation")
         if list_nima is None:
             list_nima = range(self.nimages)
 
@@ -1670,13 +1694,16 @@ class AlignMuseDataset(object):
             return
 
         if self.verbose:
-            upipe.print_info(f"Apply optical flow offset solution to Image #{nima:03d}")
+            upipe.print_info(
+                f"Apply optical flow offset solution to Image #{nima:03d}")
         # Now set up the extra needed offsets as the solution from optical flow
         # We need to invert Y, X to X, Y (the [::-1]) and use the minus sign
         # considering optical flow derives the motion of ref to MUSE
         self.apply_extra_offset_ima(nima=nima,
-                                    extra_pixel=- self.optical_flows[nima].translation[::-1],
+                                    extra_pixel=-
+                                    self.optical_flows[nima].translation[::-1],
                                     extra_rotation=-self.optical_flows[nima].rotation_deg)
+
         # Initialise the plot
         self.op_plots[nima] = init_plot_optical_flow(self.optical_flows[nima])
 
@@ -1692,9 +1719,11 @@ class AlignMuseDataset(object):
             Number of iterations
         """
         if self.verbose:
-            upipe.print_info(f"Optical flow with {niter} iterations for Image #{nima + 1}/i={nima}")
+            upipe.print_info(
+                f"Optical flow with {niter} iterations for Image #{nima + 1}/i={nima}")
 
-        list_guess_key = ["guess_rotation", "guess_offset_pixel", "guess_offset_arcsec"]
+        list_guess_key = ["guess_rotation",
+                          "guess_offset_pixel", "guess_offset_arcsec"]
         given_guess = any(guess_key in kwargs for guess_key in list_guess_key)
         reset_opf = kwargs.pop("reset_optical_flow", False)
 
@@ -1702,7 +1731,8 @@ class AlignMuseDataset(object):
             self.init_optical_flow_ima(nima, verbose=verbose, **kwargs)
 
         if "homography_method" in kwargs:
-            homography_method = kwargs.pop("homography_method", transform.EuclideanTransform)
+            homography_method = kwargs.pop(
+                "homography_method", transform.EuclideanTransform)
         else:
             if use_rotation:
                 homography_method = transform.EuclideanTransform
@@ -1730,7 +1760,8 @@ class AlignMuseDataset(object):
             list_nima = range(self.nimages)
 
         for nima in list_nima:
-            self.iterate_on_optical_flow_ima(nima=nima, use_rotation=use_rotation, **kwargs)
+            self.iterate_on_optical_flow_ima(
+                nima=nima, use_rotation=use_rotation, **kwargs)
 
     def init_optical_flow_listima(self, list_nima=None, **kwargs):
         """Initialise the optical flow on a list of images
@@ -1768,7 +1799,8 @@ class AlignMuseDataset(object):
         if guess_offset_pixel is None and guess_offset_arcsec is None:
             # Force a PCC guess
             if force_pcc_guess:
-                self.get_shift_from_pcc_ima(nima, threshold=threshold, verbose=verbose)
+                self.get_shift_from_pcc_ima(
+                    nima, threshold=threshold, verbose=verbose)
                 guess_offset_pixel = self.pcc_off_pixel[nima][::-1]
             # Or use the already defined one
             else:
@@ -1802,7 +1834,8 @@ class AlignMuseDataset(object):
         # All guesses should not be 0, since they have been processed above
         self.optical_flows[nima] = self.init_optical_flow_hdu(hdu_off_muse,
                                                               rotation=0., threshold=threshold,
-                                                              guess_translation=[0., 0.],
+                                                              guess_translation=[
+                                                                  0., 0.],
                                                               header=header, verbose=verbose,
                                                               **kwargs)
 
@@ -1882,7 +1915,7 @@ class AlignMuseDataset(object):
 
     def find_cross_peak(self, muse_hdu, rotation=0.0, threshold=None, **kwargs):
         """Aligns the MUSE HDU to a reference HDU
-         
+
         Input
         -----
         muse_hdu: astropy.io.fits hdu
@@ -1894,13 +1927,14 @@ class AlignMuseDataset(object):
         threshold: minimum flux to be used in the cross-correlation
             Flux below that value will be set to 0.
             Default is 0.
-        
+
         Returns
         -------
         xpix_cross
         ypix_cross: x and y pixel coordinates of the cross-correlation peak
         """
-        ima_ref, ima_muse = self.get_imaref_muse(muse_hdu, rotation, threshold=threshold, **kwargs)
+        ima_ref, ima_muse = self.get_imaref_muse(
+            muse_hdu, rotation, threshold=threshold, **kwargs)
 
         if self.phase_corr:
             shifts, shift_errors, phasediff = phase_cross_correlation(
@@ -1950,7 +1984,7 @@ class AlignMuseDataset(object):
 
     def save_image(self, newfits_name=None, nima=0):
         """Save the newly determined hdu
-         
+
         Input
         -----
         newfits_name: str
@@ -1976,12 +2010,13 @@ class AlignMuseDataset(object):
             newhdr['CRPIX1'] += total_off_pixel[0]
             newhdr['CRPIX2'] += total_off_pixel[1]
 
-            hdu_offmuse = pyfits.PrimaryHDU(self.list_muse_hdu[nima].data, header=newhdr)
+            hdu_offmuse = pyfits.PrimaryHDU(
+                self.list_muse_hdu[nima].data, header=newhdr)
 
             # Get rotated image
             img_to_save, _, _ = self._align_hdu(hdu_target=hdu_offmuse, hdu_to_align=self.reference_hdu,
-                                   target_rotation=self._total_rotangles[nima], to_align_rotation=0,
-                                   conversion_factor=1.)
+                                                target_rotation=self._total_rotangles[nima], to_align_rotation=0,
+                                                conversion_factor=1.)
             img_to_save.writeto(newfits_name, overwrite=True)
         else:
             upipe.print_error("There are not yet any new hdu to save")
@@ -2021,7 +2056,7 @@ class AlignMuseDataset(object):
                              ref_rotation=0.0, conversion_factor=None):
         """Project the reference image onto the target hdu
         Hidden function, as only used internally
-         
+
         Input
         -----
         hdu_target: HDU [None]
@@ -2030,7 +2065,7 @@ class AlignMuseDataset(object):
             Target rotation angle in degrees
         ref_rotation: float [0]
             Rotation of the reference image
-        
+
         Returns
         -------
         hdu_repr: HDU
@@ -2053,9 +2088,95 @@ class AlignMuseDataset(object):
     def _total_off_arcsec(self):
         return self.init_off_arcsec + self.extra_off_arcsec
 
+    @property
+    def _trial_total_off_pixel(self):
+        return self._total_off_pixel + self.trial_off_pixel
+
+    @property
+    def _trial_total_off_arcsec(self):
+        return self._total_off_arcsec + self.trial_off_arcsec
+
+    @property
+    def _trial_total_rotangles(self):
+        return self._total_rotangles + self.trial_rotangles
+
+    def _set_trial_offset_ima(self, nima=0,
+                              trial_pixel=None,
+                              trial_arcsec=None,
+                              trial_rotation=None):
+
+        if trial_pixel is None:
+            if trial_arcsec is not None:
+                self.trial_off_arcsec[nima] = trial_arcsec
+                self.trial_off_pixel[nima] = arcsec_to_pixel(
+                    self.list_muse_hdu[nima],
+                    trial_arcsec)
+        else:
+            self.trial_off_pixel[nima] = trial_pixel
+            self.trial_off_arcsec[nima] = pixel_to_arcsec(
+                self.list_muse_hdu[nima],
+                trial_pixel)
+
+        if trial_rotation is not None:
+            self.trial_rotangles[nima] = trial_rotation
+
+    def clear_trial_offset_ima(self, nima=0):
+        self.trial_off_pixel[nima] = 0.
+        self.trial_off_arcsec[nima] = 0.
+        self.trial_rotangles[nima] = 0.
+
+    def accept_trial_offset_ima(self, nima=0, compare=True, **kwargs):
+        """
+        Transfer current trial offset into extra offset.
+        """
+        self._add_extra_offset_ima(nima=nima,
+                                   add_pixel=self.trial_off_pixel[nima], add_rotation=self.trial_rotangles[nima])
+
+        # Reset trial offsets
+        self.clear_trial_offset_ima(nima)
+
+        # Apply alignment
+        self._apply_alignment_ima(nima)
+
+        # If compare, do it so the user can see it
+        if compare:
+            self.compare_with_trial_offset_ima(nima=nima, **kwargs)
+
+    def _add_extra_offset_ima(self, nima=0, add_pixel=None, add_arcsec=None,
+                              add_rotation=None):
+        """Add offset to the extra_offset itself
+
+        Input
+        -----
+        add_pixel: list of 2 floats [0,0]
+            Add offsets (x,y) in pixels
+        add_arsec: list of 2 floats [0,0]
+            Add offsets (x,y) in arcsec if add_pixel is not provided
+        add_rotation: rotation in degrees [0]
+        nima: int
+            Index of image to consider
+        """
+        # Add this to the off arrays
+        if add_pixel is None:
+            if add_arcsec is not None:
+                # Transforming the arc into pix
+                self.extra_off_arcsec[nima] += add_arcsec
+                # Transforming into pixels - would be better with setter
+                self.extra_off_pixel[nima] += arcsec_to_pixel(
+                    self.list_muse_hdu[nima], add_arcsec)
+        else:
+            self.extra_off_pixel[nima] += add_pixel
+            # Transforming into arcsec - would be better with setter
+            self.extra_off_arcsec[nima] += pixel_to_arcsec(
+                self.list_muse_hdu[nima], add_pixel)
+
+        # And add to the rotation angle in degrees
+        if add_rotation is not None:
+            self.extra_rotangles[nima] += add_rotation
+
     def _set_extra_offset_ima(self, nima=0, extra_pixel=None, extra_arcsec=None,
-                              extra_rotation=None):
-        """Add user offset in pixel and transform into arcseconds
+                              extra_rotation=None, **kwargs):
+        """Set user offset in pixel and transform into arcseconds
 
         Input
         -----
@@ -2073,11 +2194,13 @@ class AlignMuseDataset(object):
                 # Transforming the arc into pix
                 self.extra_off_arcsec[nima] = extra_arcsec
                 # Transforming into pixels - would be better with setter
-                self.extra_off_pixel[nima] = arcsec_to_pixel(self.list_muse_hdu[nima], extra_arcsec)
+                self.extra_off_pixel[nima] = arcsec_to_pixel(
+                    self.list_muse_hdu[nima], extra_arcsec)
         else:
             self.extra_off_pixel[nima] = extra_pixel
             # Transforming into arcsec - would be better with setter
-            self.extra_off_arcsec[nima] = pixel_to_arcsec(self.list_muse_hdu[nima], extra_pixel)
+            self.extra_off_arcsec[nima] = pixel_to_arcsec(
+                self.list_muse_hdu[nima], extra_pixel)
 
         # And the rotation angle in degrees
         if extra_rotation is not None:
@@ -2103,7 +2226,9 @@ class AlignMuseDataset(object):
             Rotation in degrees. If None, no new extra offset is applied
         """
         # Add this to the extra_off arrays
-        self._set_extra_offset_ima(nima=nima, extra_arcsec=extra_arcsec, extra_pixel=extra_pixel,
+        self._set_extra_offset_ima(nima=nima,
+                                   extra_arcsec=extra_arcsec,
+                                   extra_pixel=extra_pixel,
                                    extra_rotation=extra_rotation)
 
         # Actually apply the alignment to the image
@@ -2174,20 +2299,22 @@ class AlignMuseDataset(object):
                          total_rotangle=0., **kwargs):
         """Create New HDU after shifting it with the right offset
         (only considering image with index nima)
-         
+
         Input
         -----
         hdu : HDU
             Input HDU of image to offset
         nima: int
             Index of image to consider
-        
+
         Does not return anything, but could in principle
         """
         # Create a new Header
         newhdr = copy.copy(hdu.header)
 
         # Using input offset or total
+        total_off_pixel, total_off_arcsec = self._sort_offset_pixel_arcsec(hdu, total_off_pixel,
+                                                                           total_off_arcsec)
         total_off_pixel, total_off_arcsec = self._sort_offset_pixel_arcsec(hdu, total_off_pixel,
                                                                            total_off_arcsec)
 
@@ -2198,7 +2325,8 @@ class AlignMuseDataset(object):
                              f" {total_off_pixel[1]:8.4f}  /  "
                              f"[ARCSEC]: {total_off_arcsec[0]:8.4f}"
                              f"{total_off_arcsec[1]:8.4f}")
-            upipe.print_info(f"       Rotation [DEGREE]: {total_rotangle:8.4f}")
+            upipe.print_info(
+                f"       Rotation [DEGREE]: {total_rotangle:8.4f}")
 
         # Shifting the CRPIX values in the header
         newhdr['CRPIX1'] += total_off_pixel[0]
@@ -2210,16 +2338,17 @@ class AlignMuseDataset(object):
 
         # Reprojecting the Reference image onto the new MUSE frame
         hdu_target, hdu_projref, diffra = \
-            self._align_reference_hdu(hdu_target=hdu_offmuse, target_rotation=total_rotangle)
+            self._align_reference_hdu(
+                hdu_target=hdu_offmuse, target_rotation=total_rotangle)
 
         return hdu_offmuse, hdu_projref, diffra
 
     def get_normfactor_ima(self, nima=0, median_filter=True, border=0, convolve_muse=0.,
                            convolve_reference=0., chunk_size=10, **kwargs):
-        """Get the normalisation factor for shifted and projected images. This function only 
+        """Get the normalisation factor for shifted and projected images. This function only
         consider the input image given by index nima and the reference image (after
         projection).
-         
+
         Input
         -----
         nima: int
@@ -2238,7 +2367,7 @@ class AlignMuseDataset(object):
             Threshold for the input image flux to consider
         chunk_size: int
             Size of chunks to consider for chunk statistics (polynomial normalisation)
-        
+
         Returns
         -------
         data: 2d array
@@ -2246,7 +2375,7 @@ class AlignMuseDataset(object):
             The 2 arrays (input, reference) after processing
         """
         threshold = kwargs.pop("threshold", self.ima_threshold[nima])
-        percentiles = kwargs.pop("percentiles", (0,100))
+        percentiles = kwargs.pop("percentiles", (0, 100))
         sigclip = kwargs.pop("sigclip", 0)
 
         return get_normfactor(self.list_offmuse_hdu[nima].data, self.list_proj_refhdu[nima].data,
@@ -2265,10 +2394,141 @@ class AlignMuseDataset(object):
             self.ima_background[nima] = beta[0]
             self.ima_norm_factors[nima] = beta[1]
 
+    def compare_with_trial_offset_ima(self, nima=0,
+                                      trial_pixel=None, trial_arcsec=None, trial_rotation=None,
+                                      nima_museref=None, convolve_muse=0., convolve_reference=0.,
+                                      **kwargs):
+        """
+        Compare the alignment after adding a temporary (trial) offset
+        and/or rotation.
+
+        The trial values are NOT applied to self.extra_off_*.
+        They are only used for this comparison and can later be accepted
+        via accept_trial_offset_ima().
+
+        Parameters
+        ----------
+        nima : int
+            Image index.
+        trial_pixel : array-like(2), optional
+            Trial offset (x,y) in pixels.
+        trial_arcsec : array-like(2), optional
+            Trial offset (x,y) in arcsec.
+        trial_rotation : float, optional
+            Trial rotation angle in degrees.
+        """
+
+        if not self._check_nima(nima):
+            return
+
+        # Store the trial values
+        self._set_trial_offset_ima(nima=nima,
+                                   trial_pixel=trial_pixel,
+                                   trial_arcsec=trial_arcsec,
+                                   trial_rotation=trial_rotation
+                                   )
+
+        # Compute temporary total alignment
+        total_pixel = self._trial_total_off_pixel[nima]
+        total_arcsec = self._trial_total_off_arcsec[nima]
+        total_rot = self._trial_total_rotangles[nima]
+
+        if self.verbose:
+            upipe.print_info(
+                f"Trial alignment for image #{nima+1:03d}/i={nima:03d}"
+            )
+            upipe.print_info(
+                f"   trial pix = {self.trial_off_pixel[nima]}"
+            )
+            upipe.print_info(
+                f"   total pix = {total_pixel}"
+            )
+            upipe.print_info(
+                f"   total rot = {total_rot:.5f} deg"
+            )
+
+        # Build temporary aligned image
+        hdu_offmuse, hdu_projref, _ = self._apply_alignment(
+            self.list_muse_hdu[nima],
+            total_off_pixel=total_pixel,
+            total_off_arcsec=total_arcsec,
+            total_rotangle=total_rot,
+            verbose=False
+        )
+
+        # Same logic as compare_ima()
+        museref = nima_museref is not None
+        if museref:
+            refhdu = self.list_offmuse_hdu[nima_museref]
+        else:
+            refhdu = hdu_projref
+
+        threshold_muse = kwargs.pop("threshold_muse", self.ima_threshold[nima])
+
+        percentiles = kwargs.pop("percentiles", (0, 100))
+        sigclip = kwargs.get("sigclip", 0)
+
+        musedata, refdata, polypar = get_normfactor(hdu_offmuse.data, refhdu.data,
+                                                    convolve_data1=convolve_muse,
+                                                    convolve_data2=convolve_reference,
+                                                    threshold=threshold_muse,
+                                                    percentiles=percentiles,
+                                                    sigclip=sigclip)
+
+        self.compare(aligned=musedata, reference=refdata,
+                     header=hdu_offmuse.header, suffix_fig=f"{nima:03d}_trial",
+                     **kwargs)
+
+    def set_extra_and_compare_ima(self, nima=0, extra_pixel=None, extra_arcsec=None,
+                                  extra_rotation=None, **kwargs):
+        """Run the offset and comparison for a given image number
+
+        Input
+        -----
+        nima: int
+            Index of the image to consider
+        extra_pixel: list of 2 floats
+            Offsets in X and Y in pixels to add to the existing
+            guessed offsets
+            IMPORTANT NOTE: extra_pixel will be considered first
+            (before extra_arcsec).
+        extra_arcsec: list of 2 floats
+            Offsets in X and Y in arcsec to add to the existing
+            guessed offsets. Ignored if extra_pixel is given or None
+        extra_rotation: rotation in degrees
+            Angle to rotate the image (in degrees). Ignore if None
+
+        Additional arguments
+        --------------------
+        threshold: float [0]
+            Threshold to consider when plotting the comparison
+        plot (bool): if True, will plot the comparison
+            If not used, will use the default self.plot
+               * flux comparison (1 to 1)
+               * Map of the flux ratio
+               * Contours of the two scaled maps
+               * Cuts of the division between the 2 maps
+
+        See also all arguments from self.compare
+        """
+        if not self._check_nima(nima):
+            return
+
+        # Add the offset from user
+        border = kwargs.get("border", self.border)
+        chunk_size = kwargs.get("chunk_size", self.chunk_size)
+        self.apply_extra_offset_ima(nima=nima, extra_arcsec=extra_arcsec,
+                                    extra_pixel=extra_pixel,
+                                    extra_rotation=extra_rotation,
+                                    border=border, chunk_size=chunk_size)
+
+        # Compare contours if plot is set to True
+        self.compare_ima(nima=nima, **kwargs)
+
     def compare_ima(self, nima=0, nima_museref=None,
                     convolve_muse=0, convolve_reference=0., **kwargs):
         """
-        
+
         Input
         -----
         nima: int
@@ -2319,7 +2579,7 @@ class AlignMuseDataset(object):
                 suffix_fig="", **kwargs):
         """Compare the projected reference and MUSE image
         by plotting the contours, the difference and vertical/horizontal cuts.
-         
+
         Parameters
         ----------
         aligned:
@@ -2363,7 +2623,7 @@ class AlignMuseDataset(object):
         savefig = kwargs.pop("savefig", True)
         threshold = kwargs.pop("threshold", 0.)
         sigclip = kwargs.pop("sigclip", 0.)
-        percentiles = kwargs.pop("percentiles", (0.,100.))
+        percentiles = kwargs.pop("percentiles", (0., 100.))
 
         # Getting the data
         _, _, polypar = get_normfactor(aligned, reference,
@@ -2378,6 +2638,8 @@ class AlignMuseDataset(object):
         # If normalising, use the polypar slope and background
         if normalise:
             if self.verbose:
+                upipe.print_info(f"Linear Fitting stats"
+                                 f"MAD = {polypar.robust_std:8.4e}, RMS=({polypar.rms:8.4e})")
                 upipe.print_info(f"Renormalising the data as: Normalised = "
                                  f"{polypar.beta[1]:8.4e} * ({polypar.beta[0]:8.4e} + MUSE)")
 

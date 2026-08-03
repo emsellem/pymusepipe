@@ -11,6 +11,7 @@ import os
 from os.path import join as joinpath
 import glob
 import copy
+import warnings
 
 # Numpy
 import numpy as np
@@ -32,7 +33,8 @@ from mpdaf.drs import PixTable
 # Import package modules
 from . import util_pipe as upipe
 from .util_pipe import get_dataset_tpl_nexpo, append_value_to_dict
-from .config_pipe import (default_ndigits, default_str_dataset, default_offset_table, default_filter_list)
+from .config_pipe import (
+    default_ndigits, default_str_dataset, default_offset_table, default_filter_list)
 from .config_pipe import mjd_names, date_names, tpl_names, iexpo_names, dataset_names
 
 try:
@@ -77,16 +79,19 @@ class SelectionZone(object):
     params: list of floats
         List of parameters for the selection zone
     """
+
     def __init__(self, params=None):
         self.params = params
         if self.params is None:
-            upipe.print_error("Warning: no parameters given for Selection Zone")
+            upipe.print_error(
+                "Warning: no parameters given for Selection Zone")
 
 
 class RectangleZone(SelectionZone):
     """Define a rectangular zone, given by
     a center, a length, a width and an angle
     """
+
     def __init__(self):
         self.geometry = "Rectangle"
         self.nparams = 5
@@ -116,6 +121,7 @@ class CircleZone(SelectionZone):
     """Define a Circular zone, defined by
     a center and a radius
     """
+
     def __init__(self):
         self.geometry = "Circle"
         self.nparams = 5
@@ -140,6 +146,7 @@ class TrailZone(SelectionZone):
     """Define a Trail zone, defined by
     two points and a width
     """
+
     def __init__(self):
         self.geometry = "Trail"
         self.nparams = 5
@@ -216,7 +223,8 @@ def get_polynorm(array1, array2, chunk_size=15, threshold1=0.,
         threshold1 = 0.
     if threshold2 is None:
         threshold2 = 0.
-    pos = (med[0] > threshold1) & (std[0] > 0.) & (std[1] > 0.) & (med[1] > threshold2)
+    pos = (med[0] > threshold1) & (std[0] > 0.) & (
+        std[1] > 0.) & (med[1] > threshold2)
     # Guess the slope from this selection
     guess_slope = 1.0
 
@@ -283,11 +291,14 @@ def regress_odr(x, y, sx, sy, beta0=(0., 1.),
             sx, sy = sx[~filtered.mask], sy[~filtered.mask]
             # Run ODR again on the cleaned data
             r = local_run_odr(x, y, sx, sy, 0)
+        r.residuals = y - my_linear_model([r.beta[0], r.beta[1]], x)
+        r.rms = np.sqrt(np.mean(r.residuals**2))
+        r.robust_std = mad_std(r.residuals, ignore_nan=True)
         return r
     return local_run_odr(xsel, ysel, sxsel, sysel, sigclip)
 
 
-def chunk_stats(list_arrays, chunk_size=15):
+def chunk_stats(list_arrays, chunk_size=15, valid_threshold=0.3):
     """Cut the datasets in 2d chunks and take the median
     Return the set of medians for all chunks.
 
@@ -323,8 +334,25 @@ def chunk_stats(list_arrays, chunk_size=15):
     grids_nchunkx  = np.array(np.split(arrays3d_chunk_ready, nchunk_x, axis=1))
     grids_xy = np.array(np.split(np.array(grids_nchunkx), nchunk_y, axis=-1))
 
-    med_array = np.nanmedian(grids_xy, axis=(-2,-1)).T.reshape(narrays, grid_number)
-    std_array = mad_std(grids_xy, axis=(-2,-1), ignore_nan=True).T.reshape(narrays, grid_number)
+    # Test the fraction of valid chunks
+    npix_chunk = chunk_size * chunk_size
+    frac_valid = (np.sum(np.isfinite(grids_xy), axis=(-2, -1)) / npix_chunk)
+    good_chunk = frac_valid > valid_threshold
+
+    # Computing the number of bad chunks (allNan)
+    n_bad = np.sum(np.all(np.isnan(grids_xy), axis=(-2,-1)))
+    if n_bad > 0:
+        upipe.print_info(f"Ignoring {n_bad} fully-NaN chunks")
+
+    # Remove warnings in stats
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="All-NaN slice encountered")
+        med_array = np.nanmedian(grids_xy, axis=(-2,-1)).T.reshape(narrays, grid_number)
+        std_array = mad_std(grids_xy, axis=(-2,-1), ignore_nan=True).T.reshape(narrays, grid_number)
+
+    # Remove (to Nan) the bad chunks (too many Nan)
+    med_array[~good_chunk.T.reshape(narrays, grid_number)] = np.nan
+    std_array[~good_chunk.T.reshape(narrays, grid_number)] = np.nan
 
     # Cleaning in case of Nan
     med_array = np.nan_to_num(med_array)
@@ -360,6 +388,31 @@ def get_flux_range(data, border=15, low=2, high=98):
         lperc, hperc = 0., 1.
 
     return lperc, hperc
+
+
+def crop_to_common_footprint(d1, d2):
+    """ Cropping two arrays to a common Not NaN area
+
+    Input
+    -----
+    d1, d2: 2 arrays
+
+    Returns
+    -------
+    Cropped arrays in tuple
+    """
+    common = np.isfinite(d1) & np.isfinite(d2)
+
+    if not np.any(common):
+        return d1, d2
+
+    yy, xx = np.where(common)
+
+    ymin, ymax = yy.min(), yy.max()
+    xmin, xmax = xx.min(), xx.max()
+
+    return (d1[ymin:ymax+1, xmin:xmax+1],
+            d2[ymin:ymax+1, xmin:xmax+1])
 
 
 def get_normfactor(array1, array2, median_filter=True, border=0,
@@ -398,11 +451,18 @@ def get_normfactor(array1, array2, median_filter=True, border=0,
     polypar: the result of an ODR regression
     """
     # Retrieving the data and preparing it
-    d1 = prepare_image(array1+add_background1, median_filter=median_filter, sigma=convolve_data1,
-                       border=border)
-    d2 = prepare_image(array2, median_filter=median_filter, sigma=convolve_data2, border=border)
-    polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold, sigclip=sigclip,
-                           percentiles=percentiles)
+    d1 = prepare_image(array1+add_background1, median_filter=median_filter,
+                       sigma=convolve_data1, border=border)
+    d2 = prepare_image(array2, median_filter=median_filter,
+                       sigma=convolve_data2, border=border)
+    # Common footprint
+    common_mask = np.isfinite(d1) & np.isfinite(d2)
+    d1 = np.where(common_mask, d1, np.nan)
+    d2 = np.where(common_mask, d2, np.nan)
+
+    # Now the polynorm
+    polypar = get_polynorm(d1, d2, chunk_size=chunk_size, threshold1=threshold,
+                           sigclip=sigclip, percentiles=percentiles)
 
     # Returning the processed data
     return d1, d2, polypar

@@ -28,3 +28,4 @@ src/*.egg-info
 lib
 lib64
 HOWTO.txt
+token-pypi

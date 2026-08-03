@@ -5,6 +5,7 @@ HOWTO.txt
 LICENSE.txt
 MANIFEST.in
 README.md
+pyproject.toml
 requirements.txt
 setup.cfg
 setup.py
