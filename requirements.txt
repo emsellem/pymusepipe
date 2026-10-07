@@ -6,7 +6,7 @@ matplotlib>=3.0.0
 sphinxcontrib.email
 reproject>=0.8
 scikit-image>=0.19.3
-spacepylot>=0.0.post1.dev20+g857829b.d20221118
+spacepylot
 pymusepipe>=2.26.9
 photutils>=1.2.0
 pypher>=0.6.4

@@ -20,8 +20,8 @@ default_muse_unit = u.erg / (u.cm * u.cm * u.second * u.AA) * 1.e-20
 default_reference_unit = 1.000 * u.microJansky
 
 # Default equivalencies for other filters
-dict_equivalencies = {"WFI_BB":      [1.000 * u.microJansky, 6483.58   * u.AA],
-                      "DUPONT_R":    [1.000 * u.microJansky, 6483.58   * u.AA],
+dict_equivalencies = {"WFI_BB":      [1.000 * u.microJansky, 6483.58 * u.AA],
+                      "DUPONT_R":    [1.000 * u.microJansky, 6483.58 * u.AA],
                       "Johnson_B":   [1.000 * u.microJansky, 4402.1095 * u.AA],
                       "Johnson_V":   [1.000 * u.microJansky, 5492.9237 * u.AA],
                       "Cousins_R":   [1.000 * u.microJansky, 6449.8565 * u.AA],
@@ -121,22 +121,23 @@ dict_listObject = {'OBJECT': 'PIXTABLE_OBJECT',
 dict_listMasterObject = {**dict_listMaster, **dict_listObject}
 
 listexpo_files = {
-        "OBJECT": ['object', 'OBJECT', str, '20A'],
-        "TYPE": ['type', 'ESO DPR TYPE', str, '20A'],
-        "DATE":  ['mjd', 'MJD-OBS', float, 'E'],
-        "MODE":  ['mode', 'ESO INS MODE', str, '10A'],
-        "EXPTIME":  ['exptime', 'EXPTIME', float, 'E'],
-        "TPLS":  ['tpls', 'ESO TPL START', str, '30A'],
-        "TPLN":  ['tplnexp', 'ESO TPL NEXP', int, 'J'],
-        "TPLNO":  ['tplno', 'ESO TPL EXPNO', int, 'J']
-        }
+    "OBJECT": ['object', 'OBJECT', str, '20A'],
+    "TYPE": ['type', 'ESO DPR TYPE', str, '20A'],
+    "DATE":  ['mjd', 'MJD-OBS', float, 'E'],
+    "MODE":  ['mode', 'ESO INS MODE', str, '10A'],
+    "EXPTIME":  ['exptime', 'EXPTIME', float, 'E'],
+    "TPLS":  ['tpls', 'ESO TPL START', str, '30A'],
+    "TPLN":  ['tplnexp', 'ESO TPL NEXP', int, 'J'],
+    "TPLNO":  ['tplno', 'ESO TPL EXPNO', int, 'J']
+}
 
 # Excluding files from the checking of their MUSE mode (AO, noAO, N/E etc)
 list_exclude_checkmode = ['BIAS', 'DARK', 'GEOMETRY']
 list_fieldspecific_checkmode = ['ILLUM', 'ASTROMETRY']
 
 # List of modes allowed for MUSE
-list_musemodes = ['WFM-AO-N', 'WFM-AO-E', 'WFM-NOAO-E', 'WFM-NOAO-N', 'NFM-AO-N']
+list_musemodes = ['WFM-AO-N', 'WFM-AO-E',
+                  'WFM-NOAO-E', 'WFM-NOAO-N', 'NFM-AO-N']
 dict_musemodes = {'field': 0, 'ao': 1, 'lrange': 2}
 
 # Suffix for the pre/post-alignment files. Will be part of the output names
@@ -148,29 +149,29 @@ suffix_rawfiles = ['fits.fz', 'fits']
 
 # List of names from the products
 dict_files_iexpo_products = {
-        'ALIGN': ['SOURCE_LIST']
-        }
+    'ALIGN': ['SOURCE_LIST']
+}
 
 dict_files_products = {
-        'STD': ['DATACUBE_STD', 'STD_FLUXES',
-                'STD_RESPONSE', 'STD_TELLURIC'],
-        'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
-        'SKY': ['SKY_MASK', 'SKY_IMAGE', 'SKY_LINES', 'SKY_SPECTRUM',
-                'SKY_CONTINUUM'],
-        'ALIGN': ['OFFSET_LIST']
-        }
+    'STD': ['DATACUBE_STD', 'STD_FLUXES',
+            'STD_RESPONSE', 'STD_TELLURIC'],
+    'TWILIGHT': ['DATACUBE_SKYFLAT', 'TWILIGHT_CUBE'],
+    'SKY': ['SKY_MASK', 'SKY_IMAGE', 'SKY_LINES', 'SKY_SPECTRUM',
+            'SKY_CONTINUUM'],
+    'ALIGN': ['OFFSET_LIST']
+}
 
 dict_products_scipost = {
-        'cube': ['DATACUBE_FINAL', 'IMAGE_FOV'],
-        'individual': ['PIXTABLE_REDUCED'],
-        'stacked': ['OBJECT_RESAMPLED'],
-        'positioned': ['PIXTABLE_POSITIONED'],
-        'combined': ['PIXTABLE_COMBINED'],
-        'skymodel': ['SKY_MASK', 'SKY_SPECTRUM',
-                     'SKY_LINES', 'SKY_IMAGE'],
-        'raman': ['RAMAN_IMAGES'],
-        'autocal': ['AUTOCAL_FACTORS']
-        }
+    'cube': ['DATACUBE_FINAL', 'IMAGE_FOV'],
+    'individual': ['PIXTABLE_REDUCED'],
+    'stacked': ['OBJECT_RESAMPLED'],
+    'positioned': ['PIXTABLE_POSITIONED'],
+    'combined': ['PIXTABLE_COMBINED'],
+    'skymodel': ['SKY_MASK', 'SKY_SPECTRUM',
+                 'SKY_LINES', 'SKY_IMAGE'],
+    'raman': ['RAMAN_IMAGES'],
+    'autocal': ['AUTOCAL_FACTORS']
+}
 
 # -- END ---------------------------------------------------------------#
 
@@ -192,28 +193,28 @@ default_str_pointing = 'P'
 # ======================================================================#
 # BEGIN
 #           DEFAULT PATHS for the Muse pipeline
-# 
+#
 # Default hard-coded folders
-# The setting of these folders can be overwritten 
+# The setting of these folders can be overwritten
 # by a given rc file if provided
 # ======================================================================#
 # for init_musepipe module
 
 dict_user_folders = {
-            # values provide the folder and whether or not this should be attempted to create
-            # Muse calibration files (common to all)
-            "musecalib": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/soft/muse-pipelines/calib/'",
-            # Time varying calibrations
-            "musecalib_time": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/time_calibrations/",
-            # Calibration files (specific to OBs)
-            "root": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/live/",
+    # values provide the folder and whether or not this should be attempted to create
+    # Muse calibration files (common to all)
+    "musecalib": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/soft/muse-pipelines/calib/'",
+    # Time varying calibrations
+    "musecalib_time": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/time_calibrations/",
+    # Calibration files (specific to OBs)
+    "root": "/data/beegfs/astro-storage/groups/schinnerer/PHANGS/MUSE/live/",
             # Default prefix for Datasets
             "str_dataset": default_str_dataset,
             # Default prefix for Pointings
             "str_pointing": default_str_pointing,
             # Default number of digits for Blocks
             "ndigits": default_ndigits
-            }
+}
 
 # Default initialisation file
 default_rc_filename = "~/.musepiperc"
@@ -237,7 +238,7 @@ dict_extra_filters = {
     "DUPONT_R": "data/Filters/LCO_SITe3_rp.txt",
     "LCO-HA663": "data/Filters/Ha663BP6_AA.txt",
     "LCO-HA657": "data/Filters/Ha657BP6_AA.txt"
-    }
+}
 
 # Default hard-coded fits files - Calibration Tables
 # These are also overwritten by the given calib input file (if provided)
@@ -260,72 +261,72 @@ dict_calib_tables = {
     "sky_lines": "sky_lines.fits",
     # Filter List
     "filter_list": "filter_list.fits",
-    }
+}
 
 # Default structure folders
 # If already existing, won't be created
 # If not, will be created automatically
 dict_input_folders = {
-            # Raw Data files
-            "rawfiles": "Raw/",
-            # Config files
-            "config": "Config/",
-            # Tables
-            "astro_tables": "Astro_tables/",
-            # esores log files
-            "esorex_log": "Esorex_log/",
-            # Data Products - first writing
-            "pipe_products": "Pipe_products/",
-            # Log
-            "log": "Log/"
-            }
+    # Raw Data files
+    "rawfiles": "Raw/",
+    # Config files
+    "config": "Config/",
+    # Tables
+    "astro_tables": "Astro_tables/",
+    # esores log files
+    "esorex_log": "Esorex_log/",
+    # Data Products - first writing
+    "pipe_products": "Pipe_products/",
+    # Log
+    "log": "Log/"
+}
 
 # Values provide the folder names for the file structure
 # If already existing, won't be created
 # If not, will be created automatically
 dict_folders = {
-            # Master Calibration files
-            "master": "Master/",
-            # Object files
-            "object": "Object/",
-            # Sky files
-            "sky": "Sky/",
-            # Std files
-            "std": "Std/",
-            # Reconstructed Maps
-            "maps": "Maps/",
-            # SOF folder 
+    # Master Calibration files
+    "master": "Master/",
+    # Object files
+    "object": "Object/",
+    # Sky files
+    "sky": "Sky/",
+    # Std files
+    "std": "Std/",
+    # Reconstructed Maps
+    "maps": "Maps/",
+            # SOF folder
             "sof": "Sof/",
             # Figure
             "figures": "Figures/"
-            }
+}
 
 # This dictionary includes extra folders for certain specific task
 # e.g., alignment - associated with the target
 # Will be created automatically if not already existing
 dict_folders_target = {
-        "alignment": "Alignment/"
-        }
+    "alignment": "Alignment/"
+}
 
 dict_combined_folders = {
-        # Sof files
-        "sof": "Sof/",
-        # Combined products
-        "cubes": "Cubes/",
-        # esores log files
-        "esorex_log": "Esorex_log/",
-        # Data Products - first writing
-        "pipe_products": "Pipe_products/",
-        # Log
-        "log": "Log/"
-        }
+    # Sof files
+    "sof": "Sof/",
+    # Combined products
+    "cubes": "Cubes/",
+    # esores log files
+    "esorex_log": "Esorex_log/",
+    # Data Products - first writing
+    "pipe_products": "Pipe_products/",
+    # Log
+    "log": "Log/"
+}
 
 # -- END ---------------------------------------------------------------#
 # ======================================================================#
 # BEGIN
 #           DEFAULT GEOMETRY AND ASTROWCS FILES
 #           Also DEADLINE for VIGNETTING_MASK
-# 
+#
 # These are provided if you need time varying astrometry files
 # ======================================================================#
 # For musepipe module
@@ -378,20 +379,21 @@ dict_geo_astrowcs_table = {
     'gto32': ['2019-03-04', '2019-03-07'],
     'gto33': ['2019-04-05', '2019-04-11'],
     'gto34': ['2019-05-03', '2019-05-05']
-    }
+}
 # -- END ---------------------------------------------------------------#
 
 # ======================================================================#
 # BEGIN
 #           DEFAULT KEYWORDS and COLUMNS for OFFSET_TABLES
-# 
+#
 # Define useful keywords for fits table and images
 # ======================================================================#
 mjd_names = {'table': "MJD_OBS", 'image': "MJD-OBS"}
 date_names = {'table': "DATE_OBS", 'image': "DATE-OBS"}
 tpl_names = {'table': "TPL_START", 'image': "HIERARCH ESO TPL START"}
 iexpo_names = {'table': "IEXPO_OBS", 'image': "MUSEPIPE_IEXPO"}
-dataset_names = {'table': "DATASET_OBS", 'image': "MUSEPIPE_DATASET", 'oldimage': "MUSEPIPE_POINTING"}
+dataset_names = {'table': "DATASET_OBS",
+                 'image': "MUSEPIPE_DATASET", 'oldimage': "MUSEPIPE_POINTING"}
 
 default_offset_table = {'date': [date_names['table'], 'S23', ""],
                         'mjd': [mjd_names['table'], 'f8', 0.0],
@@ -416,8 +418,21 @@ default_wave_wcs = 6500.0
 default_prefix_mask = "mask_"
 
 ao_mask_lambda = [5800, 5970]
-lambdaminmax_for_wcs = [6800, 6805]
-lambdaminmax_for_mosaic = [4700, 9400]
+
+dict_lmode_lambda_ranges = {
+    "AO": {
+        "wcs": [6800, 6805],
+        "mosaic": [4700, 9400],
+    },
+    "NOAO": {
+        "wcs": [6800, 6805],
+        "mosaic": [4700, 9400],
+    },
+    "EXT": {
+        "wcs": [6800, 6805],
+        "mosaic": [4600, 9400],
+    },
+}
 
 # ===========================================
 # Recipes for data reduction
@@ -438,7 +453,7 @@ dict_recipes_per_num = {1: 'bias',
                         }
 
 # Value by default for certain fixed parameters in recipes
-dict_default_for_recipes = {'fraction': 0.8, 
+dict_default_for_recipes = {'fraction': 0.8,
                             'skymethod': 'model',
                             'illum': True,
                             'use_vignetting_mask': None,
@@ -454,4 +469,3 @@ for key in dict_recipes_per_num:
     dict_recipes_per_name[dict_recipes_per_num[key]] = key
 
 # ========================================================
-

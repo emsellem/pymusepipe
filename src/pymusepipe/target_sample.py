@@ -44,10 +44,10 @@ from astropy.table import Table
 # Sample of galaxies
 # For each galaxy, we provide the datasets numbers and the run attached to that dataset
 dict_SAMPLE_example = {
-        "NGC628": ['P100', {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0,
-                            12: 0}],
-        "NGC1087": ['P101', {1: 1}],
-        }
+    "NGC628": ['P100', {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0,
+                        12: 0}],
+    "NGC1087": ['P101', {1: 1}],
+}
 # ----------------- Galaxies and Datasets ----------------#
 
 
@@ -88,7 +88,7 @@ def update_calib_file(filename, subfolder="", folder_config=""):
     # Testing existence of filename
     if not os.path.isfile(full_filename):
         upipe.print_error("ERROR: input filename {inputname} cannot be found. ".format(
-                            inputname=full_filename))
+            inputname=full_filename))
         return ""
 
     # If it exists, open and read it
@@ -106,7 +106,8 @@ def update_calib_file(filename, subfolder="", folder_config=""):
             new_rc.write(line)
             continue
         if not os.path.isdir(sline[1]):
-            upipe.print_warning("{} not an existing folder (from rcfile)".format(sline[1]))
+            upipe.print_warning(
+                "{} not an existing folder (from rcfile)".format(sline[1]))
 
         newline = line.replace(sline[1], joinpath(sline[1], subfolder))
         new_rc.write(newline)
@@ -123,10 +124,10 @@ def update_calib_file(filename, subfolder="", folder_config=""):
 class PipeDict(dict):
     """Dictionary with extra attributes
     """
+
     def __init__(self, *args, **kwargs):
         self.update(*args, **kwargs)
         self._initialised = False
-
 
     def __setitem__(self, key, value):
         """Setting the item by using the dictionary of the new values
@@ -136,7 +137,6 @@ class PipeDict(dict):
                 setattr(self, funcname, self.run_on_all_keys(funcname))
 
         super(PipeDict, self).__setitem__(key, value)
-
 
     def update(self, *args, **kwargs):
         if args:
@@ -149,12 +149,10 @@ class PipeDict(dict):
         for key in kwargs:
             self[key] = kwargs[key]
 
-
     def setdefault(self, key, value=None):
         if key not in self:
             self[key] = value
         return self[key]
-
 
     def run_on_all_keys(self, funcname):
         """Runs the given function on all the keys
@@ -214,7 +212,8 @@ class MusePipeSample(object):
 
         # Reading configuration filenames
         if rc_filename is None or cal_filename is None:
-            upipe.print_error("rc_filename and/or cal_filename is None. Please define both.")
+            upipe.print_error(
+                "rc_filename and/or cal_filename is None. Please define both.")
             return
         self.cal_filename = cal_filename
         self.rc_filename = rc_filename
@@ -261,8 +260,10 @@ class MusePipeSample(object):
                                      for targetname in self.targetnames])
 
         for subfolder in self._subfolders:
-            update_calib_file(rc_filename, subfolder, folder_config=folder_config)
-            update_calib_file(cal_filename, subfolder, folder_config=folder_config)
+            update_calib_file(rc_filename, subfolder,
+                              folder_config=folder_config)
+            update_calib_file(cal_filename, subfolder,
+                              folder_config=folder_config)
 
     def _get_calib_filenames(self, targetname=None):
         """Get calibration file names
@@ -282,14 +283,18 @@ class MusePipeSample(object):
             name_rc = self.rc_filename
             name_cal = self.cal_filename
         else:
-            name_rc = insert_suffix(self.rc_filename, self.targets[targetname].subfolder)
-            name_cal = insert_suffix(self.cal_filename, self.targets[targetname].subfolder)
+            name_rc = insert_suffix(
+                self.rc_filename, self.targets[targetname].subfolder)
+            name_cal = insert_suffix(
+                self.cal_filename, self.targets[targetname].subfolder)
 
         folder_config = self.folder_config
 
         # Checking the folders
-        folder_rc, rc_filename_target = os.path.split(joinpath(folder_config, name_rc))
-        folder_cal, cal_filename_target = os.path.split(joinpath(folder_config, name_cal))
+        folder_rc, rc_filename_target = os.path.split(
+            joinpath(folder_config, name_rc))
+        folder_cal, cal_filename_target = os.path.split(
+            joinpath(folder_config, name_cal))
 
         if rc_filename_target == "" or cal_filename_target == "":
             upipe.print_error("Missing a calibration name file")
@@ -327,7 +332,8 @@ class MusePipeSample(object):
             # Shortcut to call the musepipe instance
             self.pipes[targetname] = self.targets[targetname].pipes
 
-            folder_config, rc_filename, cal_filename = self._get_calib_filenames(targetname)
+            folder_config, rc_filename, cal_filename = self._get_calib_filenames(
+                targetname)
             self.targets[targetname].rc_filename = rc_filename
             self.targets[targetname].cal_filename = cal_filename
             self.targets[targetname].folder_config = folder_config
@@ -337,9 +343,11 @@ class MusePipeSample(object):
                                                     folder_config=folder_config,
                                                     verbose=self.verbose)
             self.targets[targetname].root_path = init_params_target.root
-            self.targets[targetname].data_path = joinpath(init_params_target.root, targetname)
+            self.targets[targetname].data_path = joinpath(
+                init_params_target.root, targetname)
             self.pipes[targetname].root_path = init_params_target.root
-            self.pipes[targetname].data_path = joinpath(init_params_target.root, targetname)
+            self.pipes[targetname].data_path = joinpath(
+                init_params_target.root, targetname)
 
             init_comb_target = MusePointings(targetname=targetname,
                                              list_datasets=list_datasets,
@@ -379,10 +387,12 @@ class MusePipeSample(object):
             checked_datasets_list = []
             # Check they exist
             upipe.print_warning(f"Wished dataset list = {list_datasets}")
-            upipe.print_warning(f"Existing Target dataset list = {target_datasets}")
+            upipe.print_warning(
+                f"Existing Target dataset list = {target_datasets}")
             for dataset in list_datasets:
                 if dataset not in target_datasets:
-                    upipe.print_warning(f"No dataset [{dataset}] for the given target")
+                    upipe.print_warning(
+                        f"No dataset [{dataset}] for the given target")
                 else:
                     checked_datasets_list.append(dataset)
             return checked_datasets_list
@@ -400,7 +410,8 @@ class MusePipeSample(object):
             True if yes, False if no.
         """
         if targetname not in self.targetnames:
-            upipe.print_error(f"No '{targetname}' in the defined Target Name List -- Aborting")
+            upipe.print_error(
+                f"No '{targetname}' in the defined Target Name List -- Aborting")
             return False
         else:
             return True
@@ -427,10 +438,12 @@ class MusePipeSample(object):
             return
 
         # Galaxy name
-        upipe.print_info("=== Initialising MusePipe for Target {name} ===".format(name=targetname))
+        upipe.print_info(
+            "=== Initialising MusePipe for Target {name} ===".format(name=targetname))
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(
+            targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
@@ -457,7 +470,8 @@ class MusePipeSample(object):
                     kwargs[attr] = config_args[attr]
 
         # extracting the kwargs
-        list_kwargs = ', '.join(['{}={!r}'.format(k, v) for k, v in kwargs.items()])
+        list_kwargs = ', '.join(['{}={!r}'.format(k, v)
+                                for k, v in kwargs.items()])
 
         # Config files
         rc_filename = self.targets[targetname].rc_filename
@@ -467,7 +481,7 @@ class MusePipeSample(object):
         # Loop on the datasets
         for dataset in list_datasets:
             upipe.print_info("Initialise Pipe for Target = {0:10s} / Dataset {1:03d} ".format(
-                                 targetname, dataset))
+                targetname, dataset))
             # New log file name with dataset included
             log_filename_dataset = f"{log_filename}_{get_pointing_name(dataset)}{log_fileext}"
             # Setting up the names of the output files
@@ -542,9 +556,11 @@ class MusePipeSample(object):
             One of the recipe to end with
         """
         for target in self.targets:
-            upipe.print_info("=== Start Reduction of Target {name} ===".format(name=target))
+            upipe.print_info(
+                "=== Start Reduction of Target {name} ===".format(name=target))
             self.reduce_target(targetname=target, **kwargs)
-            upipe.print_info("===  End  Reduction of Target {name} ===".format(name=target))
+            upipe.print_info(
+                "===  End  Reduction of Target {name} ===".format(name=target))
 
     def reduce_target_prealign(self, targetname=None, list_datasets=None, **kwargs):
         """Reduce target for all steps before pre-alignment (included)
@@ -578,7 +594,7 @@ class MusePipeSample(object):
                            create_expocubes=True, create_pixtables=True,
                            create_pointingcubes=True,
                            name_offset_table=None, folder_offset_table=None,
-                           list_datasets=None, lambdaminmax=None, **kwargs):
+                           list_datasets=None, lmode=None, **kwargs):
         """Finalise the reduction steps by using the offset table, rotating the
         pixeltables, then reconstructing the PIXTABLE_REDUCED, produce reference
         WCS for each pointing, and then run the reconstruction of the final
@@ -595,7 +611,7 @@ class MusePipeSample(object):
         name_offset_table: str
         folder_offset_table: str
         list_datasets: list
-        lambdaminmax: list
+        lmode: str
         **kwargs: include
             wcs_refcube_name: str
                 Reference WCS (cube) to be used to project all cubes
@@ -616,7 +632,8 @@ class MusePipeSample(object):
 
         if rot_pixtab:
             # We first use the offset table to rotate the pixtables
-            upipe.print_info("========== ROTATION OF PIXTABLES ===============")
+            upipe.print_info(
+                "========== ROTATION OF PIXTABLES ===============")
             self.rotate_pixtables_target(targetname=targetname,
                                          folder_offset_table=folder_offset_table,
                                          name_offset_table=name_offset_table,
@@ -629,7 +646,8 @@ class MusePipeSample(object):
         if create_pixtables:
             # We then reconstruct the pixtable reduced
             # and redo a muse_exp_combine if needed
-            upipe.print_info("==== REDUCED PIXTABLES for REFERENCE MOSAIC ====")
+            upipe.print_info(
+                "==== REDUCED PIXTABLES for REFERENCE MOSAIC ====")
             self.run_target_scipost_perexpo(targetname=targetname,
                                             folder_offset_table=folder_offset_table,
                                             name_offset_table=name_offset_table,
@@ -645,7 +663,8 @@ class MusePipeSample(object):
 
         if create_wcs:
             # Creating the WCS reference frames. Full mosaic and individual Pointings.
-            upipe.print_info("=========== CREATION OF WCS MASKS ==============")
+            upipe.print_info(
+                "=========== CREATION OF WCS MASKS ==============")
             # Do we create individual pointings cubes
             pointings_wcs = kwargs.pop("pointings_wcs", True)
             # Create a mosaic WCS or not
@@ -670,11 +689,12 @@ class MusePipeSample(object):
                                       list_datasets=list_datasets,
                                       folder_refcube=folder_refcube,
                                       pointing_table=pointing_table,
-                                      fakemode=False, lambdaminmax=lambdaminmax)
+                                      fakemode=False, lmode=lmode)
 
         if create_expocubes:
             # Running the individual cubes now with the same WCS reference
-            upipe.print_info("=========== CREATION OF EXPO CUBES =============")
+            upipe.print_info(
+                "=========== CREATION OF EXPO CUBES =============")
             self.run_target_scipost_perexpo(targetname=targetname,
                                             folder_offset_table=folder_offset_table,
                                             name_offset_table=name_offset_table,
@@ -687,7 +707,8 @@ class MusePipeSample(object):
 
         if create_pointingcubes:
             # Running the pointing cubes now with the same WCS reference
-            upipe.print_info("========= CREATION OF POINTING CUBES ===========")
+            upipe.print_info(
+                "========= CREATION OF POINTING CUBES ===========")
             self.combine_target_per_pointing(targetname=targetname,
                                              name_offset_table=name_offset_table,
                                              folder_offset_table=folder_offset_table,
@@ -717,7 +738,8 @@ class MusePipeSample(object):
 
         """
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(
+            targetname, list_datasets)
         upipe.print_info(f"List of datasets to be reduced: {list_datasets}")
         if len(list_datasets) == 0:
             return
@@ -818,14 +840,16 @@ class MusePipeSample(object):
         list_keys = list(kwargs.keys())
         for kw in list_keys:
             if kw in dict_default_for_recipes.keys():
-                kwargs_recipe[kw] = kwargs.pop(kw, dict_default_for_recipes[kw])
+                kwargs_recipe[kw] = kwargs.pop(
+                    kw, dict_default_for_recipes[kw])
 
         # Initialise the pipe if needed
         self.set_pipe_target(targetname=targetname, list_datasets=list_datasets,
                              first_recipe=recipe_name, last_recipe=recipe_name, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(
+            targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
@@ -842,7 +866,7 @@ class MusePipeSample(object):
             if dataset in kwargs_per_dataset:
                 if recipe_name in kwargs_per_dataset[dataset]:
                     this_param_recipes[recipe_name].update(
-                                     kwargs_per_dataset[dataset][recipe_name])
+                        kwargs_per_dataset[dataset][recipe_name])
 
             # Initialise raw tables if not already done (takes some time)
             if not self.pipes[targetname][dataset]._raw_table_initialised:
@@ -853,7 +877,8 @@ class MusePipeSample(object):
             else:
                 self.pipes[targetname][dataset].run_recipes(param_recipes=this_param_recipes,
                                                             **kwargs_recipe)
-            upipe.print_info("====== END   - DATASET {0:2d} ======".format(dataset))
+            upipe.print_info(
+                "====== END   - DATASET {0:2d} ======".format(dataset))
 
     def reduce_target(self, targetname=None, list_datasets=None, **kwargs):
         """Reduce one target for a list of datasets
@@ -874,7 +899,7 @@ class MusePipeSample(object):
 
         # General print out
         upipe.print_info("---- Starting the Data Reduction for Target={0} ----".format(
-                            targetname))
+            targetname))
 
         # Get the parameters for the recipes
         param_recipes = kwargs.pop("param_recipes", {})
@@ -882,7 +907,8 @@ class MusePipeSample(object):
         list_keys = list(kwargs.keys())
         for kw in list_keys:
             if kw in dict_default_for_recipes.keys():
-                kwargs_recipe[kw] = kwargs.pop(kw, dict_default_for_recipes[kw])
+                kwargs_recipe[kw] = kwargs.pop(
+                    kw, dict_default_for_recipes[kw])
 
         for key in ['first_recipe', 'last_recipe']:
             if key in kwargs:
@@ -890,16 +916,19 @@ class MusePipeSample(object):
 
         # Initialise the pipe if needed
         if not self.pipes[targetname]._initialised:
-            self.set_pipe_target(targetname=targetname, list_datasets=list_datasets, **kwargs)
+            self.set_pipe_target(targetname=targetname,
+                                 list_datasets=list_datasets, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(
+            targetname, list_datasets)
         if len(list_datasets) == 0:
             return
 
         # Loop on the datasets
         for dataset in list_datasets:
-            upipe.print_info("====== START - DATASET {0:2d} ======".format(dataset))
+            upipe.print_info(
+                "====== START - DATASET {0:2d} ======".format(dataset))
             # Initialise raw tables if not already done (takes some time)
             if not self.pipes[targetname][dataset]._raw_table_initialised:
                 self.pipes[targetname][dataset].init_raw_table(overwrite=True)
@@ -909,7 +938,8 @@ class MusePipeSample(object):
             else:
                 self.pipes[targetname][dataset].run_recipes(param_recipes=param_recipes,
                                                             **kwargs_recipe)
-            upipe.print_info("====== END   - DATASET {0:2d} ======".format(dataset))
+            upipe.print_info(
+                "====== END   - DATASET {0:2d} ======".format(dataset))
 
     def rotate_pixtables_target(self, targetname=None, list_datasets=None,
                                 folder_offset_table=None, name_offset_table=None,
@@ -927,15 +957,18 @@ class MusePipeSample(object):
                                  list_datasets=list_datasets, **kwargs)
 
         # Check if datasets are valid
-        list_datasets = self._check_list_datasets_for_target(targetname, list_datasets)
+        list_datasets = self._check_list_datasets_for_target(
+            targetname, list_datasets)
 
         if len(list_datasets) == 0:
             return
 
         prefix = kwargs.pop("prefix", "")
         if folder_offset_table is None:
-            folder_offset_table = self.pipes[targetname][list_datasets[0]].paths.alignment
-        offset_table = Table.read(joinpath(folder_offset_table, name_offset_table))
+            folder_offset_table = self.pipes[targetname][list_datasets[0]
+                                                         ].paths.alignment
+        offset_table = Table.read(
+            joinpath(folder_offset_table, name_offset_table))
         offset_table.sort(["DATASET_OBS", "IEXPO_OBS"])
         # Loop on the datasets
 
@@ -946,7 +979,8 @@ class MusePipeSample(object):
             iexpo = row['IEXPO_OBS']
             tpls = row['TPL_START']
             angle = row['ROTANGLE']
-            ndigits = int(self.pipes[targetname][list_datasets[0]].pipe_params.ndigits)
+            ndigits = int(self.pipes[targetname]
+                          [list_datasets[0]].pipe_params.ndigits)
             upipe.print_info(f"Rotation ={angle} Deg for "
                              f"Dataset={dataset:{ndigits}d}, "
                              f"TPLS={tpls} - Expo {iexpo:02d}")
@@ -1075,7 +1109,8 @@ class MusePipeSample(object):
             self.pipes_mosaic[targetname].copt_fwhm = target_fwhm
 
         if suffix is None:
-            suffix = "conv{0}_{1:.2f}".format(target_function.lower()[:4], target_fwhm)
+            suffix = "conv{0}_{1:.2f}".format(
+                target_function.lower()[:4], target_fwhm)
 
         # Convolve
         if not fakemode:
@@ -1090,12 +1125,13 @@ class MusePipeSample(object):
             for name in self.pipes_mosaic[targetname].cube_names:
                 # Building the images
                 cube = MuseCube(filename=name)
-                prefix = (name.replace("DATACUBE_FINAL", "IMAGE_FOV")).split(add_string(suffix))[0]
+                prefix = (name.replace("DATACUBE_FINAL", "IMAGE_FOV")
+                          ).split(add_string(suffix))[0]
                 cube.build_filterlist_images(filter_list=filter_list,
                                              prefix=prefix, suffix=suffix)
 
     def mosaic(self, targetname=None, list_pointings=None, init_mosaic=True,
-               build_cube=True, build_images=True, 
+               build_cube=True, build_images=True,
                nmax=2, nclip=5.0, var='propagate', nstop=2, mad=True,
                **kwargs):
         """
@@ -1137,7 +1173,8 @@ class MusePipeSample(object):
         # defining the default cube name here to then define the output cube name
         suffixout = kwargs.pop("suffixout", "WCS_Pall_mad")
         suffixout = add_string(suffixout)
-        default_cube_name = "{0}_DATACUBE_FINAL{1}.fits".format(targetname, suffixout)
+        default_cube_name = "{0}_DATACUBE_FINAL{1}.fits".format(
+            targetname, suffixout)
         outcube_name = kwargs.pop("outcube_name", default_cube_name)
         outcube_name = joinpath(folder_cubes, outcube_name)
 
@@ -1228,7 +1265,7 @@ class MusePipeSample(object):
             self.pipes_combine[targetname].run_combine(**kwargs)
 
     def create_reference_wcs(self, targetname=None, pointings_wcs=True, mosaic_wcs=True,
-                             wcs_refcube_name=None, refcube_name=None, lambdaminmax=None,
+                             wcs_refcube_name=None, refcube_name=None, lmode=None,
                              **kwargs):
         """Run the combine for individual exposures first building up
         a mask.
@@ -1236,8 +1273,8 @@ class MusePipeSample(object):
         default_comb_folder = self.targets[targetname].combcubes_path
         folder_refcube = kwargs.pop("folder_refcube", default_comb_folder)
         self.init_combine(targetname=targetname, **kwargs)
-        if lambdaminmax is not None:
-            kwargs.update({'lambdaminmax': lambdaminmax})
+        if lmode is not None:
+            kwargs.update({'lmode': lmode})
         self.pipes_combine[targetname].create_reference_wcs(pointings_wcs=pointings_wcs,
                                                             mosaic_wcs=mosaic_wcs,
                                                             wcs_refcube_name=wcs_refcube_name,

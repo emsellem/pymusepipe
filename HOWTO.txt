@@ -5,3 +5,10 @@ git push
 
 # On remote
 git pull origin master
+
+# Looking at recent commits
+git log --oneline -n 3
+
+# And resetting the last one
+git reset --soft HEAD~1
+

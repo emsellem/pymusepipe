@@ -318,7 +318,8 @@ def chunk_stats(list_arrays, chunk_size=15, valid_threshold=0.3):
     """
     # Check that all arrays have the same size
     if not np.all([list_arrays[0].size == d.size for d in list_arrays[1:]]):
-        upipe.print_error("Input arrays are not of the same size in chunk_stats")
+        upipe.print_error(
+            "Input arrays are not of the same size in chunk_stats")
 
     list_arrays = np.atleast_3d(list_arrays)
     narrays = len(list_arrays)
@@ -329,9 +330,10 @@ def chunk_stats(list_arrays, chunk_size=15, valid_threshold=0.3):
     grid_number = nchunk_x * nchunk_y
 
     # Vectorised median and std dev
-    arrays3d_chunk_ready = list_arrays[:,:nchunk_x*chunk_size,:nchunk_y*chunk_size]
+    arrays3d_chunk_ready = list_arrays[:,
+                                       :nchunk_x*chunk_size, :nchunk_y*chunk_size]
 
-    grids_nchunkx  = np.array(np.split(arrays3d_chunk_ready, nchunk_x, axis=1))
+    grids_nchunkx = np.array(np.split(arrays3d_chunk_ready, nchunk_x, axis=1))
     grids_xy = np.array(np.split(np.array(grids_nchunkx), nchunk_y, axis=-1))
 
     # Test the fraction of valid chunks
@@ -340,15 +342,17 @@ def chunk_stats(list_arrays, chunk_size=15, valid_threshold=0.3):
     good_chunk = frac_valid > valid_threshold
 
     # Computing the number of bad chunks (allNan)
-    n_bad = np.sum(np.all(np.isnan(grids_xy), axis=(-2,-1)))
+    n_bad = np.sum(np.all(np.isnan(grids_xy), axis=(-2, -1)))
     if n_bad > 0:
         upipe.print_info(f"Ignoring {n_bad} fully-NaN chunks")
 
     # Remove warnings in stats
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="All-NaN slice encountered")
-        med_array = np.nanmedian(grids_xy, axis=(-2,-1)).T.reshape(narrays, grid_number)
-        std_array = mad_std(grids_xy, axis=(-2,-1), ignore_nan=True).T.reshape(narrays, grid_number)
+        med_array = np.nanmedian(
+            grids_xy, axis=(-2, -1)).T.reshape(narrays, grid_number)
+        std_array = mad_std(grids_xy, axis=(-2, -1),
+                            ignore_nan=True).T.reshape(narrays, grid_number)
 
     # Remove (to Nan) the bad chunks (too many Nan)
     med_array[~good_chunk.T.reshape(narrays, grid_number)] = np.nan
@@ -568,8 +572,8 @@ def prepare_image(data, median_filter=True, sigma=0., border=0):
 
 
 def flatclean_image(data, border=10, dynamic_range=10,
-                  median_window=10, threshold=0.0, squeeze=True,
-                  remove_bkg=True):
+                    median_window=10, threshold=0.0, squeeze=True,
+                    remove_bkg=True):
     """Process image by squeezing the range, removing
     the borders and filtering it. The image is first filtered,
     then it is cropped. All values below a given minimum are
@@ -650,7 +654,8 @@ def mask_point_sources(ima, fwhm=3, mask_radius=30., brightest=5, sigma=3., verb
     thresh = mean + 10. * std
 
     # Initializing and starting the starfinder
-    starfinder = IRAFStarFinder(threshold=thresh, fwhm=fwhm, brightest=brightest)
+    starfinder = IRAFStarFinder(
+        threshold=thresh, fwhm=fwhm, brightest=brightest)
     sources = starfinder(ima)
 
     yy, xx = np.ogrid[:ima.shape[0], : ima.shape[1]]
@@ -716,7 +721,8 @@ def create_offset_table(image_names, table_folder="", table_name="dummy_offset_t
     date, mjd, tpls, iexpo, dataset = [], [], [], [], []
     for ima in image_names:
         if not os.path.isfile(ima):
-            upipe.print_warning("[create_offset] Image {0} does not exists".format(ima))
+            upipe.print_warning(
+                "[create_offset] Image {0} does not exists".format(ima))
             continue
 
         head = pyfits.getheader(ima)
@@ -892,7 +898,8 @@ def group_exposures_per_pointing(list_files, target_path='', limit=10., unit=u.a
         if dtype == "guess":
             ldtype = [dtype for dtype in dict_dtype if dtype in name]
             if len(ldtype) == 0:
-                upipe.print_warning(f"Could not guess type of file {name} - Skipping")
+                upipe.print_warning(
+                    f"Could not guess type of file {name} - Skipping")
                 continue
             thistype = ldtype[0]
         else:
@@ -901,13 +908,15 @@ def group_exposures_per_pointing(list_files, target_path='', limit=10., unit=u.a
         if thistype == 'pixtable':
             coord_center = get_centre_from_pixtable(fullname)
         else:
-            coord_center = get_centre_from_image_or_cube(fullname, ext=ext, dtype=dtype)
+            coord_center = get_centre_from_image_or_cube(
+                fullname, ext=ext, dtype=dtype)
 
         # save in a dictionary the file names and the coordinates
         # Note that we only store the name, not the full name with folder
         center_dict[name] = coord_center
 
-    pointing_dict, files_pointing_dict = group_xy_per_fieldofview(center_dict, limit=limit * unit)
+    pointing_dict, files_pointing_dict = group_xy_per_fieldofview(
+        center_dict, limit=limit * unit)
 
     return center_dict, pointing_dict, files_pointing_dict
 
@@ -1025,7 +1034,8 @@ def check_column_set(input_table):
     -------
     bool: True if all names are in the table, False otherwise
     """
-    missing_cols = [colname for colname in min_column_set if colname not in input_table.colnames]
+    missing_cols = [
+        colname for colname in min_column_set if colname not in input_table.colnames]
     if len(missing_cols) > 0:
         upipe.print_error(f"Missing columns in input file: {missing_cols}")
         return False
@@ -1055,7 +1065,8 @@ def scan_filenames_from_folder(folder="", prefix="", suffix="", ext="fits", **kw
     # First check that the folder exists
     realfolder = os.path.relpath(os.path.realpath(folder))
     if not os.path.isdir(realfolder):
-        upipe.print_error(f"Folder {folder} does not exist - Aborting folder scan [pointing_table]")
+        upipe.print_error(
+            f"Folder {folder} does not exist - Aborting folder scan [pointing_table]")
         return None
 
     # List the files in the folder, using the prefix and suffix
@@ -1081,7 +1092,8 @@ def scan_filenames_from_list(list_files, **kwargs):
     QTable including filenames, tpls, dataset, expo
 
     """
-    upipe.print_info(f"Building the filename table from the list of {len(list_files)} files")
+    upipe.print_info(
+        f"Building the filename table from the list of {len(list_files)} files")
 
     # initialise the astropy QTable table
     column_formats = kwargs.pop("column_formats", min_column_set_format)
@@ -1100,7 +1112,8 @@ def scan_filenames_from_list(list_files, **kwargs):
             filename_table.add_row((filename, fdataset, ftpls, fexpo))
 
     filename_table.sort("filename")
-    upipe.print_info(f"Found {len(filename_table)} files from input filename list")
+    upipe.print_info(
+        f"Found {len(filename_table)} files from input filename list")
     return filename_table
 
 
@@ -1142,13 +1155,14 @@ def filter_list_with_pointingtable(input_list, pointing_table=None, verbose=True
                 sel_pointing = False
 
         mask = (qtable['dataset'] == dataset) & (qtable['tpls'] == tpls) \
-               & (qtable['expo'] == expo) & (qtable['select'] == 1)
+            & (qtable['expo'] == expo) & (qtable['select'] == 1)
         if len(qtable[mask]) == 0 or not sel_pointing:
             _ = output_list.remove(filename)
 
     nfiles_output_list = len(output_list)
     if verbose:
-        upipe.print_info(f"Input {nfiles_input_list} files filtered to {nfiles_output_list}")
+        upipe.print_info(
+            f"Input {nfiles_input_list} files filtered to {nfiles_output_list}")
 
     return output_list
 
@@ -1178,7 +1192,8 @@ class PointingTable(object):
         folder = kwargs.pop("folder", "")
         realfolder = os.path.relpath(os.path.realpath(folder))
         if not os.path.isdir(realfolder):
-            upipe.print_error(f"Folder {folder} does not exist. Using local folder")
+            upipe.print_error(
+                f"Folder {folder} does not exist. Using local folder")
             folder = ""
 
         self.folder = folder
@@ -1287,7 +1302,8 @@ class PointingTable(object):
         # First build the pointing table using the filenames found in folder
         self.qtable = scan_filenames_from_folder(folder=self.folder, **kwargs)
         if len(self.qtable) == 0:
-            upipe.print_error("Empty table - found 0 files in the pointing QTable after scanning.")
+            upipe.print_error(
+                "Empty table - found 0 files in the pointing QTable after scanning.")
             return
         # Reset the selection
         self._reset_select()
@@ -1311,11 +1327,13 @@ class PointingTable(object):
         # Reading the input
         self.folderout = kwargs.pop("folderout", self.folderout)
         self.tablenameout = kwargs.pop("tablenameout", self.tablenameout)
+        self.table_format = kwargs.pop("table_format", self.table_format)
         if self.tablenameout is None:
             upipe.print_error("No provided output filename")
 
         # Writing up using the astropy QTable write
-        self.qtable.write(self.fulltablenameout, overwrite=overwrite, **kwargs)
+        self.qtable.write(self.fulltablenameout,
+                          overwrite=overwrite, format=self.table_format, **kwargs)
 
     def set_select_value(self, filename, value=1, verbose=False):
         """Set the value of the select column to 1, according to a given filename
@@ -1328,7 +1346,8 @@ class PointingTable(object):
             self.qtable['selec'][selname] = int(value)
         else:
             if verbose:
-                upipe.print_warning(f"Doing nothing as filename {filename} not found")
+                upipe.print_warning(
+                    f"Doing nothing as filename {filename} not found")
 
     def unselect_filename(self, filename, verbose=False):
         """Select the filename as provided, by putting the value of column 'select' to 1
@@ -1366,12 +1385,13 @@ class PointingTable(object):
             if overwrite:
                 upipe.print_warning(f"Resetting all select values to {value}")
                 self.qtable.replace_column(name='select',
-                                                   col=[int(value)] * len(self.qtable),
-                                                   copy=False)
+                                           col=[int(value)] * len(self.qtable),
+                                           copy=False)
         else:
             upipe.print_warning(f"Column 'select' is missing: adding it and reset values to"
                                 f" {value}")
-            self.qtable.add_column([int(value)] * len(self.qtable), name='select')
+            self.qtable.add_column(
+                [int(value)] * len(self.qtable), name='select')
 
     def _reset_pointing(self, overwrite=False):
         """Reset the pointing column in the pointing table
@@ -1379,10 +1399,11 @@ class PointingTable(object):
         if 'pointing' in self.qtable.colnames:
             if overwrite:
                 self.qtable.replace_column(name='pointing',
-                                                   col=[int(0)] * len(self.qtable),
-                                                   copy=False)
+                                           col=[int(0)] * len(self.qtable),
+                                           copy=False)
         else:
-            self.qtable.add_column([int(0)] * len(self.qtable), name='pointing')
+            self.qtable.add_column(
+                [int(0)] * len(self.qtable), name='pointing')
 
     def _reset_centres(self):
         """Reset the pointing column in the pointing table
@@ -1394,7 +1415,8 @@ class PointingTable(object):
 
         if not isinstance(self.qtable['centre'], SkyCoord):
             dummycoord = [SkyCoord(0, 0, unit='deg')] * len(self.qtable)
-            self.qtable.replace_column(name="centre", col=dummycoord, copy=False)
+            self.qtable.replace_column(
+                name="centre", col=dummycoord, copy=False)
 
         self._initialise_centres = False
 
@@ -1442,10 +1464,12 @@ class PointingTable(object):
         self.folder = kwargs.pop("folder", self.folder)
         self.table_format = kwargs.pop("table_format", self.table_format)
         if not os.path.exists(self.fulltablename):
-            upipe.print_error(f"Pointing Table {self.fulltablename} does not exist. Cannot open")
+            upipe.print_error(
+                f"Pointing Table {self.fulltablename} does not exist. Cannot open")
             return
 
-        qtable = QTable.read(self.fulltablename, format=self.table_format, **kwargs)
+        qtable = QTable.read(self.fulltablename,
+                             format=self.table_format, **kwargs)
         self._init_qtable(qtable)
 
     def _get_centres(self, dtype="guess", center_dict=None, **kwargs):
@@ -1476,7 +1500,8 @@ class PointingTable(object):
 
         self._reset_centres()
 
-        upipe.print_info(f"Getting centres for the set of {len(self.qtable)} files")
+        upipe.print_info(
+            f"Getting centres for the set of {len(self.qtable)} files")
         dict_found_centres = {}
         # Loop over the pointing table and find the centre
         for row in self.qtable:
@@ -1496,7 +1521,8 @@ class PointingTable(object):
                 if center_dict is None:
                     fullname = joinpath(self.folder, filename)
                     if dtype == "guess":
-                        ldtype = [dict_dtype[dtype] for dtype in dict_dtype if dtype in filename]
+                        ldtype = [dict_dtype[dtype]
+                                  for dtype in dict_dtype if dtype in filename]
                         if len(ldtype) == 0:
                             upipe.print_warning(f"Could not guess type of file {filename} "
                                                 f"- Skipping")
@@ -1506,7 +1532,8 @@ class PointingTable(object):
                         thistype = dtype
 
                     if thistype in ["image", "cube"]:
-                        centre = get_centre_from_image_or_cube(fullname, dtype=thistype, **kwargs)
+                        centre = get_centre_from_image_or_cube(
+                            fullname, dtype=thistype, **kwargs)
                     else:
                         centre = get_centre_from_pixtable(fullname, **kwargs)
                     dict_found_centres[set_ds_tplsexpo] = centre
@@ -1538,7 +1565,8 @@ class PointingTable(object):
         self._reset_pointing(overwrite=overwrite)
 
         self.center_dict, self.pointing_dict, self.file_pointing_dict = \
-            group_exposures_per_pointing(self.selected_filenames, target_path=self.folder, **kwargs)
+            group_exposures_per_pointing(
+                self.selected_filenames, target_path=self.folder, **kwargs)
 
         # Assign centres to the table column 'center'
         self._get_centres(center_dict=self.center_dict)
@@ -1547,7 +1575,8 @@ class PointingTable(object):
         upipe.print_info(f"Assigning Pointings ---")
         for filename in self.file_pointing_dict:
             pointing = self.file_pointing_dict[filename]
-            self.qtable['pointing'][self.qtable['filename'] == filename] = pointing
+            self.qtable['pointing'][self.qtable['filename']
+                                    == filename] = pointing
             if verbose:
                 upipe.print_info(f"File: {filename} = Pointing {pointing:02d}")
 
@@ -1643,7 +1672,8 @@ class PointingTable(object):
 
         """
         if not hasattr(self, 'qtable'):
-            upipe.print_warning("Missing a pointing table - returning an empty filename list")
+            upipe.print_warning(
+                "Missing a pointing table - returning an empty filename list")
             return []
 
         inds = self.qtable['select'] == 1
@@ -1662,7 +1692,8 @@ class PointingTable(object):
         for row in self.qtable:
             # if the select value is True / 1, append filename to dictionary
             if row['select']:
-                append_value_to_dict(dict_names, row['dataset'], row['filename'])
+                append_value_to_dict(
+                    dict_names, row['dataset'], row['filename'])
 
         return dict_names
 
@@ -1675,7 +1706,8 @@ class PointingTable(object):
         for row in self.qtable:
             # if the select value is True / 1, append filename to dictionary
             if row['select']:
-                append_value_to_dict(dict_names, row['pointing'], row['filename'])
+                append_value_to_dict(
+                    dict_names, row['pointing'], row['filename'])
 
         return dict_names
 
@@ -1748,6 +1780,7 @@ def reconstruct_filter_images(cubename, filter_list=default_filter_list,
         Name of the fits file containing all the filter characteristics
         Usually in filter_list.fits (MUSE default)
     """
-    
-    command = "muse_cube_filter -f {0} {1} {2}".format(filter_list, cubename, filter_fits_file)
+
+    command = "muse_cube_filter -f {0} {1} {2}".format(
+        filter_list, cubename, filter_fits_file)
     os.system(command)

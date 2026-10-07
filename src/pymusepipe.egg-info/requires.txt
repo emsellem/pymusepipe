@@ -2,3 +2,8 @@ mpdaf
 numpy
 scipy
 astropy
+
+[dev]
+pytest
+build
+twine

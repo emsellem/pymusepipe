@@ -528,22 +528,40 @@ class MuseCubeMosaic(CubeMosaic):
         for name in list_cubes:
             self.list_cubes.append(BasicFile(name))
             if len(self.dict_psf) > 0:
-                found = False
-                for key in self.dict_psf:
-                    if found:
-                        break
-                    keyword = f"{self.prefix_cubes}_" \
-                              f"{get_dataset_name(int(key), str_dataset, ndigits)}"
-                    if keyword in name:
-                        psf = self.dict_psf[key]
-                        self.list_cubes[-1].psf = BasicPSF(psf_array=psf)
-                        found = True
-                # If none correspond, set to the 0 FWHM Gaussian
-                if not found:
-                    print_warning(f"No PSF found for cube {name}. Using default")
+                filename = os.path.basename(name)
+                _, tpl_start, exposure = get_dataset_tpl_nexpo(filename, str_dataset=str_dataset, ndigits=ndigits)
+                mask = (self.pointing_table.qtable['tpls'] == tpl_start) & (self.pointing_table.qtable['expo'] == exposure)
+                if mask.sum() == 1:
+                    pointing = self.pointing_table.qtable[mask]['pointing'][0]
+                    psf = self.dict_psf[pointing]
+                    self.list_cubes[-1].psf = BasicPSF(psf_array=psf)
+                elif mask.sum() == 0:
+                    print_warning(f"Cube {name} not in the pointing table. Using default")
                     self.list_cubes[-1].psf = BasicPSF()
+                elif mask.sum() > 1:
+                    raise ValueError(f"Multiple cubes satisfying the same constraints.")
             else:
                 self.list_cubes[-1].psf = BasicPSF()
+
+#        for name in list_cubes:
+#            self.list_cubes.append(BasicFile(name))
+#            if len(self.dict_psf) > 0:
+#                found = False
+#                for key in self.dict_psf:
+#                    if found:
+#                        break
+#                    keyword = f"{self.prefix_cubes}_" \
+#                              f"{get_dataset_name(int(key), str_dataset, ndigits)}"
+#                    if keyword in name:
+#                        psf = self.dict_psf[key]
+#                        self.list_cubes[-1].psf = BasicPSF(psf_array=psf)
+#                        found = True
+#                # If none correspond, set to the 0 FWHM Gaussian
+#                if not found:
+#                    print_warning(f"No PSF found for cube {name}. Using default")
+#                    self.list_cubes[-1].psf = BasicPSF()
+#            else:
+#                self.list_cubes[-1].psf = BasicPSF()
 
         if self.verbose:
             for i, c in enumerate(self.list_cubes):

@@ -26,7 +26,8 @@ from astropy.io import fits as pyfits
 # Import package modules
 from .config_pipe import (dict_musemodes, default_short_filter_list,
                           default_ndigits, default_str_pointing, default_str_dataset,
-                          dict_folders, dict_products_scipost)
+                          dict_folders, dict_products_scipost,
+                          dict_lmode_lambda_ranges)
 
 prefix_final_cube = dict_products_scipost['cube'][0]
 default_object_folder = dict_folders['object']
@@ -58,7 +59,7 @@ def print_warning(text, **kwargs):
         verbose = mypipe.verbose
     except AttributeError:
         verbose = kwargs.pop("verbose", True)
-    
+
     if verbose:
         print(WARNING + "# MusePipeWarning " + ENDC + text, **kwargs)
 
@@ -82,7 +83,7 @@ def print_info(text, **kwargs):
         verbose = mypipe.verbose
     except AttributeError:
         verbose = kwargs.pop("verbose", True)
-    
+
     if verbose:
         print(INFO + "# MusePipeInfo " + ENDC + text, **kwargs)
 
@@ -101,7 +102,7 @@ def print_debug(text, **kwargs):
         verbose = mypipe.verbose
     except AttributeError:
         verbose = kwargs.pop("verbose", True)
-    
+
     if verbose:
         print(DEBUG + "# DebugInfo " + ENDC + text, **kwargs)
 
@@ -125,7 +126,7 @@ def print_error(text, **kwargs):
         verbose = mypipe.verbose
     except AttributeError:
         verbose = kwargs.pop("verbose", True)
-    
+
     if verbose:
         print(ERROR + "# MusePipeError " + ENDC + text, **kwargs)
 # -----------  END OF printing functions ----------------------- #
@@ -185,7 +186,8 @@ def add_string(text, word="_", loc=0):
                     text = f"{text[:loc]}{word}{text[loc:]}"
 
             except IndexError:
-                print(f"String index [{loc}] out of range [{len(text)}] in add_string")
+                print(
+                    f"String index [{loc}] out of range [{len(text)}] in add_string")
 
     return text
 
@@ -220,8 +222,9 @@ def safely_create_folder(path, verbose=True):
             print_info("Input path is None, not doing anything")
         return
     if verbose:
-        print_info("Trying to create {folder} folder".format(folder=path), end='')
-    try: 
+        print_info("Trying to create {folder} folder".format(
+            folder=path), end='')
+    try:
         os.makedirs(path)
         if verbose:
             print_endline("... Done", end='\n')
@@ -240,6 +243,7 @@ class TimeStampDict(OrderedDict):
     """Class which builds a time stamp driven
     dictionary of objects
     """
+
     def __init__(self, description="", myobject=None):
         """Initialise an empty dictionary
         with a given name
@@ -384,7 +388,8 @@ def analyse_musemode(musemode, field, delimiter='-'):
         Value of the field which was analysed (e.g., 'AO' or 'NOAO')
     """
     if field not in dict_musemodes:
-        print_error(f"Cannot find such a field ({field}) in the dict_musemodes")
+        print_error(
+            f"Cannot find such a field ({field}) in the dict_musemodes")
         return ""
 
     index = dict_musemodes[field]
@@ -544,8 +549,8 @@ def add_key_dataset_expo(imaname, iexpo, dataset):
 #         self.dataset = dataset
 #         self.tpl = tpl
 #         self.nexpo = nexpo
-# 
-# 
+#
+#
 # def filter_list_with_pdict(input_list, list_datasets=None, dict_files=None, verbose=True,
 #                            str_dataset=default_str_dataset, ndigits=default_ndigits,
 #                            filtername=None):
@@ -825,7 +830,8 @@ def build_dict_exposures(target_path="", str_dataset=default_str_dataset,
         if show_pointings:
             dict_p_wpointings = {}
             for tpl in dict_p:
-                dict_p_wpointings[tpl] = [[nexpo, dataset] for nexpo in dict_p[tpl]]
+                dict_p_wpointings[tpl] = [[nexpo, dataset]
+                                          for nexpo in dict_p[tpl]]
             # Now changing dict_p
             dict_p = copy.copy(dict_p_wpointings)
 
@@ -854,7 +860,8 @@ def get_list_datasets(target_path="", str_dataset=default_str_dataset,
     """
     # Done by scanning the target path
     if verbose:
-        print_info(f"Searching datasets in {target_path} with {str_dataset} prefix")
+        print_info(
+            f"Searching datasets in {target_path} with {str_dataset} prefix")
     all_folders = glob.glob(f"{target_path}/{str_dataset}*")
     if verbose:
         print_info(f"All folder names  = {all_folders}")
@@ -895,7 +902,8 @@ def get_list_exposures(dataset_path="", object_folder=default_object_folder):
     list_expos: list of int
     """
     # Done by scanning the target path
-    list_files = glob.glob(f"{dataset_path}/{object_folder}/{prefix_final_cube}*_????.fits")
+    list_files = glob.glob(
+        f"{dataset_path}/{object_folder}/{prefix_final_cube}*_????.fits")
     list_expos = []
     for name in list_files:
         tpl, lint = get_tpl_nexpo(name)
@@ -951,14 +959,17 @@ def get_list_reduced_pixtables(target_path="", list_datasets=None,
     # Defining the dataset list if not provided
     # Done by scanning the target path
     if list_datasets is None:
-        list_datasets = get_list_datasets(target_path, ndigits=ndigits, str_dataset=str_dataset)
+        list_datasets = get_list_datasets(
+            target_path, ndigits=ndigits, str_dataset=str_dataset)
 
     # Looping over the datasets
     for dataset in list_datasets:
         # get the path of the dataset
-        path_dataset = joinpath(target_path, get_dataset_name(dataset, str_dataset, ndigits))
+        path_dataset = joinpath(target_path, get_dataset_name(
+            dataset, str_dataset, ndigits))
         # List existing pixtabs, using the given suffix
-        list_pixtabs = glob.glob(path_dataset + f"/{object_folder}/{pixtable_prefix}{suffix}*fits")
+        list_pixtabs = glob.glob(
+            path_dataset + f"/{object_folder}/{pixtable_prefix}{suffix}*fits")
 
         # Reset the needed temporary dictionary
         dict_tpl = {}
@@ -1013,4 +1024,16 @@ def _get_combine_products(filter_list='white', prefix_all=""):
             prefix_products.append(prefix_all)
 
     return name_products, suffix_products, suffix_prefinalnames, prefix_products
+
+
+def get_wcs_lambda_range(lmode):
+    if lmode is None:
+        lmode = "EXT"
+    return dict_lmode_lambda_ranges[lmode]["wcs"]
+
+
+def get_mosaic_lambda_range(lmode):
+    if lmode is None:
+        lmode = "EXT"
+    return dict_lmode_lambda_ranges[lmode]["mosaic"]
 # --------------- END OF Sorting list of datasets and cubes and files ----------------- #
