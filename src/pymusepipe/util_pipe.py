@@ -1027,13 +1027,14 @@ def _get_combine_products(filter_list='white', prefix_all=""):
 
 
 def get_wcs_lambda_range(lmode):
-    if lmode is None:
-        lmode = "EXT"
+    if lmode not in dict_lmode_lambda_ranges:
+        lmode = "default"
     return dict_lmode_lambda_ranges[lmode]["wcs"]
 
 
 def get_mosaic_lambda_range(lmode):
-    if lmode is None:
-        lmode = "EXT"
+    if lmode not in dict_lmode_lambda_ranges:
+        lmode = "default"
     return dict_lmode_lambda_ranges[lmode]["mosaic"]
+
 # --------------- END OF Sorting list of datasets and cubes and files ----------------- #

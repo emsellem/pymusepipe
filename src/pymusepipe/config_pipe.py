@@ -420,11 +420,11 @@ default_prefix_mask = "mask_"
 ao_mask_lambda = [5800, 5970]
 
 dict_lmode_lambda_ranges = {
-    "AO": {
+    "default": {
         "wcs": [6800, 6805],
         "mosaic": [4700, 9400],
     },
-    "NOAO": {
+    "NOM": {
         "wcs": [6800, 6805],
         "mosaic": [4700, 9400],
     },
